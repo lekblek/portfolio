@@ -76,6 +76,13 @@
       <groupId>org.flywaydb</groupId>
       <artifactId>flyway-database-postgresql</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>com.tngtech.archunit</groupId>
+      <artifactId>archunit</artifactId>
+      <version>1.5.0</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
