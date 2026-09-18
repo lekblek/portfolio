@@ -466,7 +466,7 @@ La V1 inclut :
 | D19 | État métier et visibilité d'un projet sont séparés                                       |
 | D20 | Une publication possède au maximum une catégorie et plusieurs tags                       |
 | D21 | Technologies des projets et tags éditoriaux sont deux vocabulaires distincts             |
-
+| D22 | Rendu serveur à la demande par défaut ; prerender décidé route par route à l'étape 52.1 |
 ---
 
 ## 19. Hors V1
