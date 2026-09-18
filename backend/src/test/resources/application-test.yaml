@@ -3,6 +3,10 @@ spring:
     open-in-view: false
     hibernate:
       ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
   flyway:
     enabled: true
 
@@ -15,3 +19,4 @@ logging:
   level:
     org.testcontainers: INFO
     com.github.dockerjava: WARN
+    org.hibernate.SQL: DEBUG

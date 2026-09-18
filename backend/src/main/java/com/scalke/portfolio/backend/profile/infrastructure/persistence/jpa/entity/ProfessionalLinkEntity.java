@@ -29,7 +29,7 @@ public class ProfessionalLinkEntity {
     private String url;
 
     @Column(name = "display_order", nullable = false)
-    private int displayOrder;
+    private Integer displayOrder;
 
     public ProfessionalLinkEntity(ProfileEntity profile, String label, String url, int displayOrder) {
         this.profile = profile;

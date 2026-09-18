@@ -89,7 +89,7 @@ Les éléments composés ne possèdent pas d'API métier autonome.
 
 # 4. Profile
 
-`Profile` représente le propriétaire professionnel du portfolio.
+`ProfileResponse` représente le propriétaire professionnel du portfolio.
 
 La V1 contient un seul profil.
 
@@ -186,7 +186,7 @@ ProfessionalLink
 └── displayOrder
 ```
 
-Il est composé dans `Profile`.
+Il est composé dans `ProfileResponse`.
 
 Il n'existe pas indépendamment du profil.
 
