@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${TEST_POSTGRES_HOST:localhost}:${TEST_POSTGRES_PORT:5432}/${TEST_POSTGRES_DB:portfolio_test}
+    username: ${TEST_POSTGRES_USER:portfolio}
+    password: ${TEST_POSTGRES_PASSWORD:portfolio_dev_password}
+
+management:
+  endpoint:
+    health:
+      show-details: always
