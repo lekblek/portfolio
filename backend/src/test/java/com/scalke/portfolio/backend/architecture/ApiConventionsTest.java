@@ -45,7 +45,7 @@ public class ApiConventionsTest {
     void jpa_entities_should_reside_in_a_domain_package() {
         classes()
             .that().areAnnotatedWith(Entity.class)
-            .should().resideInAPackage("..domain..")
+            .should().resideInAPackage("..infrastructure.persistence.jpa.entity..")
             .allowEmptyShould(true)
             .check(backendClasses);
     }

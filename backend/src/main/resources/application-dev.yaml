@@ -7,6 +7,10 @@ spring:
     username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
 
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
 management:
   endpoint:
     health:
