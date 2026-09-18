@@ -11,10 +11,13 @@ deploy/env/*
 *.jks
 
 # ---------- Java / Maven ----------
-target/
+backend/target/
 *.class
 hs_err_pid*
 replay_pid*
+backend/.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
 
 # ---------- Node / Angular ----------
 node_modules/
