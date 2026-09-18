@@ -635,6 +635,72 @@ Les tests à exécuter dépendent du changement.
 
 ## Backend
 
+Lorsqu’un commit touche au backend, la commande de vérification de référence est :
+
+```bash
+cd backend
+./mvnw verify
+```
+
+Sous Windows PowerShell :
+
+```powershell
+cd backend
+.\mvnw.cmd verify
+```
+
+Cette commande exécute :
+
+```text
+tests rapides (*Test)
+        ↓
+Surefire
+        ↓
+tests d’intégration (*IT)
+        ↓
+Failsafe
+        ↓
+PostgreSQL Testcontainers lorsque nécessaire
+        ↓
+BUILD SUCCESS
+```
+
+Pour la boucle de développement rapide, il reste possible d’utiliser :
+
+```bash
+./mvnw test
+```
+
+mais cette commande ne remplace pas :
+
+```bash
+./mvnw verify
+```
+
+avant un commit contenant des modifications backend.
+
+## Frontend
+
+Lorsque le frontend est concerné :
+
+```bash
+cd frontend
+npm test
+```
+
+et/ou :
+
+```bash
+npm run build
+```
+
+selon l’étape.
+
+Un changement purement documentaire ne nécessite pas artificiellement de lancer l’intégralité de la suite applicative.
+
+
+## Backend
+
 Lorsque le backend est concerné :
 
 ```bash
