@@ -1607,6 +1607,21 @@ Elles sont simplement inutiles pour le périmètre actuel.
 | C10 | Champs optionnels présents avec `null`                                                 |
 | C11 | DTO en records et contrôleurs préfixés `Public` / `Admin`                              |
 
+
+### Codes d’erreur actuellement implémentés
+
+| Code                             | HTTP | Usage                                         |
+| -------------------------------- | ---: | --------------------------------------------- |
+| `RESOURCE_NOT_FOUND`             |  404 | Ressource inexistante ou non accessible       |
+| `VALIDATION_FAILED`              |  400 | Échec de validation des champs                |
+| `MALFORMED_REQUEST`              |  400 | Requête HTTP ou JSON invalide                 |
+| `INTERNAL_ERROR`                 |  500 | Erreur serveur inattendue                     |
+| `SLUG_ALREADY_USED`              |  409 | Slug déjà utilisé                             |
+| `INVALID_PUBLICATION_TRANSITION` |  409 | Transition d’état de publication interdite    |
+| `SERIES_POSITION_ALREADY_USED`   |  409 | Position déjà occupée dans une série          |
+| `NEWS_CANNOT_JOIN_SERIES`        |  409 | Une `NEWS` ne peut pas appartenir à une série |
+| `MEDIA_STILL_REFERENCED`         |  409 | Média encore référencé                        |
+| `UNSUPPORTED_MEDIA_FORMAT`       |  409 | Format de média non accepté                   |
 ---
 
 # 38. Règles fondamentales
