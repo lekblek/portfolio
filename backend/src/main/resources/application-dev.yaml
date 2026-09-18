@@ -1,10 +1,10 @@
 spring:
   config:
-    import: optional:file:../deploy/.env[.properties]
+    import: optional:file:./deploy/.env[.properties]
 
   datasource:
     url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:portfolio}
-    username: ${POSTGRES_USER:portfolio}
+    username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
 
 management:
