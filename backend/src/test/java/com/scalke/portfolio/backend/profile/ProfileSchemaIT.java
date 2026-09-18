@@ -64,4 +64,37 @@ public class ProfileSchemaIT extends AbstractIntegrationTest {
 
         assertThat(count).isEqualTo(1);
     }
+
+    @Test
+    void rejects_a_duplicated_skill_name() {
+        insertProfile(1);
+        insertSkill("Java", "Backend");
+
+        assertThatThrownBy(() -> insertSkill("Java", "Enseignement"))
+            .isInstanceOf(DataIntegrityViolationException.class);
+    }
+
+    @Test
+    void deletes_skills_when_the_profile_is_deleted() {
+        insertProfile(1);
+        insertSkill("Java", "Backend");
+
+        jdbcClient.sql("DELETE FROM profile WHERE id = 1").update();
+
+        long remaining = jdbcClient.sql("SELECT count(*) FROM skill")
+            .query(Long.class)
+            .single();
+
+        assertThat(remaining).isZero();
+    }
+
+    private void insertSkill(String name, String category) {
+        jdbcClient.sql("""
+                    INSERT INTO skill (profile_id, name, category, display_order)
+                    VALUES (1, :name, :category, 0)
+                    """)
+            .param("name", name)
+            .param("category", category)
+            .update();
+    }
 }

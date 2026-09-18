@@ -47,8 +47,16 @@ public class ProfileEntity {
         cascade = CascadeType.ALL,
         orphanRemoval = true,
         fetch = FetchType.LAZY)
-    @OrderBy("displayOrder ASC")
+    @OrderBy("displayOrder ASC, label ASC")
     private List<ProfessionalLinkEntity> links = new ArrayList<>();
+
+    @OneToMany(
+        mappedBy = "profile",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true,
+        fetch = FetchType.LAZY)
+    @OrderBy("displayOrder ASC, name ASC")
+    private List<SkillEntity> skills = new ArrayList<>();
 
     public ProfileEntity(String displayName, String professionalTitle, String shortBio) {
         this.id = SINGLETON_ID;
@@ -63,5 +71,13 @@ public class ProfileEntity {
 
     public void removeLink(ProfessionalLinkEntity link) {
         links.remove(link);
+    }
+
+    public void addSkill(String name, String category, int displayOrder) {
+        skills.add(new SkillEntity(this, name, category, displayOrder));
+    }
+
+    public void removeSkill(SkillEntity skill) {
+        skills.remove(skill);
     }
 }

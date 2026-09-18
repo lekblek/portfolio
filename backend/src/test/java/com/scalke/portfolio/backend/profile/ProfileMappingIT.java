@@ -3,6 +3,7 @@ package com.scalke.portfolio.backend.profile;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.scalke.portfolio.backend.profile.infrastructure.persistence.jpa.entity.ProfileEntity;
+import com.scalke.portfolio.backend.profile.infrastructure.persistence.jpa.entity.SkillEntity;
 import com.scalke.portfolio.backend.testsupport.AbstractIntegrationTest;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
@@ -36,5 +37,22 @@ public class ProfileMappingIT extends AbstractIntegrationTest {
         assertThat(reloaded.getLinks())
             .extracting(link -> link.getLabel())
             .containsExactly("GitHub", "LinkedIn");
+    }
+
+    @Test
+    void persists_a_profile_with_its_skills() {
+        ProfileEntity profile = new ProfileEntity("Blek", "Développeur full-stack", "Bio courte");
+        profile.addSkill("Spring Boot", "Backend", 1);
+        profile.addSkill("Angular", "Frontend", 0);
+
+        entityManager.persist(profile);
+        entityManager.flush();
+        entityManager.clear();
+
+        ProfileEntity reloaded = entityManager.find(ProfileEntity.class, profile.getId());
+
+        assertThat(reloaded.getSkills())
+            .extracting(SkillEntity::getName)
+            .containsExactly("Angular", "Spring Boot");
     }
 }
