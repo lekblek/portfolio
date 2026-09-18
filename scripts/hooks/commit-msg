@@ -1,0 +1,16 @@
+#!/bin/sh
+# Valide le format Conventional Commits du message de commit.
+
+message_file="$1"
+first_line=$(head -n 1 "$message_file")
+
+pattern='^(feat|fix|test|refactor|docs|chore|ci|build|perf)(\([a-z0-9-]+\))?: .{1,80}$'
+
+if ! echo "$first_line" | grep -Eq "$pattern"; then
+  echo "Message de commit invalide :"
+  echo "  $first_line"
+  echo ""
+  echo "Format attendu : type(scope): description"
+  echo "Types : feat, fix, test, refactor, docs, chore, ci, build, perf"
+  exit 1
+fi

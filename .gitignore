@@ -1,0 +1,46 @@
+# ---------- Secrets et environnement ----------
+.env
+.env.*
+!.env.example
+deploy/env/*
+!deploy/env/*.example
+!deploy/env/.gitkeep
+*.pem
+*.key
+*.p12
+*.jks
+
+# ---------- Java / Maven ----------
+target/
+*.class
+hs_err_pid*
+replay_pid*
+
+# ---------- Node / Angular ----------
+node_modules/
+dist/
+.angular/
+npm-debug.log*
+yarn-error.log*
+coverage/
+
+# ---------- IDE ----------
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/*
+!.vscode/extensions.json
+.project
+.classpath
+.settings/
+
+# ---------- Système ----------
+.DS_Store
+Thumbs.db
+
+# ---------- Runtime local ----------
+*.log
+uploads/
+docs/prompts
+docs/steps
