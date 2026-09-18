@@ -17,15 +17,15 @@ public class ProfileSchemaIT extends AbstractIntegrationTest {
 
     @Test
     void rejects_a_second_profile_row() {
-        insertProfile();
+        insertProfile(1);
 
-        assertThatThrownBy(this::insertProfile)
+        assertThatThrownBy(() -> insertProfile(2))
             .isInstanceOf(DataIntegrityViolationException.class);
     }
 
     @Test
     void deletes_links_when_the_profile_is_deleted() {
-        insertProfile();
+        insertProfile(1);
 
         jdbcClient.sql("""
                         INSERT INTO professional_link (profile_id, label, url, display_order)
@@ -42,11 +42,26 @@ public class ProfileSchemaIT extends AbstractIntegrationTest {
         assertThat(remaining).isZero();
     }
 
-    private void insertProfile() {
+    private void insertProfile(long id) {
         jdbcClient.sql("""
-                        INSERT INTO profile (display_name, professional_title, short_bio)
-                        VALUES ('Blek', 'Développeur full-stack', 'Bio courte')
+                        INSERT INTO profile (id, display_name, professional_title, short_bio)
+                        VALUES (:id, 'Blek', 'Développeur full-stack', 'Bio courte')
                         """)
+            .param("id", id)
             .update();
+    }
+
+    @Test
+    void allows_recreating_the_profile_after_deletion() {
+        insertProfile(1);
+        jdbcClient.sql("DELETE FROM profile WHERE id = 1").update();
+
+        insertProfile(1);
+
+        long count = jdbcClient.sql("SELECT count(*) FROM profile")
+            .query(Long.class)
+            .single();
+
+        assertThat(count).isEqualTo(1);
     }
 }

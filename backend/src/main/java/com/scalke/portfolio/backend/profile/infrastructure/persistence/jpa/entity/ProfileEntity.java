@@ -17,9 +17,11 @@ import java.util.List;
     name = "profile"
 )
 public class ProfileEntity {
+
+    public static final long SINGLETON_ID = 1L;
+
     @Id
     @Column(name = "id", nullable = false, updatable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "display_name", nullable = false, length = 120)
@@ -49,6 +51,7 @@ public class ProfileEntity {
     private List<ProfessionalLinkEntity> links = new ArrayList<>();
 
     public ProfileEntity(String displayName, String professionalTitle, String shortBio) {
+        this.id = SINGLETON_ID;
         this.displayName = displayName;
         this.professionalTitle = professionalTitle;
         this.shortBio = shortBio;
