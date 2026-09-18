@@ -6,19 +6,25 @@ import com.scalke.portfolio.backend.profile.domain.model.Profile;
 import java.util.List;
 
 public record ProfileResponse(
-  Long id,
   String displayName,
   String professionalTitle,
+  String shortBio,
+  String aboutMarkdown,
+  String publicLocation,
   String publicEmail,
-  List<ProfessionalLink> links
+  List<ProfessionalLinkResponse> links
 ){
     public static ProfileResponse from(Profile profile) {
         return new ProfileResponse(
-            profile.id(),
-            profile.professionalTitle(),
             profile.displayName(),
+            profile.professionalTitle(),
+            profile.shortBio(),
+            profile.aboutMarkdown(),
+            profile.publicLocation(),
             profile.publicEmail(),
-            profile.links()
+            profile.links().stream().map(
+                ProfessionalLinkResponse::from
+            ).toList()
         );
     }
 }

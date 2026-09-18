@@ -8,9 +8,11 @@ public class ProfilePersistenceMapper {
 
     public static Profile toDomain(ProfileEntity entity) {
         return new Profile(
-            entity.getId(),
             entity.getDisplayName(),
             entity.getProfessionalTitle(),
+            entity.getShortBio(),
+            entity.getAboutMarkdown(),
+            entity.getPublicLocation(),
             entity.getPublicEmail(),
            ProfessionalLinkPersistenceMapper.map(entity.getLinks())
         );

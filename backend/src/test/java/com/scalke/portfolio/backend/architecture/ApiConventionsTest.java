@@ -26,7 +26,7 @@ public class ApiConventionsTest {
     void controllers_should_reside_in_an_api_package() {
         classes()
             .that().haveSimpleNameEndingWith("Controller")
-            .should().resideInAPackage("..api..")
+            .should().resideInAPackage("..web.controller..")
             .allowEmptyShould(true)
             .check(backendClasses);
     }
