@@ -688,6 +688,7 @@ project.api.admin
 
 Le choix définitif des conventions REST est traité dans `05-conventions-api.md` ou dans l’étape dédiée aux conventions API.
 
+Les conventions HTTP détaillées du backend sont définies dans [`05-conventions-api.md`](./05-conventions-api.md).
 ---
 
 ## 12. Règles d’architecture automatisées
