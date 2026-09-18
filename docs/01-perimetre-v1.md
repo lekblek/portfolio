@@ -468,6 +468,7 @@ La V1 inclut :
 | D21 | Technologies des projets et tags éditoriaux sont deux vocabulaires distincts             |
 | D22 | Rendu serveur à la demande par défaut ; prerender décidé route par route à l'étape 52.1 |
 | D23 | compose.yaml racine pour le développement local ; deploy/compose.yaml réservé à la production, mais on va le mettre dans deploy en ajoutant .dev |
+| D24 | Flyway est l'unique propriétaire du schéma ; Hibernate sera configuré en validate et jamais en update |
 ---
 
 ## 19. Hors V1
