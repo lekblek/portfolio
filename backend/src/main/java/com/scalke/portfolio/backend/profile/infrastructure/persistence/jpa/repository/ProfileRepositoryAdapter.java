@@ -2,9 +2,13 @@ package com.scalke.portfolio.backend.profile.infrastructure.persistence.jpa.repo
 
 import com.scalke.portfolio.backend.profile.domain.model.Profile;
 import com.scalke.portfolio.backend.profile.domain.port.ProfileRepository;
+import com.scalke.portfolio.backend.profile.infrastructure.persistence.jpa.entity.ProfileEntity;
 import com.scalke.portfolio.backend.profile.infrastructure.persistence.jpa.mapper.ProfilePersistenceMapper;
+import com.scalke.portfolio.backend.shared.error.ErrorCode;
+import com.scalke.portfolio.backend.shared.error.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -12,7 +16,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ProfileRepositoryAdapter implements ProfileRepository {
 
-    private final SpringDataProfileRepository repository;
+    private final ProfileJpaRepository repository;
 
     @Override
     public Optional<Profile> findById(Long id) {
@@ -20,14 +24,22 @@ public class ProfileRepositoryAdapter implements ProfileRepository {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Profile> find() {
         return repository.findWithLinks()
-            .map(ProfilePersistenceMapper::toDomain);
+            .map(profileEntity -> {
+                repository.loadSkills(profileEntity.getId());
+                return ProfilePersistenceMapper.toDomain(profileEntity);
+            });
     }
 
     @Override
     public Profile save(Profile profile) {
-        return null;
+        ProfileEntity entity = ProfilePersistenceMapper.toEntity(profile);
+
+        ProfileEntity savedEntity = repository.save(entity);
+
+        return ProfilePersistenceMapper.toDomain(savedEntity);
     }
 
     @Override

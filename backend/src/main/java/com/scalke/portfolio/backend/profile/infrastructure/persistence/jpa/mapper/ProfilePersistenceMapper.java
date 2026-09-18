@@ -14,7 +14,20 @@ public class ProfilePersistenceMapper {
             entity.getAboutMarkdown(),
             entity.getPublicLocation(),
             entity.getPublicEmail(),
-           ProfessionalLinkPersistenceMapper.map(entity.getLinks())
+           ProfessionalLinkPersistenceMapper.map(entity.getLinks()),
+            SkillPersistenceMapper.map(entity.getSkills())
         );
+    }
+
+    public static ProfileEntity toEntity(Profile profile) {
+        ProfileEntity entity = new ProfileEntity(
+            profile.displayName(),
+            profile.professionalTitle(),
+            profile.shortBio());
+
+        profile.links().forEach( link -> entity.addLink(link.label(), link.url(), link.displayOrder()));
+        profile.skills().forEach(skill -> entity.addSkill(skill.name(), skill.category(), skill.displayOrder()));
+
+        return entity;
     }
 }

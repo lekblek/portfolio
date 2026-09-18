@@ -34,7 +34,8 @@ class PublicProfileControllerTest {
             "Développeur full-stack",
             "Je conçois des solutions modernes et évolutives.");
         profile.addLink("GitHub", "https://example.test/gh", 0);
-
+        profile.addSkill("Spring Boot", "Backend", 0);
+        profile.addSkill("Angular", "Frontend", 1);
         given(getProfileUseCase.execute()).willReturn(
             ProfilePersistenceMapper.toDomain(profile)
         );
@@ -44,7 +45,10 @@ class PublicProfileControllerTest {
             .andExpect(jsonPath("$.displayName").value("Blek Gedeon Ngossanga"))
             .andExpect(jsonPath("$.publicLocation").value(org.hamcrest.Matchers.nullValue()))
             .andExpect(jsonPath("$.links[0].label").value("GitHub"))
-            .andExpect(jsonPath("$.id").doesNotExist());
+            .andExpect(jsonPath("$.id").doesNotExist())
+            .andExpect(jsonPath("$.skillGroups[0].category").value("Backend"))
+            .andExpect(jsonPath("$.skillGroups[0].skills[0].name").value("Spring Boot"))
+            .andExpect(jsonPath("$.skillGroups[0].skills[0].category").doesNotExist());
     }
 
     @Test
