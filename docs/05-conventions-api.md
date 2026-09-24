@@ -1345,6 +1345,32 @@ Les principales ressources publiques de la V1 sont conceptuellement :
 
 La présence dans cette liste ne signifie pas que tous les endpoints doivent être créés immédiatement.
 
+## Contrats implémentés
+
+### `GET /api/public/profile` (étapes 14 à 16)
+
+```text
+200 → ProfileResponse
+{
+  displayName, professionalTitle, shortBio,
+  aboutMarkdown | null, publicLocation | null, publicEmail | null,
+  links[]          { label, url },
+  skillGroups[]    { category, skills[] { name } },
+  experiences[]    { organization, title, location, startDate, endDate | null, description },
+  educations[]     { institution, degree, field, location, startDate, endDate | null, description },
+  certifications[] { name, issuer, issuedAt, expiresAt | null, credentialUrl | null }
+}
+404 → ProblemDetail, code RESOURCE_NOT_FOUND (aucun profil)
+```
+
+Règles propres à ce contrat :
+
+* tableaux déjà triés dans l’ordre d’affichage (`displayOrder`, puis date décroissante, puis identifiant — D-L) ; un tableau vide vaut `[]`, jamais `null` ;
+* ni identifiant technique ni `displayOrder` exposés (C03, D-R) : l’ordre du tableau fait foi ;
+* `endDate: null` signifie « en cours » ; `expiresAt: null` signifie « sans expiration » (D-P) ;
+* dates au format `YYYY-MM-DD` (§26) ;
+* contrat vérifié par `PublicProfileIT` sur la sérialisation réelle.
+
 Chaque module introduit ses routes lors de son étape d’implémentation.
 
 ---

@@ -15,23 +15,23 @@ Statuts : **Active** · **Remplacée** (préciser par quoi) · **À confirmer** 
 | D-C | 14.1 | Aucune donnée insérée par une migration | Active — les données de développement passent par `ProfileSeeder` (profil `dev`) | `infrastructure/seed/ProfileSeeder.java` |
 | — | 14.2 | Pas de `equals`/`hashCode` sur les entités JPA ; collections en `List` ordonnées par `@OrderBy` | Active | `ProfileEntity` |
 | — | 16.2 (consolidation) | Entités fermées : constructeur sans argument `protected`, pas de `@Builder`/`@AllArgsConstructor`/`@Setter` publics sur la racine (setters seulement pour les champs optionnels), `addX` fixe toujours la référence arrière | Active | `ProfileEntity`, `*Entity` |
-| — | 14.4 | Représentation publique : `id` jamais exposé ; `publicEmail` exposé (nullable) — **« à confirmer »** dans la fiche | À confirmer | `ProfileResponse` |
+| — | 14.4 | Représentation publique : `id` jamais exposé ; `publicEmail` exposé (nullable) — **« à confirmer »** dans la fiche | Active (maintenue en 16.3, reste à confirmer par le propriétaire) | `ProfileResponse` |
 | D-D … D-G | 15.1 / 15.2 | Fiche 15.1 vide : décisions perdues. Reconstitution depuis le code ci-dessous | À confirmer | — |
 | — | 15.1 | Nom de compétence unique par profil | À confirmer | `V002` : `UNIQUE (profile_id, name)` |
 | — | 15.1 | Pas d'index sur les clés étrangères des collections du profil (volumétrie négligeable) — citée comme « D-G » en 16.1 | Active | `V002`, `V003` |
-| — | 15.2 | Une requête par collection dans la même transaction, pour éviter `MultipleBagFetchException` et le produit cartésien | Active (confirmée par D-O) | `ProfileJpaRepository.findWithLinks` / `loadSkills` |
+| — | 15.2 | Une requête par collection dans la même transaction, pour éviter `MultipleBagFetchException` et le produit cartésien, via `findWithLinks` + `loadSkills` | Remplacée en 16.3.1 par D-O (même principe, sans requêtes explicites) | — |
 | — | 15.2 | Compétences exposées groupées par catégorie, dans l'ordre d'affichage | Active | `ProfileResponse.skillGroups` |
 | D-H | 16.1 | Une seule migration pour `experience`, `education`, `certification` | Active | `V003__create_career_entries.sql` (la fiche dit « V5 ») |
 | D-I | 16.1 | Cohérence temporelle garantie par `CHECK` (`fin >= début`, `expiration >= délivrance`) ; pas de booléen « en cours » | Active | `V003` |
 | D-J | 16.1 | Aucune contrainte d'unicité sur le parcours | Active | `V003` |
 | D-K | 16.1 | `NOT NULL` strictement aligné sur `02-modele-metier.md` | Active | `V003` |
 | D-L | 16.2 | Tri total : `displayOrder ASC`, date `DESC`, `id ASC` | Active | `@OrderBy` dans `ProfileEntity` |
-| D-M | 16.2 | Objet de valeur `DateRange` pour `Experience`/`Education`, pas pour `Certification` ; déplacement vers `shared` décidé à l'étape 17 | Active — emplacement provisoire `infrastructure.persistence.jpa.entity` ; passe dans `profile.domain.model` en 16.3 (D-Q) | `DateRange.java` |
-| D-N | 16.2 | Garde Java en `IllegalArgumentException` (erreur de programmation → 500), en plus du `CHECK` | Active — garde provisoirement dans `DateRange`/`CertificationEntity` ; passe au domaine en 16.3 (D-Q) | `DateRange`, `CertificationEntity` |
-| D-O | 16.3 | Garder une requête par collection (5 `SELECT`), prouvé par un test de comptage | Proposée (fiche 16.3) | — |
-| D-P | 16.3 | Le DTO aplatit `DateRange` (`startDate`, `endDate`), sans booléen `ongoing` | Proposée (fiche 16.3) | — |
-| D-Q | 16.3 | `DateRange` et les gardes de dates dans `profile.domain.model` ; entités à deux colonnes simples | Proposée (fiche 16.3) | — |
-| D-R | 16.3 | Représentation publique sans `id` ni `displayOrder` (l'ordre du tableau suffit) — aujourd'hui `SkillResponse` expose `id`/`displayOrder`, `ProfessionalLinkResponse` expose `displayOrder` | Proposée (fiche 16.3) | `web/dto` |
+| D-M | 16.2 | Objet de valeur `DateRange` pour `Experience`/`Education`, pas pour `Certification` ; déplacement vers `shared` décidé à l'étape 17 | Active | `profile/domain/model/DateRange.java` |
+| D-N | 16.2 | Garde Java en `IllegalArgumentException` (erreur de programmation → 500), en plus du `CHECK` | Active | `domain/model/DateRange`, `domain/model/Certification` |
+| D-O | 16.3.1 | Nombre constant de requêtes : 1 pour la racine + 1 par collection (6), sans `join fetch`. Les collections paresseuses sont chargées par le mapper **dans** la transaction de l'adaptateur ; les requêtes explicites `loadX` de la fiche ont été écartées car un test de mutation a montré qu'elles n'économisaient aucune requête une fois le mapping fait dans la transaction | Active | `ProfileRepositoryAdapter.find`, `GetProfileUseCaseIT.loads_the_profile_with_one_query_for_the_root_and_one_per_collection` |
+| D-P | 16.3.2 | Le DTO aplatit `DateRange` (`startDate`, `endDate`), sans booléen `ongoing` | Active | `ExperienceResponse`, `EducationResponse` |
+| D-Q | 16.3.1 | `DateRange` et les gardes de dates dans `profile.domain.model` ; entités à deux colonnes simples (`start_date`, `end_date`), sans `@Embeddable` ; records `Experience`, `Education`, `Certification` avec `id` et `displayOrder` comme `Skill` et `ProfessionalLink` | Active | `profile/domain/model/*`, `ExperienceEntity`, `EducationEntity` |
+| D-R | 16.3.2 | Représentation publique sans `id` ni `displayOrder` (l'ordre du tableau suffit), appliquée à toutes les collections du profil | Active | `web/dto/*Response`, `PublicProfileIT` |
 
 ## Décisions révélées par le code et non documentées ailleurs
 

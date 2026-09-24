@@ -2,25 +2,24 @@
 
 Ce fichier est la **seule** source de vérité sur l'avancement. Il ne répète pas le contenu des autres documents : il pointe vers eux.
 
-Dernière mise à jour : 2026-09-24 (consolidation avant 16.3 appliquée)
+Dernière mise à jour : 2026-09-24 (étape 16 terminée)
 
 ---
 
 ## 1. État courant
 
 ```text
-Dernière étape terminée   : 16.2 (+ consolidation du 2026-09-24)
-Prochaine étape prévue    : 16.3 — Chargement à cinq collections et exposition publique
-État                      : PRÊT dès que les commits de consolidation sont poussés et la CI verte
+Dernière étape terminée   : 16 — Experiences, Education et Certifications (16.3 incluse)
+Prochaine étape prévue    : 17 — Construire le module Project
+État                      : PRÊT dès que les commits de 16.3 sont poussés et la CI verte
 Branche                   : develop
-Vérification              : ./mvnw verify → 46 tests verts (24 *Test, 22 *IT) ; npm test (2) + npm run build verts
+Vérification              : ./mvnw verify → 50 tests verts (26 *Test, 24 *IT) ; démarrage dev vérifié
 ```
 
 ## 2. Prochaine action
 
-1. Exécuter la séquence de commits de consolidation (squash de 16.1/16.2 puis commits thématiques) et pousser `develop`.
-2. Vérifier que la CI GitHub Actions est verte.
-3. Commencer 16.3 avec la fiche réécrite (template v2) : valider D-O, D-P, D-Q, D-R avant d'écrire du code.
+1. Pousser les commits de 16.3, vérifier la CI, puis remplacer les 🟡 par ✅ avec les hashes.
+2. Étape 17 : rédiger la fiche avec le template v2 (section 0 : vérifier l'état réel ; décider du déplacement de `DateRange` vers `shared`).
 
 ---
 
@@ -49,9 +48,10 @@ Légende : ✅ terminée · 🟡 terminée, commit à pousser · ⏳ à faire
 | 14.4 | DTO et PublicProfileController | ✅ | `30a582b` (+ `PublicProfileIT` ajouté à la consolidation) |
 | 15.1 | Schéma et entité Skill | ✅ | `dfd61b6` |
 | 15.2 | Chargement multi-collections et exposition publique | ✅ | `394597c` |
-| 16.1 + 16.2 | Schéma des trois collections ; entités, ordre d'affichage et agrégat | 🟡 | un seul commit à créer (remplace `c700268` + `f0f1eb1`) |
-| — | Consolidation du 2026-09-24 | 🟡 | commits `refactor`, `test`, `chore`, `build`, `ci`, `docs` à créer |
-| 16.3 | Chargement à cinq collections et exposition publique | ⏳ | — |
+| 16.1 + 16.2 | Schéma des trois collections ; entités, ordre d'affichage et agrégat | ✅ | `0b188cd` |
+| — | Consolidation du 2026-09-24 | ✅ | `4da7b57`, `ede3eb5`, `4f4c5e2`, `623e934`, `b4b3d74`, `9c7353f`, `df536aa` |
+| 16.3.1 | Parcours dans le domaine, lecture en nombre constant de requêtes | 🟡 | à pousser |
+| 16.3.2 | Exposition publique du parcours | 🟡 | à pousser |
 | 17 → 52 | Voir `docs/steps/liste_complete_etapes.md` | ⏳ | — |
 
 Après le push, remplacer les 🟡 par ✅ et noter les hashes.
@@ -66,7 +66,8 @@ Index : [`decisions/README.md`](decisions/README.md).
 |---|---|---|
 | ADR 0001 | Architecture interne des modules (ports et adaptateurs légers) | Acceptée (2026-09-24) |
 | R-1 … R-6 | Organisation du dépôt et outillage (docs non versionnées, profils Spring, OSIV, CI, TypeScript strict, compose) | Actives |
-| D-O, D-P, D-Q, D-R | Chargement à 5 requêtes ; aplatissement de `DateRange` ; invariants de dates au domaine ; contrat public sans `id`/`displayOrder` | Proposées — à valider au début de 16.3 |
+| D-O, D-Q | Lecture en 1 + 5 requêtes constantes ; invariants de dates au domaine | Actives (16.3.1) |
+| D-P, D-R | Aplatissement de `DateRange` dans le JSON ; contrat public sans `id`/`displayOrder` | Actives (16.3.2) |
 | 14.4 | Exposition publique de `publicEmail` | À confirmer |
 
 ## 5. Problèmes connus
@@ -77,8 +78,6 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 
 | ID | Priorité | Problème | Traitement prévu |
 |---|---|---|---|
-| KI-11 | IMPORTANT | Invariants de dates dans la couche JPA (`DateRange`, `CertificationEntity`) au lieu du domaine | 16.3 (D-Q) |
-| KI-17 | IMPORTANT | Contrat public incohérent : `SkillResponse` expose `id`/`displayOrder`, `ProfessionalLinkResponse` expose `displayOrder` | 16.3 (D-R) |
 | KI-18 | AMÉLIORATION | `LICENSE` : titulaire et année non renseignés (`[year] [fullname]`) | à décider par le propriétaire du dépôt |
 | KI-19 | AMÉLIORATION | springdoc expose `/api/v3/api-docs` et Swagger UI sans décision documentée | étape 32 |
 | KI-20 | AMÉLIORATION | `GlobalExceptionHandler` : le gestionnaire `Exception` interceptera `AccessDeniedException` (→ 500) | étape 32 |
@@ -87,7 +86,7 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | KI-23 | AMÉLIORATION | `UNSUPPORTED_MEDIA_FORMAT` mappé en 409 (415 ou 400 plus juste) | étape 27 |
 | KI-16 | OPTIONNEL | `V001` : virgule manquante avant `CONSTRAINT profile_single_row` (comportement identique) ; migration appliquée, non modifiable | aucun |
 
-### Résolus le 2026-09-24 (consolidation)
+### Résolus le 2026-09-24 (consolidation et 16.3)
 
 | ID | Problème | Résolution |
 |---|---|---|
@@ -105,6 +104,8 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | KI-13 | `lang="en"`, titre « Frontend » | `lang="fr"`, « Portfolio » |
 | KI-14 | Règles ArchUnit de couches absentes | `ModuleLayersTest` |
 | KI-15 | Versionnement de `docs/steps/`, `docs/prompts/` | décision : non versionnés (R-1) |
+| KI-11 | Invariants de dates dans la couche JPA | 16.3.1 : `DateRange`, `Certification` dans `domain.model` (D-Q) |
+| KI-17 | Contrat public incohérent (`id`/`displayOrder` exposés) | 16.3.2 : D-R appliquée à toutes les collections |
 | — | Test frontend rouge ; `compose.dev.yml` ≠ documentation ; docs obsolètes ; `pom.xml` et `.gitignore` à nettoyer | corrigés |
 
 ## 6. Décisions reportées

@@ -743,10 +743,10 @@ Cette vérification démontre que les tests ne dépendent pas d’un état manue
 
 | Couche testée | Type | Suffixe | Outil | Exemple actuel |
 |---|---|---|---|---|
-| `domain.model` (invariants, objets de valeur) | unitaire pur | `*Test` | JUnit + AssertJ, sans Spring | à venir en 16.3 (`DateRangeTest`, `CertificationTest`) |
-| entités JPA (garde, rattachement) | unitaire pur | `*Test` | JUnit + AssertJ | `DateRangeTest`, `CertificationEntityTest` (provisoire, avant 16.3) |
+| `domain.model` (invariants, objets de valeur) | unitaire pur | `*Test` | JUnit + AssertJ, sans Spring | `DateRangeTest`, `CertificationTest` |
+| entités JPA (rattachement à l’agrégat) | unitaire pur | `*Test` | JUnit + AssertJ | `CertificationEntityTest` |
 | mappers de persistance | unitaire pur | `*Test` | aller-retour modèle ↔ entité | `ProfilePersistenceMapperTest` |
-| `application.usecase` (orchestration, nombre de requêtes) | intégration | `*IT` | `AbstractIntegrationTest` | `GetProfileUseCaseIT` |
+| `application.usecase` (orchestration, nombre de requêtes) | intégration | `*IT` | `AbstractIntegrationTest` + `Statistics` Hibernate (`generate_statistics`, profil `test` seulement) | `GetProfileUseCaseIT` |
 | `infrastructure.persistence` (mapping, tri, requêtes) | intégration | `*IT` | `AbstractIntegrationTest` + `EntityManager` | `ProfileMappingIT` |
 | schéma (contraintes SQL) | intégration | `*IT` | `JdbcClient` | `ProfileSchemaIT` |
 | `web` (contrat JSON, codes HTTP, erreurs) | tranche | `*Test` | `@WebMvcTest` + `@MockitoBean` du cas d’usage | `PublicProfileControllerTest` |

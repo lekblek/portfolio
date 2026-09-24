@@ -135,7 +135,7 @@ Les fiches de `docs/steps/` restent rédigées pour la structure A. Jusqu'à leu
 | # | Travail | État |
 |---|---|---|
 | 1 | Retirer du port `ProfileRepository` les méthodes non utilisées (`findById`, `delete`, `exists`) et leurs bouchons | fait le 2026-09-24 |
-| 2 | Déplacer `DateRange` et les gardes de dates vers `profile.domain.model` | prévu en 16.3 (décision D-Q de la fiche) |
+| 2 | Déplacer `DateRange` et les gardes de dates vers `profile.domain.model` | fait en 16.3.1 (D-Q) |
 | 3 | Règles ArchUnit de couches (§1) : `ModuleLayersTest` | fait le 2026-09-24 |
 | 4 | `04-architecture-backend.md` §6 et §12.4, `05-conventions-api.md` §23/§32 | fait le 2026-09-24 |
 | 5 | Entités JPA fermées (constructeur protégé, pas de setter public hors champs optionnels, `addX` qui fixe la référence arrière) | fait le 2026-09-24 |
