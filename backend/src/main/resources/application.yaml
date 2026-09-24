@@ -8,6 +8,12 @@ spring:
     open-in-view: false
     hibernate:
       ddl-auto: validate
+  data:
+    web:
+      pageable:
+        # Taille de page maximale pour toute l'API (ApiPaging.MAX_PAGE_SIZE, 05-conventions-api.md §13) :
+        # une valeur supérieure est ramenée à ce plafond. La taille par défaut se déclare par contrôleur.
+        max-page-size: 100
 
 server:
   servlet:
