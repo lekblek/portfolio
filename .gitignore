@@ -1,6 +1,8 @@
 # ------------------ No IA marks --------------
 CLAUDE.md
 .mcp.json
+.claude/
+graphify-out/
 
 
 # ---------- Secrets et environnement ----------
@@ -52,14 +54,8 @@ Thumbs.db
 *.log
 uploads/
 
-# ---------- Outillage assistant local (décision R-7) ----------
-# Graphe de connaissances graphify : régénérable (graphify update .), jamais versionné.
-graphify-out/
-# Réglages Claude Code propres à un poste (permissions, préférences).
-.claude/settings.local.json
-
 # ---------- Documentation de travail non versionnée (décision 2026-09-24) ----------
-# Fiches d'étape et prompts : supports de travail avec l'assistant, gardés hors du dépôt.
+# Fiches d'étape et prompts : supports de travail personnels, gardés hors du dépôt.
 # Toute décision qu'ils contiennent est reportée dans docs/decisions/ (versionné).
 docs/prompts/
 docs/steps/
