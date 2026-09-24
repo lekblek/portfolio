@@ -877,6 +877,8 @@ Cette opération peut échouer avec :
 
 si la transition viole un invariant.
 
+État d’implémentation (étape 21, D-AU) : les règles de transition sont dans le domaine (`Publication.transitionTo`) et le cas d’usage `ChangePublicationStatusUseCase` existe ; la route ci-dessus sera exposée à l’étape 36, derrière l’authentification. Le champ `publishedAt` du corps n’est accepté que pour `SCHEDULED` (date strictement future) ; toute transition refusée donne 409 `INVALID_PUBLICATION_TRANSITION`. Table des transitions : `02-modele-metier.md` §15.
+
 L’objectif est d’éviter qu’un simple :
 
 ```text

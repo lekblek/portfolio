@@ -85,6 +85,16 @@ Statuts : **Active** · **Remplacée** (préciser par quoi) · **À confirmer** 
 | D-AT | 20 | Pas de routes publiques `/api/public/categories` ni `/tags` avant qu'un écran en ait besoin (étape 43), comme D-AE ; chaque publication expose déjà ses termes | Active | — |
 | — | 20 | Seed `dev` de la taxonomie idempotent (terme créé seulement si son slug est absent), exécuté avant celui des publications (`@Order(0)`) | Active | `TaxonomySeeder` |
 
+## Module `publication` — étape 21 (cycle de vie éditorial)
+
+| Réf | Étape | Décision | Statut | Preuve dans le code |
+|---|---|---|---|---|
+| D-AU | 21 | Périmètre : machine à états dans le domaine, cas d'usage `ChangePublicationStatusUseCase`, persistance. **Aucune route HTTP** avant l'étape 36 : `POST /api/admin/publications/{id}/status` n'existera que derrière l'authentification (étapes 32 à 35) ; une route d'administration non protégée est exclue | Active | `ChangePublicationStatusUseCase`, `ChangePublicationStatusUseCaseIT` |
+| D-AV | 21 | Transitions évaluées sur le statut **effectif** (une `SCHEDULED` dont la date est passée est publiée, D03) : `DRAFT → IN_REVIEW, SCHEDULED, PUBLISHED` ; `IN_REVIEW → DRAFT, SCHEDULED, PUBLISHED` ; `SCHEDULED → DRAFT, SCHEDULED, PUBLISHED` ; `PUBLISHED → ARCHIVED` ; `ARCHIVED → DRAFT, PUBLISHED` (invariant 26). Dates : planifier exige une date strictement future ; publier conserve une date déjà passée (restauration d'une archive) sinon prend « maintenant » ; repasser en brouillon efface une planification encore future ; archiver conserve la date. Invariant 24 étendu à `ARCHIVED` (`V009`) | Active | `PublicationStatus.canMoveTo`, `Publication.transitionTo`, `PublicationTransitionTest`, `V009` |
+| D-AW | 21 | Toute transition refusée (paire interdite, même statut, date absente, passée ou fournie hors planification) lève `BusinessRuleViolationException` avec `INVALID_PUBLICATION_TRANSITION` (409) depuis le domaine (`domain.model` peut dépendre de `shared.error`, ADR 0001) | Active | `Publication.transitionTo` |
+| D-AX | 21 | Écriture limitée au statut : port `updateStatus` (et `findById`), méthode d'entité `changeStatus(status, publishedAt, updatedAt)` ; `updatedAt` = « maintenant » à chaque transition. La modification du contenu est une opération distincte (étape 36, `05` §17). Pas de verrouillage optimiste en V1 (un seul administrateur) | Active | `PublicationRepositoryAdapter.updateStatus`, `PublicationEntity.changeStatus` |
+| D-AY | 21 | La règle de visibilité existe en Java (`Publication.isVisibleAt`, utilisée par les transitions) et en SQL (`PublicationSpecifications.visibleAt`, utilisée par les lectures) : un test d'intégration vérifie qu'elles désignent exactement les mêmes publications | Active | `ListVisiblePublicationsUseCaseIT.the_domain_rule_and_the_query_agree_on_visibility` |
+
 ## Décisions révélées par le code et non documentées ailleurs
 
 | Sujet | Constat | Où c'est désormais documenté |

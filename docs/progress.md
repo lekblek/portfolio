@@ -2,28 +2,27 @@
 
 Ce fichier est la **seule** source de vérité sur l'avancement. Il ne répète pas le contenu des autres documents : il pointe vers eux.
 
-Dernière mise à jour : 2026-09-24 (étape 20 implémentée, commits à faire ; étape 19 commitée, push en attente)
+Dernière mise à jour : 2026-09-24 (étape 21 implémentée, commits à faire)
 
 ---
 
 ## 1. État courant
 
 ```text
-Dernière étape terminée   : 18 — Technologies des projets (poussée, CI verte : run 36044315331)
-Étapes en attente         : 19 — Publication (commitée localement, 4 commits NON poussés)
-                            20 — Catégories et tags (implémentée et vérifiée, à committer)
-Prochaine étape prévue    : 21 — Implémenter le cycle de vie éditorial (transitions de statut)
-État                      : PRÊT dès que les commits de 19 et 20 sont poussés et la CI verte
+Dernière étape terminée   : 20 — Catégories et tags (poussée, CI verte : run 36049720014)
+Étape en cours            : 21 — Cycle de vie éditorial (implémentée et vérifiée, à committer et pousser)
+Prochaine étape prévue    : 22 — Implémenter les slugs
+État                      : PRÊT dès que les commits de 21 sont poussés et la CI verte
 Branche                   : develop
-Vérification              : ./mvnw clean verify → 166 tests verts (69 *Test, 97 *IT) ; démarrage dev vérifié
-                            (V007 et V008 appliquées, seed de la taxonomie idempotent, ?category=, ?tag=, termes résolus)
+Vérification              : ./mvnw clean verify → 208 tests verts (104 *Test, 104 *IT)
+                            V009 appliquée sur la base dev (contrainte vérifiée, aucune donnée rejetée)
 ```
 
 ## 2. Prochaine action
 
-1. Committer l'étape 20 (6 commits, commandes fournies avec l'étape), puis pousser **19 et 20 ensemble** (`git push origin develop`), vérifier la CI, remplacer les 🟡 par ✅.
+1. Committer l'étape 21 (3 commits, commandes fournies avec l'étape), pousser, vérifier la CI, remplacer les 🟡 par ✅.
 2. Confirmer ou infirmer D-T (cohérence `stage` ⇔ `endDate`) : `docs/decisions/registre-implementation.md`.
-3. Étape 21 : transitions de statut (écriture, administration) ; l'API d'administration n'existant pas encore (étape 36), décider en section 0 si 21 livre le domaine seul ou attend la sécurité (32-35).
+3. Étape 22 : slugs (génération, collisions, stabilité après la première publication — D11). Point d'appui : dans `Publication.transitionTo`, une date de publication passée signifie « déjà publique ».
 
 ---
 
@@ -63,13 +62,15 @@ Légende : ✅ terminée et poussée · 🟡 terminée et vérifiée, commits à
 | — | Outillage local hors dépôt (R-7) | ✅ | `6a5c7ae` |
 | 18.1 | Schéma `V005` : vocabulaire et association | ✅ | `b72c9d6` |
 | 18.2 | Technologies des projets, filtre `?technology=` | ✅ | `b06e5fc`, `950f6ae` (CI : run 36044315331) |
-| 19.1 | Horloge applicative et schéma `V006` | 🟡 | `cf1ac20` (non poussé) |
-| 19.2 | Domaine, persistance, visibilité, cas d'usage, seed | 🟡 | `2501559` (non poussé) |
-| 19.3 | API publique des publications | 🟡 | `66a3ac4`, `fe85dfe` (non poussés) |
-| 20.1 | Module `taxonomy` : schéma `V007`, domaine, façade `TaxonomyQueryService`, seed | 🟡 | à committer |
-| 20.2 | Règle ArchUnit de communication entre modules (ADR 0002) | 🟡 | à committer |
-| 20.3 | Publications classées : `V008`, filtres `?category=` / `?tag=`, `Specification` | 🟡 | à committer |
-| 21 → 52 | Voir `docs/steps/liste_complete_etapes.md` | ⏳ | — |
+| 19.1 | Horloge applicative et schéma `V006` | ✅ | `cf1ac20` |
+| 19.2 | Domaine, persistance, visibilité, cas d'usage, seed | ✅ | `2501559` |
+| 19.3 | API publique des publications | ✅ | `66a3ac4`, `fe85dfe` |
+| 20.1 | Module `taxonomy` : schéma `V007`, domaine, façade `TaxonomyQueryService`, seed | ✅ | `b362243`, `afb2196` |
+| 20.2 | Règle ArchUnit de communication entre modules (ADR 0002) | ✅ | `959344b` |
+| 20.3 | Publications classées : `V008`, filtres `?category=` / `?tag=`, `Specification` | ✅ | `c744161`, `5b5d171`, `978830e` (CI : run 36049720014) |
+| 21.1 | Date obligatoire pour une publication archivée (`V009`) | 🟡 | à committer |
+| 21.2 | Machine à états, cas d'usage `ChangePublicationStatusUseCase` (sans route HTTP avant l'étape 36) | 🟡 | à committer |
+| 22 → 52 | Voir `docs/steps/liste_complete_etapes.md` | ⏳ | — |
 
 Après le push, remplacer les 🟡 par ✅ et noter les hashes.
 
@@ -91,6 +92,7 @@ Index : [`decisions/README.md`](decisions/README.md).
 | D-Z … D-AE | `Technology` agrégat du module `project` ; unicités ; chargement par lot ; filtre `?technology=` ; médias des projets à l'étape 27 ; pas de liste publique des technologies avant l'étape 42 | Actives (18) |
 | D-AF … D-AM | Périmètre de `publication` ; horloge applicative ; visibilité à `now` ; invariant 24 ; contrat public (SEO, temps de lecture) ; ordre et `?type=` ; slug commun ; dates d'audit par l'application | Actives (19) |
 | D-AN … D-AT | Communication entre modules (ADR 0002) ; unicité des vocabulaires ; contrat `category`/`tags` ; filtres par slug ; `Specification` ; 5 requêtes par page ; pas de route publique des termes avant l'étape 43 | Actives (20) |
+| D-AU … D-AY | Cycle de vie sans route HTTP avant l'étape 36 ; table des transitions sur le statut effectif ; 409 `INVALID_PUBLICATION_TRANSITION` ; écriture limitée au statut ; concordance règle Java / règle SQL | Actives (21) |
 | 14.4 | Exposition publique de `publicEmail` | À confirmer |
 
 ## 5. Problèmes connus
@@ -109,7 +111,7 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | KI-23 | AMÉLIORATION | `UNSUPPORTED_MEDIA_FORMAT` mappé en 409 (415 ou 400 plus juste) | étape 27 |
 | KI-16 | OPTIONNEL | `V001` : virgule manquante avant `CONSTRAINT profile_single_row` (comportement identique) ; migration appliquée, non modifiable | aucun |
 
-### Résolus le 2026-09-24 (consolidation, 16.3 à 20)
+### Résolus le 2026-09-24 (consolidation, 16.3 à 21)
 
 | ID | Problème | Résolution |
 |---|---|---|
@@ -146,7 +148,8 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | Objet de valeur `Slug`, génération et collisions | Étape 22 | D-X : seules les contraintes SQL existent |
 | Tri choisi par le client (`sort`) | quand un écran le demande | D-V : ordre fixe, paramètre ignoré |
 | Rejet explicite (400) des paramètres de pagination hors bornes, au lieu de les ramener aux bornes | si un client en a besoin | comportement Spring Data retenu (D-V) |
-| Transitions de statut des publications (`POST /api/admin/publications/{id}/status`, 409 `INVALID_PUBLICATION_TRANSITION`) | Étape 21 | D-AF : la lecture est faite, l'écriture non |
+| Route `POST /api/admin/publications/{id}/status` | Étape 36 | D-AU : cas d'usage prêt ; aucune route d'administration sans authentification (32-35) |
+| Verrouillage optimiste des publications (`@Version`) | si plusieurs administrateurs | D-AX : un seul administrateur en V1 |
 | Routes publiques `/api/public/categories` et `/api/public/tags` | Étape 43 | D-AT : les termes sont exposés par publication |
 | Stabilité du slug après la première publication (D11) | Étape 22 | D-AL |
 | Temps de lecture précalculé (colonne) si la liste devient coûteuse | Étape 52.6 | D-AJ : calculé à la lecture, contenu chargé dans la liste |

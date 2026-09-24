@@ -377,7 +377,19 @@ ARCHIVED
 
 La comparaison temporelle utilise une horloge fournie par l'application et non un appel dispersé à l'heure système.
 
-État d’implémentation (étape 19) : la visibilité est appliquée par les lectures publiques avec l’horloge applicative (D-AG, D-AH). Les transitions entre statuts arrivent à l’étape 21.
+État d’implémentation (étape 19) : la visibilité est appliquée par les lectures publiques avec l’horloge applicative (D-AG, D-AH).
+
+Transitions (étape 21, invariant 26, D-AV), évaluées sur le statut effectif — une publication `SCHEDULED` dont la date est passée est considérée comme `PUBLISHED` :
+
+```text
+DRAFT      → IN_REVIEW, SCHEDULED, PUBLISHED
+IN_REVIEW  → DRAFT, SCHEDULED, PUBLISHED
+SCHEDULED  → DRAFT, SCHEDULED (nouvelle date), PUBLISHED
+PUBLISHED  → ARCHIVED
+ARCHIVED   → DRAFT, PUBLISHED
+```
+
+Règles de date : planifier exige une date strictement future ; publier conserve une date déjà passée (restauration d’une archive), sinon date la publication à « maintenant » ; repasser en brouillon annule une planification encore future ; archiver conserve la date. Une transition refusée produit `INVALID_PUBLICATION_TRANSITION` (409).
 
 ---
 
@@ -751,10 +763,11 @@ Les règles suivantes doivent être garanties par le backend et, lorsque pertine
 21. un `Project` est `IN_PROGRESS` si et seulement s'il n'a pas de date de fin ; sa période respecte l'invariant 17 ;
 22. le nom (sans tenir compte de la casse) et le slug d'une `Technology` sont uniques ; une technologie utilisée par un projet ne peut pas être supprimée ;
 23. un `Project` référence au plus une fois la même `Technology` ;
-24. une `Publication` `SCHEDULED` ou `PUBLISHED` possède toujours une date de publication (`publishedAt`) ;
-25. le nom (sans tenir compte de la casse) et le slug d'une `Category`, d'un `Tag`, sont uniques dans leur vocabulaire ; un terme utilisé par une publication ne peut pas être supprimé.
+24. une `Publication` `SCHEDULED`, `PUBLISHED` ou `ARCHIVED` possède toujours une date de publication (`publishedAt`) — étendu à `ARCHIVED` à l’étape 21 ;
+25. le nom (sans tenir compte de la casse) et le slug d'une `Category`, d'un `Tag`, sont uniques dans leur vocabulaire ; un terme utilisé par une publication ne peut pas être supprimé ;
+26. le statut d'une `Publication` ne change que selon la table des transitions du §15.
 
-Les invariants 17 à 25 ont été ajoutés pendant l'implémentation (étapes 14 à 20) ; ils sont garantis par PostgreSQL (`CHECK`, `UNIQUE`, clés étrangères) et, pour 17, 18, 21, 23 et 24, par une garde Java dans le modèle métier. Les invariants 7 à 10 (visibilité des publications) sont appliqués par les lectures publiques depuis l'étape 19. Voir [`decisions/registre-implementation.md`](decisions/registre-implementation.md).
+Les invariants 17 à 26 ont été ajoutés pendant l'implémentation (étapes 14 à 21) ; ils sont garantis par PostgreSQL (`CHECK`, `UNIQUE`, clés étrangères) et, pour 17, 18, 21, 23, 24 et 26, par le modèle métier (garde ou méthode de transition). Les invariants 7 à 10 (visibilité des publications) sont appliqués par les lectures publiques depuis l'étape 19. Voir [`decisions/registre-implementation.md`](decisions/registre-implementation.md).
 
 ---
 
