@@ -59,6 +59,19 @@ Statuts : **Active** · **Remplacée** (préciser par quoi) · **À confirmer** 
 | D-AE | 18 | Pas de route publique listant les technologies avant qu'un écran en ait besoin (étape 42) ; chaque projet expose déjà `{ name, slug }` de ses technologies | Active | `TechnologyResponse` |
 | — | 18 | Seed `dev` transactionnel : technologies et projets créés ensemble ou pas du tout | Active | `ProjectSeeder` |
 
+## Module `publication` — étape 19
+
+| Réf | Étape | Décision | Statut | Preuve dans le code |
+|---|---|---|---|---|
+| D-AF | 19 | Périmètre : modèle commun `ARTICLE`/`NEWS`, règle de visibilité et API publique de lecture. Catégorie et tags : étape 20 ; transitions de statut (écriture) : étape 21 ; génération des slugs : étape 22 ; couverture : étape 27 | Active | `publication/**` |
+| D-AG | 19 | Horloge applicative (D03) : bean `Clock.systemUTC()` dans `shared.infrastructure.ClockConfiguration` ; les cas d'usage lisent « maintenant » dans ce `Clock` et le transmettent au port. Les `*IT` tournent avec une horloge fixe (`FixedClockConfiguration.NOW`, `@Primary`), importée par `AbstractIntegrationTest` : un seul contexte Spring, pas de conteneur supplémentaire | Active | `ClockConfiguration`, `FixedClockConfiguration`, `ListVisiblePublicationsUseCase` |
+| D-AH | 19 | Visible à `now` ⇔ `PUBLISHED`, ou `SCHEDULED` et `publishedAt <= now` (invariants 7 à 10). Règle écrite une fois (`PublicationJpaRepository.VISIBLE_AT_NOW`) et appliquée dans les requêtes pour que la pagination ne compte que le visible ; toute publication invisible donne la même 404 ; le statut n'est jamais exposé publiquement. Validée par mutation (retirer la condition de date fait échouer 3 tests) | Active | `PublicationJpaRepository`, `ListVisiblePublicationsUseCaseIT`, `GetVisiblePublicationUseCaseIT` |
+| D-AI | 19 | Invariant 24 : `SCHEDULED` ou `PUBLISHED` ⇒ `publishedAt` renseignée (garde Java + `CHECK publication_published_at_check`). Les autres règles de transition relèvent de l'étape 21 | Active | `Publication`, `V006` |
+| D-AJ | 19 | Représentations publiques : `PublicationSummaryResponse` (liste, sans contenu) et `PublicationResponse` (détail). Ni `id`, ni `status`, ni `createdAt`/`updatedAt`. `seoTitle`/`seoDescription` exposés dans le détail (nécessaires au rendu serveur des balises meta ; `null` = utiliser titre/résumé) — précise `05` §19. Temps de lecture calculé à la lecture (D12) : mots du Markdown / 200, arrondi au-dessus, minimum 1 | Active | `publication/web/dto/*`, `Publication.readingTimeMinutes`, `PublicationTest` |
+| D-AK | 19 | Ordre public : `publishedAt` décroissant, puis `id` décroissant. Filtre `?type=ARTICLE\|NEWS` facultatif ; une valeur inconnue → 400 `MALFORMED_REQUEST` (ensemble fermé du contrat), contrairement à un slug de technologie inconnu (vocabulaire ouvert → page vide, D-AC) | Active | `PublicationRepositoryAdapter`, `PublicPublicationControllerTest` |
+| D-AL | 19 | Slug : un seul espace pour articles et news (`/publications/{slug}`), `UNIQUE` + `CHECK` kebab-case comme D-X ; stabilité après première publication (D11) : étape 22 | Active | `V006`, `PublicationSchemaIT` |
+| D-AM | 19 | `createdAt`/`updatedAt` : `TIMESTAMPTZ NOT NULL` sans valeur par défaut en base ni `@CreationTimestamp` ; fixés par l'application depuis l'horloge applicative (seed aujourd'hui, cas d'usage d'administration à l'étape 36) | Active | `PublicationEntity`, `PublicationSeeder` |
+
 ## Décisions révélées par le code et non documentées ailleurs
 
 | Sujet | Constat | Où c'est désormais documenté |

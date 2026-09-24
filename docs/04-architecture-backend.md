@@ -95,13 +95,14 @@ Dépendances autorisées :
 shared → aucune dépendance métier
 ```
 
-Contenu actuel (étape 17) :
+Contenu actuel (étape 19) :
 
 | Paquet | Contenu | Règle |
 |---|---|---|
 | `shared.api` | `GlobalExceptionHandler`, `PageResponse`, `ApiPaging` | contrats HTTP transversaux |
 | `shared.error` | `ErrorCode`, `ApplicationException` et sous-classes | erreurs métier stables |
 | `shared.domain.model` | `DateRange`, `PageQuery`, `PageResult` | objets de valeur utilisés par **plusieurs** modules ; soumis aux règles de `domain` (§12.4 : ni Spring ni JPA) |
+| `shared.infrastructure` | `ClockConfiguration` | horloge applicative (`Clock`, D03) : les cas d’usage lisent « maintenant » dans ce bean, jamais par `Instant.now()` ; horloge fixe dans les `*IT` (D-AG) |
 
 Une classe n’entre dans `shared.domain.model` qu’au deuxième usage réel dans un autre module (ex. `DateRange` : `profile` puis `project`, D-S).
 
@@ -786,7 +787,7 @@ com.scalke.portfolio.backend.common
 
 ## 13. Arborescence initiale (étape 10)
 
-L’étape 10 a créé uniquement les packages racines. Les modules implémentés (`profile` depuis l’étape 14, `project` depuis l’étape 17) et `shared.domain.model` suivent le §6 et le §3.1.
+L’étape 10 a créé uniquement les packages racines. Les modules implémentés (`profile` depuis l’étape 14, `project` depuis l’étape 17, `publication` depuis l’étape 19) et `shared` suivent le §6 et le §3.1.
 
 ```text
 backend/

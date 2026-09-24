@@ -957,6 +957,8 @@ createdAt
 updatedAt
 ```
 
+Précision de l’étape 19 (D-AJ) : pour les publications, `seoTitle` et `seoDescription` figurent aussi dans le **détail public**, car le rendu serveur Angular en a besoin pour les balises `<title>` et `<meta>`. `status`, `createdAt` et `updatedAt` restent réservés à l’administration.
+
 Il ne faut pas créer un DTO unique contenant tous les champs avec une série de valeurs `null` selon la route.
 
 Les contrats public et administration répondent à des usages différents.
@@ -1321,6 +1323,8 @@ contenu non visible
 → 404
 ```
 
+Implémentation (étape 19, D-AG, D-AH) : la règle est écrite une seule fois dans la requête JPQL (`PublicationJpaRepository.VISIBLE_AT_NOW`) ; « maintenant » vient du bean `Clock` (`shared.infrastructure.ClockConfiguration`), remplacé par une horloge fixe dans les tests d’intégration.
+
 ---
 
 # 30. Ressources publiques prévues
@@ -1409,6 +1413,40 @@ Règles propres à ces contrats :
 * `technologies` : dans l’ordre du vocabulaire, `[]` si aucune ; le `slug` sert de valeur au filtre `technology` (D-AC) ; le filtre restreint les projets, pas la liste de leurs technologies ;
 * couverture et captures arriveront avec le catalogue `Media` (étape 27, D-AD) ;
 * contrats vérifiés par `PublicProjectControllerTest` et `PublicProjectIT`.
+
+### `GET /api/public/publications` (étape 19)
+
+```text
+?page=0&size=10          page 0-based ; size par défaut 10, plafonnée à 100 ; sort ignoré (ordre fixe)
+?type=ARTICLE|NEWS       facultatif ; toute autre valeur → 400 MALFORMED_REQUEST
+200 → PageResponse<PublicationSummaryResponse>
+{
+  content[] { type, title, slug, summary, publishedAt, featured, readingTimeMinutes },
+  page, size, totalElements, totalPages, first, last
+}
+```
+
+### `GET /api/public/publications/{slug}` (étape 19)
+
+```text
+200 → PublicationResponse
+{
+  type, title, slug, summary, contentMarkdown, publishedAt, featured, readingTimeMinutes,
+  seoTitle | null, seoDescription | null
+}
+404 → ProblemDetail, code RESOURCE_NOT_FOUND (slug inconnu, DRAFT, IN_REVIEW, ARCHIVED,
+                                              SCHEDULED dont la date n'est pas passée : réponse identique)
+```
+
+Règles propres à ces contrats :
+
+* visibles : `PUBLISHED`, et `SCHEDULED` dont `publishedAt <= maintenant` (§29, D-AH) ; seules les publications visibles sont listées et comptées ;
+* ordre fixe : `publishedAt` décroissant, puis identifiant décroissant (D-AK) ;
+* `publishedAt` : instant ISO-8601 UTC (§26) ;
+* `readingTimeMinutes` : calculé depuis le Markdown, 200 mots par minute, au moins 1 (D12) ;
+* ni `id`, ni `status`, ni dates d’audit (D-AJ) ; la liste n’inclut ni le contenu ni les champs SEO ;
+* catégorie et tags arriveront à l’étape 20, la couverture à l’étape 27 ;
+* contrats vérifiés par `PublicPublicationControllerTest` et `PublicPublicationIT`.
 
 Chaque module introduit ses routes lors de son étape d’implémentation.
 

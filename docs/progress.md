@@ -2,27 +2,27 @@
 
 Ce fichier est la **seule** source de vérité sur l'avancement. Il ne répète pas le contenu des autres documents : il pointe vers eux.
 
-Dernière mise à jour : 2026-09-24 (étape 18 implémentée, commits à faire)
+Dernière mise à jour : 2026-09-24 (étape 19 implémentée, commits à faire)
 
 ---
 
 ## 1. État courant
 
 ```text
-Dernière étape terminée   : 17 — Construire le module Project (poussée, CI verte : run 36042341685)
-Étape en cours            : 18 — Technologies des projets (implémentée et vérifiée, à committer et pousser)
-Prochaine étape prévue    : 19 — Concevoir et implémenter Publication
-État                      : PRÊT dès que les commits de 18 sont poussés et la CI verte
+Dernière étape terminée   : 18 — Technologies des projets (poussée, CI verte : run 36044315331)
+Étape en cours            : 19 — Publication (implémentée et vérifiée, à committer et pousser)
+Prochaine étape prévue    : 20 — Implémenter catégories et tags (module taxonomy)
+État                      : PRÊT dès que les commits de 19 sont poussés et la CI verte
 Branche                   : develop
-Vérification              : ./mvnw verify → 103 tests verts (49 *Test, 54 *IT) ; démarrage dev vérifié
-                            (V005 appliquée, seed des technologies, ?technology=, 1 requête de technologies par page)
+Vérification              : ./mvnw verify → 140 tests verts (63 *Test, 77 *IT) ; démarrage dev vérifié
+                            (V006 appliquée, seed d'une publication par cas de visibilité, ?type=, 404 des invisibles)
 ```
 
 ## 2. Prochaine action
 
-1. Committer l'étape 18 (4 commits, commandes fournies avec l'étape), pousser, vérifier la CI, puis remplacer les 🟡 par ✅ avec les hashes.
+1. Committer l'étape 19 (4 commits, commandes fournies avec l'étape), pousser, vérifier la CI, puis remplacer les 🟡 par ✅ avec les hashes.
 2. Confirmer ou infirmer D-T (cohérence `stage` ⇔ `endDate`) : `docs/decisions/registre-implementation.md`.
-3. Étape 19 : rédiger la fiche avec le template v2 (section 0 : vérifier l'état réel).
+3. Étape 20 : rédiger la fiche avec le template v2 (section 0 : vérifier l'état réel) ; `PublicationFilter` recevra la catégorie et le tag.
 
 ---
 
@@ -59,9 +59,13 @@ Légende : ✅ terminée et poussée · 🟡 terminée et vérifiée, commits à
 | 17.2 | Schéma `V004` | ✅ | `992a957` |
 | 17.3 | Domaine, port, persistance, cas d'usage, seed | ✅ | `f7fb962` |
 | 17.4 | API publique paginée | ✅ | `1b7ab39`, `e81f4f4` (CI : run 36042341685) |
-| 18.1 | Schéma `V005` : vocabulaire et association | 🟡 | à committer |
-| 18.2 | Technologies des projets, filtre `?technology=` | 🟡 | à committer |
-| 19 → 52 | Voir `docs/steps/liste_complete_etapes.md` | ⏳ | — |
+| — | Outillage local hors dépôt (R-7) | ✅ | `6a5c7ae` |
+| 18.1 | Schéma `V005` : vocabulaire et association | ✅ | `b72c9d6` |
+| 18.2 | Technologies des projets, filtre `?technology=` | ✅ | `b06e5fc`, `950f6ae` (CI : run 36044315331) |
+| 19.1 | Horloge applicative et schéma `V006` | 🟡 | à committer |
+| 19.2 | Domaine, persistance, visibilité, cas d'usage, seed | 🟡 | à committer |
+| 19.3 | API publique des publications | 🟡 | à committer |
+| 20 → 52 | Voir `docs/steps/liste_complete_etapes.md` | ⏳ | — |
 
 Après le push, remplacer les 🟡 par ✅ et noter les hashes.
 
@@ -80,6 +84,7 @@ Index : [`decisions/README.md`](decisions/README.md).
 | D-S, D-U, D-V, D-W, D-X, D-Y | `DateRange` partagé ; visibilité publique ; pagination sans type Spring dans les ports ; représentations publiques des projets ; slug ; périmètre de `V004` | Actives (17) |
 | D-T | `stage` ⇔ absence de `endDate` (invariant 21) | Active — **à confirmer** |
 | D-Z … D-AE | `Technology` agrégat du module `project` ; unicités ; chargement par lot ; filtre `?technology=` ; médias des projets à l'étape 27 ; pas de liste publique des technologies avant l'étape 42 | Actives (18) |
+| D-AF … D-AM | Périmètre de `publication` ; horloge applicative ; visibilité à `now` ; invariant 24 ; contrat public (SEO, temps de lecture) ; ordre et `?type=` ; slug commun ; dates d'audit par l'application | Actives (19) |
 | 14.4 | Exposition publique de `publicEmail` | À confirmer |
 
 ## 5. Problèmes connus
@@ -98,7 +103,7 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | KI-23 | AMÉLIORATION | `UNSUPPORTED_MEDIA_FORMAT` mappé en 409 (415 ou 400 plus juste) | étape 27 |
 | KI-16 | OPTIONNEL | `V001` : virgule manquante avant `CONSTRAINT profile_single_row` (comportement identique) ; migration appliquée, non modifiable | aucun |
 
-### Résolus le 2026-09-24 (consolidation, 16.3, 17 et 18)
+### Résolus le 2026-09-24 (consolidation, 16.3 à 19)
 
 | ID | Problème | Résolution |
 |---|---|---|
@@ -135,6 +140,9 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | Objet de valeur `Slug`, génération et collisions | Étape 22 | D-X : seules les contraintes SQL existent |
 | Tri choisi par le client (`sort`) | quand un écran le demande | D-V : ordre fixe, paramètre ignoré |
 | Rejet explicite (400) des paramètres de pagination hors bornes, au lieu de les ramener aux bornes | si un client en a besoin | comportement Spring Data retenu (D-V) |
+| Transitions de statut des publications (`POST /api/admin/publications/{id}/status`, 409 `INVALID_PUBLICATION_TRANSITION`) | Étape 21 | D-AF : la lecture est faite, l'écriture non |
+| Stabilité du slug après la première publication (D11) | Étape 22 | D-AL |
+| Temps de lecture précalculé (colonne) si la liste devient coûteuse | Étape 52.6 | D-AJ : calculé à la lecture, contenu chargé dans la liste |
 | Prérendu route par route | Étape 52.1 | D22 |
 | Cache du profil public | si le profil devient un chemin chaud | D-O |
 | Exposition de springdoc / Swagger UI | Étape 32 | KI-19 |

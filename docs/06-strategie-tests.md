@@ -743,20 +743,21 @@ Cette vérification démontre que les tests ne dépendent pas d’un état manue
 
 | Couche testée | Type | Suffixe | Outil | Exemple actuel |
 |---|---|---|---|---|
-| `domain.model` (invariants, objets de valeur) | unitaire pur | `*Test` | JUnit + AssertJ, sans Spring | `CertificationTest`, `ProjectTest`, `ProjectFilterTest` ; partagés : `DateRangeTest`, `PageQueryTest`, `PageResultTest` (`shared.domain.model`) |
+| `domain.model` (invariants, objets de valeur) | unitaire pur | `*Test` | JUnit + AssertJ, sans Spring | `CertificationTest`, `ProjectTest`, `ProjectFilterTest`, `PublicationTest` ; partagés : `DateRangeTest`, `PageQueryTest`, `PageResultTest` (`shared.domain.model`) |
 | entités JPA (rattachement à l’agrégat) | unitaire pur | `*Test` | JUnit + AssertJ | `CertificationEntityTest` |
-| mappers de persistance | unitaire pur | `*Test` | aller-retour modèle ↔ entité | `ProfilePersistenceMapperTest`, `ProjectPersistenceMapperTest` |
-| `application.usecase` (orchestration, filtrage, tri, pagination, nombre de requêtes) | intégration | `*IT` | `AbstractIntegrationTest` + `Statistics` Hibernate (`generate_statistics`, profil `test` seulement) | `GetProfileUseCaseIT`, `ListPublishedProjectsUseCaseIT` (dont le nombre de requêtes d’une page, D-AB), `GetPublishedProjectUseCaseIT` |
+| mappers de persistance | unitaire pur | `*Test` | aller-retour modèle ↔ entité | `ProfilePersistenceMapperTest`, `ProjectPersistenceMapperTest`, `PublicationPersistenceMapperTest` |
+| `application.usecase` (orchestration, filtrage, tri, pagination, nombre de requêtes) | intégration | `*IT` | `AbstractIntegrationTest` + `Statistics` Hibernate (`generate_statistics`, profil `test` seulement) | `GetProfileUseCaseIT`, `ListPublishedProjectsUseCaseIT` (dont le nombre de requêtes d’une page, D-AB), `GetPublishedProjectUseCaseIT`, `ListVisiblePublicationsUseCaseIT`, `GetVisiblePublicationUseCaseIT` (horloge fixe) |
 | `infrastructure.persistence` (mapping, tri, requêtes) | intégration | `*IT` | `AbstractIntegrationTest` + `EntityManager` | `ProfileMappingIT` |
-| schéma (contraintes SQL) | intégration | `*IT` | `JdbcClient` | `ProfileSchemaIT`, `ProjectSchemaIT`, `TechnologySchemaIT` |
-| `web` (contrat JSON, codes HTTP, erreurs, bornes de pagination) | tranche | `*Test` | `@WebMvcTest` + `@MockitoBean` du cas d’usage | `PublicProfileControllerTest`, `PublicProjectControllerTest` |
-| parcours HTTP complet (contrôleur → base) | intégration | `*IT` | `AbstractIntegrationTest` + `MockMvc` | `PublicProfileIT`, `PublicProjectIT` |
+| schéma (contraintes SQL) | intégration | `*IT` | `JdbcClient` | `ProfileSchemaIT`, `ProjectSchemaIT`, `TechnologySchemaIT`, `PublicationSchemaIT` |
+| `web` (contrat JSON, codes HTTP, erreurs, bornes de pagination) | tranche | `*Test` | `@WebMvcTest` + `@MockitoBean` du cas d’usage | `PublicProfileControllerTest`, `PublicProjectControllerTest`, `PublicPublicationControllerTest` |
+| parcours HTTP complet (contrôleur → base) | intégration | `*IT` | `AbstractIntegrationTest` + `MockMvc` | `PublicProfileIT`, `PublicProjectIT`, `PublicPublicationIT` |
 | architecture | unitaire | `*Test` | ArchUnit | `ModuleBoundariesTest`, `ModuleLayersTest`, `ApiConventionsTest` |
 
 Règles :
 
 * la classe de test vit dans le **même paquet** que la classe testée (un test de `infrastructure…DateRange` ne se range pas dans `profile.domain`) ;
 * tout test qui hérite d’`AbstractIntegrationTest` est un `*IT`, sans exception ;
+* les `*IT` tournent avec une horloge fixe (`FixedClockConfiguration.NOW`, importée par `AbstractIntegrationTest`) : les données temporelles d’un test se construisent relativement à `NOW`, jamais à `Instant.now()` (D-AG) ;
 * les données d’un `*IT` peuvent être créées par le port du module (ex. `ProjectRepository.create` avec `ProjectFixtures`) : elles passent alors par les invariants du domaine ; les tests de schéma utilisent `JdbcClient` pour atteindre la base sans le domaine ;
 * un test `@WebMvcTest` construit ses données avec le **modèle métier**, pas avec des entités JPA ni des mappers de persistance ;
 * un test de chargement ne doit pas être annoté `@Transactional` s’il prétend vérifier ce qui est chargé **hors** transaction : la transaction du test garderait la session ouverte et masquerait le problème. Pour compter les requêtes, utiliser les statistiques Hibernate plutôt qu’une supposition. Un test de comptage se valide par mutation : retirer l’optimisation qu’il protège (ex. `@BatchSize`) doit le faire échouer.

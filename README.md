@@ -76,7 +76,8 @@ Dans IntelliJ : configuration d'exécution `Application` → *Active profiles* :
 - API : `http://localhost:8080/api/public/profile`, `http://localhost:8080/api/public/projects`, `http://localhost:8080/api/public/projects/{slug}`
 - Santé : `http://localhost:8080/api/actuator/health`
 - Filtre par technologie : `http://localhost:8080/api/public/projects?technology=java`
-- En profil `dev`, `ProfileSeeder` et `ProjectSeeder` créent des données de démonstration si la base n'en contient pas (technologies, projets, dont un brouillon invisible dans l'API publique).
+- Publications : `http://localhost:8080/api/public/publications` (`?type=ARTICLE` ou `NEWS`), `http://localhost:8080/api/public/publications/{slug}`
+- En profil `dev`, `ProfileSeeder`, `ProjectSeeder` et `PublicationSeeder` créent des données de démonstration si la base n'en contient pas (technologies, projets dont un brouillon, une publication par cas de visibilité).
 
 ### 5. Frontend
 

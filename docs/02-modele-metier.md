@@ -329,6 +329,8 @@ Le Markdown est la source canonique.
 
 Aucun `contentHtml` métier n'est nécessaire.
 
+État d’implémentation (étape 19) : tous les attributs ci-dessus sauf `category` et `tags` (étape 20) et `coverMedia` (étape 27) ; le temps de lecture est calculé à partir du Markdown (D12, D-AJ). Le slug est unique pour l’ensemble des publications (D-AL).
+
 ---
 
 # 14. PublicationType
@@ -374,6 +376,8 @@ ARCHIVED
 ```
 
 La comparaison temporelle utilise une horloge fournie par l'application et non un appel dispersé à l'heure système.
+
+État d’implémentation (étape 19) : la visibilité est appliquée par les lectures publiques avec l’horloge applicative (D-AG, D-AH). Les transitions entre statuts arrivent à l’étape 21.
 
 ---
 
@@ -742,9 +746,10 @@ Les règles suivantes doivent être garanties par le backend et, lorsque pertine
 20. il existe au plus un `Profile` ;
 21. un `Project` est `IN_PROGRESS` si et seulement s'il n'a pas de date de fin ; sa période respecte l'invariant 17 ;
 22. le nom (sans tenir compte de la casse) et le slug d'une `Technology` sont uniques ; une technologie utilisée par un projet ne peut pas être supprimée ;
-23. un `Project` référence au plus une fois la même `Technology`.
+23. un `Project` référence au plus une fois la même `Technology` ;
+24. une `Publication` `SCHEDULED` ou `PUBLISHED` possède toujours une date de publication (`publishedAt`).
 
-Les invariants 17 à 23 ont été ajoutés pendant l'implémentation (étapes 14 à 18) ; ils sont garantis par PostgreSQL (`CHECK`, `UNIQUE`, clés étrangères) et, pour 17, 18, 21 et 23, par une garde Java dans le modèle métier. Voir [`decisions/registre-implementation.md`](decisions/registre-implementation.md).
+Les invariants 17 à 24 ont été ajoutés pendant l'implémentation (étapes 14 à 19) ; ils sont garantis par PostgreSQL (`CHECK`, `UNIQUE`, clés étrangères) et, pour 17, 18, 21, 23 et 24, par une garde Java dans le modèle métier. Les invariants 7 à 10 (visibilité des publications) sont appliqués par les lectures publiques depuis l'étape 19. Voir [`decisions/registre-implementation.md`](decisions/registre-implementation.md).
 
 ---
 
