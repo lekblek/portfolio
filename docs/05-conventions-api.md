@@ -77,6 +77,10 @@ Cette séparation sert à la fois :
 
 Elle contient les ressources accessibles sans authentification.
 
+> Le préfixe `/api` est porté par `server.servlet.context-path: /api` (`application.yaml`). Les contrôleurs sont donc mappés **sans** `/api` : `@RequestMapping("/public/profile")` répond sur `/api/public/profile`. Conséquence : l’Actuator répond sur `/api/actuator/health`.
+>
+> `profile` est une ressource **singleton** (un seul profil en V1) : elle reste au singulier, `GET /api/public/profile`, sans identifiant.
+
 Exemples :
 
 ```text
@@ -1079,39 +1083,31 @@ ChangePublicationStatusRequest
 
 # 23. Packages Java
 
-Les contrôleurs et DTO HTTP résident dans le sous-package :
+> Mis à jour le 2026-09-24 pour refléter le code réel (voir [ADR 0001](decisions/0001-architecture-interne-des-modules.md)).
+
+Les contrôleurs et DTO HTTP résident dans :
 
 ```text
-<module>.api
+<module>.web.controller   → Public*Controller, Admin*Controller
+<module>.web.dto          → *Request, *Response
 ```
 
 Exemple :
 
 ```text
-com.scalke.portfolio.backend.project.api
-```
-
-Le module peut ensuite contenir :
-
-```text
-project/
-├── api/
-├── domain/
-├── repository/
-└── service/
+com.scalke.portfolio.backend.profile.web.controller.PublicProfileController
+com.scalke.portfolio.backend.profile.web.dto.ProfileResponse
 ```
 
 Une entité JPA appartient à :
 
 ```text
-..domain..
+<module>.infrastructure.persistence.jpa.entity
 ```
 
-et ne doit pas être placée dans :
+et n’apparaît jamais dans `..web..` : les DTO sont construits à partir du modèle métier (`<module>.domain.model`), pas à partir des entités.
 
-```text
-..api..
-```
+Structure complète d’un module : `04-architecture-backend.md` §6.
 
 ---
 
@@ -1381,34 +1377,15 @@ Les routes d’authentification seront définies lors de l’implémentation du 
 
 # 32. Règles ArchUnit associées
 
-Les conventions Java importantes doivent être protégées automatiquement.
-
-Au minimum :
+Les conventions Java importantes sont protégées automatiquement par `ApiConventionsTest` :
 
 ```text
-toute classe terminant par Controller
-→ réside dans ..api..
+toute classe terminant par Controller → réside dans ..web.controller..
+tout Controller                       → commence par Public ou Admin
+toute entité JPA (@Entity)            → réside dans ..infrastructure.persistence.jpa.entity..
 ```
 
-et :
-
-```text
-tout Controller
-→ commence par Public ou Admin
-```
-
-ainsi que :
-
-```text
-toute entité JPA
-→ réside dans ..domain..
-```
-
-Ces règles complètent celles définies dans :
-
-```text
-docs/04-architecture-backend.md
-```
+Ces règles complètent celles de `docs/04-architecture-backend.md` §12.
 
 Le but est que les conventions importantes provoquent :
 

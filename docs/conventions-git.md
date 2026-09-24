@@ -627,6 +627,8 @@ docs: update publication lifecycle
 
 Un changement architectural significatif ne doit pas laisser la documentation volontairement incohérente.
 
+`docs/steps/` et `docs/prompts/` ne sont **pas versionnés** (décision R-1) : une décision prise dans une fiche d’étape est reportée dans `docs/decisions/`, et l’avancement dans `docs/progress.md`, dans le commit de l’étape.
+
 ---
 
 # 21. Tests avant commit
@@ -699,36 +701,6 @@ selon l’étape.
 Un changement purement documentaire ne nécessite pas artificiellement de lancer l’intégralité de la suite applicative.
 
 
-## Backend
-
-Lorsque le backend est concerné :
-
-```bash
-cd backend
-./mvnw test
-```
-
-ou la commande de vérification définie par le projet.
-
-## Frontend
-
-Lorsque le frontend est concerné :
-
-```bash
-cd frontend
-npm test
-```
-
-et/ou :
-
-```bash
-npm run build
-```
-
-selon l’étape.
-
-Un changement purement documentaire ne nécessite pas artificiellement de lancer l’intégralité de la suite applicative.
-
 ---
 
 # 22. Commit d’une étape pédagogique
@@ -763,6 +735,20 @@ git add backend/src/main/java/... \
 
 git commit -m "feat(project): add project persistence"
 ```
+
+## Clôture d’une étape
+
+Une étape (ou sous-étape) n’est terminée que lorsque :
+
+```text
+[ ] tous les fichiers de l’étape sont commités (git status propre)
+[ ] chaque commit compile seul (pas de test commité avant le code qu’il appelle)
+[ ] ./mvnw verify et/ou npm test + npm run build sont verts
+[ ] le commit est poussé sur origin/develop
+[ ] docs/progress.md est mis à jour (statut, hash, décisions, problèmes connus)
+```
+
+Un commit découpé par erreur et **non encore poussé** se corrige avec `git commit --amend` ou `git reset --soft`, jamais après un push.
 
 ---
 
@@ -986,6 +972,15 @@ vérifications
 ```
 
 Un changement qui casse la CI n’est pas considéré comme prêt à intégrer dans `main`.
+
+Depuis le 2026-09-24, `.github/workflows/ci.yml` exécute, à chaque push et pull request sur `develop` et `main` :
+
+```text
+backend  : JDK 25 → ./mvnw -B verify (Testcontainers sur Docker du runner)
+frontend : Node (.nvmrc) → npm ci → npm test -- --watch=false → npm run build
+```
+
+Les scripts exécutés sur Linux (`backend/mvnw`, `scripts/hooks/*`) doivent être enregistrés exécutables dans Git (`git update-index --chmod=+x`).
 
 ---
 

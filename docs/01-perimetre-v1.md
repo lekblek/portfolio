@@ -467,8 +467,11 @@ La V1 inclut :
 | D20 | Une publication possède au maximum une catégorie et plusieurs tags                       |
 | D21 | Technologies des projets et tags éditoriaux sont deux vocabulaires distincts             |
 | D22 | Rendu serveur à la demande par défaut ; prerender décidé route par route à l'étape 52.1 |
-| D23 | compose.yaml racine pour le développement local ; deploy/compose.yaml réservé à la production, mais on va le mettre dans deploy en ajoutant .dev |
+| D23 | Compose de développement local dans `deploy/compose.dev.yaml` (PostgreSQL seul, variables dans `deploy/.env`) ; `deploy/compose.yaml` réservé à la production (étape 52.9) |
 | D24 | Flyway est l'unique propriétaire du schéma ; Hibernate sera configuré en validate et jamais en update |
+
+Décisions d'architecture et d'implémentation postérieures : voir [`decisions/README.md`](decisions/README.md).
+
 ---
 
 ## 19. Hors V1

@@ -21,7 +21,7 @@ Le package racine du backend est :
 com.scalke.portfolio.backend
 ```
 
-La classe `PortfolioApplication` reste dans ce package racine afin que Spring Boot puisse détecter automatiquement tous les composants situés dans ses sous-packages.
+La classe `Application` reste dans ce package racine afin que Spring Boot puisse détecter automatiquement tous les composants situés dans ses sous-packages.
 
 ---
 
@@ -56,14 +56,14 @@ contact/
 
 Les couches techniques apparaissent uniquement **à l’intérieur d’un module** lorsqu’elles deviennent nécessaires.
 
-Exemple :
+Exemple (détail au §6) :
 
 ```text
 project/
-├── api/
 ├── domain/
-├── repository/
-└── service/
+├── application/
+├── infrastructure/
+└── web/
 ```
 
 Cette organisation permet de garder ensemble le code appartenant à une même fonctionnalité et de contrôler les dépendances entre domaines.
@@ -453,77 +453,83 @@ Une dépendance métier vers `security` serait le signe d’un couplage incorrec
 
 ## 6. Structure interne d’un module
 
-Lorsque le module reçoit ses premières classes, la structure cible est :
+> Section réécrite le 2026-09-24 pour décrire la structure réellement implémentée dans `profile`.
+> Référence et justification : [ADR 0001](decisions/0001-architecture-interne-des-modules.md) (acceptée le 2026-09-24).
+> La version précédente (`api/`, `domain/`, `repository/`, `service/`, entités JPA dans `domain`) est celle qu'utilisent encore les fiches de `docs/steps/` ; l'ADR donne la table de traduction.
+
+Un module est organisé en ports et adaptateurs « légers » :
 
 ```text
 <module>/
-├── api/
 ├── domain/
-├── repository/
-└── service/
+│   ├── model/          modèle métier (records, objets de valeur, enums, invariants)
+│   └── port/           interfaces sortantes utilisées par les cas d’usage
+├── application/
+│   └── usecase/        un cas d’usage par classe, frontière transactionnelle
+├── infrastructure/
+│   ├── persistence/jpa/
+│   │   ├── entity/     entités JPA *Entity
+│   │   ├── mapper/     conversions entité ↔ modèle
+│   │   └── repository/ *JpaRepository (Spring Data) + *RepositoryAdapter (implémente le port)
+│   └── seed/           données de développement (profil Spring dev uniquement)
+└── web/
+    ├── controller/     Public*Controller, Admin*Controller
+    └── dto/            *Request, *Response (records)
 ```
 
-### `api`
+Les sous-paquets n’apparaissent qu’avec leur première classe.
 
-Contient notamment :
+### `domain.model`
 
-- contrôleurs REST ;
-- DTO d’entrée ;
-- DTO de sortie ;
-- mapping entre domaine et API ;
-- validation liée au contrat HTTP.
+- modèle métier indépendant de JPA, de Spring et de Lombok ;
+- porte les invariants (constructeur compact, méthodes de l’agrégat) ;
+- testé par des tests unitaires purs (`*Test`, sans Spring ni Docker).
 
-Une entité JPA n’est jamais exposée directement comme contrat REST.
+### `domain.port`
 
----
+- interfaces **sortantes** seulement (persistance, stockage, email…) ;
+- ne contient que les méthodes réellement appelées par un cas d’usage ;
+- aucune implémentation bouchon (`return Optional.empty()`, `return false`, méthode vide).
 
-### `domain`
+### `application.usecase`
 
-Contient :
+- une classe concrète par intention : `GetProfileUseCase`, `CreateProjectUseCase`… avec une méthode `execute(...)` ;
+- pas d’interface d’entrée (`XxxUseCase` + `XxxUseCaseImpl`) ;
+- porte `@Transactional` (`readOnly = true` pour une lecture) : c’est la frontière transactionnelle ;
+- renvoie des objets du domaine, jamais des entités JPA.
 
-- entités métier ;
-- enums ;
-- règles métier ;
-- objets de valeur lorsque nécessaires.
+### `infrastructure`
 
-Le domaine ne dépend pas de la couche `api`.
+- entités JPA : structures de persistance, sans règle métier propre ;
+- l’adaptateur exécute ses requêtes dans la transaction du cas d’usage et convertit en modèle métier avant de rendre la main ; il peut porter `@Transactional` pour rester correct lorsqu’il est appelé hors cas d’usage (seed `dev`) ;
+- entités fermées : constructeur sans argument `protected`, pas de setter public hors champs optionnels, méthodes `addX` qui fixent la référence arrière ;
+- Flyway reste l’unique propriétaire du schéma (principe 6, §14).
 
-Interdit :
+### `web`
+
+- contrôleurs préfixés `Public` ou `Admin` (voir `05-conventions-api.md`) ;
+- DTO en records, construits par une méthode statique `from(...)` à partir du modèle métier ;
+- dépend de `application` et de `domain.model`, **jamais** de `infrastructure`.
+
+### Dépendances internes autorisées
 
 ```text
-domain → api
+web ──────────→ application ──→ domain
+ │                                 ↑
+ └──────────────→ domain.model     │
+infrastructure ────────────────────┘
 ```
 
----
-
-### `repository`
-
-Contient les interfaces d’accès aux données du module.
-
-Exemples :
+Interdits :
 
 ```text
-ProjectRepository
-PublicationRepository
-MediaRepository
+domain         → application, infrastructure, web, Spring, jakarta.persistence
+application    → infrastructure, web
+web            → infrastructure
+infrastructure → web
 ```
 
-Un repository appartient au module propriétaire de la donnée.
-
-Il ne devient public que si une dépendance inter-module réellement nécessaire a été décidée.
-
----
-
-### `service`
-
-Contient :
-
-- cas d’usage applicatifs ;
-- orchestration ;
-- transactions ;
-- coordination entre domaine et persistence.
-
-Les interactions entre modules passent de préférence par des services ou façades explicitement exposés plutôt que par l’accès direct aux repositories internes.
+Une entité JPA n’est jamais exposée comme contrat REST, et un contrôleur ne manipule jamais une entité JPA.
 
 ---
 
@@ -599,7 +605,7 @@ com.scalke.portfolio.backend
 Exemple :
 
 ```text
-com.scalke.portfolio.backend.PortfolioApplication
+com.scalke.portfolio.backend.Application
 ```
 
 Les modules sont directement placés en dessous :
@@ -648,7 +654,7 @@ com.scalke.portfolio.backend.service.ProjectService
 Exemple attendu :
 
 ```text
-com.scalke.portfolio.backend.project.service.ProjectService
+com.scalke.portfolio.backend.project.application.usecase.CreateProjectUseCase
 ```
 
 ---
@@ -682,8 +688,8 @@ AdminProjectController
 ou, si une séparation supplémentaire devient utile :
 
 ```text
-project.api.publicapi
-project.api.admin
+project.web.controller.publicapi
+project.web.controller.admin
 ```
 
 Le choix définitif des conventions REST est traité dans `05-conventions-api.md` ou dans l’étape dédiée aux conventions API.
@@ -748,9 +754,27 @@ com.scalke.portfolio.backend.common
 
 ---
 
-## 13. Arborescence cible initiale
+### 12.4 Couches internes d’un module
 
-À ce stade, seuls les packages racines sont créés.
+État au 2026-09-24 : **automatisé** (`ApiConventionsTest`, `ModuleLayersTest`).
+
+| Règle | Test | État |
+|---|---|---|
+| contrôleurs dans `..web.controller..` | `ApiConventionsTest` | en place |
+| contrôleurs préfixés `Public` / `Admin` | `ApiConventionsTest` | en place |
+| entités JPA dans `..infrastructure.persistence.jpa.entity..` | `ApiConventionsTest` | en place |
+| `domain` ne dépend ni de `application`, `infrastructure`, `web`, ni de Spring / `jakarta.persistence` / Hibernate | `ModuleLayersTest` | en place |
+| `application` ne dépend ni de `infrastructure` ni de `web` | `ModuleLayersTest` | en place |
+| `web` ne dépend pas de `infrastructure` | `ModuleLayersTest` | en place |
+| `infrastructure` ne dépend pas de `web` | `ModuleLayersTest` | en place |
+
+
+
+---
+
+## 13. Arborescence initiale (étape 10)
+
+L’étape 10 a créé uniquement les packages racines. L’état actuel d’un module réel (`profile`) suit le §6.
 
 ```text
 backend/
@@ -761,7 +785,7 @@ backend/
                 └── scalke/
                     └── portfolio/
                         └── backend/
-                            ├── PortfolioApplication.java
+                            ├── Application.java
                             ├── shared/
                             │   └── package-info.java
                             ├── security/
@@ -784,7 +808,7 @@ backend/
                                 └── package-info.java
 ```
 
-Les sous-packages `api`, `domain`, `repository` et `service` sont créés seulement lorsqu’un module reçoit réellement ses premières classes.
+Les sous-packages décrits au §6 sont créés seulement lorsqu’un module reçoit réellement ses premières classes.
 
 ---
 
@@ -891,11 +915,12 @@ L’objectif est que l’architecture soit une contrainte du build et non une si
 | A05 | `series` dépend de `publication`, jamais l’inverse |
 | A06 | `search` dépend de `publication` et `project`, jamais l’inverse |
 | A07 | Les modules métier ne dépendent pas directement de `security` |
-| A08 | Les couches techniques sont internes à chaque module |
+| A08 | Les couches techniques sont internes à chaque module (structure du §6, [ADR 0001](decisions/0001-architecture-interne-des-modules.md)) |
 | A09 | Une entité JPA n’est jamais exposée directement par l’API |
 | A10 | Les dépendances architecturales sont vérifiées avec ArchUnit |
 | A11 | Aucun package racine générique `utils`, `helpers` ou `common` |
 | A12 | Le package racine Spring Boot est `com.scalke.portfolio.backend` |
+| A13 | Modèle métier sans JPA ; persistance derrière un port ; cas d’usage transactionnels ([ADR 0001](decisions/0001-architecture-interne-des-modules.md)) |
 
 ---
 

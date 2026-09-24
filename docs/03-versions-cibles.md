@@ -113,10 +113,10 @@ Lorsque `psql` est nécessaire, le client fourni par le conteneur PostgreSQL est
 Exemple :
 
 ```bash
-docker compose exec postgres psql -U portfolio -d portfolio
+docker compose -f deploy/compose.dev.yaml exec postgres psql -U portfolio -d portfolio
 ```
 
-Le nom exact du service, de l'utilisateur et de la base sera défini lors de l'étape de création du `compose.yaml`.
+Le service s'appelle `postgres` ; l'utilisateur et la base viennent de `deploy/.env` (modèle : `deploy/.env.example`).
 
 ---
 
@@ -370,4 +370,79 @@ Il ne faut pas mélanger plusieurs versions majeures Angular.
 
 # 10. PostgreSQL
 
-## 10.1 Version maje
+> Section complétée le 2026-09-24 : le fichier était tronqué à cet endroit.
+
+## 10.1 Version majeure
+
+```text
+PostgreSQL 18
+```
+
+## 10.2 Image épinglée
+
+La même image est utilisée partout :
+
+| Usage | Fichier | Image |
+|---|---|---|
+| Développement local | `deploy/compose.dev.yaml` | `postgres:18.6` |
+| Tests d'intégration | `backend/src/test/java/.../testsupport/ContainersConfiguration.java` (`POSTGRES_IMAGE`) | `postgres:18.6` |
+| Production | `deploy/compose.yaml` (étape 52.9) | à aligner |
+
+`FlywayMigrationIT` vérifie que la base de test est en version 18 ou supérieure.
+
+## 10.3 Montée de version
+
+Une montée de version mineure (`18.x`) modifie les trois emplacements ci-dessus dans le même commit, puis `./mvnw verify`.
+
+Une montée de version majeure exige en plus une procédure de migration des données du volume (`pg_upgrade` ou dump/restore) : elle fera l'objet d'un ADR.
+
+## 10.4 Extensions
+
+`V000__init_schema.sql` installe `unaccent` (recherche plein texte, étape 28). En production, l'utilisateur applicatif doit avoir le droit de créer l'extension, ou l'extension doit être créée au provisionnement.
+
+---
+
+# 11. Dépendances notables effectivement installées
+
+Relevé du 2026-09-24 (`backend/pom.xml`, `frontend/package-lock.json`).
+
+## 11.1 Backend
+
+| Dépendance | Version | Gestion |
+|---|---|---|
+| Spring Boot (parent) | 4.1.1 | BOM |
+| Starters : webmvc, data-jpa, validation, actuator, flyway | BOM | BOM |
+| `flyway-database-postgresql` | BOM | BOM |
+| Driver PostgreSQL | BOM | BOM |
+| Lombok | BOM | processeur d'annotations déclaré dans `maven-compiler-plugin` |
+| `springdoc-openapi-starter-webmvc-ui` | 3.1.0 | **hors BOM**, version fixée dans le `pom.xml` |
+| ArchUnit | 1.5.0 | **hors BOM**, version fixée dans le `pom.xml` |
+| Testcontainers (`testcontainers-postgresql`) | BOM | BOM |
+| `spring-boot-devtools` | BOM | `runtime` |
+
+Toute dépendance hors BOM doit être vérifiée à chaque montée de Spring Boot.
+
+## 11.2 Frontend
+
+| Paquet | Version résolue (lockfile) |
+|---|---|
+| `@angular/core` | 22.1.7 |
+| `@angular/cli`, `@angular/build` | 22.1.8 |
+| `@angular/ssr` | 22.1.8 |
+| TypeScript | 6.0.3 |
+| Tailwind CSS (`@tailwindcss/postcss`) | 4.3.3 |
+| Vitest (via `@angular/build:unit-test`) | 4.1.11 |
+| Express (serveur SSR) | 5.2.1 |
+
+Le moteur Node requis par Angular 22.1 est `^22.22.3 || ^24.15.0 || >=26.0.0`. Le projet cible Node 24 (`.nvmrc`).
+
+---
+
+# 12. Fichiers d'épinglage des outils
+
+| Fichier | Contenu | Remarque |
+|---|---|---|
+| `.nvmrc` | `24` | Node 24 LTS |
+| `.sdkmanrc` | `java=25.0.4.1-tem`, `maven=3.9.15` | le Maven de référence reste celui du wrapper (3.9.16) ; la ligne `maven` de SDKMAN ne sert qu'aux opérations hors wrapper |
+| `backend/.mvn/wrapper/maven-wrapper.properties` | Maven 3.9.16, wrapper 3.3.4 | référence |
+| `frontend/package.json` → `packageManager` | `npm@11.16.0` | |

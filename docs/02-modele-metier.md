@@ -89,7 +89,7 @@ Les éléments composés ne possèdent pas d'API métier autonome.
 
 # 4. Profile
 
-`ProfileResponse` représente le propriétaire professionnel du portfolio.
+`Profile` représente le propriétaire professionnel du portfolio.
 
 La V1 contient un seul profil.
 
@@ -186,7 +186,7 @@ ProfessionalLink
 └── displayOrder
 ```
 
-Il est composé dans `ProfileResponse`.
+Il est composé dans `Profile`.
 
 Il n'existe pas indépendamment du profil.
 
@@ -730,6 +730,12 @@ Les règles suivantes doivent être garanties par le backend et, lorsque pertine
 14. un échec SMTP ne supprime jamais un message sauvegardé ;
 15. le mot de passe administrateur n'est jamais stocké en clair ;
 16. une entité JPA ne constitue jamais directement le contrat d'API.
+17. une période (`Experience`, `Education`) ne se termine jamais avant de commencer ; `endDate = null` signifie « en cours » ;
+18. une `Certification` n'expire jamais avant sa date de délivrance ;
+19. le nom d'une `Skill` est unique dans le profil ;
+20. il existe au plus un `Profile`.
+
+Les invariants 17 à 20 ont été ajoutés pendant l'implémentation (étapes 14 à 16) ; ils sont garantis par PostgreSQL (`CHECK`, `UNIQUE`) et, pour 17 et 18, par une garde Java. Voir [`decisions/registre-implementation.md`](decisions/registre-implementation.md).
 
 ---
 

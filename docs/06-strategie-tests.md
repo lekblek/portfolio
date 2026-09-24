@@ -737,6 +737,36 @@ Cette vérification démontre que les tests ne dépendent pas d’un état manue
 
 ---
 
+# 19 bis. Niveau de test par couche d’un module
+
+> Ajouté le 2026-09-24. S’appuie sur la structure décrite dans `04-architecture-backend.md` §6.
+
+| Couche testée | Type | Suffixe | Outil | Exemple actuel |
+|---|---|---|---|---|
+| `domain.model` (invariants, objets de valeur) | unitaire pur | `*Test` | JUnit + AssertJ, sans Spring | à venir en 16.3 (`DateRangeTest`, `CertificationTest`) |
+| entités JPA (garde, rattachement) | unitaire pur | `*Test` | JUnit + AssertJ | `DateRangeTest`, `CertificationEntityTest` (provisoire, avant 16.3) |
+| mappers de persistance | unitaire pur | `*Test` | aller-retour modèle ↔ entité | `ProfilePersistenceMapperTest` |
+| `application.usecase` (orchestration, nombre de requêtes) | intégration | `*IT` | `AbstractIntegrationTest` | `GetProfileUseCaseIT` |
+| `infrastructure.persistence` (mapping, tri, requêtes) | intégration | `*IT` | `AbstractIntegrationTest` + `EntityManager` | `ProfileMappingIT` |
+| schéma (contraintes SQL) | intégration | `*IT` | `JdbcClient` | `ProfileSchemaIT` |
+| `web` (contrat JSON, codes HTTP, erreurs) | tranche | `*Test` | `@WebMvcTest` + `@MockitoBean` du cas d’usage | `PublicProfileControllerTest` |
+| parcours HTTP complet (contrôleur → base) | intégration | `*IT` | `AbstractIntegrationTest` + `MockMvc` | `PublicProfileIT` |
+| architecture | unitaire | `*Test` | ArchUnit | `ModuleBoundariesTest`, `ModuleLayersTest`, `ApiConventionsTest` |
+
+Règles :
+
+* la classe de test vit dans le **même paquet** que la classe testée (un test de `infrastructure…DateRange` ne se range pas dans `profile.domain`) ;
+* tout test qui hérite d’`AbstractIntegrationTest` est un `*IT`, sans exception ;
+* un test `@WebMvcTest` construit ses données avec le **modèle métier**, pas avec des entités JPA ni des mappers de persistance ;
+* un test de chargement ne doit pas être annoté `@Transactional` s’il prétend vérifier ce qui est chargé **hors** transaction : la transaction du test garderait la session ouverte et masquerait le problème. Pour compter les requêtes, utiliser les statistiques Hibernate plutôt qu’une supposition.
+
+## Pièges connus
+
+* Les classes de test annotées `@RestController` (ex. `ErrorHandlingTestController`) sont détectées par le scan de composants de **tous** les `@SpringBootTest`, car elles vivent sous `com.scalke.portfolio.backend`. C’est sans effet aujourd’hui, mais un tel contrôleur doit rester limité à des routes `/test-…`.
+* `./mvnw test` doit rester exécutable sans Docker : c’est le critère qui détecte un `*Test` mal nommé.
+
+---
+
 # 20. Règles du projet
 
 ```text
