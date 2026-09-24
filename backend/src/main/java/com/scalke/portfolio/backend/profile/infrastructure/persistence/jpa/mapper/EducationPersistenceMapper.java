@@ -1,8 +1,8 @@
 package com.scalke.portfolio.backend.profile.infrastructure.persistence.jpa.mapper;
 
-import com.scalke.portfolio.backend.profile.domain.model.DateRange;
 import com.scalke.portfolio.backend.profile.domain.model.Education;
 import com.scalke.portfolio.backend.profile.infrastructure.persistence.jpa.entity.EducationEntity;
+import com.scalke.portfolio.backend.shared.domain.model.DateRange;
 
 import java.util.List;
 

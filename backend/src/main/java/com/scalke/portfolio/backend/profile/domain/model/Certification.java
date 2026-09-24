@@ -5,7 +5,8 @@ import java.util.Objects;
 
 /**
  * Certification du parcours. {@code expiresAt == null} : sans expiration (et non « en cours ») ;
- * c'est pourquoi elle ne réutilise pas {@link DateRange} (D-M).
+ * c'est pourquoi elle ne réutilise pas
+ * {@link com.scalke.portfolio.backend.shared.domain.model.DateRange} (D-M).
  * <p>
  * Invariant (D-I, D-N) : l'expiration n'est jamais antérieure à la délivrance. Doublé par
  * {@code certification_dates_check} de {@code V003}.

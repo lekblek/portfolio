@@ -1,8 +1,8 @@
 package com.scalke.portfolio.backend.profile.infrastructure.persistence.jpa.mapper;
 
-import com.scalke.portfolio.backend.profile.domain.model.DateRange;
 import com.scalke.portfolio.backend.profile.domain.model.Experience;
 import com.scalke.portfolio.backend.profile.infrastructure.persistence.jpa.entity.ExperienceEntity;
+import com.scalke.portfolio.backend.shared.domain.model.DateRange;
 
 import java.util.List;
 

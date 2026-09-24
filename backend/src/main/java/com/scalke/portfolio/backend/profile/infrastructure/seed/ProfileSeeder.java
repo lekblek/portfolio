@@ -1,13 +1,13 @@
 package com.scalke.portfolio.backend.profile.infrastructure.seed;
 
 import com.scalke.portfolio.backend.profile.domain.model.Certification;
-import com.scalke.portfolio.backend.profile.domain.model.DateRange;
 import com.scalke.portfolio.backend.profile.domain.model.Education;
 import com.scalke.portfolio.backend.profile.domain.model.Experience;
 import com.scalke.portfolio.backend.profile.domain.model.ProfessionalLink;
 import com.scalke.portfolio.backend.profile.domain.model.Profile;
 import com.scalke.portfolio.backend.profile.domain.model.Skill;
 import com.scalke.portfolio.backend.profile.domain.port.ProfileRepository;
+import com.scalke.portfolio.backend.shared.domain.model.DateRange;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;

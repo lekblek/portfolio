@@ -1,4 +1,4 @@
-package com.scalke.portfolio.backend.profile.domain.model;
+package com.scalke.portfolio.backend.shared.domain.model;
 
 import org.junit.jupiter.api.Test;
 

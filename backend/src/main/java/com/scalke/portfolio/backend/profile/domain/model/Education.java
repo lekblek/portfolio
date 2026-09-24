@@ -1,5 +1,7 @@
 package com.scalke.portfolio.backend.profile.domain.model;
 
+import com.scalke.portfolio.backend.shared.domain.model.DateRange;
+
 import java.util.Objects;
 
 public record Education(
