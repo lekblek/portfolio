@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
- * Contraintes de {@code V006__create_publication.sql}, vérifiées sans JPA.
+ * Contraintes de {@code V006__create_publication.sql} (et {@code V009} pour la date des archives), vérifiées sans JPA.
  */
 @Transactional
 class PublicationSchemaIT extends AbstractIntegrationTest {
@@ -63,8 +63,8 @@ class PublicationSchemaIT extends AbstractIntegrationTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"SCHEDULED", "PUBLISHED"})
-    void requires_a_publication_date_once_scheduled_or_published(String status) {
+    @ValueSource(strings = {"SCHEDULED", "PUBLISHED", "ARCHIVED"})
+    void requires_a_publication_date_once_scheduled_published_or_archived(String status) {
         assertThatThrownBy(() -> insert("article", "ARTICLE", status, null))
             .isInstanceOf(DataIntegrityViolationException.class)
             .hasMessageContaining("publication_published_at_check");
