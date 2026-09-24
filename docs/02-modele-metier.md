@@ -329,7 +329,7 @@ Le Markdown est la source canonique.
 
 Aucun `contentHtml` métier n'est nécessaire.
 
-État d’implémentation (étape 19) : tous les attributs ci-dessus sauf `category` et `tags` (étape 20) et `coverMedia` (étape 27) ; le temps de lecture est calculé à partir du Markdown (D12, D-AJ). Le slug est unique pour l’ensemble des publications (D-AL).
+État d’implémentation (étapes 19 et 20) : tous les attributs ci-dessus sauf `coverMedia` (étape 27) ; le temps de lecture est calculé à partir du Markdown (D12, D-AJ). Le slug est unique pour l’ensemble des publications (D-AL).
 
 ---
 
@@ -422,6 +422,8 @@ Publication → 0..1 Category
 
 Une publication possède au maximum une catégorie principale.
 
+État d’implémentation (étape 20) : module `taxonomy`, table `category` ; la publication référence sa catégorie par identifiant (`publication.category_id`, ADR 0002).
+
 ---
 
 # 18. Tag
@@ -441,6 +443,8 @@ Publication N ↔ N Tag
 Les tags sont éditoriaux.
 
 Ils ne constituent pas le catalogue des technologies des projets.
+
+État d’implémentation (étape 20) : module `taxonomy`, table `tag` ; association `publication_tag` possédée par le module `publication` (ADR 0002). Les tags n’ont pas d’ordre propre : ils sont présentés par ordre alphabétique.
 
 ---
 
@@ -747,9 +751,10 @@ Les règles suivantes doivent être garanties par le backend et, lorsque pertine
 21. un `Project` est `IN_PROGRESS` si et seulement s'il n'a pas de date de fin ; sa période respecte l'invariant 17 ;
 22. le nom (sans tenir compte de la casse) et le slug d'une `Technology` sont uniques ; une technologie utilisée par un projet ne peut pas être supprimée ;
 23. un `Project` référence au plus une fois la même `Technology` ;
-24. une `Publication` `SCHEDULED` ou `PUBLISHED` possède toujours une date de publication (`publishedAt`).
+24. une `Publication` `SCHEDULED` ou `PUBLISHED` possède toujours une date de publication (`publishedAt`) ;
+25. le nom (sans tenir compte de la casse) et le slug d'une `Category`, d'un `Tag`, sont uniques dans leur vocabulaire ; un terme utilisé par une publication ne peut pas être supprimé.
 
-Les invariants 17 à 24 ont été ajoutés pendant l'implémentation (étapes 14 à 19) ; ils sont garantis par PostgreSQL (`CHECK`, `UNIQUE`, clés étrangères) et, pour 17, 18, 21, 23 et 24, par une garde Java dans le modèle métier. Les invariants 7 à 10 (visibilité des publications) sont appliqués par les lectures publiques depuis l'étape 19. Voir [`decisions/registre-implementation.md`](decisions/registre-implementation.md).
+Les invariants 17 à 25 ont été ajoutés pendant l'implémentation (étapes 14 à 20) ; ils sont garantis par PostgreSQL (`CHECK`, `UNIQUE`, clés étrangères) et, pour 17, 18, 21, 23 et 24, par une garde Java dans le modèle métier. Les invariants 7 à 10 (visibilité des publications) sont appliqués par les lectures publiques depuis l'étape 19. Voir [`decisions/registre-implementation.md`](decisions/registre-implementation.md).
 
 ---
 

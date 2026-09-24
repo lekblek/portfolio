@@ -567,7 +567,9 @@ La visibilité package-private participe à l’encapsulation du monolithe modul
 
 Un module ne doit pas exposer ses détails internes inutilement.
 
-À terme, les dépendances entre modules doivent privilégier :
+> Depuis l’étape 20, ce principe est une règle vérifiée : voir [ADR 0002](decisions/0002-communication-entre-modules.md) et §12.5. Première façade : `taxonomy.application.query.TaxonomyQueryService`, utilisée par `publication`.
+
+Les dépendances entre modules passent par :
 
 ```text
 Module A
@@ -781,13 +783,19 @@ com.scalke.portfolio.backend.common
 | `web` ne dépend pas de `infrastructure` | `ModuleLayersTest` | en place |
 | `infrastructure` ne dépend pas de `web` | `ModuleLayersTest` | en place |
 
+---
 
+### 12.5 Communication entre modules
+
+État au 2026-09-24 (étape 20) : **automatisé** (`ModuleBoundariesTest.modules_only_use_each_other_through_domain_models_and_application_services`).
+
+Un module n’utilise d’un autre module que ses records `domain.model` et ses services `application` ; jamais ses `domain.port`, son `infrastructure` ni son `web` ([ADR 0002](decisions/0002-communication-entre-modules.md)).
 
 ---
 
 ## 13. Arborescence initiale (étape 10)
 
-L’étape 10 a créé uniquement les packages racines. Les modules implémentés (`profile` depuis l’étape 14, `project` depuis l’étape 17, `publication` depuis l’étape 19) et `shared` suivent le §6 et le §3.1.
+L’étape 10 a créé uniquement les packages racines. Les modules implémentés (`profile` depuis l’étape 14, `project` depuis l’étape 17, `publication` depuis l’étape 19, `taxonomy` depuis l’étape 20) et `shared` suivent le §6 et le §3.1. Une façade de lecture destinée aux autres modules vit dans `<module>.application.query` (ADR 0002).
 
 ```text
 backend/
@@ -934,6 +942,7 @@ L’objectif est que l’architecture soit une contrainte du build et non une si
 | A11 | Aucun package racine générique `utils`, `helpers` ou `common` |
 | A12 | Le package racine Spring Boot est `com.scalke.portfolio.backend` |
 | A13 | Modèle métier sans JPA ; persistance derrière un port ; cas d’usage transactionnels ([ADR 0001](decisions/0001-architecture-interne-des-modules.md)) |
+| A14 | Entre modules : références par identifiant et façades de lecture ; ni port, ni persistance, ni web d’un autre module ([ADR 0002](decisions/0002-communication-entre-modules.md)) |
 
 ---
 

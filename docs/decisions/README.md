@@ -21,7 +21,7 @@ Une décision n'est **jamais** enregistrée uniquement dans `docs/steps/` : ce d
 | V01 … V06 | Versions (étape 04) | intégrées à [`../03-versions-cibles.md`](../03-versions-cibles.md) |
 | A01 … A13 | Architecture backend | [`../04-architecture-backend.md` §16](../04-architecture-backend.md) |
 | C01 … C11 | Conventions API | [`../05-conventions-api.md` §37](../05-conventions-api.md) |
-| D-A … D-AM | Décisions d'implémentation des étapes 14 à 19 | [`registre-implementation.md`](registre-implementation.md) |
+| D-A … D-AT | Décisions d'implémentation des étapes 14 à 20 | [`registre-implementation.md`](registre-implementation.md) |
 | R-1 … R-7 | Organisation du dépôt et de l'outillage | [`registre-implementation.md`](registre-implementation.md) |
 
 ## ADR
@@ -29,6 +29,7 @@ Une décision n'est **jamais** enregistrée uniquement dans `docs/steps/` : ce d
 | N° | Titre | Statut |
 |---|---|---|
 | [0001](0001-architecture-interne-des-modules.md) | Architecture interne des modules backend : ports et adaptateurs légers | Acceptée (2026-09-24) |
+| [0002](0002-communication-entre-modules.md) | Communication entre modules : identifiants et façades de lecture | Acceptée (2026-09-24) |
 
 ## Quand écrire un ADR ?
 

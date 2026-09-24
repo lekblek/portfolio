@@ -823,7 +823,7 @@ GET /api/public/publications?type=ARTICLE
 Autres exemples possibles :
 
 ```text
-/api/public/publications?category=spring-boot
+/api/public/publications?category=spring-boot       (implémenté à l’étape 20, avec ?tag=)
 
 /api/public/projects?technology=java        (implémenté à l’étape 18)
 
@@ -1323,7 +1323,7 @@ contenu non visible
 → 404
 ```
 
-Implémentation (étape 19, D-AG, D-AH) : la règle est écrite une seule fois dans la requête JPQL (`PublicationJpaRepository.VISIBLE_AT_NOW`) ; « maintenant » vient du bean `Clock` (`shared.infrastructure.ClockConfiguration`), remplacé par une horloge fixe dans les tests d’intégration.
+Implémentation (étapes 19 et 20, D-AG, D-AH, D-AR) : la règle est écrite une seule fois (`PublicationSpecifications.visibleAt`) et combinée aux filtres ; « maintenant » vient du bean `Clock` (`shared.infrastructure.ClockConfiguration`), remplacé par une horloge fixe dans les tests d’intégration.
 
 ---
 
@@ -1414,24 +1414,28 @@ Règles propres à ces contrats :
 * couverture et captures arriveront avec le catalogue `Media` (étape 27, D-AD) ;
 * contrats vérifiés par `PublicProjectControllerTest` et `PublicProjectIT`.
 
-### `GET /api/public/publications` (étape 19)
+### `GET /api/public/publications` (étapes 19 et 20)
 
 ```text
 ?page=0&size=10          page 0-based ; size par défaut 10, plafonnée à 100 ; sort ignoré (ordre fixe)
 ?type=ARTICLE|NEWS       facultatif ; toute autre valeur → 400 MALFORMED_REQUEST
+?category=<slug>         facultatif ; slug inconnu → page vide
+?tag=<slug>              facultatif ; slug inconnu → page vide ; filtres cumulables (ET)
 200 → PageResponse<PublicationSummaryResponse>
 {
-  content[] { type, title, slug, summary, publishedAt, featured, readingTimeMinutes },
+  content[] { type, title, slug, summary, publishedAt, featured, readingTimeMinutes,
+              category { name, slug } | null, tags[] { name, slug } },
   page, size, totalElements, totalPages, first, last
 }
 ```
 
-### `GET /api/public/publications/{slug}` (étape 19)
+### `GET /api/public/publications/{slug}` (étapes 19 et 20)
 
 ```text
 200 → PublicationResponse
 {
   type, title, slug, summary, contentMarkdown, publishedAt, featured, readingTimeMinutes,
+  category { name, slug } | null, tags[] { name, slug },
   seoTitle | null, seoDescription | null
 }
 404 → ProblemDetail, code RESOURCE_NOT_FOUND (slug inconnu, DRAFT, IN_REVIEW, ARCHIVED,
@@ -1445,7 +1449,8 @@ Règles propres à ces contrats :
 * `publishedAt` : instant ISO-8601 UTC (§26) ;
 * `readingTimeMinutes` : calculé depuis le Markdown, 200 mots par minute, au moins 1 (D12) ;
 * ni `id`, ni `status`, ni dates d’audit (D-AJ) ; la liste n’inclut ni le contenu ni les champs SEO ;
-* catégorie et tags arriveront à l’étape 20, la couverture à l’étape 27 ;
+* `category` : `null` si non classée ; `tags` : triés par nom, `[]` si aucun ; les slugs servent de valeurs aux filtres (D-AP, D-AQ) ;
+* la couverture arrivera à l’étape 27 ;
 * contrats vérifiés par `PublicPublicationControllerTest` et `PublicPublicationIT`.
 
 Chaque module introduit ses routes lors de son étape d’implémentation.
