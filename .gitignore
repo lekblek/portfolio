@@ -1,10 +1,7 @@
 # ---------- Secrets et environnement ----------
 deploy/.env
-deploy/.env.example
-!deploy/.env.example
 deploy/env/*
 !deploy/env/*.example
-!deploy/env/.gitkeep
 .env
 .env.*
 !.env.example
@@ -49,5 +46,10 @@ Thumbs.db
 # ---------- Runtime local ----------
 *.log
 uploads/
-docs/prompts
-docs/steps
+
+# ---------- Documentation de travail non versionnée (décision 2026-09-24) ----------
+# Fiches d'étape et prompts : supports de travail avec l'assistant, gardés hors du dépôt.
+# Toute décision qu'ils contiennent est reportée dans docs/decisions/ (versionné).
+docs/prompts/
+docs/steps/
+docs/prompt.txt
