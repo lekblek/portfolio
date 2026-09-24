@@ -3,7 +3,9 @@ package com.scalke.portfolio.backend.project;
 import com.scalke.portfolio.backend.project.domain.model.Project;
 import com.scalke.portfolio.backend.project.domain.model.ProjectStage;
 import com.scalke.portfolio.backend.project.domain.model.ProjectVisibility;
+import com.scalke.portfolio.backend.project.domain.model.Technology;
 import com.scalke.portfolio.backend.project.domain.port.ProjectRepository;
+import com.scalke.portfolio.backend.project.domain.port.TechnologyRepository;
 import com.scalke.portfolio.backend.shared.domain.model.DateRange;
 import com.scalke.portfolio.backend.testsupport.AbstractIntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,8 +18,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static com.scalke.portfolio.backend.project.ProjectFixtures.project;
+import static com.scalke.portfolio.backend.project.ProjectFixtures.technology;
 import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -26,7 +30,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * Parcours HTTP complet : contrôleur → cas d'usage → adaptateur JPA → PostgreSQL.
- * Vérifie la sérialisation réelle et l'invisibilité des projets non publiés (invariant 11, D-U).
+ * Vérifie la sérialisation réelle, l'invisibilité des projets non publiés (invariant 11, D-U)
+ * et le filtre par technologie (D-AC).
  */
 @Transactional
 class PublicProjectIT extends AbstractIntegrationTest {
@@ -37,29 +42,51 @@ class PublicProjectIT extends AbstractIntegrationTest {
     @Autowired
     ProjectRepository projectRepository;
 
+    @Autowired
+    TechnologyRepository technologyRepository;
+
     @BeforeEach
     void givenOnePublishedOneDraftAndOneArchivedProject() {
+        Technology java = technologyRepository.create(technology("Java", "java", 0));
+        Technology postgresql = technologyRepository.create(technology("PostgreSQL", "postgresql", 1));
         projectRepository.create(new Project(
             null, "Portfolio full-stack", "portfolio-full-stack", "Résumé", "## Description",
             ProjectStage.COMPLETED, ProjectVisibility.PUBLISHED,
             DateRange.between(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 6, 30)),
-            null, "https://example.test/demo", false, 0));
+            null, "https://example.test/demo", false, 0,
+            List.of(postgresql, java)));
         projectRepository.create(project("brouillon", ProjectVisibility.DRAFT,
-            DateRange.ongoingSince(LocalDate.of(2026, 1, 1)), 0));
+            DateRange.ongoingSince(LocalDate.of(2026, 1, 1)), 0, java));
         projectRepository.create(project("archive", ProjectVisibility.ARCHIVED,
             DateRange.between(LocalDate.of(2020, 1, 1), LocalDate.of(2021, 1, 1)), 0));
     }
 
     @Test
-    void lists_only_published_projects() throws Exception {
+    void lists_only_published_projects_with_their_technologies() throws Exception {
         mockMvc.perform(get("/api/public/projects").contextPath("/api"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.content.length()").value(1))
             .andExpect(jsonPath("$.content[0].slug").value("portfolio-full-stack"))
             .andExpect(jsonPath("$.content[0].stage").value("COMPLETED"))
             .andExpect(jsonPath("$.content[0].endDate").value("2024-06-30"))
+            .andExpect(jsonPath("$.content[0].technologies[0].name").value("Java"))
+            .andExpect(jsonPath("$.content[0].technologies[1].slug").value("postgresql"))
             .andExpect(jsonPath("$.totalElements").value(1))
             .andExpect(jsonPath("$.size").value(10));
+    }
+
+    @Test
+    void filters_published_projects_by_technology() throws Exception {
+        mockMvc.perform(get("/api/public/projects").contextPath("/api").param("technology", "java"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.content.length()").value(1))
+            .andExpect(jsonPath("$.content[0].slug").value("portfolio-full-stack"))
+            .andExpect(jsonPath("$.totalElements").value(1));
+
+        mockMvc.perform(get("/api/public/projects").contextPath("/api").param("technology", "cobol"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.content").isEmpty())
+            .andExpect(jsonPath("$.totalElements").value(0));
     }
 
     @Test
@@ -70,7 +97,8 @@ class PublicProjectIT extends AbstractIntegrationTest {
             .andExpect(jsonPath("$.startDate").value("2024-01-01"))
             .andExpect(jsonPath("$.repositoryUrl").hasJsonPath())
             .andExpect(jsonPath("$.repositoryUrl").value(nullValue()))
-            .andExpect(jsonPath("$.demoUrl").value("https://example.test/demo"));
+            .andExpect(jsonPath("$.demoUrl").value("https://example.test/demo"))
+            .andExpect(jsonPath("$.technologies.length()").value(2));
     }
 
     @ParameterizedTest

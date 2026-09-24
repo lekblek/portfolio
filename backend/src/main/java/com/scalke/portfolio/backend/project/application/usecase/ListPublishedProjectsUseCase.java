@@ -1,6 +1,7 @@
 package com.scalke.portfolio.backend.project.application.usecase;
 
 import com.scalke.portfolio.backend.project.domain.model.Project;
+import com.scalke.portfolio.backend.project.domain.model.ProjectFilter;
 import com.scalke.portfolio.backend.project.domain.port.ProjectRepository;
 import com.scalke.portfolio.backend.shared.domain.model.PageQuery;
 import com.scalke.portfolio.backend.shared.domain.model.PageResult;
@@ -15,7 +16,7 @@ public class ListPublishedProjectsUseCase {
     private final ProjectRepository projectRepository;
 
     @Transactional(readOnly = true)
-    public PageResult<Project> execute(PageQuery query) {
-        return projectRepository.findPublished(query);
+    public PageResult<Project> execute(ProjectFilter filter, PageQuery query) {
+        return projectRepository.findPublished(filter, query);
     }
 }

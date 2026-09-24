@@ -8,12 +8,15 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.Length;
+import org.hibernate.annotations.BatchSize;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Structure de persistance d'un projet ({@code V004}). Les invariants vivent dans
- * {@code domain.model.Project} et dans les contraintes de la table (ADR 0001).
+ * Structure de persistance d'un projet ({@code V004}, {@code V005}). Les invariants vivent dans
+ * {@code domain.model.Project} et dans les contraintes des tables (ADR 0001).
  */
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -63,6 +66,21 @@ public class ProjectEntity {
     @Column(name = "display_order", nullable = false)
     private int displayOrder;
 
+    /**
+     * Références vers un autre agrégat : aucune cascade, le projet ne crée ni ne supprime une technologie.
+     * <p>
+     * {@code @BatchSize} (D-AB) : pour une page de projets, les technologies de tous les projets chargés
+     * sont lues en une seule requête au lieu d'une par projet (N+1). La taille couvre la plus grande page
+     * de l'API ({@code ApiPaging.MAX_PAGE_SIZE}). L'ordre est fixé par le domaine ({@code Technology.DISPLAY_ORDER}).
+     */
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "project_technology",
+        joinColumns = @JoinColumn(name = "project_id"),
+        inverseJoinColumns = @JoinColumn(name = "technology_id"))
+    @BatchSize(size = 100)
+    private List<TechnologyEntity> technologies = new ArrayList<>();
+
     @Builder
     private ProjectEntity(String title, String slug, String shortDescription, String descriptionMarkdown,
                           ProjectStage stage, ProjectVisibility visibility, LocalDate startDate, LocalDate endDate,
@@ -79,5 +97,9 @@ public class ProjectEntity {
         this.demoUrl = demoUrl;
         this.featured = featured;
         this.displayOrder = displayOrder;
+    }
+
+    public void addTechnology(TechnologyEntity technology) {
+        technologies.add(technology);
     }
 }

@@ -1,6 +1,7 @@
 package com.scalke.portfolio.backend.project.domain.port;
 
 import com.scalke.portfolio.backend.project.domain.model.Project;
+import com.scalke.portfolio.backend.project.domain.model.ProjectFilter;
 import com.scalke.portfolio.backend.shared.domain.model.PageQuery;
 import com.scalke.portfolio.backend.shared.domain.model.PageResult;
 
@@ -17,10 +18,11 @@ import java.util.Optional;
 public interface ProjectRepository {
 
     /**
-     * Projets {@code PUBLISHED} uniquement, dans l'ordre d'affichage public :
+     * Projets {@code PUBLISHED} uniquement, restreints par {@code filter}, dans l'ordre d'affichage public :
      * {@code displayOrder} croissant, puis date de début décroissante, puis identifiant (tri total).
+     * Chaque projet est renvoyé avec ses technologies.
      */
-    PageResult<Project> findPublished(PageQuery query);
+    PageResult<Project> findPublished(ProjectFilter filter, PageQuery query);
 
     /**
      * Vide si aucun projet ne porte ce slug ou s'il n'est pas {@code PUBLISHED} : les deux cas sont
@@ -30,5 +32,9 @@ public interface ProjectRepository {
 
     boolean existsAny();
 
+    /**
+     * Crée un projet. Ses technologies doivent déjà exister (identifiant non nul) : un projet ne crée
+     * jamais le vocabulaire (D-Z).
+     */
     Project create(Project project);
 }

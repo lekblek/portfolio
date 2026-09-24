@@ -4,6 +4,7 @@ import com.scalke.portfolio.backend.project.domain.model.Project;
 import com.scalke.portfolio.backend.project.domain.model.ProjectStage;
 
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * Détail public d'un projet ({@code GET /api/public/projects/{slug}}, D-W). Les champs optionnels
@@ -19,7 +20,8 @@ public record ProjectResponse(
     LocalDate endDate,
     String repositoryUrl,
     String demoUrl,
-    boolean featured
+    boolean featured,
+    List<TechnologyResponse> technologies
 ) {
 
     public static ProjectResponse from(Project project) {
@@ -33,6 +35,7 @@ public record ProjectResponse(
             project.period().endDate(),
             project.repositoryUrl(),
             project.demoUrl(),
-            project.featured());
+            project.featured(),
+            TechnologyResponse.from(project.technologies()));
     }
 }

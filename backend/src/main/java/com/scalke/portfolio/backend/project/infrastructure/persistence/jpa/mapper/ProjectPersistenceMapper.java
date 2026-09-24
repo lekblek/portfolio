@@ -2,7 +2,10 @@ package com.scalke.portfolio.backend.project.infrastructure.persistence.jpa.mapp
 
 import com.scalke.portfolio.backend.project.domain.model.Project;
 import com.scalke.portfolio.backend.project.infrastructure.persistence.jpa.entity.ProjectEntity;
+import com.scalke.portfolio.backend.project.infrastructure.persistence.jpa.entity.TechnologyEntity;
 import com.scalke.portfolio.backend.shared.domain.model.DateRange;
+
+import java.util.List;
 
 public final class ProjectPersistenceMapper {
 
@@ -11,6 +14,7 @@ public final class ProjectPersistenceMapper {
 
     /**
      * Reconstruit le {@link Project} du domaine : ses invariants sont revérifiés à chaque lecture.
+     * Parcourt les technologies : à appeler dans la transaction qui a chargé l'entité.
      */
     public static Project toDomain(ProjectEntity entity) {
         return new Project(
@@ -25,15 +29,18 @@ public final class ProjectPersistenceMapper {
             entity.getRepositoryUrl(),
             entity.getDemoUrl(),
             entity.isFeatured(),
-            entity.getDisplayOrder()
+            entity.getDisplayOrder(),
+            TechnologyPersistenceMapper.map(entity.getTechnologies())
         );
     }
 
     /**
      * Nouvelle entité, sans identifiant : attribué par PostgreSQL à l'insertion.
+     *
+     * @param technologies entités des technologies du projet, déjà persistées (fournies par l'adaptateur)
      */
-    public static ProjectEntity toNewEntity(Project project) {
-        return ProjectEntity.builder()
+    public static ProjectEntity toNewEntity(Project project, List<TechnologyEntity> technologies) {
+        ProjectEntity entity = ProjectEntity.builder()
             .title(project.title())
             .slug(project.slug())
             .shortDescription(project.shortDescription())
@@ -47,5 +54,7 @@ public final class ProjectPersistenceMapper {
             .featured(project.featured())
             .displayOrder(project.displayOrder())
             .build();
+        technologies.forEach(entity::addTechnology);
+        return entity;
     }
 }
