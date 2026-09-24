@@ -2,17 +2,12 @@ package com.scalke.portfolio.backend.profile.web.dto;
 
 import com.scalke.portfolio.backend.profile.domain.model.Skill;
 
-public record SkillResponse(
-    Long id,
-    String name,
-    Integer displayOrder
-) {
+/**
+ * Compétence publique. Ni identifiant technique ni ordre d'affichage (D-R) : l'ordre du tableau fait foi.
+ */
+public record SkillResponse(String name) {
 
     static SkillResponse from(Skill skill) {
-        return new SkillResponse(
-            skill.id(),
-            skill.name(),
-            skill.displayOrder()
-        );
+        return new SkillResponse(skill.name());
     }
 }
