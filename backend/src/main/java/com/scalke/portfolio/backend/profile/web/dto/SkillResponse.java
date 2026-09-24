@@ -5,7 +5,6 @@ import com.scalke.portfolio.backend.profile.domain.model.Skill;
 public record SkillResponse(
     Long id,
     String name,
-//    String category,
     Integer displayOrder
 ) {
 
@@ -13,7 +12,6 @@ public record SkillResponse(
         return new SkillResponse(
             skill.id(),
             skill.name(),
-//            skill.category(),
             skill.displayOrder()
         );
     }

@@ -4,7 +4,6 @@ import com.scalke.portfolio.backend.profile.domain.model.ProfessionalLink;
 import com.scalke.portfolio.backend.profile.domain.model.Profile;
 import com.scalke.portfolio.backend.profile.domain.model.Skill;
 import com.scalke.portfolio.backend.profile.domain.port.ProfileRepository;
-import com.scalke.portfolio.backend.profile.infrastructure.persistence.jpa.entity.ProfileEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
@@ -24,12 +23,12 @@ public class ProfileSeeder implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        seedAdmin();
+        seedProfile();
     }
 
-    private void seedAdmin() {
+    private void seedProfile() {
 
-        if(profileRepository.find().isEmpty()){
+        if (profileRepository.find().isEmpty()) {
             List<ProfessionalLink> links = new ArrayList<>();
             links.add(new ProfessionalLink(null, "LinkedIn", "https://example.test/in", 1));
             links.add(new ProfessionalLink(null, "GitHub", "https://example.test/gh", 0));

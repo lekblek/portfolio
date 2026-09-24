@@ -11,11 +11,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class GetProfileUseCase {
+
     private final ProfileRepository profileRepository;
 
     @Transactional(readOnly = true)
-    public Profile execute(){
-         return profileRepository.find()
-             .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.RESOURCE_NOT_FOUND, "Aucun profil n'est disponible."));
+    public Profile execute() {
+        return profileRepository.find()
+            .orElseThrow(() -> new ResourceNotFoundException(
+                ErrorCode.RESOURCE_NOT_FOUND, "Aucun profil n'est disponible."));
     }
 }

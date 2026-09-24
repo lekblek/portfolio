@@ -5,12 +5,13 @@ import com.scalke.portfolio.backend.profile.infrastructure.persistence.jpa.entit
 
 import java.util.List;
 
-public class ProfessionalLinkPersistenceMapper {
+public final class ProfessionalLinkPersistenceMapper {
 
-    private ProfessionalLinkPersistenceMapper() {}
+    private ProfessionalLinkPersistenceMapper() {
+    }
 
     public static ProfessionalLink toDomain(ProfessionalLinkEntity entity) {
-        return  new ProfessionalLink(
+        return new ProfessionalLink(
             entity.getId(),
             entity.getLabel(),
             entity.getUrl(),
@@ -19,8 +20,6 @@ public class ProfessionalLinkPersistenceMapper {
     }
 
     public static List<ProfessionalLink> map(List<ProfessionalLinkEntity> entities) {
-        return entities.stream().map(
-            ProfessionalLinkPersistenceMapper::toDomain
-        ).toList();
+        return entities.stream().map(ProfessionalLinkPersistenceMapper::toDomain).toList();
     }
 }

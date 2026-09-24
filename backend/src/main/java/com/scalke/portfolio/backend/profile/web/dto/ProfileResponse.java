@@ -1,6 +1,5 @@
 package com.scalke.portfolio.backend.profile.web.dto;
 
-import com.scalke.portfolio.backend.profile.domain.model.ProfessionalLink;
 import com.scalke.portfolio.backend.profile.domain.model.Profile;
 import com.scalke.portfolio.backend.profile.domain.model.Skill;
 
@@ -9,15 +8,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public record ProfileResponse(
-  String displayName,
-  String professionalTitle,
-  String shortBio,
-  String aboutMarkdown,
-  String publicLocation,
-  String publicEmail,
-  List<ProfessionalLinkResponse> links,
-  List<SkillGroupResponse> skillGroups
-){
+    String displayName,
+    String professionalTitle,
+    String shortBio,
+    String aboutMarkdown,
+    String publicLocation,
+    String publicEmail,
+    List<ProfessionalLinkResponse> links,
+    List<SkillGroupResponse> skillGroups
+) {
     public static ProfileResponse from(Profile profile) {
         return new ProfileResponse(
             profile.displayName(),
