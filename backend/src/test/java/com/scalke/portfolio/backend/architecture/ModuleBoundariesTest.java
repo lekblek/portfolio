@@ -6,6 +6,8 @@ import com.tngtech.archunit.core.importer.ImportOption;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
@@ -47,6 +49,27 @@ class ModuleBoundariesTest {
                 BASE + ".contact..")
             .allowEmptyShould(true)
             .check(backendClasses);
+    }
+
+    /**
+     * D-AN ({@code 04} §8) : un module n'utilise d'un autre module que son modèle ({@code domain.model}) et
+     * ses services applicatifs ({@code application}, par exemple {@code TaxonomyQueryService}) ; jamais ses
+     * ports, sa persistance ni ses contrôleurs. Chaque module reste propriétaire de ses tables.
+     */
+    @Test
+    void modules_only_use_each_other_through_domain_models_and_application_services() {
+        for (String module : List.of("shared", "security", "profile", "project", "publication",
+            "series", "taxonomy", "media", "search", "contact")) {
+            String root = BASE + "." + module;
+            noClasses()
+                .that().resideOutsideOfPackage(root + "..")
+                .should().dependOnClassesThat().resideInAnyPackage(
+                    root + ".domain.port..",
+                    root + ".infrastructure..",
+                    root + ".web..")
+                .allowEmptyShould(true)
+                .check(backendClasses);
+        }
     }
 
     @Test
