@@ -139,6 +139,7 @@ Les fiches de `docs/steps/` restent rédigées pour la structure A. Jusqu'à leu
 | 3 | Règles ArchUnit de couches (§1) : `ModuleLayersTest` | fait le 2026-09-24 |
 | 4 | `04-architecture-backend.md` §6 et §12.4, `05-conventions-api.md` §23/§32 | fait le 2026-09-24 |
 | 5 | Entités JPA fermées (constructeur protégé, pas de setter public hors champs optionnels, `addX` qui fixe la référence arrière) | fait le 2026-09-24 |
+| 6 | Objets de valeur partagés entre modules dans `shared.domain.model` (`DateRange`, `PageQuery`, `PageResult`) : `domain.model` et `domain.port` peuvent en dépendre ; ArchUnit leur applique les règles de `domain` | fait à l'étape 17 (D-S, D-V) |
 
 ### Protection
 

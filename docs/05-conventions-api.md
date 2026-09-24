@@ -896,18 +896,20 @@ ne sont jamais retournées directement
 ne sont jamais acceptées directement comme corps HTTP
 ```
 
-Exemple d’organisation :
+Exemple d’organisation (structure de l’ADR 0001 ; les fichiers `Admin*` et `*Request` arriveront à l’étape 36) :
 
 ```text
 project/
-└── api/
-    ├── PublicProjectController.java
-    ├── AdminProjectController.java
-    ├── ProjectResponse.java
-    ├── ProjectSummaryResponse.java
-    ├── AdminProjectResponse.java
-    ├── CreateProjectRequest.java
-    └── UpdateProjectRequest.java
+└── web/
+    ├── controller/
+    │   ├── PublicProjectController.java
+    │   └── AdminProjectController.java
+    └── dto/
+        ├── ProjectResponse.java
+        ├── ProjectSummaryResponse.java
+        ├── AdminProjectResponse.java
+        ├── CreateProjectRequest.java
+        └── UpdateProjectRequest.java
 ```
 
 ---
@@ -1371,6 +1373,37 @@ Règles propres à ce contrat :
 * dates au format `YYYY-MM-DD` (§26) ;
 * contrat vérifié par `PublicProfileIT` sur la sérialisation réelle.
 
+### `GET /api/public/projects` (étape 17)
+
+```text
+?page=0&size=10          page 0-based ; size par défaut 10, plafonnée à 100 ; sort ignoré (ordre fixe)
+200 → PageResponse<ProjectSummaryResponse>
+{
+  content[] { title, slug, shortDescription, stage, startDate, endDate | null, featured },
+  page, size, totalElements, totalPages, first, last
+}
+```
+
+### `GET /api/public/projects/{slug}` (étape 17)
+
+```text
+200 → ProjectResponse
+{
+  title, slug, shortDescription, descriptionMarkdown, stage,
+  startDate, endDate | null, repositoryUrl | null, demoUrl | null, featured
+}
+404 → ProblemDetail, code RESOURCE_NOT_FOUND (slug inconnu, projet DRAFT ou ARCHIVED : réponse identique)
+```
+
+Règles propres à ces contrats :
+
+* seuls les projets `PUBLISHED` existent pour l’API publique (invariant 11, D-U) : ils sont seuls listés et comptés dans `totalElements` ;
+* ordre fixe : `displayOrder` croissant, date de début décroissante, puis identifiant (D-V) ;
+* `stage` vaut `IN_PROGRESS` si et seulement si `endDate` est `null` (invariant 21, D-T) ;
+* ni `id`, ni `displayOrder`, ni `visibility` (D-W) ; la liste n’inclut pas `descriptionMarkdown` ;
+* technologies, couverture et captures arriveront aux étapes 18 et 27 ;
+* contrats vérifiés par `PublicProjectControllerTest` et `PublicProjectIT`.
+
 Chaque module introduit ses routes lors de son étape d’implémentation.
 
 ---
@@ -1433,29 +1466,36 @@ com.scalke.portfolio.backend.shared.api
 
 contient les contrats HTTP transversaux.
 
-Structure prévue :
+Structure en place depuis l’étape 17 (D-V) :
 
 ```text
 shared/
-└── api/
-    ├── package-info.java
-    ├── PageResponse.java
-    └── ApiPaging.java
+├── api/
+│   ├── PageResponse.java     contrat HTTP ; PageResponse.from(PageResult)
+│   └── ApiPaging.java        PUBLIC_PAGE_SIZE = 10, ADMIN_PAGE_SIZE = 20, MAX_PAGE_SIZE = 100
+└── domain/model/
+    ├── PageQuery.java        demande de page passée au port (page, size)
+    └── PageResult.java       page renvoyée par le port (content, page, size, totalElements)
 ```
 
 `PageResponse<T>` constitue le contrat unique des collections paginées.
 
-`ApiPaging` centralise :
+Chaîne d’une lecture paginée :
 
 ```text
-PUBLIC_PAGE_SIZE = 10
-ADMIN_PAGE_SIZE = 20
-MAX_PAGE_SIZE = 100
+HTTP ?page=&size=
+  → Pageable (Spring Data Web : @PageableDefault(size = ApiPaging.PUBLIC_PAGE_SIZE ou ADMIN_PAGE_SIZE))
+  → PageQuery                                  (contrôleur)
+  → cas d’usage → port → adaptateur JPA        (PageRequest + tri fixe, puis PageResult)
+  → PageResult.map(XxxResponse::from)
+  → PageResponse.from(...)
 ```
 
-Ces constantes ne remplacent pas les règles de validation serveur.
+Règles :
 
-La limite maximale doit également être appliquée à la résolution réelle des requêtes HTTP.
+* la taille maximale est appliquée à la résolution HTTP par `spring.data.web.pageable.max-page-size: 100` (`application.yaml`) : une taille supérieure est ramenée à 100, une page négative à 0 (comportement Spring Data) ; `PublicProjectControllerTest` vérifie que cette valeur reste égale à `ApiPaging.MAX_PAGE_SIZE` ;
+* un port ne reçoit jamais `Pageable` et ne renvoie jamais `Page` : le domaine ne dépend pas de Spring (ADR 0001) ;
+* le tri est fixé par le port tant qu’aucun tri client n’est nécessaire ; le paramètre `sort` est alors ignoré (§15).
 
 ---
 

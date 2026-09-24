@@ -95,6 +95,16 @@ Dépendances autorisées :
 shared → aucune dépendance métier
 ```
 
+Contenu actuel (étape 17) :
+
+| Paquet | Contenu | Règle |
+|---|---|---|
+| `shared.api` | `GlobalExceptionHandler`, `PageResponse`, `ApiPaging` | contrats HTTP transversaux |
+| `shared.error` | `ErrorCode`, `ApplicationException` et sous-classes | erreurs métier stables |
+| `shared.domain.model` | `DateRange`, `PageQuery`, `PageResult` | objets de valeur utilisés par **plusieurs** modules ; soumis aux règles de `domain` (§12.4 : ni Spring ni JPA) |
+
+Une classe n’entre dans `shared.domain.model` qu’au deuxième usage réel dans un autre module (ex. `DateRange` : `profile` puis `project`, D-S).
+
 ---
 
 ### 3.2 `security`
@@ -482,6 +492,7 @@ Les sous-paquets n’apparaissent qu’avec leur première classe.
 ### `domain.model`
 
 - modèle métier indépendant de JPA, de Spring et de Lombok ;
+- peut dépendre de `shared.domain.model` (objets de valeur partagés) et de `shared.error` ;
 - porte les invariants (constructeur compact, méthodes de l’agrégat) ;
 - testé par des tests unitaires purs (`*Test`, sans Spring ni Docker).
 
@@ -489,6 +500,7 @@ Les sous-paquets n’apparaissent qu’avec leur première classe.
 
 - interfaces **sortantes** seulement (persistance, stockage, email…) ;
 - ne contient que les méthodes réellement appelées par un cas d’usage ;
+- ne manipule aucun type de framework : une lecture paginée prend un `PageQuery` et renvoie un `PageResult` (`shared.domain.model`), jamais `Pageable` / `Page` de Spring Data (D-V) ;
 - aucune implémentation bouchon (`return Optional.empty()`, `return false`, méthode vide).
 
 ### `application.usecase`
@@ -774,7 +786,7 @@ com.scalke.portfolio.backend.common
 
 ## 13. Arborescence initiale (étape 10)
 
-L’étape 10 a créé uniquement les packages racines. L’état actuel d’un module réel (`profile`) suit le §6.
+L’étape 10 a créé uniquement les packages racines. Les modules implémentés (`profile` depuis l’étape 14, `project` depuis l’étape 17) et `shared.domain.model` suivent le §6 et le §3.1.
 
 ```text
 backend/

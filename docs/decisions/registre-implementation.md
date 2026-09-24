@@ -26,12 +26,26 @@ Statuts : **Active** · **Remplacée** (préciser par quoi) · **À confirmer** 
 | D-J | 16.1 | Aucune contrainte d'unicité sur le parcours | Active | `V003` |
 | D-K | 16.1 | `NOT NULL` strictement aligné sur `02-modele-metier.md` | Active | `V003` |
 | D-L | 16.2 | Tri total : `displayOrder ASC`, date `DESC`, `id ASC` | Active | `@OrderBy` dans `ProfileEntity` |
-| D-M | 16.2 | Objet de valeur `DateRange` pour `Experience`/`Education`, pas pour `Certification` ; déplacement vers `shared` décidé à l'étape 17 | Active | `profile/domain/model/DateRange.java` |
-| D-N | 16.2 | Garde Java en `IllegalArgumentException` (erreur de programmation → 500), en plus du `CHECK` | Active | `domain/model/DateRange`, `domain/model/Certification` |
+| D-M | 16.2 | Objet de valeur `DateRange` pour `Experience`/`Education`, pas pour `Certification` ; déplacement vers `shared` décidé à l'étape 17 | Active — emplacement **remplacé par D-S** (étape 17) | `shared/domain/model/DateRange.java` |
+| D-N | 16.2 | Garde Java en `IllegalArgumentException` (erreur de programmation → 500), en plus du `CHECK` | Active (appliquée aussi à `Project`, D-T) | `shared/domain/model/DateRange`, `profile/domain/model/Certification`, `project/domain/model/Project` |
 | D-O | 16.3.1 | Nombre constant de requêtes : 1 pour la racine + 1 par collection (6), sans `join fetch`. Les collections paresseuses sont chargées par le mapper **dans** la transaction de l'adaptateur ; les requêtes explicites `loadX` de la fiche ont été écartées car un test de mutation a montré qu'elles n'économisaient aucune requête une fois le mapping fait dans la transaction | Active | `ProfileRepositoryAdapter.find`, `GetProfileUseCaseIT.loads_the_profile_with_one_query_for_the_root_and_one_per_collection` |
 | D-P | 16.3.2 | Le DTO aplatit `DateRange` (`startDate`, `endDate`), sans booléen `ongoing` | Active | `ExperienceResponse`, `EducationResponse` |
-| D-Q | 16.3.1 | `DateRange` et les gardes de dates dans `profile.domain.model` ; entités à deux colonnes simples (`start_date`, `end_date`), sans `@Embeddable` ; records `Experience`, `Education`, `Certification` avec `id` et `displayOrder` comme `Skill` et `ProfessionalLink` | Active | `profile/domain/model/*`, `ExperienceEntity`, `EducationEntity` |
+| D-Q | 16.3.1 | `DateRange` et les gardes de dates dans `profile.domain.model` ; entités à deux colonnes simples (`start_date`, `end_date`), sans `@Embeddable` ; records `Experience`, `Education`, `Certification` avec `id` et `displayOrder` comme `Skill` et `ProfessionalLink` | Active — `DateRange` déplacé dans `shared.domain.model` par D-S (étape 17) | `profile/domain/model/*`, `ExperienceEntity`, `EducationEntity` |
 | D-R | 16.3.2 | Représentation publique sans `id` ni `displayOrder` (l'ordre du tableau suffit), appliquée à toutes les collections du profil | Active | `web/dto/*Response`, `PublicProfileIT` |
+
+## Module `project` — étape 17
+
+| Réf | Étape | Décision | Statut | Preuve dans le code |
+|---|---|---|---|---|
+| D-S | 17 | `DateRange` déplacé dans `shared.domain.model` : deuxième usage réel (`Project`) dans un module qui ne peut pas dépendre de `profile` (graphe `04` §4). Un objet de valeur n'entre dans `shared` qu'à son deuxième usage inter-modules | Active | `shared/domain/model/DateRange.java` |
+| D-T | 17 | `stage` stocké (modèle `02` §10) mais cohérent avec la période : `IN_PROGRESS` ⇔ `endDate` absente (invariant 21). Garde Java dans `Project` + `CHECK project_stage_matches_dates_check`. Alternative écartée : dériver `stage` de `endDate` (aucune colonne) — plus simple, mais s'écarte du modèle validé ; à reconsidérer si un projet « en cours avec date de fin prévue » devient nécessaire | Active — à confirmer par le propriétaire | `Project`, `V004`, `ProjectTest`, `ProjectSchemaIT` |
+| D-U | 17 | Seul `PUBLISHED` est public (invariant 11). Règle appliquée dans les requêtes de l'adaptateur (`findPublished`, `findPublishedBySlug`) pour que la pagination ne compte que les projets visibles ; `DRAFT`, `ARCHIVED` et slug inconnu donnent la **même** 404 (`05` §9) | Active | `ProjectRepositoryAdapter`, `GetPublishedProjectUseCaseIT`, `PublicProjectIT` |
+| D-V | 17 | Pagination : la couche web résout un `Pageable` Spring Data (`@PageableDefault(size = ApiPaging.PUBLIC_PAGE_SIZE)`, plafond global `spring.data.web.pageable.max-page-size: 100`), le convertit en `PageQuery` ; le port renvoie un `PageResult` (`shared.domain.model`) ; `PageResponse.from(PageResult)` remplace `from(Page)`, inutilisable puisqu'un port ne renvoie pas de type Spring. Tri fixe (`displayOrder`, `startDate` desc, `id`) ; `sort` ignoré | Active | `PublicProjectController`, `PageResponse`, `application.yaml`, `PublicProjectControllerTest` |
+| D-W | 17 | Deux représentations publiques : `ProjectSummaryResponse` (liste, sans `descriptionMarkdown`) et `ProjectResponse` (détail). Ni `id`, ni `displayOrder`, ni `visibility` (C03, D-R) ; période aplatie comme D-P | Active | `project/web/dto/*` |
+| D-X | 17 | Slug stocké en `VARCHAR(160)` avec `UNIQUE` et `CHECK` kebab-case (`^[a-z0-9]+(-[a-z0-9]+)*$`). Génération, objet de valeur `Slug` et gestion des collisions : étape 22 | Active | `V004`, `ProjectSchemaIT` |
+| D-Y | 17 | Ni couverture, ni captures, ni technologies avant les étapes 18 et 27 (même principe que D-B) ; pas d'index secondaire (volumétrie négligeable, comme D-G) — à réévaluer à l'étape 52.6 | Active | `V004` |
+| — | 17 | Port `create(Project)` (et non `save`) : seul le seed crée des projets ; la modification arrivera avec `Admin*` (étape 36). L'adaptateur refuse un projet déjà identifié | Active | `ProjectRepository`, `ProjectRepositoryAdapter` |
+| — | 17 | Données de test des `*IT` créées par le port (`ProjectFixtures`) plutôt que par des entités : elles passent par les invariants du domaine | Active | `project/*IT` |
 
 ## Décisions révélées par le code et non documentées ailleurs
 
@@ -55,3 +69,4 @@ Statuts : **Active** · **Remplacée** (préciser par quoi) · **À confirmer** 
 | R-4 | 2026-09-24 | CI GitHub Actions minimale dès maintenant (backend `./mvnw verify`, frontend test + build), sans attendre l'étape 52.12 | Active | `.github/workflows/ci.yml` |
 | R-5 | 2026-09-24 | TypeScript `strict` et `strictTemplates` activés | Active | `frontend/tsconfig.json` |
 | R-6 | 2026-09-24 | Compose de développement nommé `deploy/compose.dev.yaml` (aligné sur la documentation) | Active | `deploy/compose.dev.yaml` |
+| R-7 | 2026-09-24 | Outillage de l'assistant : `CLAUDE.md` (contexte, pointe vers la documentation) et `.mcp.json` (serveur MCP Angular CLI en lecture seule, chemin relatif au dépôt, sans téléchargement) sont **versionnés** ; les plugins Claude Code et graphify sont installés au niveau du poste ; `graphify-out/` et `.claude/settings.local.json` sont ignorés. Aucun outil de l'assistant n'est requis pour compiler, tester ou déployer | Active | `CLAUDE.md`, `.mcp.json`, `.gitignore` |

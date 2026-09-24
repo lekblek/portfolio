@@ -2,30 +2,34 @@
 
 Ce fichier est la **seule** source de vérité sur l'avancement. Il ne répète pas le contenu des autres documents : il pointe vers eux.
 
-Dernière mise à jour : 2026-09-24 (étape 16 terminée)
+Dernière mise à jour : 2026-09-24 (étape 17 implémentée, commits à faire)
 
 ---
 
 ## 1. État courant
 
 ```text
-Dernière étape terminée   : 16 — Experiences, Education et Certifications (16.3 incluse)
-Prochaine étape prévue    : 17 — Construire le module Project
-État                      : PRÊT dès que les commits de 16.3 sont poussés et la CI verte
+Dernière étape terminée   : 16 — Experiences, Education et Certifications (poussée, CI verte)
+Étape en cours            : 17 — Construire le module Project (implémentée et vérifiée, à committer et pousser)
+Prochaine étape prévue    : 18 — Ajouter technologies et médias aux projets
+État                      : PRÊT dès que les commits de 17 sont poussés et la CI verte
 Branche                   : develop
-Vérification              : ./mvnw verify → 50 tests verts (26 *Test, 24 *IT) ; démarrage dev vérifié
+Vérification              : ./mvnw verify → 85 tests verts (42 *Test, 43 *IT) ; démarrage dev vérifié
+                            (V004 appliquée, ProjectSeeder, GET /api/public/projects et /{slug}, brouillon → 404)
 ```
 
 ## 2. Prochaine action
 
-1. Pousser les commits de 16.3, vérifier la CI, puis remplacer les 🟡 par ✅ avec les hashes.
-2. Étape 17 : rédiger la fiche avec le template v2 (section 0 : vérifier l'état réel ; décider du déplacement de `DateRange` vers `shared`).
+1. Committer l'étape 17 (7 commits, commandes fournies avec l'étape), pousser, vérifier la CI, puis remplacer les 🟡 par ✅ avec les hashes.
+2. Confirmer ou infirmer D-T (cohérence `stage` ⇔ `endDate`) : `docs/decisions/registre-implementation.md`.
+3. Après le push : `graphify update .` pour rafraîchir le graphe local (facultatif, R-7).
+4. Étape 18 : rédiger la fiche avec le template v2 (section 0 : vérifier l'état réel).
 
 ---
 
 ## 3. Étapes
 
-Légende : ✅ terminée · 🟡 terminée, commit à pousser · ⏳ à faire
+Légende : ✅ terminée et poussée · 🟡 terminée et vérifiée, commits à faire ou à pousser · ⏳ à faire
 
 | Étape | Titre | Statut | Commits |
 |---|---|---|---|
@@ -50,9 +54,11 @@ Légende : ✅ terminée · 🟡 terminée, commit à pousser · ⏳ à faire
 | 15.2 | Chargement multi-collections et exposition publique | ✅ | `394597c` |
 | 16.1 + 16.2 | Schéma des trois collections ; entités, ordre d'affichage et agrégat | ✅ | `0b188cd` |
 | — | Consolidation du 2026-09-24 | ✅ | `4da7b57`, `ede3eb5`, `4f4c5e2`, `623e934`, `b4b3d74`, `9c7353f`, `df536aa` |
-| 16.3.1 | Parcours dans le domaine, lecture en nombre constant de requêtes | 🟡 | à pousser |
-| 16.3.2 | Exposition publique du parcours | 🟡 | à pousser |
-| 17 → 52 | Voir `docs/steps/liste_complete_etapes.md` | ⏳ | — |
+| 16.3.1 | Parcours dans le domaine, lecture en nombre constant de requêtes | ✅ | `0f65a25` |
+| 16.3.2 | Exposition publique du parcours | ✅ | `c9237e7`, `e19431c` (CI verte : run 36005370667) |
+| — | Outillage de l'assistant (R-7) | 🟡 | à committer |
+| 17 | Module Project : schéma, domaine, persistance, cas d'usage, API publique paginée | 🟡 | à committer (6 commits) |
+| 18 → 52 | Voir `docs/steps/liste_complete_etapes.md` | ⏳ | — |
 
 Après le push, remplacer les 🟡 par ✅ et noter les hashes.
 
@@ -64,15 +70,17 @@ Index : [`decisions/README.md`](decisions/README.md).
 
 | Réf | Sujet | Statut |
 |---|---|---|
-| ADR 0001 | Architecture interne des modules (ports et adaptateurs légers) | Acceptée (2026-09-24) |
-| R-1 … R-6 | Organisation du dépôt et outillage (docs non versionnées, profils Spring, OSIV, CI, TypeScript strict, compose) | Actives |
+| ADR 0001 | Architecture interne des modules (ports et adaptateurs légers) | Acceptée (2026-09-24) ; travail induit n° 6 (`shared.domain.model`) fait à l'étape 17 |
+| R-1 … R-7 | Organisation du dépôt et outillage (docs non versionnées, profils Spring, OSIV, CI, TypeScript strict, compose, outillage de l'assistant) | Actives |
 | D-O, D-Q | Lecture en 1 + 5 requêtes constantes ; invariants de dates au domaine | Actives (16.3.1) |
 | D-P, D-R | Aplatissement de `DateRange` dans le JSON ; contrat public sans `id`/`displayOrder` | Actives (16.3.2) |
+| D-S, D-U, D-V, D-W, D-X, D-Y | `DateRange` partagé ; visibilité publique ; pagination sans type Spring dans les ports ; représentations publiques des projets ; slug ; périmètre de `V004` | Actives (17) |
+| D-T | `stage` ⇔ absence de `endDate` (invariant 21) | Active — **à confirmer** |
 | 14.4 | Exposition publique de `publicEmail` | À confirmer |
 
 ## 5. Problèmes connus
 
-Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-audit-avant-16.3.md).
+Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-audit-avant-16.3.md). Contrôle de dérive refait avant l'étape 17 (voir « Résolus »).
 
 ### Ouverts
 
@@ -86,7 +94,7 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | KI-23 | AMÉLIORATION | `UNSUPPORTED_MEDIA_FORMAT` mappé en 409 (415 ou 400 plus juste) | étape 27 |
 | KI-16 | OPTIONNEL | `V001` : virgule manquante avant `CONSTRAINT profile_single_row` (comportement identique) ; migration appliquée, non modifiable | aucun |
 
-### Résolus le 2026-09-24 (consolidation et 16.3)
+### Résolus le 2026-09-24 (consolidation, 16.3 et 17)
 
 | ID | Problème | Résolution |
 |---|---|---|
@@ -106,13 +114,21 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | KI-15 | Versionnement de `docs/steps/`, `docs/prompts/` | décision : non versionnés (R-1) |
 | KI-11 | Invariants de dates dans la couche JPA | 16.3.1 : `DateRange`, `Certification` dans `domain.model` (D-Q) |
 | KI-17 | Contrat public incohérent (`id`/`displayOrder` exposés) | 16.3.2 : D-R appliquée à toutes les collections |
+| KI-24 | `ApiPaging.MAX_PAGE_SIZE` documenté (`05` §33) mais appliqué nulle part à la résolution HTTP | 17 : `spring.data.web.pageable.max-page-size: 100`, vérifié par `PublicProjectControllerTest` (D-V) |
+| KI-25 | `PageResponse.from(Page)` inutilisable : un port ne peut pas renvoyer de type Spring (ADR 0001) | 17 : `PageResult` / `PageQuery` dans `shared.domain.model`, `PageResponse.from(PageResult)` (D-V) |
+| KI-26 | `05-conventions-api.md` §18 décrivait encore `project/api/` | 17 : exemple aligné sur l'ADR 0001 |
+| KI-27 | `progress.md` indiquait 16.3 « à pousser » alors que les commits étaient poussés et la CI verte | 17 : statuts et hashes mis à jour |
+| KI-28 | Aucun contexte partagé pour l'assistant de code ; outillage non documenté | R-7 : `CLAUDE.md`, `.mcp.json`, `.gitignore` |
 | — | Test frontend rouge ; `compose.dev.yml` ≠ documentation ; docs obsolètes ; `pom.xml` et `.gitignore` à nettoyer | corrigés |
 
 ## 6. Décisions reportées
 
 | Sujet | Reporté à | Raison |
 |---|---|---|
-| Emplacement partagé de `DateRange` (`shared` ?) | Étape 17 | deuxième usage réel (`Project`) — D-M |
+| Filtres `technology` et `featured` sur `GET /api/public/projects` | Étapes 18 et 40 | aucun écran ne les utilise encore |
+| Objet de valeur `Slug`, génération et collisions | Étape 22 | D-X : seules les contraintes SQL existent |
+| Tri choisi par le client (`sort`) | quand un écran le demande | D-V : ordre fixe, paramètre ignoré |
+| Rejet explicite (400) des paramètres de pagination hors bornes, au lieu de les ramener aux bornes | si un client en a besoin | comportement Spring Data retenu (D-V) |
 | Prérendu route par route | Étape 52.1 | D22 |
 | Cache du profil public | si le profil devient un chemin chaud | D-O |
 | Exposition de springdoc / Swagger UI | Étape 32 | KI-19 |

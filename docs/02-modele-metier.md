@@ -218,6 +218,8 @@ IN_PROGRESS
 COMPLETED
 ```
 
+`stage` est cohérent avec la période : `IN_PROGRESS` si et seulement si `endDate` est absente (invariant 21, ajouté à l’étape 17, D-T). Il reste indépendant de la visibilité (D19).
+
 ## ProjectVisibility
 
 ```text
@@ -227,6 +229,8 @@ ARCHIVED
 ```
 
 Seul un projet `PUBLISHED` est exposé publiquement.
+
+État d’implémentation (étape 17) : tous les attributs ci-dessus sauf `coverMedia` (étape 27) ; `Technology` et `ProjectScreenshot` arrivent à l’étape 18 (D-Y). Le slug est unique et au format kebab-case, garanti par PostgreSQL (D-X).
 
 ---
 
@@ -730,12 +734,13 @@ Les règles suivantes doivent être garanties par le backend et, lorsque pertine
 14. un échec SMTP ne supprime jamais un message sauvegardé ;
 15. le mot de passe administrateur n'est jamais stocké en clair ;
 16. une entité JPA ne constitue jamais directement le contrat d'API.
-17. une période (`Experience`, `Education`) ne se termine jamais avant de commencer ; `endDate = null` signifie « en cours » ;
+17. une période (`Experience`, `Education`, `Project`) ne se termine jamais avant de commencer ; `endDate = null` signifie « en cours » ;
 18. une `Certification` n'expire jamais avant sa date de délivrance ;
 19. le nom d'une `Skill` est unique dans le profil ;
-20. il existe au plus un `Profile`.
+20. il existe au plus un `Profile` ;
+21. un `Project` est `IN_PROGRESS` si et seulement s'il n'a pas de date de fin ; sa période respecte l'invariant 17.
 
-Les invariants 17 à 20 ont été ajoutés pendant l'implémentation (étapes 14 à 16) ; ils sont garantis par PostgreSQL (`CHECK`, `UNIQUE`) et, pour 17 et 18, par une garde Java. Voir [`decisions/registre-implementation.md`](decisions/registre-implementation.md).
+Les invariants 17 à 21 ont été ajoutés pendant l'implémentation (étapes 14 à 17) ; ils sont garantis par PostgreSQL (`CHECK`, `UNIQUE`) et, pour 17, 18 et 21, par une garde Java dans le modèle métier. Voir [`decisions/registre-implementation.md`](decisions/registre-implementation.md).
 
 ---
 

@@ -73,9 +73,9 @@ cd backend
 
 Dans IntelliJ : configuration d'exécution `Application` → *Active profiles* : `dev`.
 
-- API : `http://localhost:8080/api/public/profile`
+- API : `http://localhost:8080/api/public/profile`, `http://localhost:8080/api/public/projects`, `http://localhost:8080/api/public/projects/{slug}`
 - Santé : `http://localhost:8080/api/actuator/health`
-- En profil `dev`, `ProfileSeeder` crée un profil de démonstration si la base est vide.
+- En profil `dev`, `ProfileSeeder` et `ProjectSeeder` créent des données de démonstration si la base n'en contient pas (dont un projet en brouillon, invisible dans l'API publique).
 
 ### 5. Frontend
 
@@ -117,6 +117,7 @@ Stratégie complète : [docs/06-strategie-tests.md](docs/06-strategie-tests.md).
 | [conventions-git.md](docs/conventions-git.md) | branches, Conventional Commits, clôture d'étape |
 | [decisions/](docs/decisions/README.md) | index des décisions, ADR, registre d'implémentation |
 | [audits/](docs/audits/) | audits ponctuels (instantanés datés, non maintenus) |
+| [CLAUDE.md](CLAUDE.md) | contexte de l'assistant de code et outillage facultatif (MCP Angular, graphify, plugins) |
 
 ## Licence
 
