@@ -17,7 +17,10 @@ public final class ProfilePersistenceMapper {
             entity.getPublicLocation(),
             entity.getPublicEmail(),
             ProfessionalLinkPersistenceMapper.map(entity.getLinks()),
-            SkillPersistenceMapper.map(entity.getSkills())
+            SkillPersistenceMapper.map(entity.getSkills()),
+            ExperiencePersistenceMapper.map(entity.getExperiences()),
+            EducationPersistenceMapper.map(entity.getEducations()),
+            CertificationPersistenceMapper.map(entity.getCertifications())
         );
     }
 
@@ -32,6 +35,12 @@ public final class ProfilePersistenceMapper {
 
         profile.links().forEach(link -> entity.addLink(link.label(), link.url(), link.displayOrder()));
         profile.skills().forEach(skill -> entity.addSkill(skill.name(), skill.category(), skill.displayOrder()));
+        profile.experiences().forEach(experience ->
+            entity.addExperience(ExperiencePersistenceMapper.toEntity(experience)));
+        profile.educations().forEach(education ->
+            entity.addEducation(EducationPersistenceMapper.toEntity(education)));
+        profile.certifications().forEach(certification ->
+            entity.addCertification(CertificationPersistenceMapper.toEntity(certification)));
 
         return entity;
     }

@@ -41,7 +41,10 @@ class PublicProfileControllerTest {
             List.of(new ProfessionalLink(1L, "GitHub", "https://example.test/gh", 0)),
             List.of(
                 new Skill(1L, "Spring Boot", "Backend", 0),
-                new Skill(2L, "Angular", "Frontend", 1))));
+                new Skill(2L, "Angular", "Frontend", 1)),
+            List.of(),
+            List.of(),
+            List.of()));
 
         mockMvc.perform(get("/api/public/profile").contextPath("/api"))
             .andExpect(status().isOk())

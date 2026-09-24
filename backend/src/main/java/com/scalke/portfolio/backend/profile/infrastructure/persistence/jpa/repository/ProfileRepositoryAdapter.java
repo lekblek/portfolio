@@ -23,17 +23,18 @@ public class ProfileRepositoryAdapter implements ProfileRepository {
     private final ProfileJpaRepository repository;
 
     /**
-     * Une requête par collection, dans la même transaction : la seconde requête initialise
-     * la collection de l'entité déjà présente dans le contexte de persistance.
+     * Lecture en nombre constant de requêtes (D-O) : une pour le profil, puis une par collection,
+     * déclenchée par le mapper lorsqu'il parcourt la collection. Le mapping a lieu dans la
+     * transaction ; le résultat est un record, sans aucun chargement paresseux possible ensuite.
+     * <p>
+     * Pas de {@code join fetch} : joindre plusieurs collections produirait un produit cartésien
+     * ({@code MultipleBagFetchException}) ; en joindre une seule n'économiserait qu'une requête.
      */
     @Override
     @Transactional(readOnly = true)
     public Optional<Profile> find() {
-        return repository.findWithLinks()
-            .map(profile -> {
-                repository.loadSkills(profile.getId());
-                return ProfilePersistenceMapper.toDomain(profile);
-            });
+        return repository.findById(ProfileEntity.SINGLETON_ID)
+            .map(ProfilePersistenceMapper::toDomain);
     }
 
     @Override

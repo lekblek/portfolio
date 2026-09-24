@@ -1,16 +1,16 @@
-package com.scalke.portfolio.backend.profile.infrastructure.persistence.jpa.entity;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
+package com.scalke.portfolio.backend.profile.domain.model;
 
 import java.time.LocalDate;
 import java.util.Objects;
 
-@Embeddable
-public record DateRange(
-    @Column(name = "start_date", nullable = false) LocalDate startDate,
-    @Column(name = "end_date") LocalDate endDate
-) {
+/**
+ * Période d'une expérience ou d'une formation. {@code endDate == null} signifie « en cours ».
+ * <p>
+ * Invariant (D-I, D-N) : la fin n'est jamais antérieure au début. Doublé par les contraintes
+ * {@code experience_dates_check} et {@code education_dates_check} de {@code V003}.
+ */
+public record DateRange(LocalDate startDate, LocalDate endDate) {
+
     public DateRange {
         Objects.requireNonNull(startDate, "startDate");
         if (endDate != null && endDate.isBefore(startDate)) {

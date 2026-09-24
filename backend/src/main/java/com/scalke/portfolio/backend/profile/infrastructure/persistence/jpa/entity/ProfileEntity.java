@@ -58,11 +58,11 @@ public class ProfileEntity {
     private List<SkillEntity> skills = new ArrayList<>();
 
     @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @OrderBy("displayOrder ASC, period.startDate DESC, id ASC")
+    @OrderBy("displayOrder ASC, startDate DESC, id ASC")
     private List<ExperienceEntity> experiences = new ArrayList<>();
 
     @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @OrderBy("displayOrder ASC, period.startDate DESC, id ASC")
+    @OrderBy("displayOrder ASC, startDate DESC, id ASC")
     private List<EducationEntity> educations = new ArrayList<>();
 
     @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)

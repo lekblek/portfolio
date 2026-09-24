@@ -66,7 +66,8 @@ class ProfileMappingIT extends AbstractIntegrationTest {
                 .organization("Org A")
                 .title("Poste A")
                 .location("Tanger")
-                .period(DateRange.between(LocalDate.of(2020, 1, 1), LocalDate.of(2021, 1, 1)))
+                .startDate(LocalDate.of(2020, 1, 1))
+                .endDate(LocalDate.of(2021, 1, 1))
                 .description("...")
                 .displayOrder(1)
                 .build()
@@ -77,8 +78,8 @@ class ProfileMappingIT extends AbstractIntegrationTest {
                 .organization("Org B")
                 .title("Poste B")
                 .location("Tanger")
-                .period(DateRange.between(
-                    LocalDate.of(2019, 1, 1), LocalDate.of(2020, 1, 1)))
+                .startDate(LocalDate.of(2019, 1, 1))
+                .endDate(LocalDate.of(2020, 1, 1))
                 .description("...")
                 .displayOrder(0)
                 .build()
@@ -89,8 +90,7 @@ class ProfileMappingIT extends AbstractIntegrationTest {
                 .organization("Org C")
                 .title("Poste C")
                 .location("Tanger")
-                .period(DateRange.ongoingSince(
-                    LocalDate.of(2023, 1, 1)))
+                .startDate(LocalDate.of(2023, 1, 1))
                 .description("...")
                 .displayOrder(0)
                 .build()
@@ -101,7 +101,7 @@ class ProfileMappingIT extends AbstractIntegrationTest {
                 .organization("Org D")
                 .title("Poste D")
                 .location("Tanger")
-                .period(DateRange.ongoingSince(LocalDate.of(2023, 1, 1)))
+                .startDate(LocalDate.of(2023, 1, 1))
                 .description("...")
                 .displayOrder(0)
                 .build()
@@ -124,7 +124,7 @@ class ProfileMappingIT extends AbstractIntegrationTest {
                 .degree("Doctorat")
                 .field("Informatique")
                 .location("Tanger")
-                .period(DateRange.ongoingSince(LocalDate.of(2023, 12, 1)))
+                .startDate(LocalDate.of(2023, 12, 1))
                 .description("...")
                 .displayOrder(0)
                 .build()
@@ -142,7 +142,7 @@ class ProfileMappingIT extends AbstractIntegrationTest {
         ProfileEntity reloaded = persistAndReload(profile);
 
         assertThat(reloaded.getEducations()).singleElement()
-            .satisfies(e -> assertThat(e.getPeriod().isOngoing()).isTrue());
+            .satisfies(e -> assertThat(e.getEndDate()).isNull());
         assertThat(reloaded.getCertifications()).singleElement()
             .satisfies(c -> {
                 assertThat(c.getExpiresAt()).isNull();

@@ -7,13 +7,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.Objects;
 
 /**
  * Certification du parcours. Créée par son builder, puis rattachée au profil par
  * {@link ProfileEntity#addCertification(CertificationEntity)}.
  * <p>
- * La garde sur les dates (D-N) double la contrainte {@code certification_dates_check} de {@code V003}.
+ * Structure de persistance : l'invariant sur les dates vit dans le modèle métier
+ * ({@code domain.model.Certification}) et dans la contrainte {@code certification_dates_check}.
  */
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -50,10 +50,6 @@ public class CertificationEntity {
     @Builder
     private CertificationEntity(String name, String issuer, LocalDate issuedAt, LocalDate expiresAt,
                                 String credentialUrl, int displayOrder) {
-        Objects.requireNonNull(issuedAt, "issuedAt");
-        if (expiresAt != null && expiresAt.isBefore(issuedAt)) {
-            throw new IllegalArgumentException("expiresAt must not be before issuedAt");
-        }
         this.name = name;
         this.issuer = issuer;
         this.issuedAt = issuedAt;

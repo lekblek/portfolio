@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.Objects;
+import java.time.LocalDate;
 
 /**
  * Expérience du parcours. Créée par son builder, puis rattachée au profil par
@@ -35,8 +35,11 @@ public class ExperienceEntity {
     @Column(name = "location", nullable = false, length = 120)
     private String location;
 
-    @Embedded
-    private DateRange period;
+    @Column(name = "start_date", nullable = false)
+    private LocalDate startDate;
+
+    @Column(name = "end_date")
+    private LocalDate endDate;
 
     @Column(name = "description", nullable = false)
     private String description;
@@ -45,12 +48,13 @@ public class ExperienceEntity {
     private int displayOrder;
 
     @Builder
-    private ExperienceEntity(String organization, String title, String location, DateRange period,
-                             String description, int displayOrder) {
+    private ExperienceEntity(String organization, String title, String location,
+                             LocalDate startDate, LocalDate endDate, String description, int displayOrder) {
         this.organization = organization;
         this.title = title;
         this.location = location;
-        this.period = Objects.requireNonNull(period, "period");
+        this.startDate = startDate;
+        this.endDate = endDate;
         this.description = description;
         this.displayOrder = displayOrder;
     }

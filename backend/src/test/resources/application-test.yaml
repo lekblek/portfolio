@@ -4,6 +4,8 @@ spring:
       hibernate:
         format_sql: true
         show_sql: true
+        # Compteur de requêtes utilisé par GetProfileUseCaseIT (D-O). Profil test uniquement.
+        generate_statistics: true
   flyway:
     enabled: true
 
@@ -17,3 +19,5 @@ logging:
     org.testcontainers: INFO
     com.github.dockerjava: WARN
     org.hibernate.SQL: DEBUG
+    # generate_statistics journalise des métriques à chaque session : inutile ici.
+    org.hibernate.engine.internal.StatisticalLoggingSessionEventListener: WARN

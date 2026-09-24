@@ -1,4 +1,4 @@
-package com.scalke.portfolio.backend.profile.infrastructure.persistence.jpa.entity;
+package com.scalke.portfolio.backend.profile.domain.model;
 
 import org.junit.jupiter.api.Test;
 

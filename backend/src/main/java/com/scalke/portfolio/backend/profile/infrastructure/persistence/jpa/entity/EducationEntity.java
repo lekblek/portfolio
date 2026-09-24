@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.Objects;
+import java.time.LocalDate;
 
 /**
  * Formation du parcours. Créée par son builder, puis rattachée au profil par
@@ -38,8 +38,11 @@ public class EducationEntity {
     @Column(name = "location", nullable = false, length = 120)
     private String location;
 
-    @Embedded
-    private DateRange period;
+    @Column(name = "start_date", nullable = false)
+    private LocalDate startDate;
+
+    @Column(name = "end_date")
+    private LocalDate endDate;
 
     @Column(name = "description", nullable = false)
     private String description;
@@ -49,12 +52,13 @@ public class EducationEntity {
 
     @Builder
     private EducationEntity(String institution, String degree, String field, String location,
-                            DateRange period, String description, int displayOrder) {
+                            LocalDate startDate, LocalDate endDate, String description, int displayOrder) {
         this.institution = institution;
         this.degree = degree;
         this.field = field;
         this.location = location;
-        this.period = Objects.requireNonNull(period, "period");
+        this.startDate = startDate;
+        this.endDate = endDate;
         this.description = description;
         this.displayOrder = displayOrder;
     }

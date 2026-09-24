@@ -1,5 +1,9 @@
 package com.scalke.portfolio.backend.profile.infrastructure.seed;
 
+import com.scalke.portfolio.backend.profile.domain.model.Certification;
+import com.scalke.portfolio.backend.profile.domain.model.DateRange;
+import com.scalke.portfolio.backend.profile.domain.model.Education;
+import com.scalke.portfolio.backend.profile.domain.model.Experience;
 import com.scalke.portfolio.backend.profile.domain.model.ProfessionalLink;
 import com.scalke.portfolio.backend.profile.domain.model.Profile;
 import com.scalke.portfolio.backend.profile.domain.model.Skill;
@@ -10,9 +14,13 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
+import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Données de démonstration du profil `dev`, créées uniquement si la base ne contient aucun profil.
+ * Ce ne sont pas des données réelles (voir docs/01-perimetre-v1.md §20).
+ */
 @Component
 @org.springframework.context.annotation.Profile("dev")
 @RequiredArgsConstructor
@@ -22,32 +30,37 @@ public class ProfileSeeder implements ApplicationRunner {
     private final ProfileRepository profileRepository;
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
-        seedProfile();
+    public void run(ApplicationArguments args) {
+        if (profileRepository.find().isPresent()) {
+            return;
+        }
+        profileRepository.save(demoProfile());
+        log.info("Profil de démonstration créé (profil dev)");
     }
 
-    private void seedProfile() {
-
-        if (profileRepository.find().isEmpty()) {
-            List<ProfessionalLink> links = new ArrayList<>();
-            links.add(new ProfessionalLink(null, "LinkedIn", "https://example.test/in", 1));
-            links.add(new ProfessionalLink(null, "GitHub", "https://example.test/gh", 0));
-
-
-            List<Skill> skills = new ArrayList<>();
-            skills.add(new Skill(null, "Spring Boot", "Backend", 1));
-            skills.add(new Skill(null, "Angular", "Frontend", 0));
-
-
-            Profile profile = Profile.create(
-                "Blek Gedeon Ngossanga",
-                "Développeur full-stack",
-                "Je conçois des solutions modernes et évolutives.",
-                null,
-                links,
-                skills
-            );
-            profileRepository.save(profile);
-        }
+    private static Profile demoProfile() {
+        return new Profile(
+            "Blek Gedeon Ngossanga",
+            "Développeur full-stack",
+            "Je conçois des solutions modernes et évolutives.",
+            null,
+            null,
+            null,
+            List.of(
+                new ProfessionalLink(null, "GitHub", "https://example.test/gh", 0),
+                new ProfessionalLink(null, "LinkedIn", "https://example.test/in", 1)),
+            List.of(
+                new Skill(null, "Angular", "Frontend", 0),
+                new Skill(null, "Spring Boot", "Backend", 1)),
+            List.of(
+                new Experience(null, "Organisation de démonstration", "Développeur full-stack", "Tanger",
+                    DateRange.ongoingSince(LocalDate.of(2024, 1, 1)), "Expérience de démonstration.", 0)),
+            List.of(
+                new Education(null, "École de démonstration", "Diplôme d'ingénieur", "Informatique", "Tanger",
+                    DateRange.between(LocalDate.of(2018, 9, 1), LocalDate.of(2023, 6, 30)),
+                    "Formation de démonstration.", 0)),
+            List.of(
+                new Certification(null, "Certification de démonstration", "Émetteur",
+                    LocalDate.of(2025, 1, 1), null, null, 0)));
     }
 }
