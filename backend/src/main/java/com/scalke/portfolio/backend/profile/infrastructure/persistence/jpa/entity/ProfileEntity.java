@@ -1,21 +1,25 @@
 package com.scalke.portfolio.backend.profile.infrastructure.persistence.jpa.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.Length;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Racine de persistance du profil (singleton : {@code id = 1}, garanti par {@code V001}).
+ * <p>
+ * Les collections sont initialisées à la déclaration et ne sont modifiées que par les
+ * méthodes {@code addX}, qui positionnent toujours la référence arrière vers le profil.
+ */
 @Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(
-    name = "profile"
-)
+@Table(name = "profile")
 public class ProfileEntity {
 
     public static final long SINGLETON_ID = 1L;
@@ -33,30 +37,37 @@ public class ProfileEntity {
     @Column(name = "short_bio", nullable = false, length = 500)
     private String shortBio;
 
+    @Setter
     @Column(name = "public_location", length = 120)
     private String publicLocation;
 
+    @Setter
     @Column(name = "public_email", length = 255)
     private String publicEmail;
 
+    @Setter
     @Column(name = "about_markdown", length = Length.LONG32, columnDefinition = "TEXT")
     private String aboutMarkdown;
 
-    @OneToMany(
-        mappedBy = "profile",
-        cascade = CascadeType.ALL,
-        orphanRemoval = true,
-        fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @OrderBy("displayOrder ASC, label ASC")
     private List<ProfessionalLinkEntity> links = new ArrayList<>();
 
-    @OneToMany(
-        mappedBy = "profile",
-        cascade = CascadeType.ALL,
-        orphanRemoval = true,
-        fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @OrderBy("displayOrder ASC, name ASC")
     private List<SkillEntity> skills = new ArrayList<>();
+
+    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OrderBy("displayOrder ASC, period.startDate DESC, id ASC")
+    private List<ExperienceEntity> experiences = new ArrayList<>();
+
+    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OrderBy("displayOrder ASC, period.startDate DESC, id ASC")
+    private List<EducationEntity> educations = new ArrayList<>();
+
+    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OrderBy("displayOrder ASC, issuedAt DESC, id ASC")
+    private List<CertificationEntity> certifications = new ArrayList<>();
 
     public ProfileEntity(String displayName, String professionalTitle, String shortBio) {
         this.id = SINGLETON_ID;
@@ -79,5 +90,20 @@ public class ProfileEntity {
 
     public void removeSkill(SkillEntity skill) {
         skills.remove(skill);
+    }
+
+    public void addExperience(ExperienceEntity experience) {
+        experience.attachTo(this);
+        experiences.add(experience);
+    }
+
+    public void addEducation(EducationEntity education) {
+        education.attachTo(this);
+        educations.add(education);
+    }
+
+    public void addCertification(CertificationEntity certification) {
+        certification.attachTo(this);
+        certifications.add(certification);
     }
 }

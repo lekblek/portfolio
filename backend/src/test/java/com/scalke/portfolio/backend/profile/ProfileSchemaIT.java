@@ -7,11 +7,13 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Transactional
-public class ProfileSchemaIT extends AbstractIntegrationTest {
+class ProfileSchemaIT extends AbstractIntegrationTest {
     @Autowired
     JdbcClient jdbcClient;
 
@@ -96,5 +98,95 @@ public class ProfileSchemaIT extends AbstractIntegrationTest {
             .param("name", name)
             .param("category", category)
             .update();
+    }
+
+    @Test
+    void accepts_an_ongoing_experience() {
+        insertProfile(1);
+
+        insertExperience(LocalDate.of(2024, 1, 1), null);
+
+        assertThat(count("experience")).isEqualTo(1);
+    }
+
+    @Test
+    void rejects_an_experience_ending_before_it_starts() {
+        insertProfile(1);
+
+        assertThatThrownBy(() -> insertExperience(LocalDate.of(2024, 6, 1), LocalDate.of(2024, 1, 1)))
+            .isInstanceOf(DataIntegrityViolationException.class)
+            .hasMessageContaining("experience_dates_check");
+    }
+
+    @Test
+    void rejects_an_education_ending_before_it_starts() {
+        insertProfile(1);
+
+        assertThatThrownBy(() -> insertEducation(LocalDate.of(2020, 9, 1), LocalDate.of(2019, 6, 30)))
+            .isInstanceOf(DataIntegrityViolationException.class)
+            .hasMessageContaining("education_dates_check");
+    }
+
+    @Test
+    void rejects_a_certification_expiring_before_it_is_issued() {
+        insertProfile(1);
+
+        assertThatThrownBy(() -> insertCertification(LocalDate.of(2025, 3, 1), LocalDate.of(2025, 1, 1)))
+            .isInstanceOf(DataIntegrityViolationException.class)
+            .hasMessageContaining("certification_dates_check");
+    }
+
+    @Test
+    void deletes_career_entries_when_the_profile_is_deleted() {
+        insertProfile(1);
+        insertExperience(LocalDate.of(2024, 1, 1), null);
+        insertEducation(LocalDate.of(2018, 9, 1), LocalDate.of(2023, 6, 30));
+        insertCertification(LocalDate.of(2025, 1, 1), null);
+
+        jdbcClient.sql("DELETE FROM profile WHERE id = 1").update();
+
+        assertThat(count("experience")).isZero();
+        assertThat(count("education")).isZero();
+        assertThat(count("certification")).isZero();
+    }
+
+    private void insertExperience(LocalDate start, LocalDate end) {
+        jdbcClient.sql("""
+                    INSERT INTO experience (profile_id, organization, title, location,
+                                            start_date, end_date, description, display_order)
+                    VALUES (1, 'Scalke', 'Fondateur', 'Tanger', :start, :end, 'Description', 0)
+                    """)
+            .param("start", start)
+            .param("end", end)
+            .update();
+    }
+
+    private void insertEducation(LocalDate start, LocalDate end) {
+        jdbcClient.sql("""
+                    INSERT INTO education (profile_id, institution, degree, field, location,
+                                           start_date, end_date, description, display_order)
+                    VALUES (1, 'ENSA Tanger', 'Ingénieur', 'Informatique', 'Tanger',
+                            :start, :end, 'Description', 0)
+                    """)
+            .param("start", start)
+            .param("end", end)
+            .update();
+    }
+
+    private void insertCertification(LocalDate issued, LocalDate expires) {
+        jdbcClient.sql("""
+                    INSERT INTO certification (profile_id, name, issuer, issued_at,
+                                               expires_at, display_order)
+                    VALUES (1, 'Certification', 'Émetteur', :issued, :expires, 0)
+                    """)
+            .param("issued", issued)
+            .param("expires", expires)
+            .update();
+    }
+
+    private long count(String table) {
+        return jdbcClient.sql("SELECT count(*) FROM " + table)
+            .query(Long.class)
+            .single();
     }
 }

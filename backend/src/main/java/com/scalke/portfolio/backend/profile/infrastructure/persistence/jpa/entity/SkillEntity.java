@@ -1,17 +1,14 @@
 package com.scalke.portfolio.backend.profile.infrastructure.persistence.jpa.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(
-    name = "skill"
-)
+@Table(name = "skill")
 public class SkillEntity {
 
     @Id

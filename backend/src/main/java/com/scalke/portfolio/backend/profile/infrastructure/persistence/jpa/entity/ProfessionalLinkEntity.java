@@ -1,17 +1,14 @@
 package com.scalke.portfolio.backend.profile.infrastructure.persistence.jpa.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(
-    name = "professional_link"
-)
+@Table(name = "professional_link")
 public class ProfessionalLinkEntity {
 
     @Id
@@ -29,9 +26,9 @@ public class ProfessionalLinkEntity {
     private String url;
 
     @Column(name = "display_order", nullable = false)
-    private Integer displayOrder;
+    private int displayOrder;
 
-    public ProfessionalLinkEntity(ProfileEntity profile, String label, String url, int displayOrder) {
+    ProfessionalLinkEntity(ProfileEntity profile, String label, String url, int displayOrder) {
         this.profile = profile;
         this.label = label;
         this.url = url;
