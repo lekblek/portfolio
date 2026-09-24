@@ -825,10 +825,12 @@ Autres exemples possibles :
 ```text
 /api/public/publications?category=spring-boot
 
-/api/public/projects?technology=java
+/api/public/projects?technology=java        (implémenté à l’étape 18)
 
 /api/public/search?q=postgresql
 ```
+
+Un filtre dont la valeur ne correspond à rien renvoie une page vide, jamais une erreur.
 
 Les filtres doivent utiliser des noms métier et non des noms de colonnes PostgreSQL.
 
@@ -1373,24 +1375,27 @@ Règles propres à ce contrat :
 * dates au format `YYYY-MM-DD` (§26) ;
 * contrat vérifié par `PublicProfileIT` sur la sérialisation réelle.
 
-### `GET /api/public/projects` (étape 17)
+### `GET /api/public/projects` (étapes 17 et 18)
 
 ```text
 ?page=0&size=10          page 0-based ; size par défaut 10, plafonnée à 100 ; sort ignoré (ordre fixe)
+?technology=<slug>       facultatif ; seuls les projets utilisant cette technologie ; slug inconnu → page vide
 200 → PageResponse<ProjectSummaryResponse>
 {
-  content[] { title, slug, shortDescription, stage, startDate, endDate | null, featured },
+  content[] { title, slug, shortDescription, stage, startDate, endDate | null, featured,
+              technologies[] { name, slug } },
   page, size, totalElements, totalPages, first, last
 }
 ```
 
-### `GET /api/public/projects/{slug}` (étape 17)
+### `GET /api/public/projects/{slug}` (étapes 17 et 18)
 
 ```text
 200 → ProjectResponse
 {
   title, slug, shortDescription, descriptionMarkdown, stage,
-  startDate, endDate | null, repositoryUrl | null, demoUrl | null, featured
+  startDate, endDate | null, repositoryUrl | null, demoUrl | null, featured,
+  technologies[] { name, slug }
 }
 404 → ProblemDetail, code RESOURCE_NOT_FOUND (slug inconnu, projet DRAFT ou ARCHIVED : réponse identique)
 ```
@@ -1401,7 +1406,8 @@ Règles propres à ces contrats :
 * ordre fixe : `displayOrder` croissant, date de début décroissante, puis identifiant (D-V) ;
 * `stage` vaut `IN_PROGRESS` si et seulement si `endDate` est `null` (invariant 21, D-T) ;
 * ni `id`, ni `displayOrder`, ni `visibility` (D-W) ; la liste n’inclut pas `descriptionMarkdown` ;
-* technologies, couverture et captures arriveront aux étapes 18 et 27 ;
+* `technologies` : dans l’ordre du vocabulaire, `[]` si aucune ; le `slug` sert de valeur au filtre `technology` (D-AC) ; le filtre restreint les projets, pas la liste de leurs technologies ;
+* couverture et captures arriveront avec le catalogue `Media` (étape 27, D-AD) ;
 * contrats vérifiés par `PublicProjectControllerTest` et `PublicProjectIT`.
 
 Chaque module introduit ses routes lors de son étape d’implémentation.

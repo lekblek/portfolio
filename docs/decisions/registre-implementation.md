@@ -47,6 +47,18 @@ Statuts : **Active** · **Remplacée** (préciser par quoi) · **À confirmer** 
 | — | 17 | Port `create(Project)` (et non `save`) : seul le seed crée des projets ; la modification arrivera avec `Admin*` (étape 36). L'adaptateur refuse un projet déjà identifié | Active | `ProjectRepository`, `ProjectRepositoryAdapter` |
 | — | 17 | Données de test des `*IT` créées par le port (`ProjectFixtures`) plutôt que par des entités : elles passent par les invariants du domaine | Active | `project/*IT` |
 
+## Module `project` — étape 18
+
+| Réf | Étape | Décision | Statut | Preuve dans le code |
+|---|---|---|---|---|
+| D-Z | 18 | `Technology` est une racine d'agrégat du module `project` (vocabulaire distinct des tags, D21). Relation N↔N par `project_technology`, sans ordre propre au projet : `Project` porte une liste immuable de `Technology`, toujours triée par le domaine (`displayOrder`, nom, slug). Un projet référence des technologies existantes, il ne les crée jamais ; aucune cascade | Active | `Project`, `Technology`, `ProjectEntity.technologies`, `ProjectRepositoryAdapter.create` |
+| D-AA | 18 | Unicité du vocabulaire : slug `UNIQUE` + `CHECK` kebab-case ; nom unique **sans tenir compte de la casse** (index unique sur `lower(name)`) ; technologie utilisée non supprimable (`ON DELETE RESTRICT`) ; suppression d'un projet → ses associations disparaissent (`ON DELETE CASCADE`) | Active | `V005`, `TechnologySchemaIT` |
+| D-AB | 18 | Technologies d'une page chargées par `@BatchSize(size = 100)` sur la collection : 3 requêtes par page (projets, comptage, technologies), quel que soit le nombre de projets. Écartés : `join fetch` / `@EntityGraph` avec pagination (pagination en mémoire), une requête par projet (N+1, mesuré à 5 requêtes pour 3 projets sans `@BatchSize`) | Active | `ProjectEntity`, `ListPublishedProjectsUseCaseIT.loads_a_page_with_its_technologies_in_a_constant_number_of_queries` |
+| D-AC | 18 | Filtre `GET /api/public/projects?technology=<slug>` : slug exact ; absent ou vide = aucun filtre ; inconnu = page vide (ni 400 ni 404). Critères portés par le record `ProjectFilter` du domaine ; requête dérivée avec jointure, sans doublon puisque le slug est unique. Le filtre restreint les projets, pas la liste de leurs technologies | Active | `ProjectFilter`, `ProjectJpaRepository.findByVisibilityAndTechnologiesSlug`, `PublicProjectIT` |
+| D-AD | 18 | Couverture et captures des projets reportées au catalogue `Media` (étape 27), avec l'avatar et le CV du profil (D-B) : une référence vers une table inexistante n'est pas possible | Active | — |
+| D-AE | 18 | Pas de route publique listant les technologies avant qu'un écran en ait besoin (étape 42) ; chaque projet expose déjà `{ name, slug }` de ses technologies | Active | `TechnologyResponse` |
+| — | 18 | Seed `dev` transactionnel : technologies et projets créés ensemble ou pas du tout | Active | `ProjectSeeder` |
+
 ## Décisions révélées par le code et non documentées ailleurs
 
 | Sujet | Constat | Où c'est désormais documenté |
@@ -63,10 +75,10 @@ Statuts : **Active** · **Remplacée** (préciser par quoi) · **À confirmer** 
 
 | Réf | Date | Décision | Statut | Preuve |
 |---|---|---|---|---|
-| R-1 | 2026-09-24 | `docs/steps/` et `docs/prompts/` ne sont **pas versionnés** (supports de travail avec l'assistant) ; toute décision qu'ils contiennent est reportée dans `docs/decisions/` | Active | `.gitignore` |
+| R-1 | 2026-09-24 | `docs/steps/` et `docs/prompts/` ne sont **pas versionnés** (supports de travail personnels) ; toute décision qu'ils contiennent est reportée dans `docs/decisions/` | Active | `.gitignore` |
 | R-2 | 2026-09-24 | Aucun profil Spring actif par défaut : `dev` s'active au lancement (`-Dspring-boot.run.profiles=dev` ou IDE), `test` par `@ActiveProfiles` | Active | `application.yaml` |
 | R-3 | 2026-09-24 | `spring.jpa.open-in-view: false` et `ddl-auto: validate` dans la configuration commune (plus seulement en test) | Active | `application.yaml` |
 | R-4 | 2026-09-24 | CI GitHub Actions minimale dès maintenant (backend `./mvnw verify`, frontend test + build), sans attendre l'étape 52.12 | Active | `.github/workflows/ci.yml` |
 | R-5 | 2026-09-24 | TypeScript `strict` et `strictTemplates` activés | Active | `frontend/tsconfig.json` |
 | R-6 | 2026-09-24 | Compose de développement nommé `deploy/compose.dev.yaml` (aligné sur la documentation) | Active | `deploy/compose.dev.yaml` |
-| R-7 | 2026-09-24 | Outillage de l'assistant : `CLAUDE.md` (contexte, pointe vers la documentation) et `.mcp.json` (serveur MCP Angular CLI en lecture seule, chemin relatif au dépôt, sans téléchargement) sont **versionnés** ; les plugins Claude Code et graphify sont installés au niveau du poste ; `graphify-out/` et `.claude/settings.local.json` sont ignorés. Aucun outil de l'assistant n'est requis pour compiler, tester ou déployer | Active | `CLAUDE.md`, `.mcp.json`, `.gitignore` |
+| R-7 | 2026-09-24 | Outillage local du poste de développement (configuration d'éditeur et d'outils, graphe de code) : jamais versionné, ignoré par `.gitignore` ; aucun de ces outils n'est requis pour compiler, tester ou déployer | Active | `.gitignore` |

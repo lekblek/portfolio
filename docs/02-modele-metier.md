@@ -230,7 +230,7 @@ ARCHIVED
 
 Seul un projet `PUBLISHED` est exposé publiquement.
 
-État d’implémentation (étape 17) : tous les attributs ci-dessus sauf `coverMedia` (étape 27) ; `Technology` et `ProjectScreenshot` arrivent à l’étape 18 (D-Y). Le slug est unique et au format kebab-case, garanti par PostgreSQL (D-X).
+État d’implémentation (étapes 17 et 18) : tous les attributs ci-dessus et les technologies ; `coverMedia` et `ProjectScreenshot` arrivent avec le catalogue `Media` à l’étape 27 (D-AD). Le slug est unique et au format kebab-case, garanti par PostgreSQL (D-X).
 
 ---
 
@@ -263,6 +263,8 @@ PyTorch
 ```
 
 `Technology` est distinct de `Tag`.
+
+État d’implémentation (étape 18) : module `project`, tables `technology` et `project_technology`. Les technologies d’un projet sont toujours présentées dans l’ordre du vocabulaire (`displayOrder`, puis nom) ; un projet n’a pas d’ordre propre pour ses technologies (D-Z).
 
 ---
 
@@ -738,9 +740,11 @@ Les règles suivantes doivent être garanties par le backend et, lorsque pertine
 18. une `Certification` n'expire jamais avant sa date de délivrance ;
 19. le nom d'une `Skill` est unique dans le profil ;
 20. il existe au plus un `Profile` ;
-21. un `Project` est `IN_PROGRESS` si et seulement s'il n'a pas de date de fin ; sa période respecte l'invariant 17.
+21. un `Project` est `IN_PROGRESS` si et seulement s'il n'a pas de date de fin ; sa période respecte l'invariant 17 ;
+22. le nom (sans tenir compte de la casse) et le slug d'une `Technology` sont uniques ; une technologie utilisée par un projet ne peut pas être supprimée ;
+23. un `Project` référence au plus une fois la même `Technology`.
 
-Les invariants 17 à 21 ont été ajoutés pendant l'implémentation (étapes 14 à 17) ; ils sont garantis par PostgreSQL (`CHECK`, `UNIQUE`) et, pour 17, 18 et 21, par une garde Java dans le modèle métier. Voir [`decisions/registre-implementation.md`](decisions/registre-implementation.md).
+Les invariants 17 à 23 ont été ajoutés pendant l'implémentation (étapes 14 à 18) ; ils sont garantis par PostgreSQL (`CHECK`, `UNIQUE`, clés étrangères) et, pour 17, 18, 21 et 23, par une garde Java dans le modèle métier. Voir [`decisions/registre-implementation.md`](decisions/registre-implementation.md).
 
 ---
 
