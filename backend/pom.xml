@@ -11,21 +11,8 @@
   <groupId>com.scalke.portfolio</groupId>
   <artifactId>backend</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <name>backend</name>
-  <description>backend</description>
-  <url/>
-  <licenses>
-    <license/>
-  </licenses>
-  <developers>
-    <developer/>
-  </developers>
-  <scm>
-    <connection/>
-    <developerConnection/>
-    <tag/>
-    <url/>
-  </scm>
+  <name>portfolio-backend</name>
+  <description>API Spring Boot du portfolio (monolithe modulaire)</description>
   <properties>
     <java.version>25</java.version>
   </properties>
