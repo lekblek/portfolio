@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 
-public class ApiConventionsTest {
+class ApiConventionsTest {
 
     private static final String BASE = "com.scalke.portfolio.backend";
 
@@ -23,7 +23,7 @@ public class ApiConventionsTest {
     }
 
     @Test
-    void controllers_should_reside_in_an_api_package() {
+    void controllers_should_reside_in_a_web_controller_package() {
         classes()
             .that().haveSimpleNameEndingWith("Controller")
             .should().resideInAPackage("..web.controller..")
@@ -42,7 +42,7 @@ public class ApiConventionsTest {
     }
 
     @Test
-    void jpa_entities_should_reside_in_a_domain_package() {
+    void jpa_entities_should_reside_in_the_jpa_persistence_package() {
         classes()
             .that().areAnnotatedWith(Entity.class)
             .should().resideInAPackage("..infrastructure.persistence.jpa.entity..")
