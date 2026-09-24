@@ -1,0 +1,51 @@
+package com.scalke.portfolio.backend.publication.infrastructure.persistence.jpa.mapper;
+
+import com.scalke.portfolio.backend.publication.domain.model.Publication;
+import com.scalke.portfolio.backend.publication.infrastructure.persistence.jpa.entity.PublicationEntity;
+
+public final class PublicationPersistenceMapper {
+
+    private PublicationPersistenceMapper() {
+    }
+
+    /**
+     * Reconstruit la {@link Publication} du domaine : ses invariants sont revérifiés à chaque lecture.
+     */
+    public static Publication toDomain(PublicationEntity entity) {
+        return new Publication(
+            entity.getId(),
+            entity.getType(),
+            entity.getTitle(),
+            entity.getSlug(),
+            entity.getSummary(),
+            entity.getContentMarkdown(),
+            entity.getStatus(),
+            entity.getPublishedAt(),
+            entity.isFeatured(),
+            entity.getSeoTitle(),
+            entity.getSeoDescription(),
+            entity.getCreatedAt(),
+            entity.getUpdatedAt()
+        );
+    }
+
+    /**
+     * Nouvelle entité, sans identifiant : attribué par PostgreSQL à l'insertion.
+     */
+    public static PublicationEntity toNewEntity(Publication publication) {
+        return PublicationEntity.builder()
+            .type(publication.type())
+            .title(publication.title())
+            .slug(publication.slug())
+            .summary(publication.summary())
+            .contentMarkdown(publication.contentMarkdown())
+            .status(publication.status())
+            .publishedAt(publication.publishedAt())
+            .featured(publication.featured())
+            .seoTitle(publication.seoTitle())
+            .seoDescription(publication.seoDescription())
+            .createdAt(publication.createdAt())
+            .updatedAt(publication.updatedAt())
+            .build();
+    }
+}

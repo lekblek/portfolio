@@ -8,6 +8,6 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
-@Import(ContainersConfiguration.class)
+@Import({ContainersConfiguration.class, FixedClockConfiguration.class})
 public abstract class AbstractIntegrationTest {
 }
