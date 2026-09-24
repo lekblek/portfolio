@@ -16,14 +16,14 @@ class PublicationTest {
     private static final Instant AT = Instant.parse("2026-06-01T09:00:00Z");
 
     @ParameterizedTest
-    @EnumSource(value = PublicationStatus.class, names = {"SCHEDULED", "PUBLISHED"})
-    void requires_a_publication_date_once_scheduled_or_published(PublicationStatus status) {
+    @EnumSource(value = PublicationStatus.class, names = {"SCHEDULED", "PUBLISHED", "ARCHIVED"})
+    void requires_a_publication_date_once_scheduled_published_or_archived(PublicationStatus status) {
         assertThatThrownBy(() -> publication(status, null, "Contenu"))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
     @ParameterizedTest
-    @EnumSource(value = PublicationStatus.class, names = {"DRAFT", "IN_REVIEW", "ARCHIVED"})
+    @EnumSource(value = PublicationStatus.class, names = {"DRAFT", "IN_REVIEW"})
     void accepts_no_publication_date_otherwise(PublicationStatus status) {
         assertThat(publication(status, null, "Contenu").publishedAt()).isNull();
     }

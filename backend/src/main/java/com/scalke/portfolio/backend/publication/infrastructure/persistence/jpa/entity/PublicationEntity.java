@@ -106,4 +106,14 @@ public class PublicationEntity {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
+
+    /**
+     * Seule écriture après création (D-AX) : les valeurs viennent d'une transition déjà validée par le
+     * domaine ({@code Publication.transitionTo}).
+     */
+    public void changeStatus(PublicationStatus status, Instant publishedAt, Instant updatedAt) {
+        this.status = status;
+        this.publishedAt = publishedAt;
+        this.updatedAt = updatedAt;
+    }
 }

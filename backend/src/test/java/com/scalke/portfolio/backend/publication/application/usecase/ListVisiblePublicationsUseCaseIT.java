@@ -1,5 +1,6 @@
 package com.scalke.portfolio.backend.publication.application.usecase;
 
+import com.scalke.portfolio.backend.publication.domain.model.Publication;
 import com.scalke.portfolio.backend.publication.domain.model.PublicationStatus;
 import com.scalke.portfolio.backend.publication.domain.model.PublicationType;
 import com.scalke.portfolio.backend.publication.domain.port.PublicationRepository;
@@ -19,6 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.scalke.portfolio.backend.publication.PublicationFixtures.article;
 import static com.scalke.portfolio.backend.publication.PublicationFixtures.classifiedArticle;
@@ -67,6 +71,25 @@ class ListVisiblePublicationsUseCaseIT extends AbstractIntegrationTest {
             .extracting(ListVisiblePublicationsUseCaseIT::slug)
             .containsExactly("planifiee-maintenant", "planifiee-passee", "news-publiee", "publiee-ancienne");
         assertThat(page.totalElements()).isEqualTo(4);
+    }
+
+    /**
+     * D-AY : la règle du domaine ({@code Publication.isVisibleAt}) et celle de la requête
+     * ({@code PublicationSpecifications.visibleAt}) désignent exactement les mêmes publications.
+     */
+    @Test
+    void the_domain_rule_and_the_query_agree_on_visibility() {
+        List<Publication> all = givenOnePublicationPerVisibilityCase();
+
+        Set<String> visibleByDomain = all.stream()
+            .filter(publication -> publication.isVisibleAt(NOW))
+            .map(Publication::slug)
+            .collect(Collectors.toSet());
+        Set<String> visibleByQuery = list(PublicationCriteria.none(), new PageQuery(0, 100)).content().stream()
+            .map(ListVisiblePublicationsUseCaseIT::slug)
+            .collect(Collectors.toSet());
+
+        assertThat(visibleByQuery).hasSize(4).isEqualTo(visibleByDomain);
     }
 
     @Test
@@ -182,16 +205,17 @@ class ListVisiblePublicationsUseCaseIT extends AbstractIntegrationTest {
         return visible.publication().slug();
     }
 
-    private void givenOnePublicationPerVisibilityCase() {
-        publicationRepository.create(article("publiee-ancienne", PublicationStatus.PUBLISHED, NOW.minus(Duration.ofDays(30))));
-        publicationRepository.create(publication("news-publiee", PublicationType.NEWS, PublicationStatus.PUBLISHED,
-            NOW.minus(Duration.ofDays(3))));
-        publicationRepository.create(article("planifiee-passee", PublicationStatus.SCHEDULED, NOW.minus(Duration.ofDays(1))));
-        publicationRepository.create(article("planifiee-maintenant", PublicationStatus.SCHEDULED, NOW));
-        publicationRepository.create(article("planifiee-future", PublicationStatus.SCHEDULED, NOW.plusSeconds(1)));
-        publicationRepository.create(article("brouillon", PublicationStatus.DRAFT, null));
-        publicationRepository.create(article("en-relecture", PublicationStatus.IN_REVIEW, null));
-        publicationRepository.create(article("archivee", PublicationStatus.ARCHIVED, NOW.minus(Duration.ofDays(60))));
+    private List<Publication> givenOnePublicationPerVisibilityCase() {
+        return List.of(
+            article("publiee-ancienne", PublicationStatus.PUBLISHED, NOW.minus(Duration.ofDays(30))),
+            publication("news-publiee", PublicationType.NEWS, PublicationStatus.PUBLISHED, NOW.minus(Duration.ofDays(3))),
+            article("planifiee-passee", PublicationStatus.SCHEDULED, NOW.minus(Duration.ofDays(1))),
+            article("planifiee-maintenant", PublicationStatus.SCHEDULED, NOW),
+            article("planifiee-future", PublicationStatus.SCHEDULED, NOW.plusSeconds(1)),
+            article("brouillon", PublicationStatus.DRAFT, null),
+            article("en-relecture", PublicationStatus.IN_REVIEW, null),
+            article("archivee", PublicationStatus.ARCHIVED, NOW.minus(Duration.ofDays(60)))
+        ).stream().map(publicationRepository::create).toList();
     }
 
     /**

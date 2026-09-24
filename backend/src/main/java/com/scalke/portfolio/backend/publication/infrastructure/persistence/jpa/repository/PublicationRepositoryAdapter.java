@@ -3,6 +3,7 @@ package com.scalke.portfolio.backend.publication.infrastructure.persistence.jpa.
 import com.scalke.portfolio.backend.publication.domain.model.Publication;
 import com.scalke.portfolio.backend.publication.domain.model.PublicationFilter;
 import com.scalke.portfolio.backend.publication.domain.port.PublicationRepository;
+import com.scalke.portfolio.backend.publication.infrastructure.persistence.jpa.entity.PublicationEntity;
 import com.scalke.portfolio.backend.publication.infrastructure.persistence.jpa.mapper.PublicationPersistenceMapper;
 import com.scalke.portfolio.backend.shared.domain.model.PageQuery;
 import com.scalke.portfolio.backend.shared.domain.model.PageResult;
@@ -70,5 +71,23 @@ public class PublicationRepositoryAdapter implements PublicationRepository {
         }
         return PublicationPersistenceMapper.toDomain(
             repository.save(PublicationPersistenceMapper.toNewEntity(publication)));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Publication> findById(Long id) {
+        return repository.findById(id).map(PublicationPersistenceMapper::toDomain);
+    }
+
+    /**
+     * Modifie l'entité gérée ; l'écriture a lieu à la validation de la transaction (dirty checking).
+     */
+    @Override
+    @Transactional
+    public Publication updateStatus(Publication publication) {
+        PublicationEntity entity = repository.findById(publication.id())
+            .orElseThrow(() -> new IllegalStateException("publication " + publication.id() + " does not exist"));
+        entity.changeStatus(publication.status(), publication.publishedAt(), publication.updatedAt());
+        return PublicationPersistenceMapper.toDomain(entity);
     }
 }
