@@ -8,11 +8,14 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.Length;
+import org.hibernate.annotations.BatchSize;
 
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * Structure de persistance d'une publication ({@code V006}). Les invariants vivent dans
+ * Structure de persistance d'une publication ({@code V006}, {@code V008}). Les invariants vivent dans
  * {@code domain.model.Publication} et dans les contraintes de la table (ADR 0001).
  * <p>
  * {@code createdAt} et {@code updatedAt} sont fixés par l'application à partir de l'horloge applicative
@@ -54,6 +57,22 @@ public class PublicationEntity {
     @Column(name = "featured", nullable = false)
     private boolean featured;
 
+    /**
+     * Identifiant d'une catégorie du module {@code taxonomy} : jamais une entité de ce module (D-AN).
+     */
+    @Column(name = "category_id")
+    private Long categoryId;
+
+    /**
+     * Identifiants des tags ({@code publication_tag}). {@code @BatchSize} : pour une page, une seule
+     * requête charge les tags de toutes les publications chargées (D-AS).
+     */
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "publication_tag", joinColumns = @JoinColumn(name = "publication_id"))
+    @Column(name = "tag_id", nullable = false)
+    @BatchSize(size = 100)
+    private Set<Long> tagIds = new HashSet<>();
+
     @Column(name = "seo_title", length = 120)
     private String seoTitle;
 
@@ -69,7 +88,8 @@ public class PublicationEntity {
     @Builder
     private PublicationEntity(PublicationType type, String title, String slug, String summary,
                               String contentMarkdown, PublicationStatus status, Instant publishedAt,
-                              boolean featured, String seoTitle, String seoDescription,
+                              boolean featured, Long categoryId, Set<Long> tagIds,
+                              String seoTitle, String seoDescription,
                               Instant createdAt, Instant updatedAt) {
         this.type = type;
         this.title = title;
@@ -79,6 +99,8 @@ public class PublicationEntity {
         this.status = status;
         this.publishedAt = publishedAt;
         this.featured = featured;
+        this.categoryId = categoryId;
+        this.tagIds = new HashSet<>(tagIds);
         this.seoTitle = seoTitle;
         this.seoDescription = seoDescription;
         this.createdAt = createdAt;

@@ -7,6 +7,7 @@ import com.scalke.portfolio.backend.publication.infrastructure.persistence.jpa.e
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -24,6 +25,8 @@ class PublicationPersistenceMapperTest {
             PublicationStatus.SCHEDULED,
             Instant.parse("2026-07-01T08:00:00Z"),
             true,
+            7L,
+            Set.of(1L, 2L),
             "Titre SEO",
             "Description SEO",
             Instant.parse("2026-06-01T09:00:00Z"),

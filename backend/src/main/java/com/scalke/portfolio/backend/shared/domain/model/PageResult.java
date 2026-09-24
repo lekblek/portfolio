@@ -22,6 +22,13 @@ public record PageResult<T>(List<T> content, int page, int size, long totalEleme
         }
     }
 
+    /**
+     * Page vide pour une demande dont on sait déjà qu'elle ne trouvera rien (filtre sur un terme inconnu).
+     */
+    public static <T> PageResult<T> empty(PageQuery query) {
+        return new PageResult<>(List.of(), query.page(), query.size(), 0);
+    }
+
     public int totalPages() {
         return (int) Math.ceil((double) totalElements / size);
     }

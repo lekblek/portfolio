@@ -2,8 +2,9 @@ package com.scalke.portfolio.backend.publication.web.controller;
 
 import com.scalke.portfolio.backend.publication.application.usecase.GetVisiblePublicationUseCase;
 import com.scalke.portfolio.backend.publication.application.usecase.ListVisiblePublicationsUseCase;
+import com.scalke.portfolio.backend.publication.application.usecase.PublicationCriteria;
+import com.scalke.portfolio.backend.publication.application.usecase.VisiblePublication;
 import com.scalke.portfolio.backend.publication.domain.model.Publication;
-import com.scalke.portfolio.backend.publication.domain.model.PublicationFilter;
 import com.scalke.portfolio.backend.publication.domain.model.PublicationStatus;
 import com.scalke.portfolio.backend.publication.domain.model.PublicationType;
 import com.scalke.portfolio.backend.shared.api.ApiPaging;
@@ -11,6 +12,8 @@ import com.scalke.portfolio.backend.shared.domain.model.PageQuery;
 import com.scalke.portfolio.backend.shared.domain.model.PageResult;
 import com.scalke.portfolio.backend.shared.error.ErrorCode;
 import com.scalke.portfolio.backend.shared.error.ResourceNotFoundException;
+import com.scalke.portfolio.backend.taxonomy.domain.model.Category;
+import com.scalke.portfolio.backend.taxonomy.domain.model.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -20,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
@@ -34,10 +38,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(PublicPublicationController.class)
 class PublicPublicationControllerTest {
 
-    private static final Publication ARTICLE = new Publication(
-        42L, PublicationType.ARTICLE, "Construire une API", "construire-une-api", "Résumé", "## Contenu",
-        PublicationStatus.PUBLISHED, Instant.parse("2026-06-01T09:00:00Z"), true, "Titre SEO", null,
-        Instant.parse("2026-05-30T08:00:00Z"), Instant.parse("2026-06-01T09:00:00Z"));
+    private static final VisiblePublication ARTICLE = new VisiblePublication(
+        new Publication(
+            42L, PublicationType.ARTICLE, "Construire une API", "construire-une-api", "Résumé", "## Contenu",
+            PublicationStatus.PUBLISHED, Instant.parse("2026-06-01T09:00:00Z"), true, 3L, Set.of(5L, 6L),
+            "Titre SEO", null, Instant.parse("2026-05-30T08:00:00Z"), Instant.parse("2026-06-01T09:00:00Z")),
+        new Category(3L, "Backend", "backend", "Spring Boot, API, persistance."),
+        List.of(new Tag(6L, "Java", "java"), new Tag(5L, "Spring Boot", "spring-boot")));
+
+    private static final VisiblePublication UNCLASSIFIED_NEWS = new VisiblePublication(
+        new Publication(
+            43L, PublicationType.NEWS, "Lancement", "lancement", "Résumé", "Contenu",
+            PublicationStatus.PUBLISHED, Instant.parse("2026-06-02T09:00:00Z"), false, null, Set.of(),
+            null, null, Instant.parse("2026-06-02T09:00:00Z"), Instant.parse("2026-06-02T09:00:00Z")),
+        null,
+        List.of());
 
     @Autowired
     MockMvc mockMvc;
@@ -51,7 +66,7 @@ class PublicPublicationControllerTest {
     @Test
     void lists_publications_as_a_page_of_summaries() throws Exception {
         given(listVisiblePublicationsUseCase.execute(any(), any()))
-            .willReturn(new PageResult<>(List.of(ARTICLE), 0, 10, 1));
+            .willReturn(new PageResult<>(List.of(ARTICLE, UNCLASSIFIED_NEWS), 0, 10, 2));
 
         mockMvc.perform(get("/api/public/publications").contextPath("/api"))
             .andExpect(status().isOk())
@@ -61,27 +76,43 @@ class PublicPublicationControllerTest {
             .andExpect(jsonPath("$.content[0].publishedAt").value("2026-06-01T09:00:00Z"))
             .andExpect(jsonPath("$.content[0].featured").value(true))
             .andExpect(jsonPath("$.content[0].readingTimeMinutes").value(1))
+            // classement : nom et slug seulement (D-AP)
+            .andExpect(jsonPath("$.content[0].category.name").value("Backend"))
+            .andExpect(jsonPath("$.content[0].category.slug").value("backend"))
+            .andExpect(jsonPath("$.content[0].category.id").doesNotHaveJsonPath())
+            .andExpect(jsonPath("$.content[0].category.description").doesNotHaveJsonPath())
+            .andExpect(jsonPath("$.content[0].tags[0].slug").value("java"))
+            .andExpect(jsonPath("$.content[0].tags[1].name").value("Spring Boot"))
+            // non classée : null et [] explicites (C10)
+            .andExpect(jsonPath("$.content[1].category").hasJsonPath())
+            .andExpect(jsonPath("$.content[1].category").value(nullValue()))
+            .andExpect(jsonPath("$.content[1].tags").isEmpty())
             // pas de contenu dans la liste, aucun champ interne (D-AJ)
             .andExpect(jsonPath("$.content[0].contentMarkdown").doesNotHaveJsonPath())
             .andExpect(jsonPath("$.content[0].id").doesNotHaveJsonPath())
             .andExpect(jsonPath("$.content[0].status").doesNotHaveJsonPath())
+            .andExpect(jsonPath("$.content[0].categoryId").doesNotHaveJsonPath())
+            .andExpect(jsonPath("$.content[0].tagIds").doesNotHaveJsonPath())
             .andExpect(jsonPath("$.content[0].createdAt").doesNotHaveJsonPath())
-            .andExpect(jsonPath("$.content[0].updatedAt").doesNotHaveJsonPath())
-            .andExpect(jsonPath("$.totalElements").value(1));
+            .andExpect(jsonPath("$.totalElements").value(2));
 
         then(listVisiblePublicationsUseCase).should()
-            .execute(PublicationFilter.none(), new PageQuery(0, ApiPaging.PUBLIC_PAGE_SIZE));
+            .execute(PublicationCriteria.none(), new PageQuery(0, ApiPaging.PUBLIC_PAGE_SIZE));
     }
 
     @Test
-    void passes_the_type_filter_to_the_use_case() throws Exception {
+    void passes_every_filter_to_the_use_case() throws Exception {
         given(listVisiblePublicationsUseCase.execute(any(), any())).willReturn(new PageResult<>(List.of(), 0, 10, 0));
 
-        mockMvc.perform(get("/api/public/publications").contextPath("/api").param("type", "NEWS"))
+        mockMvc.perform(get("/api/public/publications").contextPath("/api")
+                .param("type", "NEWS")
+                .param("category", "backend")
+                .param("tag", " spring-boot "))
             .andExpect(status().isOk());
 
-        then(listVisiblePublicationsUseCase).should()
-            .execute(PublicationFilter.ofType(PublicationType.NEWS), new PageQuery(0, ApiPaging.PUBLIC_PAGE_SIZE));
+        then(listVisiblePublicationsUseCase).should().execute(
+            new PublicationCriteria(PublicationType.NEWS, "backend", "spring-boot"),
+            new PageQuery(0, ApiPaging.PUBLIC_PAGE_SIZE));
     }
 
     /**
@@ -104,6 +135,8 @@ class PublicPublicationControllerTest {
         mockMvc.perform(get("/api/public/publications/construire-une-api").contextPath("/api"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.contentMarkdown").value("## Contenu"))
+            .andExpect(jsonPath("$.category.slug").value("backend"))
+            .andExpect(jsonPath("$.tags.length()").value(2))
             .andExpect(jsonPath("$.seoTitle").value("Titre SEO"))
             .andExpect(jsonPath("$.seoDescription").hasJsonPath())
             .andExpect(jsonPath("$.seoDescription").value(nullValue()))

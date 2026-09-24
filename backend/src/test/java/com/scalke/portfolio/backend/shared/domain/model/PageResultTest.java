@@ -28,6 +28,16 @@ class PageResultTest {
     }
 
     @Test
+    void an_empty_result_keeps_the_requested_page_and_size() {
+        PageResult<String> page = PageResult.empty(new PageQuery(2, 10));
+
+        assertThat(page.content()).isEmpty();
+        assertThat(page).extracting(PageResult::page, PageResult::size, PageResult::totalElements)
+            .containsExactly(2, 10, 0L);
+        assertThat(page.isLast()).isTrue();
+    }
+
+    @Test
     void rejects_a_negative_total() {
         assertThatThrownBy(() -> new PageResult<>(List.of(), 0, 10, -1))
             .isInstanceOf(IllegalArgumentException.class);

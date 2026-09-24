@@ -3,6 +3,10 @@ package com.scalke.portfolio.backend.publication;
 import com.scalke.portfolio.backend.publication.domain.model.PublicationStatus;
 import com.scalke.portfolio.backend.publication.domain.model.PublicationType;
 import com.scalke.portfolio.backend.publication.domain.port.PublicationRepository;
+import com.scalke.portfolio.backend.taxonomy.domain.model.Category;
+import com.scalke.portfolio.backend.taxonomy.domain.model.Tag;
+import com.scalke.portfolio.backend.taxonomy.domain.port.CategoryRepository;
+import com.scalke.portfolio.backend.taxonomy.domain.port.TagRepository;
 import com.scalke.portfolio.backend.testsupport.AbstractIntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,16 +21,19 @@ import java.time.Duration;
 import java.time.Instant;
 
 import static com.scalke.portfolio.backend.publication.PublicationFixtures.article;
+import static com.scalke.portfolio.backend.publication.PublicationFixtures.classifiedArticle;
 import static com.scalke.portfolio.backend.publication.PublicationFixtures.publication;
 import static com.scalke.portfolio.backend.testsupport.FixedClockConfiguration.NOW;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * Parcours HTTP complet : contrôleur → cas d'usage (horloge fixe) → adaptateur JPA → PostgreSQL.
- * Vérifie la sérialisation réelle des instants et la visibilité publique (D-AH).
+ * Parcours HTTP complet : contrôleur → cas d'usage (horloge fixe) → adaptateur JPA et façade de la
+ * taxonomie → PostgreSQL. Vérifie la sérialisation réelle, la visibilité (D-AH) et les filtres (D-AQ).
  */
 @Transactional
 class PublicPublicationIT extends AbstractIntegrationTest {
@@ -39,9 +46,18 @@ class PublicPublicationIT extends AbstractIntegrationTest {
     @Autowired
     PublicationRepository publicationRepository;
 
+    @Autowired
+    CategoryRepository categoryRepository;
+
+    @Autowired
+    TagRepository tagRepository;
+
     @BeforeEach
     void givenVisibleAndInvisiblePublications() {
-        publicationRepository.create(article("article-publie", PublicationStatus.PUBLISHED, PUBLISHED_AT));
+        Category backend = categoryRepository.create(new Category(null, "Backend", "backend", null));
+        Tag java = tagRepository.create(new Tag(null, "Java", "java"));
+        Tag tests = tagRepository.create(new Tag(null, "Tests", "tests"));
+        publicationRepository.create(classifiedArticle("article-publie", PUBLISHED_AT, backend.id(), tests.id(), java.id()));
         publicationRepository.create(publication("news-planifiee-passee", PublicationType.NEWS,
             PublicationStatus.SCHEDULED, NOW.minus(Duration.ofHours(1))));
         publicationRepository.create(article("article-planifie-futur", PublicationStatus.SCHEDULED,
@@ -50,22 +66,33 @@ class PublicPublicationIT extends AbstractIntegrationTest {
     }
 
     @Test
-    void lists_visible_publications_with_iso_instants() throws Exception {
+    void lists_visible_publications_with_iso_instants_and_their_terms() throws Exception {
         mockMvc.perform(get("/api/public/publications").contextPath("/api"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.content.length()").value(2))
             .andExpect(jsonPath("$.content[0].slug").value("news-planifiee-passee"))
+            .andExpect(jsonPath("$.content[0].category").value(nullValue()))
+            .andExpect(jsonPath("$.content[0].tags").isEmpty())
             .andExpect(jsonPath("$.content[1].slug").value("article-publie"))
             .andExpect(jsonPath("$.content[1].publishedAt").value("2026-06-10T08:30:00Z"))
+            .andExpect(jsonPath("$.content[1].category.slug").value("backend"))
+            .andExpect(jsonPath("$.content[1].tags[0].name").value("Java"))
+            .andExpect(jsonPath("$.content[1].tags[1].name").value("Tests"))
             .andExpect(jsonPath("$.totalElements").value(2));
     }
 
     @Test
-    void filters_by_type() throws Exception {
+    void filters_by_type_category_and_tag() throws Exception {
         mockMvc.perform(get("/api/public/publications").contextPath("/api").param("type", "ARTICLE"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.content.length()").value(1))
+            .andExpect(jsonPath("$.content[*].slug").value(contains("article-publie")));
+        mockMvc.perform(get("/api/public/publications").contextPath("/api").param("category", "backend"))
+            .andExpect(jsonPath("$.totalElements").value(1));
+        mockMvc.perform(get("/api/public/publications").contextPath("/api").param("tag", "java"))
             .andExpect(jsonPath("$.content[0].slug").value("article-publie"));
+        mockMvc.perform(get("/api/public/publications").contextPath("/api").param("tag", "inconnu"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.content").isEmpty())
+            .andExpect(jsonPath("$.totalElements").value(0));
     }
 
     @Test
@@ -74,7 +101,9 @@ class PublicPublicationIT extends AbstractIntegrationTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.type").value("ARTICLE"))
             .andExpect(jsonPath("$.contentMarkdown").value("# article-publie\n\nContenu."))
-            .andExpect(jsonPath("$.readingTimeMinutes").value(1));
+            .andExpect(jsonPath("$.readingTimeMinutes").value(1))
+            .andExpect(jsonPath("$.category.name").value("Backend"))
+            .andExpect(jsonPath("$.tags.length()").value(2));
     }
 
     @ParameterizedTest

@@ -5,6 +5,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -53,8 +55,20 @@ class PublicationTest {
             .isEqualTo(2);
     }
 
+    @Test
+    void keeps_an_immutable_copy_of_its_tags() {
+        Set<Long> tags = new HashSet<>(Set.of(1L, 2L));
+        Publication publication = new Publication(null, PublicationType.ARTICLE, "Titre", "titre", "Résumé", "Contenu",
+            PublicationStatus.DRAFT, null, false, 7L, tags, null, null, AT, AT);
+
+        tags.add(3L);
+
+        assertThat(publication.tagIds()).containsExactlyInAnyOrder(1L, 2L);
+        assertThatThrownBy(() -> publication.tagIds().add(4L)).isInstanceOf(UnsupportedOperationException.class);
+    }
+
     private static Publication publication(PublicationStatus status, Instant publishedAt, String content) {
         return new Publication(null, PublicationType.ARTICLE, "Titre", "titre", "Résumé", content,
-            status, publishedAt, false, null, null, AT, AT);
+            status, publishedAt, false, null, Set.of(), null, null, AT, AT);
     }
 }

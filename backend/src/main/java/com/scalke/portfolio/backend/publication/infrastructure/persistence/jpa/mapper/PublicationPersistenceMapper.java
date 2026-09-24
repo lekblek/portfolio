@@ -3,6 +3,8 @@ package com.scalke.portfolio.backend.publication.infrastructure.persistence.jpa.
 import com.scalke.portfolio.backend.publication.domain.model.Publication;
 import com.scalke.portfolio.backend.publication.infrastructure.persistence.jpa.entity.PublicationEntity;
 
+import java.util.Set;
+
 public final class PublicationPersistenceMapper {
 
     private PublicationPersistenceMapper() {
@@ -10,6 +12,7 @@ public final class PublicationPersistenceMapper {
 
     /**
      * Reconstruit la {@link Publication} du domaine : ses invariants sont revérifiés à chaque lecture.
+     * Parcourt les tags : à appeler dans la transaction qui a chargé l'entité.
      */
     public static Publication toDomain(PublicationEntity entity) {
         return new Publication(
@@ -22,6 +25,8 @@ public final class PublicationPersistenceMapper {
             entity.getStatus(),
             entity.getPublishedAt(),
             entity.isFeatured(),
+            entity.getCategoryId(),
+            Set.copyOf(entity.getTagIds()),
             entity.getSeoTitle(),
             entity.getSeoDescription(),
             entity.getCreatedAt(),
@@ -42,6 +47,8 @@ public final class PublicationPersistenceMapper {
             .status(publication.status())
             .publishedAt(publication.publishedAt())
             .featured(publication.featured())
+            .categoryId(publication.categoryId())
+            .tagIds(publication.tagIds())
             .seoTitle(publication.seoTitle())
             .seoDescription(publication.seoDescription())
             .createdAt(publication.createdAt())

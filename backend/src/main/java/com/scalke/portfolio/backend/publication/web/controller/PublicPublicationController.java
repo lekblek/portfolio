@@ -2,7 +2,7 @@ package com.scalke.portfolio.backend.publication.web.controller;
 
 import com.scalke.portfolio.backend.publication.application.usecase.GetVisiblePublicationUseCase;
 import com.scalke.portfolio.backend.publication.application.usecase.ListVisiblePublicationsUseCase;
-import com.scalke.portfolio.backend.publication.domain.model.PublicationFilter;
+import com.scalke.portfolio.backend.publication.application.usecase.PublicationCriteria;
 import com.scalke.portfolio.backend.publication.domain.model.PublicationType;
 import com.scalke.portfolio.backend.publication.web.dto.PublicationResponse;
 import com.scalke.portfolio.backend.publication.web.dto.PublicationSummaryResponse;
@@ -29,16 +29,19 @@ public class PublicPublicationController {
     /**
      * Pagination bornée comme pour les projets (D-V) ; ordre fixe, les plus récentes d'abord (D-AK).
      * <p>
-     * {@code type} : {@code ARTICLE} ou {@code NEWS} ; absent, les deux. Une autre valeur est une
-     * requête invalide (400 {@code MALFORMED_REQUEST}) : le type est un ensemble fermé du contrat (C09).
+     * Filtres cumulables : {@code type} ({@code ARTICLE} ou {@code NEWS}, toute autre valeur → 400
+     * {@code MALFORMED_REQUEST}, ensemble fermé du contrat) ; {@code category} et {@code tag} (slugs,
+     * inconnus → page vide, vocabulaire ouvert : D-AQ).
      */
     @GetMapping
     PageResponse<PublicationSummaryResponse> listPublications(
         @RequestParam(required = false) PublicationType type,
+        @RequestParam(required = false) String category,
+        @RequestParam(required = false) String tag,
         @PageableDefault(size = ApiPaging.PUBLIC_PAGE_SIZE) Pageable pageable) {
         PageQuery query = new PageQuery(pageable.getPageNumber(), pageable.getPageSize());
         return PageResponse.from(listVisiblePublicationsUseCase
-            .execute(PublicationFilter.ofType(type), query)
+            .execute(PublicationCriteria.of(type, category, tag), query)
             .map(PublicationSummaryResponse::from));
     }
 
