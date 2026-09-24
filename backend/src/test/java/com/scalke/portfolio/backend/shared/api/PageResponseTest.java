@@ -2,18 +2,15 @@ package com.scalke.portfolio.backend.shared.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.scalke.portfolio.backend.shared.domain.model.PageResult;
 import org.junit.jupiter.api.Test;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 
 class PageResponseTest {
     @Test
     void maps_an_intermediate_page() {
-        Page<String> page = new PageImpl<>(
-            List.of("b1", "b2"), PageRequest.of(1, 2), 5);
+        PageResult<String> page = new PageResult<>(List.of("b1", "b2"), 1, 2, 5);
 
         PageResponse<String> response = PageResponse.from(page);
 
@@ -28,7 +25,7 @@ class PageResponseTest {
 
     @Test
     void maps_an_empty_page() {
-        Page<String> page = Page.empty(PageRequest.of(0, 10));
+        PageResult<String> page = new PageResult<>(List.of(), 0, 10, 0);
 
         PageResponse<String> response = PageResponse.from(page);
 
