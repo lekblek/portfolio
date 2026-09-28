@@ -11,8 +11,8 @@ import java.util.Optional;
  * implémentation compatible S3 pourra la remplacer sans modifier les appelants (D-BO).
  * <p>
  * Ne contient que les méthodes utilisées par un appelant existant (ADR 0001) : {@code open} par
- * {@code OpenMediaFileUseCase}, {@code store} par {@code UploadMediaUseCase}. La suppression arrive avec ses
- * appelants, la compensation d'un envoi et la suppression contrôlée d'un média du catalogue (étape 27, D-BT).
+ * {@code OpenMediaFileUseCase}, {@code store} par {@code UploadMediaUseCase}. La suppression arrive avec la
+ * suppression contrôlée d'un média du catalogue (étape 27.2, D-BT).
  */
 public interface MediaStorage {
 

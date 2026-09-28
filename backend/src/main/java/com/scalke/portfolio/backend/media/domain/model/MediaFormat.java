@@ -44,6 +44,13 @@ public enum MediaFormat {
     }
 
     /**
+     * Vrai pour PNG, JPEG et WebP : un média de ce format a des dimensions (D-BU).
+     */
+    public boolean isImage() {
+        return this != PDF;
+    }
+
+    /**
      * Taille maximale d'un fichier de ce format, en octets.
      */
     public long maxSize() {

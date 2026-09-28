@@ -1,5 +1,6 @@
 package com.scalke.portfolio.backend.media;
 
+import com.scalke.portfolio.backend.media.application.usecase.MediaUpload;
 import com.scalke.portfolio.backend.media.application.usecase.UploadMediaUseCase;
 import com.scalke.portfolio.backend.media.domain.model.StorageKey;
 import com.scalke.portfolio.backend.media.infrastructure.storage.MediaStorageProperties;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.ByteArrayInputStream;
@@ -39,6 +41,9 @@ class PublicMediaIT extends AbstractIntegrationTest {
     @Autowired
     UploadMediaUseCase uploadMediaUseCase;
 
+    @Autowired
+    JdbcClient jdbcClient;
+
     private Path file;
 
     @BeforeEach
@@ -63,7 +68,8 @@ class PublicMediaIT extends AbstractIntegrationTest {
     @Test
     void serves_an_uploaded_file_under_its_new_key() throws Exception {
         byte[] pdf = "%PDF-1.7 curriculum vitae".getBytes();
-        StorageKey key = uploadMediaUseCase.execute(new ByteArrayInputStream(pdf));
+        StorageKey key = uploadMediaUseCase.execute(new MediaUpload("cv.pdf", null, new ByteArrayInputStream(pdf)))
+            .storageKey();
         try {
             mockMvc.perform(get("/api/public/media/" + key.value()).contextPath("/api"))
                 .andExpect(status().isOk())
@@ -71,6 +77,7 @@ class PublicMediaIT extends AbstractIntegrationTest {
                 .andExpect(content().bytes(pdf));
         } finally {
             Files.deleteIfExists(properties.storageRoot().resolve(key.value()));
+            jdbcClient.sql("DELETE FROM media WHERE storage_key = :key").param("key", key.value()).update();
         }
     }
 
