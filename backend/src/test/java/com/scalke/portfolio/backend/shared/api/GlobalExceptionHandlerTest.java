@@ -39,6 +39,19 @@ public class GlobalExceptionHandlerTest {
             .andExpect(jsonPath("$.code").value("SLUG_ALREADY_USED"));
     }
 
+    /**
+     * D-BS (KI-23) : format refusé → 415, fichier trop volumineux → 413.
+     */
+    @Test
+    void renders_a_rejected_upload_with_its_http_status() throws Exception {
+        mockMvc.perform(get("/test-errors/unsupported-content"))
+            .andExpect(status().isUnsupportedMediaType())
+            .andExpect(jsonPath("$.code").value("UNSUPPORTED_MEDIA_FORMAT"));
+        mockMvc.perform(get("/test-errors/too-large"))
+            .andExpect(status().isPayloadTooLarge())
+            .andExpect(jsonPath("$.code").value("MEDIA_TOO_LARGE"));
+    }
+
     @Test
     void renders_validation_failures_with_field_details() throws Exception {
         mockMvc.perform(post("/test-errors/validate")

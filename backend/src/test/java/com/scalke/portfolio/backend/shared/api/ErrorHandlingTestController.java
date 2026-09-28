@@ -1,8 +1,10 @@
 package com.scalke.portfolio.backend.shared.api;
 
 import com.scalke.portfolio.backend.shared.error.BusinessRuleViolationException;
+import com.scalke.portfolio.backend.shared.error.ContentTooLargeException;
 import com.scalke.portfolio.backend.shared.error.ErrorCode;
 import com.scalke.portfolio.backend.shared.error.ResourceNotFoundException;
+import com.scalke.portfolio.backend.shared.error.UnsupportedContentException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +26,18 @@ public class ErrorHandlingTestController {
     void conflict() {
         throw new BusinessRuleViolationException(
             ErrorCode.SLUG_ALREADY_USED, "Ce slug est déjà utilisé.");
+    }
+
+    @GetMapping("/unsupported-content")
+    void unsupportedContent() {
+        throw new UnsupportedContentException(
+            ErrorCode.UNSUPPORTED_MEDIA_FORMAT, "Format de fichier non accepté : PNG, JPEG, WebP ou PDF.");
+    }
+
+    @GetMapping("/too-large")
+    void tooLarge() {
+        throw new ContentTooLargeException(
+            ErrorCode.MEDIA_TOO_LARGE, "Fichier trop volumineux : 5 Mo au plus pour ce format.");
     }
 
     @PostMapping("/validate")

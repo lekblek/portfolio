@@ -19,5 +19,6 @@ public enum ErrorCode {
 
     // media
     MEDIA_STILL_REFERENCED,
-    UNSUPPORTED_MEDIA_FORMAT
+    UNSUPPORTED_MEDIA_FORMAT,
+    MEDIA_TOO_LARGE
 }

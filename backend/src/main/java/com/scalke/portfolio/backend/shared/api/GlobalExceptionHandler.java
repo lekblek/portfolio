@@ -1,8 +1,10 @@
 package com.scalke.portfolio.backend.shared.api;
 
 import com.scalke.portfolio.backend.shared.error.BusinessRuleViolationException;
+import com.scalke.portfolio.backend.shared.error.ContentTooLargeException;
 import com.scalke.portfolio.backend.shared.error.ErrorCode;
 import com.scalke.portfolio.backend.shared.error.ResourceNotFoundException;
+import com.scalke.portfolio.backend.shared.error.UnsupportedContentException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -45,6 +47,16 @@ class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(BusinessRuleViolationException.class)
     ProblemDetail handleBusinessRuleViolation(BusinessRuleViolationException ex) {
         return problem(HttpStatus.CONFLICT, ex.getMessage(), ex.errorCode());
+    }
+
+    @ExceptionHandler(UnsupportedContentException.class)
+    ProblemDetail handleUnsupportedContent(UnsupportedContentException ex) {
+        return problem(HttpStatus.UNSUPPORTED_MEDIA_TYPE, ex.getMessage(), ex.errorCode());
+    }
+
+    @ExceptionHandler(ContentTooLargeException.class)
+    ProblemDetail handleContentTooLarge(ContentTooLargeException ex) {
+        return problem(HttpStatus.CONTENT_TOO_LARGE, ex.getMessage(), ex.errorCode());
     }
 
     @Override
