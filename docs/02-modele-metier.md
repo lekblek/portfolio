@@ -477,6 +477,8 @@ Une série ne possède pas de workflow éditorial propre dans la V1.
 
 Elle organise des articles.
 
+État d’implémentation (étape 23) : tous les attributs ci-dessus sauf `coverMedia` (étape 27). Une série est publique si et seulement si au moins un de ses articles est visible ; sa table des matières ne montre que ces articles, numérotés à partir de 1 (D-BG). Lecture publique seulement : création et modification à l’étape 36 (D-BE).
+
 ---
 
 # 20. SeriesItem
@@ -507,6 +509,8 @@ position > 0
 ```
 
 `SeriesItem` n'existe pas sans `Series`.
+
+État d’implémentation (étape 23) : les positions peuvent laisser des trous, seul leur ordre compte. Supprimer un article le retire de sa série ; un article rangé dans une série ne peut pas devenir une `NEWS` (D-BF).
 
 ---
 
@@ -770,7 +774,7 @@ Les règles suivantes doivent être garanties par le backend et, lorsque pertine
 25. le nom (sans tenir compte de la casse) et le slug d'une `Category`, d'un `Tag`, sont uniques dans leur vocabulaire ; un terme utilisé par une publication ne peut pas être supprimé ;
 26. le statut d'une `Publication` ne change que selon la table des transitions du §15.
 
-Les invariants 17 à 26 ont été ajoutés pendant l'implémentation (étapes 14 à 21). Les invariants 17 à 25 sont garantis par PostgreSQL (`CHECK`, `UNIQUE`, clés étrangères) et, pour 17, 18, 21, 23 et 24, doublés par le modèle métier. L'invariant 26 (table des transitions) est **applicatif uniquement** : aucune contrainte SQL ne compare l'ancien et le nouveau statut ; il est garanti tant que le statut n'est écrit que par `ChangePublicationStatusUseCase` (seul appelant de `updateStatus`, D-AX). L'invariant 6 (slug stable) est lui aussi applicatif : `Publication.changeSlug` refuse le changement dès que `firstPublishedAt` est passée (D-BC) ; l'invariant 5 est garanti par les contraintes `UNIQUE` de PostgreSQL (D-X, D-AA, D-AL, D-AO). Les invariants 7 à 10 (visibilité des publications) sont appliqués par les lectures publiques depuis l'étape 19. Voir [`decisions/registre-implementation.md`](decisions/registre-implementation.md).
+Les invariants 17 à 26 ont été ajoutés pendant l'implémentation (étapes 14 à 21). Les invariants 17 à 25 sont garantis par PostgreSQL (`CHECK`, `UNIQUE`, clés étrangères) et, pour 17, 18, 21, 23 et 24, doublés par le modèle métier. L'invariant 26 (table des transitions) est **applicatif uniquement** : aucune contrainte SQL ne compare l'ancien et le nouveau statut ; il est garanti tant que le statut n'est écrit que par `ChangePublicationStatusUseCase` (seul appelant de `updateStatus`, D-AX). L'invariant 6 (slug stable) est lui aussi applicatif : `Publication.changeSlug` refuse le changement dès que `firstPublishedAt` est passée (D-BC) ; l'invariant 5 est garanti par les contraintes `UNIQUE` de PostgreSQL (D-X, D-AA, D-AL, D-AO). Les invariants 1 à 3 (séries) sont garantis par PostgreSQL depuis l'étape 23 (`V011`, D-BF) et, pour 3, doublés par le modèle métier. Les invariants 7 à 10 (visibilité des publications) sont appliqués par les lectures publiques depuis l'étape 19. Voir [`decisions/registre-implementation.md`](decisions/registre-implementation.md).
 
 ---
 

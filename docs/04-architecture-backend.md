@@ -235,6 +235,8 @@ series → media
 
 Une série référence des publications de type `ARTICLE`.
 
+État d’implémentation (étape 23) : `series` lit les articles par la façade `PublicationQueryService` (visibilité, publications) et ne lit que ses propres tables (`series`, `series_item`), D-BH.
+
 La dépendance est volontairement unidirectionnelle :
 
 ```text
@@ -569,7 +571,7 @@ La visibilité package-private participe à l’encapsulation du monolithe modul
 
 Un module ne doit pas exposer ses détails internes inutilement.
 
-> Depuis l’étape 20, ce principe est une règle vérifiée : voir [ADR 0002](decisions/0002-communication-entre-modules.md) et §12.5. Première façade : `taxonomy.application.query.TaxonomyQueryService`, utilisée par `publication`.
+> Depuis l’étape 20, ce principe est une règle vérifiée : voir [ADR 0002](decisions/0002-communication-entre-modules.md) et §12.5. Façades : `taxonomy.application.query.TaxonomyQueryService`, utilisée par `publication` (étape 20) ; `publication.application.query.PublicationQueryService`, utilisée par `series` (étape 23).
 
 Les dépendances entre modules passent par :
 

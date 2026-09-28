@@ -50,4 +50,4 @@ Option **B**, avec les règles suivantes.
 - Règle ArchUnit `ModuleBoundariesTest.modules_only_use_each_other_through_domain_models_and_application_services` : fait échouer le build si un module dépend des `domain.port`, `infrastructure` ou `web` d'un autre (validée en introduisant une violation temporaire).
 - Les tests d'un module peuvent utiliser les ports d'un autre pour préparer leurs données (ArchUnit n'importe pas les classes de test).
 - `series → publication` (étape 23) et `search → publication, project` (étapes 28-29) suivront les mêmes règles ; `04` §8 n'est plus « à terme » mais la règle.
-- Première application : `publication` et `taxonomy` à l'étape 20 (décisions D-AN à D-AT du registre).
+- Première application : `publication` et `taxonomy` à l'étape 20 (décisions D-AN à D-AT du registre). Deuxième : `series` et `publication` à l'étape 23 (`PublicationQueryService`, D-BH).

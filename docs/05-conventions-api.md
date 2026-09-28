@@ -1461,6 +1461,37 @@ Règles propres à ces contrats :
 * la couverture arrivera à l’étape 27 ;
 * contrats vérifiés par `PublicPublicationControllerTest` et `PublicPublicationIT`.
 
+### `GET /api/public/series` (étape 23)
+
+```text
+?page=0&size=10          page 0-based ; size par défaut 10, plafonnée à 100 ; sort ignoré (ordre fixe)
+200 → PageResponse<SeriesSummaryResponse>
+{
+  content[] { title, slug, descriptionMarkdown, chapterCount },
+  page, size, totalElements, totalPages, first, last
+}
+```
+
+### `GET /api/public/series/{slug}` (étape 23)
+
+```text
+200 → SeriesResponse
+{
+  title, slug, descriptionMarkdown,
+  chapters[] { position, title, slug, summary, publishedAt, readingTimeMinutes }
+}
+404 → ProblemDetail, code RESOURCE_NOT_FOUND (slug inconnu ou mal formé, série sans article visible : réponse identique)
+```
+
+Règles propres à ces contrats :
+
+* une série est publique si et seulement si au moins un de ses articles est visible (§29) ; seules ces séries sont listées et comptées (D-BG) ;
+* ordre fixe : titre sans tenir compte de la casse, puis identifiant (D-BI) ;
+* `chapterCount` et `chapters` ne comptent que les articles visibles ; `position` est leur rang dans la série à partir de 1, jamais la position stockée ;
+* `chapters[].slug` mène à `GET /api/public/publications/{slug}` ;
+* ni `id`, ni positions internes ; la couverture arrivera à l’étape 27, la navigation précédent / suivant à l’étape 24 ;
+* contrats vérifiés par `PublicSeriesControllerTest` et `PublicSeriesIT`.
+
 Chaque module introduit ses routes lors de son étape d’implémentation.
 
 ---
