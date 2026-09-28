@@ -3,6 +3,7 @@ package com.scalke.portfolio.backend.media.domain.model;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -33,6 +34,13 @@ public record StorageKey(String value) {
         return candidate != null && FORMAT.matcher(candidate).matches()
             ? Optional.of(new StorageKey(candidate))
             : Optional.empty();
+    }
+
+    /**
+     * Nouvelle clé aléatoire pour un fichier de ce format (UUID version 4 : 122 bits aléatoires, D-BP).
+     */
+    public static StorageKey random(MediaFormat format) {
+        return new StorageKey(UUID.randomUUID().toString().replace("-", "") + "." + format.extension());
     }
 
     public MediaFormat format() {

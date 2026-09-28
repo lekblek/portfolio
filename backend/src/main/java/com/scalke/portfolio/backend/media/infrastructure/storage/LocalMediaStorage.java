@@ -11,12 +11,13 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Optional;
 
 /**
  * Stockage des médias sur le système de fichiers local (implémentation V1, D-BO) : un fichier par clé,
- * directement sous la racine configurée. Le répertoire doit être un volume persistant en production
- * (étape 52).
+ * directement sous la racine configurée, créée au premier enregistrement. Le répertoire doit être un volume
+ * persistant en production (étape 52).
  */
 @Component
 @Slf4j
@@ -41,6 +42,30 @@ public class LocalMediaStorage implements MediaStorage {
             return Optional.empty();
         } catch (IOException e) {
             throw new UncheckedIOException("cannot read media " + key, e);
+        }
+    }
+
+    /**
+     * Écrit dans un fichier temporaire de la racine, puis le renomme atomiquement : un lecteur ne voit jamais un
+     * fichier partiel. Un nom temporaire ({@code upload-*.tmp}) ne peut pas être une clé.
+     */
+    @Override
+    public void store(StorageKey key, byte[] content) {
+        Path file = resolve(key);
+        try {
+            Files.createDirectories(root);
+            if (Files.exists(file)) {
+                throw new IllegalStateException("storage key " + key + " is already used");
+            }
+            Path temporary = Files.createTempFile(root, "upload-", ".tmp");
+            try {
+                Files.write(temporary, content);
+                Files.move(temporary, file, StandardCopyOption.ATOMIC_MOVE);
+            } finally {
+                Files.deleteIfExists(temporary);
+            }
+        } catch (IOException e) {
+            throw new UncheckedIOException("cannot store media " + key, e);
         }
     }
 

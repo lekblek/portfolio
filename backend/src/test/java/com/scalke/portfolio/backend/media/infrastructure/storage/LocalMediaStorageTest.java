@@ -65,6 +65,36 @@ class LocalMediaStorageTest {
     }
 
     @Test
+    void stores_a_file_that_can_then_be_opened() throws IOException {
+        storage().store(KEY, new byte[]{4, 5, 6});
+
+        try (InputStream stream = storage().open(KEY).orElseThrow().stream()) {
+            assertThat(stream.readAllBytes()).containsExactly(4, 5, 6);
+        }
+    }
+
+    /**
+     * Écriture par fichier temporaire renommé : aucun fichier temporaire ne subsiste.
+     */
+    @Test
+    void creates_the_root_on_first_store_and_leaves_no_temporary_file() throws IOException {
+        Path absent = root.resolve("medias");
+        new LocalMediaStorage(new MediaStorageProperties(absent)).store(KEY, new byte[]{1});
+
+        try (var files = Files.list(absent)) {
+            assertThat(files).containsExactly(absent.resolve(KEY.value()));
+        }
+    }
+
+    @Test
+    void never_overwrites_a_stored_file() throws IOException {
+        storage().store(KEY, new byte[]{1});
+
+        assertThatThrownBy(() -> storage().store(KEY, new byte[]{2})).isInstanceOf(IllegalStateException.class);
+        assertThat(Files.readAllBytes(root.resolve(KEY.value()))).containsExactly(1);
+    }
+
+    @Test
     void refuses_an_empty_root() {
         assertThatThrownBy(() -> new MediaStorageProperties(Path.of("")))
             .isInstanceOf(IllegalArgumentException.class);

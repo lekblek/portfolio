@@ -11,7 +11,8 @@ import java.util.Optional;
  * implémentation compatible S3 pourra la remplacer sans modifier les appelants (D-BO).
  * <p>
  * Ne contient que les méthodes utilisées par un appelant existant (ADR 0001) : {@code open} par
- * {@code OpenMediaFileUseCase}. L'écriture et la suppression arrivent avec l'envoi de fichiers (étape 26).
+ * {@code OpenMediaFileUseCase}, {@code store} par {@code UploadMediaUseCase}. La suppression arrive avec ses
+ * appelants, la compensation d'un envoi et la suppression contrôlée d'un média du catalogue (étape 27, D-BT).
  */
 public interface MediaStorage {
 
@@ -19,4 +20,10 @@ public interface MediaStorage {
      * Contenu stocké sous cette clé ; vide s'il n'existe pas. L'appelant ferme le flux.
      */
     Optional<MediaContent> open(StorageKey key);
+
+    /**
+     * Enregistre {@code content} sous une clé encore inutilisée ; échoue si elle existe déjà. Le fichier n'est
+     * lisible sous sa clé qu'une fois entièrement écrit. Le contenu est borné par l'appelant (10 Mio au plus).
+     */
+    void store(StorageKey key, byte[] content);
 }

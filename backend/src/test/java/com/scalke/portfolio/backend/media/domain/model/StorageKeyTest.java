@@ -50,6 +50,16 @@ class StorageKeyTest {
     }
 
     @Test
+    void generates_a_new_opaque_key_for_a_format() {
+        StorageKey first = StorageKey.random(MediaFormat.WEBP);
+        StorageKey second = StorageKey.random(MediaFormat.WEBP);
+
+        assertThat(first.value()).matches("[0-9a-f]{32}\\.webp");
+        assertThat(first.format()).isEqualTo(MediaFormat.WEBP);
+        assertThat(first).isNotEqualTo(second);
+    }
+
+    @Test
     void parses_a_valid_key() {
         assertThat(StorageKey.parse(HEX + ".webp")).contains(new StorageKey(HEX + ".webp"));
         assertThat(StorageKey.parse(null)).isEmpty();

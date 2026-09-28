@@ -1,5 +1,7 @@
 package com.scalke.portfolio.backend.media;
 
+import com.scalke.portfolio.backend.media.application.usecase.UploadMediaUseCase;
+import com.scalke.portfolio.backend.media.domain.model.StorageKey;
 import com.scalke.portfolio.backend.media.infrastructure.storage.MediaStorageProperties;
 import com.scalke.portfolio.backend.testsupport.AbstractIntegrationTest;
 import org.junit.jupiter.api.AfterEach;
@@ -9,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,8 +22,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * Parcours HTTP complet : contrôleur → cas d'usage → stockage local réel, dans la racine du profil
- * {@code test} ({@code target/test-media}).
+ * Parcours complet : envoi (cas d'usage, sans route avant l'étape 36) puis lecture HTTP, sur le stockage
+ * local réel, dans la racine du profil {@code test} ({@code target/test-media}).
  */
 class PublicMediaIT extends AbstractIntegrationTest {
 
@@ -32,6 +35,9 @@ class PublicMediaIT extends AbstractIntegrationTest {
 
     @Autowired
     MediaStorageProperties properties;
+
+    @Autowired
+    UploadMediaUseCase uploadMediaUseCase;
 
     private Path file;
 
@@ -52,6 +58,20 @@ class PublicMediaIT extends AbstractIntegrationTest {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.IMAGE_PNG))
             .andExpect(content().bytes(PNG_SIGNATURE));
+    }
+
+    @Test
+    void serves_an_uploaded_file_under_its_new_key() throws Exception {
+        byte[] pdf = "%PDF-1.7 curriculum vitae".getBytes();
+        StorageKey key = uploadMediaUseCase.execute(new ByteArrayInputStream(pdf));
+        try {
+            mockMvc.perform(get("/api/public/media/" + key.value()).contextPath("/api"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_PDF))
+                .andExpect(content().bytes(pdf));
+        } finally {
+            Files.deleteIfExists(properties.storageRoot().resolve(key.value()));
+        }
     }
 
     @Test
