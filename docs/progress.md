@@ -2,27 +2,26 @@
 
 Ce fichier est la **seule** source de vérité sur l'avancement. Il ne répète pas le contenu des autres documents : il pointe vers eux.
 
-Dernière mise à jour : 2026-09-24 (étape 21 implémentée, commits à faire)
+Dernière mise à jour : 2026-09-28 (étape 22 terminée et vérifiée, commits à faire)
 
 ---
 
 ## 1. État courant
 
 ```text
-Dernière étape terminée   : 20 — Catégories et tags (poussée, CI verte : run 36049720014)
-Étape en cours            : 21 — Cycle de vie éditorial (implémentée et vérifiée, à committer et pousser)
-Prochaine étape prévue    : 22 — Implémenter les slugs
-État                      : PRÊT dès que les commits de 21 sont poussés et la CI verte
+Dernière étape terminée   : 22 — Slugs et mémoire de première publication (vérifiée, commits à faire)
+Étape en cours            : aucune
+Prochaine étape prévue    : 23 — Construire le module Series
+État                      : PRÊT après commit et push de l'étape 22
 Branche                   : develop
-Vérification              : ./mvnw clean verify → 208 tests verts (104 *Test, 104 *IT)
-                            V009 appliquée sur la base dev (contrainte vérifiée, aucune donnée rejetée)
+Vérification              : ./mvnw clean verify → 268 tests verts (151 *Test, 117 *IT) à la fin de l'étape 22
 ```
 
 ## 2. Prochaine action
 
-1. Committer l'étape 21 (3 commits, commandes fournies avec l'étape), pousser, vérifier la CI, remplacer les 🟡 par ✅.
-2. Confirmer ou infirmer D-T (cohérence `stage` ⇔ `endDate`) : `docs/decisions/registre-implementation.md`.
-3. Étape 22 : slugs (génération, collisions, stabilité après la première publication — D11). Point d'appui : dans `Publication.transitionTo`, une date de publication passée signifie « déjà publique ».
+1. Committer et pousser l'étape 22 (22.1 à 22.3), vérifier la CI, puis remplacer les 🟡 par ✅.
+2. Étape 23 : module `series` ; son slug utilise `Slug` (D-BA) et sa stabilité suit D11 comme les publications (D-BC).
+3. Confirmer ou infirmer D-T (cohérence `stage` ⇔ `endDate`) : `docs/decisions/registre-implementation.md`.
 
 ---
 
@@ -68,9 +67,13 @@ Légende : ✅ terminée et poussée · 🟡 terminée et vérifiée, commits à
 | 20.1 | Module `taxonomy` : schéma `V007`, domaine, façade `TaxonomyQueryService`, seed | ✅ | `b362243`, `afb2196` |
 | 20.2 | Règle ArchUnit de communication entre modules (ADR 0002) | ✅ | `959344b` |
 | 20.3 | Publications classées : `V008`, filtres `?category=` / `?tag=`, `Specification` | ✅ | `c744161`, `5b5d171`, `978830e` (CI : run 36049720014) |
-| 21.1 | Date obligatoire pour une publication archivée (`V009`) | 🟡 | à committer |
-| 21.2 | Machine à états, cas d'usage `ChangePublicationStatusUseCase` (sans route HTTP avant l'étape 36) | 🟡 | à committer |
-| 22 → 52 | Voir `docs/steps/liste_complete_etapes.md` | ⏳ | — |
+| 21.1 | Date obligatoire pour une publication archivée (`V009`) | ✅ | `1af1e67` |
+| 21.2 | Machine à états, cas d'usage `ChangePublicationStatusUseCase` (sans route HTTP avant l'étape 36) | ✅ | `29a043d`, `417d940` (CI : run 36052194346) |
+| 22.1 | Graphe des dépendances entre modules vérifié par ArchUnit (audit A04) | 🟡 | à committer |
+| 22.2 | Objet de valeur `Slug` : format, génération, collisions | 🟡 | à committer |
+| 22.3 | `Slug` dans les modèles ; première publication (`V010`) ; slug stable après publication (D11) | 🟡 | à committer |
+| — | Corrections documentaires de l'audit du 2026-09-25 | 🟡 | à committer |
+| 23 → 52 | Voir `docs/steps/liste_complete_etapes.md` | ⏳ | — |
 
 Après le push, remplacer les 🟡 par ✅ et noter les hashes.
 
@@ -93,6 +96,7 @@ Index : [`decisions/README.md`](decisions/README.md).
 | D-AF … D-AM | Périmètre de `publication` ; horloge applicative ; visibilité à `now` ; invariant 24 ; contrat public (SEO, temps de lecture) ; ordre et `?type=` ; slug commun ; dates d'audit par l'application | Actives (19) |
 | D-AN … D-AT | Communication entre modules (ADR 0002) ; unicité des vocabulaires ; contrat `category`/`tags` ; filtres par slug ; `Specification` ; 5 requêtes par page ; pas de route publique des termes avant l'étape 43 | Actives (20) |
 | D-AU … D-AY | Cycle de vie sans route HTTP avant l'étape 36 ; table des transitions sur le statut effectif ; 409 `INVALID_PUBLICATION_TRANSITION` ; écriture limitée au statut ; concordance règle Java / règle SQL | Actives (21) |
+| D-AZ … D-BD | Mémoire de la première publication (`V010`) ; objet de valeur `Slug` ; slug mal formé → 404 sans requête ; slug verrouillé après publication (409 `SLUG_LOCKED`) ; unicité par suffixe puis `UNIQUE` (appelants à l'étape 36) | Actives (22) |
 | 14.4 | Exposition publique de `publicEmail` | À confirmer |
 
 ## 5. Problèmes connus
@@ -110,6 +114,21 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | KI-22 | AMÉLIORATION | SSR : `security.allowedHosts` vide | étape 52 (déploiement) |
 | KI-23 | AMÉLIORATION | `UNSUPPORTED_MEDIA_FORMAT` mappé en 409 (415 ou 400 plus juste) | étape 27 |
 | KI-16 | OPTIONNEL | `V001` : virgule manquante avant `CONSTRAINT profile_single_row` (comportement identique) ; migration appliquée, non modifiable | aucun |
+| KI-29 | OPTIONNEL | Surface sans appelant : `ProfileEntity.removeLink` / `removeSkill`, `App.title` (frontend) ; codes d'erreur des séries et médias déclarés d'avance | au plus tard avec l'administration du profil (étape 36) et le frontend (37) |
+| KI-30 | OPTIONNEL | Les `*IT` transactionnels (écriture de statut, lectures publiques) ne prouvent pas le comportement après commit | à reprendre si un défaut de transaction apparaît |
+
+### Résolus le 2026-09-28 (audit du 2026-09-25, étape 22)
+
+| ID | Problème | Résolution |
+|---|---|---|
+| A01 | `publishedAt` ne suffisait pas à savoir si une publication avait été publique (`PUBLISHED → ARCHIVED → DRAFT → SCHEDULED → DRAFT` l'effaçait) | 22.3 : `first_published_at` (`V010`), `Publication.hasBeenPublic` (D-AZ) |
+| A02 | `progress.md` demandait de committer l'étape 21 déjà poussée | §1 à §3 alignés sur le dépôt |
+| A03 | `02` §30 présentait la table des transitions comme garantie par PostgreSQL | §30 : invariants 17 à 25 en SQL, 26 et 6 applicatifs ; D-AX précise la confiance du port en son unique appelant |
+| A04 | Graphe des dépendances du `04` §4 non vérifié couple par couple | 22.1 : règle ArchUnit du graphe, validée par mutation |
+| A05, A06, A08, A11 | Exemples de `05` contradictoires ou obsolètes (§16, §17, §29, §34) ; formulation de D-AW | exemples et formulations alignés sur le code |
+| A07 | Versions de JUnit et Testcontainers non à jour | `README.md`, `06` §15 |
+| A10 | Fichiers d'outillage local non ignorés | `.gitignore` (R-7) |
+| — | SQL journalisé deux fois dans les tests (`show_sql` et logger) | `application-test.yaml` : logger seul |
 
 ### Résolus le 2026-09-24 (consolidation, 16.3 à 21)
 
@@ -145,13 +164,13 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | Filtre `featured` sur `GET /api/public/projects` | Étape 40 | aucun écran ne l'utilise encore (le filtre `technology` est fait : D-AC) |
 | Couverture et captures des projets ; avatar et CV du profil | Étape 27 | catalogue `Media` requis (D-AD, D-B) |
 | Liste publique des technologies (`/api/public/technologies`) | Étape 42 | D-AE : les technologies sont exposées par projet |
-| Objet de valeur `Slug`, génération et collisions | Étape 22 | D-X : seules les contraintes SQL existent |
 | Tri choisi par le client (`sort`) | quand un écran le demande | D-V : ordre fixe, paramètre ignoré |
 | Rejet explicite (400) des paramètres de pagination hors bornes, au lieu de les ramener aux bornes | si un client en a besoin | comportement Spring Data retenu (D-V) |
 | Route `POST /api/admin/publications/{id}/status` | Étape 36 | D-AU : cas d'usage prêt ; aucune route d'administration sans authentification (32-35) |
 | Verrouillage optimiste des publications (`@Version`) | si plusieurs administrateurs | D-AX : un seul administrateur en V1 |
 | Routes publiques `/api/public/categories` et `/api/public/tags` | Étape 43 | D-AT : les termes sont exposés par publication |
-| Stabilité du slug après la première publication (D11) | Étape 22 | D-AL |
+| Stabilité du slug d'un projet après sa première publication (D11) | Étape 36 | D-BC : pas encore de mémoire de publication des projets ni de modification |
+| Création et modification avec slug libre (`firstAvailable`), `SLUG_ALREADY_USED` sur conflit `UNIQUE` | Étape 36 | D-BD : aucun appelant avant l'administration |
 | Temps de lecture précalculé (colonne) si la liste devient coûteuse | Étape 52.6 | D-AJ : calculé à la lecture, contenu chargé dans la liste |
 | Prérendu route par route | Étape 52.1 | D22 |
 | Cache du profil public | si le profil devient un chemin chaud | D-O |

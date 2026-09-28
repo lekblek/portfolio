@@ -12,7 +12,7 @@ En construction — V1. Avancement détaillé, étape courante et problèmes con
 |---|---|
 | Backend | Java 25, Spring Boot 4.1 (Web MVC, Data JPA, Validation, Actuator), Flyway, PostgreSQL 18 |
 | Frontend | Angular 22 (SSR / rendu hybride), Tailwind CSS 4, Vitest |
-| Tests backend | JUnit 5, AssertJ, MockMvc, Testcontainers (PostgreSQL réel), ArchUnit |
+| Tests backend | JUnit 6, AssertJ, MockMvc, Testcontainers 2 (PostgreSQL réel), ArchUnit |
 | Infrastructure | Docker Compose ; en production : Caddy, HTTPS, VPS (à venir) |
 
 Versions exactes et justification : [docs/03-versions-cibles.md](docs/03-versions-cibles.md).

@@ -101,10 +101,10 @@ Contenu actuel (étape 19) :
 |---|---|---|
 | `shared.api` | `GlobalExceptionHandler`, `PageResponse`, `ApiPaging` | contrats HTTP transversaux |
 | `shared.error` | `ErrorCode`, `ApplicationException` et sous-classes | erreurs métier stables |
-| `shared.domain.model` | `DateRange`, `PageQuery`, `PageResult` | objets de valeur utilisés par **plusieurs** modules ; soumis aux règles de `domain` (§12.4 : ni Spring ni JPA) |
+| `shared.domain.model` | `DateRange`, `PageQuery`, `PageResult`, `Slug` | objets de valeur utilisés par **plusieurs** modules ; soumis aux règles de `domain` (§12.4 : ni Spring ni JPA) |
 | `shared.infrastructure` | `ClockConfiguration` | horloge applicative (`Clock`, D03) : les cas d’usage lisent « maintenant » dans ce bean, jamais par `Instant.now()` ; horloge fixe dans les `*IT` (D-AG) |
 
-Une classe n’entre dans `shared.domain.model` qu’au deuxième usage réel dans un autre module (ex. `DateRange` : `profile` puis `project`, D-S).
+Une classe n’entre dans `shared.domain.model` qu’au deuxième usage réel dans un autre module (ex. `DateRange` : `profile` puis `project`, D-S ; `Slug` : `project`, `publication` et `taxonomy`, D-BA).
 
 ---
 
@@ -396,6 +396,8 @@ search       → shared, publication, project
 ```
 
 Ce graphe doit rester **acyclique**.
+
+État au 2026-09-28 (étape 22) : **automatisé** (`ModuleBoundariesTest.modules_only_depend_on_the_modules_allowed_by_the_architecture`) : toute dépendance absente de la forme compacte ci-dessus fait échouer le build, même si elle ne crée pas de cycle (écart relevé par l’audit du 2026-09-25). La table `ALLOWED_MODULE_DEPENDENCIES` du test et la forme compacte changent ensemble.
 
 ---
 
@@ -719,6 +721,8 @@ L’architecture doit être protégée avec ArchUnit.
 Les règles minimales sont :
 
 ### 12.1 Absence de cycles
+
+État : **automatisé** (`ModuleBoundariesTest.modules_should_be_free_of_cycles`) ; le graphe du §4 est lui-même vérifié.
 
 ```text
 aucun cycle entre les modules racines

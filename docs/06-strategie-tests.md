@@ -599,10 +599,14 @@ cd backend
 
 La sortie Maven constitue la référence sur la version réellement résolue.
 
-Version actuellement résolue :
+Versions résolues (Spring Boot 4.1.1, relevées le 2026-09-28 par `./mvnw dependency:list -DincludeScope=test`) :
 
 ```text
-À renseigner après exécution de dependency:tree.
+Testcontainers  2.0.5   (testcontainers, testcontainers-postgresql, testcontainers-jdbc)
+JUnit Jupiter   6.0.3
+AssertJ         3.27.7
+Mockito         5.23.0
+ArchUnit        1.5.0   (version fixée dans pom.xml, hors BOM)
 ```
 
 Cette valeur doit être mise à jour lors d’une montée de version importante de Spring Boot ou Testcontainers.
@@ -743,10 +747,10 @@ Cette vérification démontre que les tests ne dépendent pas d’un état manue
 
 | Couche testée | Type | Suffixe | Outil | Exemple actuel |
 |---|---|---|---|---|
-| `domain.model` (invariants, objets de valeur) | unitaire pur | `*Test` | JUnit + AssertJ, sans Spring | `CertificationTest`, `ProjectTest`, `ProjectFilterTest`, `PublicationTest`, `PublicationTransitionTest` (table des transitions exhaustive, paramétrée), `TagTest` ; partagés : `DateRangeTest`, `PageQueryTest`, `PageResultTest` (`shared.domain.model`) |
+| `domain.model` (invariants, objets de valeur) | unitaire pur | `*Test` | JUnit + AssertJ, sans Spring | `CertificationTest`, `ProjectTest`, `ProjectFilterTest`, `PublicationTest`, `PublicationTransitionTest` (table des transitions exhaustive, paramétrée ; première publication et slug stable), `TagTest` ; partagés : `DateRangeTest`, `PageQueryTest`, `PageResultTest`, `SlugTest` (génération et collisions en `@CsvSource`) (`shared.domain.model`) |
 | entités JPA (rattachement à l’agrégat) | unitaire pur | `*Test` | JUnit + AssertJ | `CertificationEntityTest` |
 | mappers de persistance | unitaire pur | `*Test` | aller-retour modèle ↔ entité | `ProfilePersistenceMapperTest`, `ProjectPersistenceMapperTest`, `PublicationPersistenceMapperTest`, `CategoryPersistenceMapperTest`, `TagPersistenceMapperTest` |
-| `application.usecase` (orchestration, filtrage, tri, pagination, nombre de requêtes) | intégration | `*IT` | `AbstractIntegrationTest` + `Statistics` Hibernate (`generate_statistics`, profil `test` seulement) | `GetProfileUseCaseIT`, `ListPublishedProjectsUseCaseIT` (dont le nombre de requêtes d’une page, D-AB), `GetPublishedProjectUseCaseIT`, `ListVisiblePublicationsUseCaseIT`, `GetVisiblePublicationUseCaseIT` (horloge fixe), `ChangePublicationStatusUseCaseIT` (écriture sans HTTP), `TaxonomyQueryServiceIT` (façade inter-modules) |
+| `application.usecase` (orchestration, filtrage, tri, pagination, nombre de requêtes) | intégration | `*IT` | `AbstractIntegrationTest` + `Statistics` Hibernate (`generate_statistics`, profil `test` seulement) | `GetProfileUseCaseIT`, `ListPublishedProjectsUseCaseIT` (dont le nombre de requêtes d’une page, D-AB), `GetPublishedProjectUseCaseIT`, `ListVisiblePublicationsUseCaseIT`, `GetVisiblePublicationUseCaseIT` (horloge fixe ; slug mal formé sans requête SQL), `ChangePublicationStatusUseCaseIT` (écriture sans HTTP), `TaxonomyQueryServiceIT` (façade inter-modules) |
 | `infrastructure.persistence` (mapping, tri, requêtes) | intégration | `*IT` | `AbstractIntegrationTest` + `EntityManager` | `ProfileMappingIT` |
 | schéma (contraintes SQL) | intégration | `*IT` | `JdbcClient` | `ProfileSchemaIT`, `ProjectSchemaIT`, `TechnologySchemaIT`, `PublicationSchemaIT`, `TaxonomySchemaIT`, `PublicationTaxonomySchemaIT` |
 | `web` (contrat JSON, codes HTTP, erreurs, bornes de pagination) | tranche | `*Test` | `@WebMvcTest` + `@MockitoBean` du cas d’usage | `PublicProfileControllerTest`, `PublicProjectControllerTest`, `PublicPublicationControllerTest` |
@@ -760,7 +764,7 @@ Règles :
 * les `*IT` tournent avec une horloge fixe (`FixedClockConfiguration.NOW`, importée par `AbstractIntegrationTest`) : les données temporelles d’un test se construisent relativement à `NOW`, jamais à `Instant.now()` (D-AG) ;
 * les données d’un `*IT` peuvent être créées par le port du module (ex. `ProjectRepository.create` avec `ProjectFixtures`) : elles passent alors par les invariants du domaine ; les tests de schéma utilisent `JdbcClient` pour atteindre la base sans le domaine ;
 * une règle écrite deux fois (en Java dans le domaine, en SQL dans une requête) est protégée par un test de concordance qui compare les deux sur les mêmes données (ex. `the_domain_rule_and_the_query_agree_on_visibility`, D-AY) ;
-* une machine à états se teste par une table exhaustive (`@CsvSource` de toutes les paires origine → cible) plutôt que par quelques cas choisis ;
+* une machine à états se teste par une table exhaustive (`@CsvSource` de toutes les paires origine → cible) plutôt que par quelques cas choisis ; une règle qui dépend de l’historique se teste aussi par une **suite** de transitions (ex. `no_sequence_of_transitions_forgets_a_past_publication`, audit A01) ;
 * un test `@WebMvcTest` construit ses données avec le **modèle métier**, pas avec des entités JPA ni des mappers de persistance ;
 * un test de chargement ne doit pas être annoté `@Transactional` s’il prétend vérifier ce qui est chargé **hors** transaction : la transaction du test garderait la session ouverte et masquerait le problème. Pour compter les requêtes, utiliser les statistiques Hibernate plutôt qu’une supposition. Un test de comptage se valide par mutation : retirer l’optimisation qu’il protège (ex. `@BatchSize`) doit le faire échouer. Une mutation se vérifie avec `./mvnw clean verify` : la compilation incrémentale peut laisser `target/` incohérent (entité « Not a managed type », classe supprimée encore présente) et produire une erreur sans rapport avec la mutation.
 

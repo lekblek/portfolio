@@ -316,6 +316,7 @@ Publication
 ├── coverMedia?
 ├── status
 ├── publishedAt?
+├── firstPublishedAt?
 ├── category?
 ├── tags
 ├── featured
@@ -329,7 +330,7 @@ Le Markdown est la source canonique.
 
 Aucun `contentHtml` métier n'est nécessaire.
 
-État d’implémentation (étapes 19 et 20) : tous les attributs ci-dessus sauf `coverMedia` (étape 27) ; le temps de lecture est calculé à partir du Markdown (D12, D-AJ). Le slug est unique pour l’ensemble des publications (D-AL).
+État d’implémentation (étapes 19 à 22) : tous les attributs ci-dessus sauf `coverMedia` (étape 27) ; le temps de lecture est calculé à partir du Markdown (D12, D-AJ). Le slug est unique pour l’ensemble des publications (D-AL). `firstPublishedAt` retient la première apparition publique : provisoire tant qu’elle est future, elle ne change plus une fois passée (D-AZ) ; elle rend le slug définitif (§16).
 
 ---
 
@@ -413,6 +414,8 @@ Un slug est :
 * validé côté serveur.
 
 Après la première publication publique d'un contenu, son slug est considéré comme stable.
+
+État d’implémentation (étape 22) : objet de valeur `Slug` partagé par les modules (D-BA). Un slug est généré depuis un titre ou un nom (« Construire une API REST avec Spring Boot » → `construire-une-api-rest-avec-spring-boot`) ; en cas de collision, le premier suffixe libre de `-2` à `-99` est retenu, la contrainte `UNIQUE` restant la garantie finale (D-BD). Une valeur d’URL mal formée est introuvable sans interroger la base (D-BB). Une publication déjà publique refuse tout changement de slug (`SLUG_LOCKED`, D-BC) ; pour les projets, la règle arrive avec leur modification (étape 36) ; les slugs des vocabulaires (technologies, catégories, tags) restent modifiables.
 
 ---
 
@@ -763,11 +766,11 @@ Les règles suivantes doivent être garanties par le backend et, lorsque pertine
 21. un `Project` est `IN_PROGRESS` si et seulement s'il n'a pas de date de fin ; sa période respecte l'invariant 17 ;
 22. le nom (sans tenir compte de la casse) et le slug d'une `Technology` sont uniques ; une technologie utilisée par un projet ne peut pas être supprimée ;
 23. un `Project` référence au plus une fois la même `Technology` ;
-24. une `Publication` `SCHEDULED`, `PUBLISHED` ou `ARCHIVED` possède toujours une date de publication (`publishedAt`) — étendu à `ARCHIVED` à l’étape 21 ;
+24. une `Publication` `SCHEDULED`, `PUBLISHED` ou `ARCHIVED` possède toujours une date de publication (`publishedAt`) et une date de première publication (`firstPublishedAt`, jamais postérieure à `publishedAt`) — étendu à `ARCHIVED` à l’étape 21, première publication à l’étape 22 ;
 25. le nom (sans tenir compte de la casse) et le slug d'une `Category`, d'un `Tag`, sont uniques dans leur vocabulaire ; un terme utilisé par une publication ne peut pas être supprimé ;
 26. le statut d'une `Publication` ne change que selon la table des transitions du §15.
 
-Les invariants 17 à 26 ont été ajoutés pendant l'implémentation (étapes 14 à 21) ; ils sont garantis par PostgreSQL (`CHECK`, `UNIQUE`, clés étrangères) et, pour 17, 18, 21, 23, 24 et 26, par le modèle métier (garde ou méthode de transition). Les invariants 7 à 10 (visibilité des publications) sont appliqués par les lectures publiques depuis l'étape 19. Voir [`decisions/registre-implementation.md`](decisions/registre-implementation.md).
+Les invariants 17 à 26 ont été ajoutés pendant l'implémentation (étapes 14 à 21). Les invariants 17 à 25 sont garantis par PostgreSQL (`CHECK`, `UNIQUE`, clés étrangères) et, pour 17, 18, 21, 23 et 24, doublés par le modèle métier. L'invariant 26 (table des transitions) est **applicatif uniquement** : aucune contrainte SQL ne compare l'ancien et le nouveau statut ; il est garanti tant que le statut n'est écrit que par `ChangePublicationStatusUseCase` (seul appelant de `updateStatus`, D-AX). L'invariant 6 (slug stable) est lui aussi applicatif : `Publication.changeSlug` refuse le changement dès que `firstPublishedAt` est passée (D-BC) ; l'invariant 5 est garanti par les contraintes `UNIQUE` de PostgreSQL (D-X, D-AA, D-AL, D-AO). Les invariants 7 à 10 (visibilité des publications) sont appliqués par les lectures publiques depuis l'étape 19. Voir [`decisions/registre-implementation.md`](decisions/registre-implementation.md).
 
 ---
 

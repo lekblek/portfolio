@@ -260,6 +260,8 @@ Le slug :
 * ne révèle pas l’identifiant technique ;
 * devient stable après la première publication conformément au périmètre V1.
 
+Format : minuscules ASCII, chiffres et tirets simples (`^[a-z0-9]+(-[a-z0-9]+)*$`), 160 caractères au plus. Une valeur d’URL qui ne respecte pas ce format reçoit la même 404 qu’un slug inconnu, sans requête en base (D-BB). Changer le slug d’une publication déjà publiée est refusé avec `SLUG_LOCKED` (409, D-BC).
+
 ---
 
 ## Administration
@@ -496,6 +498,8 @@ Exemples :
 
 ```text
 slug déjà utilisé
+
+slug d’un contenu déjà publié
 
 position déjà occupée dans une série
 
@@ -830,7 +834,7 @@ Autres exemples possibles :
 /api/public/search?q=postgresql
 ```
 
-Un filtre dont la valeur ne correspond à rien renvoie une page vide, jamais une erreur.
+Un filtre sur un **vocabulaire ouvert** (slug de technologie, de catégorie, de tag) dont la valeur ne correspond à rien renvoie une page vide, jamais une erreur. Un filtre sur un **ensemble fermé** du contrat (énumération, ex. `type=ARTICLE|NEWS`) refuse toute autre valeur : 400 `MALFORMED_REQUEST` (D-AC, D-AK).
 
 Les filtres doivent utiliser des noms métier et non des noms de colonnes PostgreSQL.
 
@@ -864,10 +868,12 @@ Corps :
 
 ```json
 {
-  "status": "PUBLISHED",
+  "status": "SCHEDULED",
   "publishedAt": "2026-10-01T09:00:00Z"
 }
 ```
+
+Pour toute autre cible, `publishedAt` est absent : `{ "status": "PUBLISHED" }`.
 
 Cette opération peut échouer avec :
 
@@ -1325,7 +1331,7 @@ contenu non visible
 → 404
 ```
 
-Implémentation (étapes 19 et 20, D-AG, D-AH, D-AR) : la règle est écrite une seule fois (`PublicationSpecifications.visibleAt`) et combinée aux filtres ; « maintenant » vient du bean `Clock` (`shared.infrastructure.ClockConfiguration`), remplacé par une horloge fixe dans les tests d’intégration.
+Implémentation (étapes 19 à 21, D-AG, D-AH, D-AR, D-AY) : pour les lectures, la règle est écrite une seule fois en SQL (`PublicationSpecifications.visibleAt`) et combinée aux filtres ; le domaine en possède une version Java (`Publication.isVisibleAt`, utilisée par les transitions), et un test de concordance garantit que les deux désignent les mêmes publications ; « maintenant » vient du bean `Clock` (`shared.infrastructure.ClockConfiguration`), remplacé par une horloge fixe dans les tests d’intégration.
 
 ---
 
@@ -1403,7 +1409,7 @@ Règles propres à ce contrat :
   startDate, endDate | null, repositoryUrl | null, demoUrl | null, featured,
   technologies[] { name, slug }
 }
-404 → ProblemDetail, code RESOURCE_NOT_FOUND (slug inconnu, projet DRAFT ou ARCHIVED : réponse identique)
+404 → ProblemDetail, code RESOURCE_NOT_FOUND (slug inconnu ou mal formé, projet DRAFT ou ARCHIVED : réponse identique)
 ```
 
 Règles propres à ces contrats :
@@ -1440,7 +1446,7 @@ Règles propres à ces contrats :
   category { name, slug } | null, tags[] { name, slug },
   seoTitle | null, seoDescription | null
 }
-404 → ProblemDetail, code RESOURCE_NOT_FOUND (slug inconnu, DRAFT, IN_REVIEW, ARCHIVED,
+404 → ProblemDetail, code RESOURCE_NOT_FOUND (slug inconnu ou mal formé, DRAFT, IN_REVIEW, ARCHIVED,
                                               SCHEDULED dont la date n'est pas passée : réponse identique)
 ```
 
@@ -1552,60 +1558,44 @@ Règles :
 
 # 34. Exemple de flux réussi
 
+Flux réel depuis les étapes 19 et 20 (la sécurité s’ajoutera en tête à l’étape 32) :
+
 ```text
-GET /api/public/publications
-    ?page=0
-    &size=10
-    &sort=publishedAt,desc
-
-        ↓
-
-Spring Security
-/api/public/** autorisé anonymement
+GET /api/public/publications?page=0&size=10&tag=java
 
         ↓
 
 PublicPublicationController
+  Pageable (taille bornée) → PageQuery ; paramètres → PublicationCriteria
 
         ↓
 
-Pageable
-page = 0
-size = 10
-publishedAt DESC
+ListVisiblePublicationsUseCase                      (transaction en lecture)
+  maintenant = Clock ; slugs → identifiants via TaxonomyQueryService
 
         ↓
 
-PublicationQueryService
+PublicationRepository (port) → PublicationRepositoryAdapter
+  Specification : visibleAt(maintenant) ∧ filtres ; tri publishedAt desc, id desc
 
         ↓
 
-règles de visibilité publique
+PostgreSQL → PageResult<Publication>
 
         ↓
 
-PublicationRepository
+VisiblePublicationAssembler (catégories, tags) → PageResult<VisiblePublication>
 
         ↓
 
-PostgreSQL
-
-        ↓
-
-Page<Publication>
-
-        ↓
-
-Page.map(PublicationSummaryResponse::from)
-
-        ↓
-
-PageResponse.from(...)
+map(PublicationSummaryResponse::from) → PageResponse.from(...)
 
         ↓
 
 200 application/json
 ```
+
+Le paramètre `sort` n’est pas pris en compte : l’ordre est fixe (D-V).
 
 ---
 
@@ -1711,6 +1701,7 @@ Elles sont simplement inutiles pour le périmètre actuel.
 | `MALFORMED_REQUEST`              |  400 | Requête HTTP ou JSON invalide                 |
 | `INTERNAL_ERROR`                 |  500 | Erreur serveur inattendue                     |
 | `SLUG_ALREADY_USED`              |  409 | Slug déjà utilisé                             |
+| `SLUG_LOCKED`                    |  409 | Slug d’un contenu déjà publié (D11)           |
 | `INVALID_PUBLICATION_TRANSITION` |  409 | Transition d’état de publication interdite    |
 | `SERIES_POSITION_ALREADY_USED`   |  409 | Position déjà occupée dans une série          |
 | `NEWS_CANNOT_JOIN_SERIES`        |  409 | Une `NEWS` ne peut pas appartenir à une série |
