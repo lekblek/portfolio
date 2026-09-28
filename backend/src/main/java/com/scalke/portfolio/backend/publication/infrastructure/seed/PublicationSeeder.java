@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,9 +32,11 @@ import java.util.stream.Stream;
  * Un cas par règle de visibilité : deux publiées, une planifiée passée (visible), une planifiée
  * future, un brouillon, une en relecture et une archivée (invisibles). Dates relatives à l'horloge.
  * Les termes de classement sont ceux du seed de la taxonomie (exécuté avant), obtenus par sa façade.
+ * Exécuté avant le seed des séries ({@link Order} 1), qui range ces articles.
  */
 @Component
 @Profile("dev")
+@Order(1)
 @RequiredArgsConstructor
 @Slf4j
 public class PublicationSeeder implements ApplicationRunner {
