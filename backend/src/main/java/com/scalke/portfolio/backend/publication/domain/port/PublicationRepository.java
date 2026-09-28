@@ -19,7 +19,8 @@ import java.util.Set;
  * {@code ListVisiblePublicationsUseCase}, {@code findVisibleBySlug} par {@code GetVisiblePublicationUseCase},
  * {@code existsAny} et {@code create} par le seed de développement, {@code findById} et {@code updateStatus}
  * par {@code ChangePublicationStatusUseCase}, {@code findVisibleIds}, {@code findVisibleByIds} et
- * {@code findBySlug} par la façade {@code PublicationQueryService} (autres modules, ADR 0002).
+ * {@code findBySlug} par la façade {@code PublicationQueryService} (autres modules, ADR 0002), qui utilise
+ * aussi {@code findVisibleBySlug}.
  * <p>
  * « Visible à {@code now} » (D-AH) : {@code PUBLISHED}, ou {@code SCHEDULED} avec {@code publishedAt <= now}.
  * {@code now} est fourni par l'appelant, qui le lit dans l'horloge applicative.

@@ -54,6 +54,14 @@ public class PublicationQueryService {
     }
 
     /**
+     * Publication visible maintenant portant ce slug ; vide si elle n'existe pas ou n'est pas visible (les deux
+     * cas sont indiscernables, comme pour la lecture publique).
+     */
+    public Optional<Publication> findVisibleBySlug(Slug slug) {
+        return publicationRepository.findVisibleBySlug(slug, clock.instant());
+    }
+
+    /**
      * Toute publication portant ce slug, quel que soit son statut : pour le seed de développement (et
      * l'administration), jamais pour une lecture publique.
      */

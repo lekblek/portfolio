@@ -92,6 +92,14 @@ class PublicationQueryServiceIT extends AbstractIntegrationTest {
     }
 
     @Test
+    void finds_a_visible_publication_by_slug() {
+        assertThat(publicationQueryService.findVisibleBySlug(Slug.of("planifiee-passee"))).map(Publication::id)
+            .contains(due.id());
+        assertThat(publicationQueryService.findVisibleBySlug(Slug.of("planifiee-future"))).isEmpty();
+        assertThat(publicationQueryService.findVisibleBySlug(Slug.of("brouillon"))).isEmpty();
+    }
+
+    @Test
     void finds_a_publication_by_slug_whatever_its_status() {
         assertThat(publicationQueryService.findBySlug(Slug.of("brouillon"))).map(Publication::id).contains(draft.id());
         assertThat(publicationQueryService.findBySlug(Slug.of("inconnue"))).isEmpty();
