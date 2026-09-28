@@ -7,6 +7,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
@@ -70,6 +72,38 @@ class ModuleBoundariesTest {
                 .allowEmptyShould(true)
                 .check(backendClasses);
         }
+    }
+
+    /**
+     * Graphe des dépendances autorisées entre modules ({@code 04-architecture-backend.md} §4). Toute
+     * dépendance absente de cette table est interdite, même sans cycle (ex. {@code profile → publication}).
+     */
+    private static final Map<String, Set<String>> ALLOWED_MODULE_DEPENDENCIES = Map.ofEntries(
+        Map.entry("shared", Set.of()),
+        Map.entry("security", Set.of("shared")),
+        Map.entry("taxonomy", Set.of("shared")),
+        Map.entry("media", Set.of("shared")),
+        Map.entry("contact", Set.of("shared")),
+        Map.entry("profile", Set.of("shared", "media")),
+        Map.entry("project", Set.of("shared", "media")),
+        Map.entry("publication", Set.of("shared", "media", "taxonomy")),
+        Map.entry("series", Set.of("shared", "publication", "media")),
+        Map.entry("search", Set.of("shared", "publication", "project")));
+
+    @Test
+    void modules_only_depend_on_the_modules_allowed_by_the_architecture() {
+        ALLOWED_MODULE_DEPENDENCIES.forEach((module, allowed) -> {
+            String[] forbidden = ALLOWED_MODULE_DEPENDENCIES.keySet().stream()
+                .filter(other -> !other.equals(module) && !allowed.contains(other))
+                .map(other -> BASE + "." + other + "..")
+                .toArray(String[]::new);
+            noClasses()
+                .that().resideInAPackage(BASE + "." + module + "..")
+                .should().dependOnClassesThat().resideInAnyPackage(forbidden)
+                .as(module + " ne dépend que de " + allowed + " (04 §4)")
+                .allowEmptyShould(true)
+                .check(backendClasses);
+        });
     }
 
     @Test
