@@ -57,6 +57,19 @@ class MediaQueryServiceIT extends AbstractIntegrationTest {
     }
 
     @Test
+    void gives_the_public_form_of_documents_only() {
+        Media image = mediaRepository.create(image("Portrait"));
+        Media document = mediaRepository.create(pdf());
+
+        Map<Long, PublicDocument> documents = mediaQueryService.documentsById(List.of(image.id(), document.id()));
+
+        assertThat(documents).containsOnlyKeys(document.id());
+        assertThat(documents.get(document.id()))
+            .isEqualTo(new PublicDocument("/api/public/media/" + document.storageKey().value(), 2_048));
+        assertThat(mediaQueryService.documentsById(Set.of())).isEmpty();
+    }
+
+    @Test
     void asking_for_no_identifier_costs_no_query() {
         Statistics statistics = statistics();
 

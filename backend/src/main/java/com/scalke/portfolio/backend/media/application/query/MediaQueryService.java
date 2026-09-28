@@ -39,4 +39,17 @@ public class MediaQueryService {
             .filter(media -> media.format().isImage())
             .collect(Collectors.toUnmodifiableMap(Media::id, PublicImage::of));
     }
+
+    /**
+     * Documents PDF parmi {@code ids}, sous leur forme publique ; une image ou un identifiant inconnu est absent.
+     * Une seule requête ; aucune si la collection est vide.
+     */
+    public Map<Long, PublicDocument> documentsById(Collection<Long> ids) {
+        if (ids.isEmpty()) {
+            return Map.of();
+        }
+        return mediaRepository.findAllById(ids).stream()
+            .filter(media -> !media.format().isImage())
+            .collect(Collectors.toUnmodifiableMap(Media::id, PublicDocument::of));
+    }
 }
