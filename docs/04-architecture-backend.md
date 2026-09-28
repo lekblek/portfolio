@@ -306,6 +306,8 @@ storageKey
 
 et non un chemin physique du système de fichiers.
 
+État d’implémentation (étape 25) : port `MediaStorage` réduit à sa méthode utilisée (`open`), implémentation `LocalMediaStorage` (`media.infrastructure.storage`), lecture publique `GET /api/public/media/{storageKey}` (D-BO, D-BP). Écriture et suppression : étape 26 ; catalogue et contrôle des références : étape 27.
+
 ---
 
 ### 3.9 `search`

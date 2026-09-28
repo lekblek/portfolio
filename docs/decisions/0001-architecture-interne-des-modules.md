@@ -106,7 +106,7 @@ infrastructure  → web
 
 ### 4. Transactions
 
-La frontière transactionnelle est le **cas d'usage** (`@Transactional`, `readOnly = true` pour une lecture).
+La frontière transactionnelle est le **cas d'usage** (`@Transactional`, `readOnly = true` pour une lecture). Exception : un cas d'usage qui n'accède pas à la base (ex. `OpenMediaFileUseCase`, lecture d'un fichier) n'est pas transactionnel (D-BQ).
 
 Un adaptateur de persistance peut aussi être annoté `@Transactional` lorsqu'il doit rester correct hors cas d'usage (ex. `ProfileSeeder` en profil `dev`, qui appelle directement le port) : appelé depuis un cas d'usage, il rejoint la transaction existante (propagation `REQUIRED`). Il convertit toujours ses entités en objets du domaine **avant** de rendre la main.
 

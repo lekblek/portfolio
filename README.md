@@ -63,7 +63,7 @@ docker compose -f deploy/compose.dev.yaml exec postgres psql -U portfolio -d por
 
 ### 4. Backend
 
-Aucun profil Spring n'est actif par défaut : activer `dev` explicitement. Le profil `dev` lit `deploy/.env` depuis la racine du dépôt ou depuis `backend/`.
+Aucun profil Spring n'est actif par défaut : activer `dev` explicitement. Le profil `dev` lit `deploy/.env` depuis la racine du dépôt ou depuis `backend/`. Les fichiers de médias sont stockés dans `uploads/` sous le répertoire de travail (ignoré par Git) ; `MEDIA_STORAGE_ROOT` désigne un autre répertoire.
 
 ```bash
 cd backend

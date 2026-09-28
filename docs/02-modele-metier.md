@@ -546,6 +546,8 @@ storageKey
 
 mais pas le chemin physique utilisé par `LocalMediaStorage`.
 
+État d’implémentation (étape 25) : `StorageKey` (UUID aléatoire et extension du format, D-BP) et lecture publique d’un fichier par sa clé ; les autres attributs (catalogue) arrivent à l’étape 27, l’envoi et sa validation (formats, tailles) à l’étape 26.
+
 ---
 
 # 22. Suppression des médias

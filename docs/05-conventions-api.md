@@ -1352,6 +1352,8 @@ Les principales ressources publiques de la V1 sont conceptuellement :
 /api/public/series/{slug}
 /api/public/publications/{slug}/series
 
+/api/public/media/{storageKey}
+
 /api/public/categories
 /api/public/tags
 
@@ -1514,6 +1516,24 @@ Règles propres à ce contrat :
 * positions et voisins calculés parmi les seuls articles visibles : un article masqué est sauté (D-BM) ;
 * progression : `position` sur `chapterCount`, calculée par le client ;
 * contrat vérifié par `PublicSeriesNavigationControllerTest` et `PublicSeriesIT`.
+
+### `GET /api/public/media/{storageKey}` (étape 25)
+
+```text
+200 → contenu brut du fichier (pas de JSON)
+      Content-Type             type MIME du format de la clé : image/png, image/jpeg, image/webp, application/pdf
+      Content-Length           taille du fichier
+      Cache-Control            max-age=31536000, public, immutable
+      X-Content-Type-Options   nosniff
+404 → ProblemDetail, code RESOURCE_NOT_FOUND « Média introuvable. » (clé inconnue ou mal formée : réponse identique)
+```
+
+Règles propres à ce contrat :
+
+* `storageKey` : 32 caractères hexadécimaux et l’extension du format (`png`, `jpg`, `webp`, `pdf`) ; jamais un chemin (D-BP) ;
+* une clé ne change jamais de contenu : un nouvel envoi crée une nouvelle clé, d’où le cache immuable ;
+* un fichier est accessible à quiconque connaît sa clé, imprévisible ; les contenus exposeront ces clés à partir de l’étape 27 ;
+* contrat vérifié par `PublicMediaControllerTest` et `PublicMediaIT`.
 
 Chaque module introduit ses routes lors de son étape d’implémentation.
 
