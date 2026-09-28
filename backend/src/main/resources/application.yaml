@@ -19,6 +19,12 @@ server:
   servlet:
     context-path: /api
 
+portfolio:
+  media:
+    # Racine du stockage local des médias (D-BO) : relative au répertoire de travail en développement,
+    # volume persistant en production (étape 52).
+    storage-root: ${MEDIA_STORAGE_ROOT:uploads}
+
 management:
   endpoints:
     web:
