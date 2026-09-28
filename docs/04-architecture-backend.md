@@ -306,7 +306,7 @@ storageKey
 
 et non un chemin physique du système de fichiers.
 
-État d’implémentation (étape 25) : port `MediaStorage` réduit à sa méthode utilisée (`open`), implémentation `LocalMediaStorage` (`media.infrastructure.storage`), lecture publique `GET /api/public/media/{storageKey}` (D-BO, D-BP). Depuis l’étape 26 : `store`, appelé par `UploadMediaUseCase` (validation par signature et taille, D-BR). Depuis l’étape 27.1 : catalogue (`MediaRepository`, table `media`), inscrit dans la même transaction que l’envoi (D-BU). Suppression contrôlée et rattachements aux contenus : étapes 27.2 à 27.4.
+État d’implémentation (étape 25) : port `MediaStorage` réduit à sa méthode utilisée (`open`), implémentation `LocalMediaStorage` (`media.infrastructure.storage`), lecture publique `GET /api/public/media/{storageKey}` (D-BO, D-BP). Depuis l’étape 26 : `store`, appelé par `UploadMediaUseCase` (validation par signature et taille, D-BR). Depuis l’étape 27.1 : catalogue (`MediaRepository`, table `media`), inscrit dans la même transaction que l’envoi (D-BU). Depuis l’étape 27.2 : façade `MediaQueryService` (forme publique `PublicImage`, D-BW), suppression contrôlée `DeleteMediaUseCase` ; les contenus référencent les médias par clé étrangère `ON DELETE RESTRICT` (D-BV). Rattachements du profil, des publications et des séries : étapes 27.3 et 27.4.
 
 ---
 

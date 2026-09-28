@@ -1404,18 +1404,21 @@ Règles propres à ce contrat :
 200 → PageResponse<ProjectSummaryResponse>
 {
   content[] { title, slug, shortDescription, stage, startDate, endDate | null, featured,
+              cover { url, width, height, altText | null } | null,
               technologies[] { name, slug } },
   page, size, totalElements, totalPages, first, last
 }
 ```
 
-### `GET /api/public/projects/{slug}` (étapes 17 et 18)
+### `GET /api/public/projects/{slug}` (étapes 17, 18 et 27.2)
 
 ```text
 200 → ProjectResponse
 {
   title, slug, shortDescription, descriptionMarkdown, stage,
   startDate, endDate | null, repositoryUrl | null, demoUrl | null, featured,
+  cover { url, width, height, altText | null } | null,
+  screenshots[] { image { url, width, height, altText | null }, caption | null },
   technologies[] { name, slug }
 }
 404 → ProblemDetail, code RESOURCE_NOT_FOUND (slug inconnu ou mal formé, projet DRAFT ou ARCHIVED : réponse identique)
@@ -1428,7 +1431,8 @@ Règles propres à ces contrats :
 * `stage` vaut `IN_PROGRESS` si et seulement si `endDate` est `null` (invariant 21, D-T) ;
 * ni `id`, ni `displayOrder`, ni `visibility` (D-W) ; la liste n’inclut pas `descriptionMarkdown` ;
 * `technologies` : dans l’ordre du vocabulaire, `[]` si aucune ; le `slug` sert de valeur au filtre `technology` (D-AC) ; le filtre restreint les projets, pas la liste de leurs technologies ;
-* couverture et captures arriveront avec le catalogue `Media` (étape 27, D-AD) ;
+* images (D-BW) : `{ url, width, height, altText }`, forme commune à toutes les images publiques ; `url` pointe vers `GET /api/public/media/{storageKey}` ; `width` et `height` en pixels réservent la place de l’image avant son chargement ; `altText` vaut `null` si aucun texte n’a été saisi ;
+* `cover` : `null` sans couverture, dans la liste et le détail ; `screenshots` : détail seulement, dans leur ordre d’affichage, `[]` si aucune ;
 * contrats vérifiés par `PublicProjectControllerTest` et `PublicProjectIT`.
 
 ### `GET /api/public/publications` (étapes 19 et 20)
@@ -1538,7 +1542,7 @@ Règles propres à ce contrat :
 
 * `storageKey` : 32 caractères hexadécimaux et l’extension du format (`png`, `jpg`, `webp`, `pdf`) ; jamais un chemin (D-BP) ;
 * une clé ne change jamais de contenu : un nouvel envoi crée une nouvelle clé, d’où le cache immuable ;
-* un fichier est accessible à quiconque connaît sa clé, imprévisible ; les contenus exposeront ces clés à partir de l’étape 27 ;
+* un fichier est accessible à quiconque connaît sa clé, imprévisible ; les contenus publient ces adresses (`url` des images, depuis l’étape 27.2) ;
 * contrat vérifié par `PublicMediaControllerTest` et `PublicMediaIT`.
 
 Chaque module introduit ses routes lors de son étape d’implémentation.

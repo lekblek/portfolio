@@ -230,7 +230,7 @@ ARCHIVED
 
 Seul un projet `PUBLISHED` est exposé publiquement.
 
-État d’implémentation (étapes 17 et 18) : tous les attributs ci-dessus et les technologies ; `coverMedia` et `ProjectScreenshot` arrivent avec le catalogue `Media` à l’étape 27 (D-AD). Le slug est unique et au format kebab-case, garanti par PostgreSQL (D-X).
+État d’implémentation (étapes 17, 18 et 27.2) : tous les attributs ci-dessus, les technologies, la couverture et les captures (`ProjectScreenshot`, références vers le catalogue `Media`, D-BV). Le slug est unique et au format kebab-case, garanti par PostgreSQL (D-X).
 
 ---
 
@@ -287,6 +287,8 @@ ProjectScreenshot N → 1 Media
 `ProjectScreenshot` est composé dans `Project`.
 
 La suppression d'une capture ne supprime pas automatiquement le `Media`.
+
+État d’implémentation (étape 27.2) : une capture apparaît au plus une fois dans un projet (invariant 27) ; ordre d’affichage positif ou nul, puis identifiant du média ; légende de 300 caractères au plus. Supprimer un projet supprime ses captures, pas les médias (D-BV).
 
 ---
 
@@ -775,9 +777,10 @@ Les règles suivantes doivent être garanties par le backend et, lorsque pertine
 23. un `Project` référence au plus une fois la même `Technology` ;
 24. une `Publication` `SCHEDULED`, `PUBLISHED` ou `ARCHIVED` possède toujours une date de publication (`publishedAt`) et une date de première publication (`firstPublishedAt`, jamais postérieure à `publishedAt`) — étendu à `ARCHIVED` à l’étape 21, première publication à l’étape 22 ;
 25. le nom (sans tenir compte de la casse) et le slug d'une `Category`, d'un `Tag`, sont uniques dans leur vocabulaire ; un terme utilisé par une publication ne peut pas être supprimé ;
-26. le statut d'une `Publication` ne change que selon la table des transitions du §15.
+26. le statut d'une `Publication` ne change que selon la table des transitions du §15 ;
+27. un `Project` référence au plus une fois le même média parmi ses captures.
 
-Les invariants 17 à 26 ont été ajoutés pendant l'implémentation (étapes 14 à 21). Les invariants 17 à 25 sont garantis par PostgreSQL (`CHECK`, `UNIQUE`, clés étrangères) et, pour 17, 18, 21, 23 et 24, doublés par le modèle métier. L'invariant 26 (table des transitions) est **applicatif uniquement** : aucune contrainte SQL ne compare l'ancien et le nouveau statut ; il est garanti tant que le statut n'est écrit que par `ChangePublicationStatusUseCase` (seul appelant de `updateStatus`, D-AX). L'invariant 6 (slug stable) est lui aussi applicatif : `Publication.changeSlug` refuse le changement dès que `firstPublishedAt` est passée (D-BC) ; l'invariant 5 est garanti par les contraintes `UNIQUE` de PostgreSQL (D-X, D-AA, D-AL, D-AO). Les invariants 1 à 3 (séries) sont garantis par PostgreSQL depuis l'étape 23 (`V011`, D-BF) et, pour 3, doublés par le modèle métier. Les invariants 7 à 10 (visibilité des publications) sont appliqués par les lectures publiques depuis l'étape 19. Voir [`decisions/registre-implementation.md`](decisions/registre-implementation.md).
+Les invariants 17 à 27 ont été ajoutés pendant l'implémentation (étapes 14 à 27) ; 27 est garanti par PostgreSQL et doublé par le modèle métier. Les invariants 17 à 25 sont garantis par PostgreSQL (`CHECK`, `UNIQUE`, clés étrangères) et, pour 17, 18, 21, 23 et 24, doublés par le modèle métier. L'invariant 26 (table des transitions) est **applicatif uniquement** : aucune contrainte SQL ne compare l'ancien et le nouveau statut ; il est garanti tant que le statut n'est écrit que par `ChangePublicationStatusUseCase` (seul appelant de `updateStatus`, D-AX). L'invariant 6 (slug stable) est lui aussi applicatif : `Publication.changeSlug` refuse le changement dès que `firstPublishedAt` est passée (D-BC) ; l'invariant 5 est garanti par les contraintes `UNIQUE` de PostgreSQL (D-X, D-AA, D-AL, D-AO). Les invariants 1 à 3 (séries) sont garantis par PostgreSQL depuis l'étape 23 (`V011`, D-BF) et, pour 3, doublés par le modèle métier. L'invariant 13 (média référencé non supprimable) est garanti par les clés étrangères `ON DELETE RESTRICT` des contenus vers `media`, depuis l'étape 27.2 pour les projets (D-BV). Les invariants 7 à 10 (visibilité des publications) sont appliqués par les lectures publiques depuis l'étape 19. Voir [`decisions/registre-implementation.md`](decisions/registre-implementation.md).
 
 ---
 

@@ -2,7 +2,7 @@
 
 Ce fichier est la **seule** source de vérité sur l'avancement. Il ne répète pas le contenu des autres documents : il pointe vers eux.
 
-Dernière mise à jour : 2026-09-28 (étape 26 poussée, CI verte ; étape 27.1 terminée et vérifiée, commits à faire)
+Dernière mise à jour : 2026-09-28 (27.1 poussée, CI verte ; 27.2 terminée et vérifiée, commits à faire)
 
 ---
 
@@ -10,17 +10,17 @@ Dernière mise à jour : 2026-09-28 (étape 26 poussée, CI verte ; étape 27.1 
 
 ```text
 Dernière étape terminée   : 26 — Envoi et validation des médias (poussée, CI verte : run 36462754639)
-Étape en cours            : 27 — Catalogue Media : 27.1 (catalogue) vérifiée, commits à faire ; 27.2 à 27.4 à faire
-Prochaine étape prévue    : 27.2 — Couverture et captures des projets, suppression contrôlée
-État                      : PRÊT après commit et push de 27.1
+Étape en cours            : 27 — Catalogue Media : 27.1 poussée (CI verte : run 36464422452) ; 27.2 vérifiée, commits à faire ; 27.3 et 27.4 à faire
+Prochaine étape prévue    : 27.3 — Avatar et CV du profil
+État                      : PRÊT après commit et push de 27.2
 Branche                   : develop
-Vérification              : ./mvnw clean verify → 406 tests verts (227 *Test, 179 *IT) à la fin de 27.1
+Vérification              : ./mvnw clean verify → 423 tests verts (231 *Test, 192 *IT) à la fin de 27.2
 ```
 
 ## 2. Prochaine action
 
-1. Committer et pousser 27.1, vérifier la CI, puis remplacer les 🟡 par ✅.
-2. 27.2 : couverture et captures des projets (D-AD) avec clés étrangères `ON DELETE RESTRICT` vers `media`, façade `MediaQueryService` et exposition publique ; suppression contrôlée d'un média (`MediaStorage.delete`, `MEDIA_STILL_REFERENCED`, D-BT). Puis 27.3 : avatar et CV du profil (D-B) ; 27.4 : couvertures des publications et des séries.
+1. Committer et pousser 27.2, vérifier la CI, puis remplacer les 🟡 par ✅.
+2. 27.3 : avatar (image) et CV (PDF) du profil (D-B), références `ON DELETE RESTRICT` comme D-BV ; le CV demande une forme publique de fichier (adresse, taille) à côté de `PublicImage`. Puis 27.4 : couvertures des publications et des séries.
 3. Confirmer ou infirmer D-T (cohérence `stage` ⇔ `endDate`) : `docs/decisions/registre-implementation.md`.
 
 ---
@@ -80,8 +80,9 @@ Légende : ✅ terminée et poussée · 🟡 terminée et vérifiée, commits à
 | 24.2 | `GET /api/public/publications/{slug}/series` : navigation et progression depuis un article | ✅ | `4d974c0`, `b2fb6c4`, `262925c` (CI : run 36460488555) |
 | 25 | Port `MediaStorage` (lecture), `LocalMediaStorage`, `GET /api/public/media/{storageKey}` | ✅ | `dbfe4ee`, `d1d1825` (CI : run 36461821408) |
 | 26 | Envoi validé (signature, taille par format), écriture atomique ; 415 / 413 | ✅ | `3d26cf9`, `05d0e0c`, `5127e41` (CI : run 36462754639) |
-| 27.1 | Catalogue `media` (`V012`), dimensions des images, envoi transactionnel | 🟡 | à committer |
-| 27.2 → 27.4 | Rattachements : projets, profil, publications et séries ; suppression contrôlée | ⏳ | — |
+| 27.1 | Catalogue `media` (`V012`), dimensions des images, envoi transactionnel | ✅ | `2e55819`, `85ac21e`, `b3e051d` (CI : run 36464422452) |
+| 27.2 | Couverture et captures des projets (`V013`), façade `MediaQueryService`, suppression contrôlée | 🟡 | à committer |
+| 27.3, 27.4 | Rattachements : profil ; publications et séries | ⏳ | — |
 | 28 → 52 | Voir `docs/steps/liste_complete_etapes.md` | ⏳ | — |
 
 Après le push, remplacer les 🟡 par ✅ et noter les hashes.
@@ -111,6 +112,7 @@ Index : [`decisions/README.md`](decisions/README.md).
 | D-BO … D-BQ | Port `MediaStorage` livré avec son premier appelant (écart assumé avec la liste des étapes) ; clé opaque et lecture publique en cache immuable ; cas d'usage sans base non transactionnel | Actives (25) |
 | D-BR … D-BT | Format par signature, 5 / 10 Mio, lecture bornée, écriture atomique ; 415 et 413 (`MEDIA_TOO_LARGE`) ; suppression à l'étape 27 | Actives (26) ; D-BT remplacée en partie par D-BU |
 | D-BU | Catalogue `media`, dimensions lues dans l'en-tête, envoi transactionnel sans compensation | Active (27.1) |
+| D-BV, D-BW | Références aux médias par clé étrangère `RESTRICT`, suppression contrôlée ; `PublicImage` par la façade, couverture et captures des projets | Actives (27.2) |
 | 14.4 | Exposition publique de `publicEmail` | À confirmer |
 
 ## 5. Problèmes connus
@@ -181,7 +183,9 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | Sujet | Reporté à | Raison |
 |---|---|---|
 | Filtre `featured` sur `GET /api/public/projects` | Étape 40 | aucun écran ne l'utilise encore (le filtre `technology` est fait : D-AC) |
-| Couverture et captures des projets ; avatar et CV du profil | Étape 27 | catalogue `Media` requis (D-AD, D-B) |
+| Avatar et CV du profil | Étape 27.3 | D-B |
+| Couvertures des publications et des séries | Étape 27.4 | D-AF, D-BE |
+| Vérifier qu'une couverture ou une capture est une image à l'écriture | Étape 36 | D-BV : pas de garantie SQL ; la façade n'expose que des images |
 | Liste publique des technologies (`/api/public/technologies`) | Étape 42 | D-AE : les technologies sont exposées par projet |
 | Tri choisi par le client (`sort`) | quand un écran le demande | D-V : ordre fixe, paramètre ignoré |
 | Rejet explicite (400) des paramètres de pagination hors bornes, au lieu de les ramener aux bornes | si un client en a besoin | comportement Spring Data retenu (D-V) |
@@ -192,7 +196,6 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | Création et modification avec slug libre (`firstAvailable`), `SLUG_ALREADY_USED` sur conflit `UNIQUE` | Étape 36 | D-BD : aucun appelant avant l'administration |
 | Écriture des séries (création, chapitres, `NEWS_CANNOT_JOIN_SERIES`, `SERIES_POSITION_ALREADY_USED`) et stabilité de leur slug | Étape 36 | D-BE, D-BK : aucune route d'administration sans authentification |
 | Séries mises en avant sur l'accueil | si le modèle l'adopte | D-BI : absent de `02` §19 |
-| Suppression contrôlée d'un média (`MediaStorage.delete`, `MEDIA_STILL_REFERENCED`) | Étape 27.2 | D-BT, D-BU : arrive avec la première référence |
 | Route d'envoi et limite multipart à 10 Mio | Étape 36 | D-BR, D-BS : aucune route d'administration sans authentification |
 | Médias privés (fichier visible seulement si le contenu qui l'utilise l'est) | si le besoin apparaît | D-BP : clé imprévisible jugée suffisante |
 | Temps de lecture précalculé (colonne) si la liste devient coûteuse | Étape 52.6 | D-AJ : calculé à la lecture, contenu chargé dans la liste |
