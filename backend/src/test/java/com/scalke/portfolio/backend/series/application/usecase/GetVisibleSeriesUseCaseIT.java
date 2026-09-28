@@ -1,5 +1,7 @@
 package com.scalke.portfolio.backend.series.application.usecase;
 
+import com.scalke.portfolio.backend.media.domain.model.Media;
+import com.scalke.portfolio.backend.media.domain.port.MediaRepository;
 import com.scalke.portfolio.backend.publication.domain.model.PublicationStatus;
 import com.scalke.portfolio.backend.publication.domain.port.PublicationRepository;
 import com.scalke.portfolio.backend.series.domain.model.Series;
@@ -23,8 +25,10 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 
+import static com.scalke.portfolio.backend.media.MediaFixtures.image;
 import static com.scalke.portfolio.backend.publication.PublicationFixtures.article;
 import static com.scalke.portfolio.backend.series.SeriesFixtures.series;
+import static com.scalke.portfolio.backend.series.SeriesFixtures.withCover;
 import static com.scalke.portfolio.backend.testsupport.FixedClockConfiguration.NOW;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -48,6 +52,9 @@ class GetVisibleSeriesUseCaseIT extends AbstractIntegrationTest {
     @Autowired
     EntityManagerFactory entityManagerFactory;
 
+    @Autowired
+    MediaRepository mediaRepository;
+
     @BeforeEach
     void givenAVisibleAndAnInvisibleSeries() {
         Long published = create("introduction", PublicationStatus.PUBLISHED, NOW.minus(Duration.ofDays(10)));
@@ -56,7 +63,7 @@ class GetVisibleSeriesUseCaseIT extends AbstractIntegrationTest {
         Long planned = create("planifie-futur", PublicationStatus.SCHEDULED, NOW.plus(Duration.ofDays(1)));
         seriesRepository.create(new Series(null, "Spring Boot", Slug.of("spring-boot"), "## Une série",
             List.of(new SeriesItem(planned, 7), new SeriesItem(due, 5), new SeriesItem(draft, 2),
-                new SeriesItem(published, 1))));
+                new SeriesItem(published, 1)), null));
         seriesRepository.create(series("angular", create("en-relecture", PublicationStatus.IN_REVIEW, null)));
         entityManager.flush();
         entityManager.clear();
@@ -73,6 +80,19 @@ class GetVisibleSeriesUseCaseIT extends AbstractIntegrationTest {
         assertThat(visible.chapters())
             .extracting(SeriesChapter::position, chapter -> chapter.publication().slug().value())
             .containsExactly(tuple(1, "introduction"), tuple(2, "planifie-passe"));
+    }
+
+    @Test
+    void returns_a_series_with_its_public_cover() {
+        Media cover = mediaRepository.create(image("Couverture"));
+        seriesRepository.create(withCover(
+            series("avec-couverture", create("chapitre", PublicationStatus.PUBLISHED, NOW.minus(Duration.ofDays(1)))),
+            cover.id()));
+
+        VisibleSeries visible = getVisibleSeriesUseCase.execute("avec-couverture");
+
+        assertThat(visible.cover().url()).isEqualTo("/api/public/media/" + cover.storageKey().value());
+        assertThat(getVisibleSeriesUseCase.execute("spring-boot").cover()).isNull();
     }
 
     /**

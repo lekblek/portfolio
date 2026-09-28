@@ -15,7 +15,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Structure de persistance d'une publication ({@code V006}, {@code V008}, {@code V010}). Les invariants vivent dans
+ * Structure de persistance d'une publication ({@code V006}, {@code V008}, {@code V010}, {@code V015}). Les invariants vivent dans
  * {@code domain.model.Publication} et dans les contraintes de la table (ADR 0001).
  * <p>
  * {@code createdAt} et {@code updatedAt} sont fixés par l'application à partir de l'horloge applicative
@@ -88,13 +88,19 @@ public class PublicationEntity {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
+    /**
+     * Identifiant d'une image du module {@code media} : jamais une entité de ce module (ADR 0002, D-BY).
+     */
+    @Column(name = "cover_media_id")
+    private Long coverMediaId;
+
     @Builder
     private PublicationEntity(PublicationType type, String title, String slug, String summary,
                               String contentMarkdown, PublicationStatus status, Instant publishedAt,
                               Instant firstPublishedAt,
                               boolean featured, Long categoryId, Set<Long> tagIds,
                               String seoTitle, String seoDescription,
-                              Instant createdAt, Instant updatedAt) {
+                              Instant createdAt, Instant updatedAt, Long coverMediaId) {
         this.type = type;
         this.title = title;
         this.slug = slug;
@@ -110,6 +116,7 @@ public class PublicationEntity {
         this.seoDescription = seoDescription;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.coverMediaId = coverMediaId;
     }
 
     /**

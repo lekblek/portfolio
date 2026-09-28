@@ -1,5 +1,6 @@
 package com.scalke.portfolio.backend.publication.web.dto;
 
+import com.scalke.portfolio.backend.media.application.query.PublicImage;
 import com.scalke.portfolio.backend.publication.application.usecase.VisiblePublication;
 import com.scalke.portfolio.backend.publication.domain.model.Publication;
 import com.scalke.portfolio.backend.publication.domain.model.PublicationType;
@@ -20,6 +21,7 @@ public record PublicationSummaryResponse(
     Instant publishedAt,
     boolean featured,
     int readingTimeMinutes,
+    PublicImage cover,
     TaxonomyTermResponse category,
     List<TaxonomyTermResponse> tags
 ) {
@@ -34,6 +36,7 @@ public record PublicationSummaryResponse(
             publication.publishedAt(),
             publication.featured(),
             publication.readingTimeMinutes(),
+            visible.cover(),
             TaxonomyTermResponse.from(visible.category()),
             TaxonomyTermResponse.from(visible.tags()));
     }

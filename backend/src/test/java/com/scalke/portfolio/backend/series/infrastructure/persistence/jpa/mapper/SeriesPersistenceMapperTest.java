@@ -16,7 +16,7 @@ class SeriesPersistenceMapperTest {
     void keeps_every_field_through_a_round_trip() {
         Series series = new Series(null, "Spring Boot de zéro à la production",
             Slug.of("spring-boot-de-zero-a-la-production"), "## Description",
-            List.of(new SeriesItem(7L, 1), new SeriesItem(3L, 4)));
+            List.of(new SeriesItem(7L, 1), new SeriesItem(3L, 4)), 9L);
 
         SeriesEntity entity = SeriesPersistenceMapper.toNewEntity(series);
 

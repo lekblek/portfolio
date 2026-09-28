@@ -1,5 +1,6 @@
 package com.scalke.portfolio.backend.series.web.dto;
 
+import com.scalke.portfolio.backend.media.application.query.PublicImage;
 import com.scalke.portfolio.backend.series.application.usecase.SeriesSummary;
 import com.scalke.portfolio.backend.series.domain.model.Series;
 
@@ -10,6 +11,7 @@ public record SeriesSummaryResponse(
     String title,
     String slug,
     String descriptionMarkdown,
+    PublicImage cover,
     int chapterCount
 ) {
 
@@ -19,6 +21,7 @@ public record SeriesSummaryResponse(
             series.title(),
             series.slug().value(),
             series.descriptionMarkdown(),
+            summary.cover(),
             summary.chapterCount());
     }
 }

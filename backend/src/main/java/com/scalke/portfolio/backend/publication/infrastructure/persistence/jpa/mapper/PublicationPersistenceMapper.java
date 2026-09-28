@@ -32,7 +32,8 @@ public final class PublicationPersistenceMapper {
             entity.getSeoTitle(),
             entity.getSeoDescription(),
             entity.getCreatedAt(),
-            entity.getUpdatedAt()
+            entity.getUpdatedAt(),
+            entity.getCoverMediaId()
         );
     }
 
@@ -56,6 +57,7 @@ public final class PublicationPersistenceMapper {
             .seoDescription(publication.seoDescription())
             .createdAt(publication.createdAt())
             .updatedAt(publication.updatedAt())
+            .coverMediaId(publication.coverMediaId())
             .build();
     }
 }

@@ -1,5 +1,7 @@
 package com.scalke.portfolio.backend.publication.application.usecase;
 
+import com.scalke.portfolio.backend.media.domain.model.Media;
+import com.scalke.portfolio.backend.media.domain.port.MediaRepository;
 import com.scalke.portfolio.backend.publication.domain.model.Publication;
 import com.scalke.portfolio.backend.publication.domain.model.PublicationStatus;
 import com.scalke.portfolio.backend.publication.domain.model.PublicationType;
@@ -25,9 +27,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.scalke.portfolio.backend.media.MediaFixtures.image;
 import static com.scalke.portfolio.backend.publication.PublicationFixtures.article;
 import static com.scalke.portfolio.backend.publication.PublicationFixtures.classifiedArticle;
 import static com.scalke.portfolio.backend.publication.PublicationFixtures.publication;
+import static com.scalke.portfolio.backend.publication.PublicationFixtures.withCover;
 import static com.scalke.portfolio.backend.testsupport.FixedClockConfiguration.NOW;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -51,6 +55,9 @@ class ListVisiblePublicationsUseCaseIT extends AbstractIntegrationTest {
 
     @Autowired
     EntityManagerFactory entityManagerFactory;
+
+    @Autowired
+    MediaRepository mediaRepository;
 
     private Category backend;
     private Tag java;
@@ -175,16 +182,17 @@ class ListVisiblePublicationsUseCaseIT extends AbstractIntegrationTest {
     }
 
     /**
-     * D-AS : une page complète coûte 5 requêtes (publications, comptage, tags de la page, catégories,
-     * termes des tags), quel que soit le nombre de publications. Sans {@code @BatchSize}, il y aurait
-     * une requête de tags par publication.
+     * D-AS, D-BY : une page complète coûte 6 requêtes (publications, comptage, tags de la page, catégories,
+     * termes des tags, couvertures), quel que soit le nombre de publications. Sans {@code @BatchSize}, il y
+     * aurait une requête de tags par publication.
      */
     @Test
-    void loads_a_page_and_its_terms_in_a_constant_number_of_queries() {
+    void loads_a_page_its_terms_and_its_covers_in_a_constant_number_of_queries() {
         givenClassifiedPublications();
         for (int i = 0; i < 3; i++) {
-            publicationRepository.create(classifiedArticle("autre-" + i, NOW.minus(Duration.ofDays(10 + i)),
-                backend.id(), java.id()));
+            Media cover = mediaRepository.create(image("Couverture " + i));
+            publicationRepository.create(withCover(classifiedArticle("autre-" + i, NOW.minus(Duration.ofDays(10 + i)),
+                backend.id(), java.id()), cover.id()));
         }
         entityManager.flush();
         entityManager.clear();
@@ -195,7 +203,24 @@ class ListVisiblePublicationsUseCaseIT extends AbstractIntegrationTest {
 
         assertThat(page.content()).hasSize(4);
         assertThat(page.totalElements()).isEqualTo(6);
-        assertThat(statistics.getPrepareStatementCount()).isEqualTo(5);
+        assertThat(statistics.getPrepareStatementCount()).isEqualTo(6);
+    }
+
+    /**
+     * D-BY : la couverture sous forme publique, {@code null} sans couverture.
+     */
+    @Test
+    void returns_each_publication_with_its_public_cover() {
+        Media cover = mediaRepository.create(image("Schéma"));
+        publicationRepository.create(withCover(
+            article("avec-couverture", PublicationStatus.PUBLISHED, NOW.minus(Duration.ofDays(1))), cover.id()));
+        publicationRepository.create(article("sans-couverture", PublicationStatus.PUBLISHED, NOW.minus(Duration.ofDays(2))));
+
+        PageResult<VisiblePublication> page = list(PublicationCriteria.none(), new PageQuery(0, 10));
+
+        assertThat(page.content().get(0).cover().url()).isEqualTo("/api/public/media/" + cover.storageKey().value());
+        assertThat(page.content().get(0).cover().altText()).isEqualTo("Schéma");
+        assertThat(page.content().get(1).cover()).isNull();
     }
 
     private PageResult<VisiblePublication> list(PublicationCriteria criteria, PageQuery query) {

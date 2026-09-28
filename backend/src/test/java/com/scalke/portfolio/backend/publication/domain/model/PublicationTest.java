@@ -60,7 +60,7 @@ class PublicationTest {
     void keeps_an_immutable_copy_of_its_tags() {
         Set<Long> tags = new HashSet<>(Set.of(1L, 2L));
         Publication publication = new Publication(null, PublicationType.ARTICLE, "Titre", Slug.of("titre"), "Résumé", "Contenu",
-            PublicationStatus.DRAFT, null, null, false, 7L, tags, null, null, AT, AT);
+            PublicationStatus.DRAFT, null, null, false, 7L, tags, null, null, AT, AT, null);
 
         tags.add(3L);
 
@@ -70,6 +70,6 @@ class PublicationTest {
 
     private static Publication publication(PublicationStatus status, Instant publishedAt, String content) {
         return new Publication(null, PublicationType.ARTICLE, "Titre", Slug.of("titre"), "Résumé", content,
-            status, publishedAt, publishedAt, false, null, Set.of(), null, null, AT, AT);
+            status, publishedAt, publishedAt, false, null, Set.of(), null, null, AT, AT, null);
     }
 }

@@ -11,7 +11,8 @@ import java.util.Set;
 /**
  * Série d'articles (racine d'agrégat, D05) : liste ordonnée d'articles du module {@code publication},
  * référencés par identifiant (ADR 0002). Pas de workflow éditorial propre (01 §8) : une série est publique
- * si et seulement si au moins un de ses articles est visible (D-BG). Couverture : étape 27.
+ * si et seulement si au moins un de ses articles est visible (D-BG). Couverture ({@code coverMediaId},
+ * facultative) : référence vers une image du catalogue {@code media}, par identifiant (D-BY).
  * <p>
  * Invariants : une position au plus une fois (invariant 3), positions strictement positives, un article au
  * plus une fois. Doublés par PostgreSQL, qui garantit aussi qu'un article n'appartient qu'à une série et
@@ -23,7 +24,8 @@ public record Series(
     String title,
     Slug slug,
     String descriptionMarkdown,
-    List<SeriesItem> items
+    List<SeriesItem> items,
+    Long coverMediaId
 ) {
 
     public Series {

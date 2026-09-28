@@ -61,6 +61,6 @@ public class SeriesSeeder implements ApplicationRunner {
                 .ifPresent(article -> items.add(new SeriesItem(article.id(), items.size() + 1)));
         }
         return new Series(null, title, Slug.fromText(title),
-            "Série de démonstration : " + title + ".", items);
+            "Série de démonstration : " + title + ".", items, null);
     }
 }

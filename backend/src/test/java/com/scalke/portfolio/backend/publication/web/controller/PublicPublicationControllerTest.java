@@ -1,5 +1,6 @@
 package com.scalke.portfolio.backend.publication.web.controller;
 
+import com.scalke.portfolio.backend.media.application.query.PublicImage;
 import com.scalke.portfolio.backend.publication.application.usecase.GetVisiblePublicationUseCase;
 import com.scalke.portfolio.backend.publication.application.usecase.ListVisiblePublicationsUseCase;
 import com.scalke.portfolio.backend.publication.application.usecase.PublicationCriteria;
@@ -44,18 +45,20 @@ class PublicPublicationControllerTest {
             42L, PublicationType.ARTICLE, "Construire une API", Slug.of("construire-une-api"), "Résumé", "## Contenu",
             PublicationStatus.PUBLISHED, Instant.parse("2026-06-01T09:00:00Z"),
             Instant.parse("2026-06-01T09:00:00Z"), true, 3L, Set.of(5L, 6L),
-            "Titre SEO", null, Instant.parse("2026-05-30T08:00:00Z"), Instant.parse("2026-06-01T09:00:00Z")),
+            "Titre SEO", null, Instant.parse("2026-05-30T08:00:00Z"), Instant.parse("2026-06-01T09:00:00Z"), null),
         new Category(3L, "Backend", Slug.of("backend"), "Spring Boot, API, persistance."),
-        List.of(new Tag(6L, "Java", Slug.of("java")), new Tag(5L, "Spring Boot", Slug.of("spring-boot"))));
+        List.of(new Tag(6L, "Java", Slug.of("java")), new Tag(5L, "Spring Boot", Slug.of("spring-boot"))),
+        new PublicImage("/api/public/media/3f2a9c0e8d7b4a1f9e6c5b4a3d2e1f0a.webp", 1200, 630, "Schéma de l'API"));
 
     private static final VisiblePublication UNCLASSIFIED_NEWS = new VisiblePublication(
         new Publication(
             43L, PublicationType.NEWS, "Lancement", Slug.of("lancement"), "Résumé", "Contenu",
             PublicationStatus.PUBLISHED, Instant.parse("2026-06-02T09:00:00Z"),
             Instant.parse("2026-06-02T09:00:00Z"), false, null, Set.of(),
-            null, null, Instant.parse("2026-06-02T09:00:00Z"), Instant.parse("2026-06-02T09:00:00Z")),
+            null, null, Instant.parse("2026-06-02T09:00:00Z"), Instant.parse("2026-06-02T09:00:00Z"), null),
         null,
-        List.of());
+        List.of(),
+        null);
 
     @Autowired
     MockMvc mockMvc;
@@ -79,6 +82,12 @@ class PublicPublicationControllerTest {
             .andExpect(jsonPath("$.content[0].publishedAt").value("2026-06-01T09:00:00Z"))
             .andExpect(jsonPath("$.content[0].featured").value(true))
             .andExpect(jsonPath("$.content[0].readingTimeMinutes").value(1))
+            // couverture sous forme publique (D-BY) ; null explicite sans couverture (C10)
+            .andExpect(jsonPath("$.content[0].cover.url").value("/api/public/media/3f2a9c0e8d7b4a1f9e6c5b4a3d2e1f0a.webp"))
+            .andExpect(jsonPath("$.content[0].cover.altText").value("Schéma de l'API"))
+            .andExpect(jsonPath("$.content[1].cover").hasJsonPath())
+            .andExpect(jsonPath("$.content[1].cover").value(nullValue()))
+            .andExpect(jsonPath("$.content[0].coverMediaId").doesNotHaveJsonPath())
             // classement : nom et slug seulement (D-AP)
             .andExpect(jsonPath("$.content[0].category.name").value("Backend"))
             .andExpect(jsonPath("$.content[0].category.slug").value("backend"))
@@ -138,6 +147,7 @@ class PublicPublicationControllerTest {
         mockMvc.perform(get("/api/public/publications/construire-une-api").contextPath("/api"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.contentMarkdown").value("## Contenu"))
+            .andExpect(jsonPath("$.cover.width").value(1200))
             .andExpect(jsonPath("$.category.slug").value("backend"))
             .andExpect(jsonPath("$.tags.length()").value(2))
             .andExpect(jsonPath("$.seoTitle").value("Titre SEO"))

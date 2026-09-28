@@ -34,12 +34,12 @@ class PublicSeriesNavigationControllerTest {
 
     private static final Series SPRING_BOOT = new Series(4L, "Spring Boot de zéro à la production",
         Slug.of("spring-boot-de-zero-a-la-production"), "## Une série",
-        List.of(new SeriesItem(41L, 1), new SeriesItem(42L, 2)));
+        List.of(new SeriesItem(41L, 1), new SeriesItem(42L, 2)), null);
 
     private static final Publication INTRODUCTION = new Publication(
         41L, PublicationType.ARTICLE, "Introduction", Slug.of("introduction"), "Résumé", "## Contenu",
         PublicationStatus.PUBLISHED, Instant.parse("2026-06-01T09:00:00Z"), Instant.parse("2026-06-01T09:00:00Z"),
-        false, null, Set.of(), null, null, Instant.parse("2026-05-30T08:00:00Z"), Instant.parse("2026-06-01T09:00:00Z"));
+        false, null, Set.of(), null, null, Instant.parse("2026-05-30T08:00:00Z"), Instant.parse("2026-06-01T09:00:00Z"), null);
 
     @Autowired
     MockMvc mockMvc;

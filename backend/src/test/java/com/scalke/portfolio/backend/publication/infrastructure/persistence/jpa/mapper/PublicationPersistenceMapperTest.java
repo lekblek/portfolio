@@ -32,7 +32,7 @@ class PublicationPersistenceMapperTest {
             "Titre SEO",
             "Description SEO",
             Instant.parse("2026-06-01T09:00:00Z"),
-            Instant.parse("2026-06-02T09:00:00Z"));
+            Instant.parse("2026-06-02T09:00:00Z"), 9L);
 
         PublicationEntity entity = PublicationPersistenceMapper.toNewEntity(publication);
 

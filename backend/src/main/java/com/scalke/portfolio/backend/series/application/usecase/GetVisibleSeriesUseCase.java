@@ -1,5 +1,7 @@
 package com.scalke.portfolio.backend.series.application.usecase;
 
+import com.scalke.portfolio.backend.media.application.query.MediaQueryService;
+import com.scalke.portfolio.backend.media.application.query.PublicImage;
 import com.scalke.portfolio.backend.publication.application.query.PublicationQueryService;
 import com.scalke.portfolio.backend.publication.domain.model.Publication;
 import com.scalke.portfolio.backend.series.domain.model.Series;
@@ -13,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.IntStream;
 
 @Service
@@ -21,6 +24,7 @@ public class GetVisibleSeriesUseCase {
 
     private final SeriesRepository seriesRepository;
     private final PublicationQueryService publications;
+    private final MediaQueryService media;
 
     /**
      * Une série inexistante, au slug mal formé ou sans aucun article visible produit la même erreur :
@@ -38,7 +42,12 @@ public class GetVisibleSeriesUseCase {
         }
         return new VisibleSeries(series, IntStream.range(0, chapters.size())
             .mapToObj(index -> new SeriesChapter(index + 1, visible.get(chapters.get(index))))
-            .toList());
+            .toList(), cover(series));
+    }
+
+    private PublicImage cover(Series series) {
+        Long id = series.coverMediaId();
+        return id == null ? null : media.imagesById(Set.of(id)).get(id);
     }
 
     private static ResourceNotFoundException notFound() {

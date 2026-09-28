@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Structure de persistance d'une série ({@code V011}). Les invariants vivent dans
+ * Structure de persistance d'une série ({@code V011}, {@code V016}). Les invariants vivent dans
  * {@code domain.model.Series} et dans les contraintes des tables (ADR 0001).
  */
 @Getter
@@ -43,11 +43,19 @@ public class SeriesEntity {
     @BatchSize(size = 100)
     private List<SeriesItemEmbeddable> items = new ArrayList<>();
 
+    /**
+     * Identifiant d'une image du module {@code media} : jamais une entité de ce module (ADR 0002, D-BY).
+     */
+    @Column(name = "cover_media_id")
+    private Long coverMediaId;
+
     @Builder
-    private SeriesEntity(String title, String slug, String descriptionMarkdown, List<SeriesItemEmbeddable> items) {
+    private SeriesEntity(String title, String slug, String descriptionMarkdown, List<SeriesItemEmbeddable> items,
+                         Long coverMediaId) {
         this.title = title;
         this.slug = slug;
         this.descriptionMarkdown = descriptionMarkdown;
         this.items = new ArrayList<>(items);
+        this.coverMediaId = coverMediaId;
     }
 }

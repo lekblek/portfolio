@@ -210,14 +210,14 @@ class PublicationTransitionTest {
     @Test
     void rejects_a_first_publication_date_after_the_publication_date() {
         assertThatThrownBy(() -> new Publication(1L, PublicationType.ARTICLE, "Titre", Slug.of("titre"), "Résumé",
-            "Contenu", PUBLISHED, PAST, NOW, false, null, Set.of(), null, null, CREATED, CREATED))
+            "Contenu", PUBLISHED, PAST, NOW, false, null, Set.of(), null, null, CREATED, CREATED, null))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     void a_publication_date_requires_a_first_publication_date() {
         assertThatThrownBy(() -> new Publication(1L, PublicationType.ARTICLE, "Titre", Slug.of("titre"), "Résumé",
-            "Contenu", ARCHIVED, PAST, null, false, null, Set.of(), null, null, CREATED, CREATED))
+            "Contenu", ARCHIVED, PAST, null, false, null, Set.of(), null, null, CREATED, CREATED, null))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -244,7 +244,7 @@ class PublicationTransitionTest {
 
     private static Publication publication(PublicationStatus status, Instant publishedAt) {
         return new Publication(1L, PublicationType.ARTICLE, "Titre", Slug.of("titre"), "Résumé", "Contenu",
-            status, publishedAt, publishedAt, false, 3L, Set.of(4L), "SEO", null, CREATED, CREATED);
+            status, publishedAt, publishedAt, false, 3L, Set.of(4L), "SEO", null, CREATED, CREATED, null);
     }
 
     private static void assertRefused(ThrowingCallable transition) {

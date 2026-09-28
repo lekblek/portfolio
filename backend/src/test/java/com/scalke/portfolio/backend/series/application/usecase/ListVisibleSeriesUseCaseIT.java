@@ -1,5 +1,7 @@
 package com.scalke.portfolio.backend.series.application.usecase;
 
+import com.scalke.portfolio.backend.media.domain.model.Media;
+import com.scalke.portfolio.backend.media.domain.port.MediaRepository;
 import com.scalke.portfolio.backend.publication.domain.model.PublicationStatus;
 import com.scalke.portfolio.backend.publication.domain.port.PublicationRepository;
 import com.scalke.portfolio.backend.series.domain.port.SeriesRepository;
@@ -16,8 +18,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 
+import static com.scalke.portfolio.backend.media.MediaFixtures.image;
 import static com.scalke.portfolio.backend.publication.PublicationFixtures.article;
 import static com.scalke.portfolio.backend.series.SeriesFixtures.series;
+import static com.scalke.portfolio.backend.series.SeriesFixtures.withCover;
 import static com.scalke.portfolio.backend.testsupport.FixedClockConfiguration.NOW;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -38,6 +42,9 @@ class ListVisibleSeriesUseCaseIT extends AbstractIntegrationTest {
 
     @Autowired
     EntityManagerFactory entityManagerFactory;
+
+    @Autowired
+    MediaRepository mediaRepository;
 
     @Test
     void returns_an_empty_page_when_no_series_has_a_visible_article() {
@@ -94,13 +101,15 @@ class ListVisibleSeriesUseCaseIT extends AbstractIntegrationTest {
     }
 
     /**
-     * D-BJ : une page coûte 5 requêtes quel que soit le nombre de séries : articles des séries, articles
-     * visibles (façade), séries, comptage, articles de toute la page ({@code @BatchSize}).
+     * D-BJ, D-BY : une page coûte 6 requêtes quel que soit le nombre de séries : articles des séries, articles
+     * visibles (façade), séries, comptage, articles de toute la page ({@code @BatchSize}), couvertures.
      */
     @Test
     void loads_a_page_in_a_constant_number_of_queries() {
         for (int i = 0; i < 4; i++) {
-            seriesRepository.create(series("serie-" + i, published("article-" + i), draft("brouillon-" + i)));
+            Media cover = mediaRepository.create(image("Couverture " + i));
+            seriesRepository.create(withCover(series("serie-" + i, published("article-" + i), draft("brouillon-" + i)),
+                cover.id()));
         }
         entityManager.flush();
         entityManager.clear();
@@ -109,8 +118,11 @@ class ListVisibleSeriesUseCaseIT extends AbstractIntegrationTest {
 
         PageResult<SeriesSummary> page = listVisibleSeriesUseCase.execute(new PageQuery(0, 3));
 
-        assertThat(page.content()).hasSize(3).allSatisfy(summary -> assertThat(summary.chapterCount()).isEqualTo(1));
-        assertThat(statistics.getPrepareStatementCount()).isEqualTo(5);
+        assertThat(page.content()).hasSize(3).allSatisfy(summary -> {
+            assertThat(summary.chapterCount()).isEqualTo(1);
+            assertThat(summary.cover()).isNotNull();
+        });
+        assertThat(statistics.getPrepareStatementCount()).isEqualTo(6);
     }
 
     private Long published(String slug) {

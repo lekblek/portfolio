@@ -1,5 +1,7 @@
 package com.scalke.portfolio.backend.publication.application.usecase;
 
+import com.scalke.portfolio.backend.media.domain.model.Media;
+import com.scalke.portfolio.backend.media.domain.port.MediaRepository;
 import com.scalke.portfolio.backend.publication.domain.model.Publication;
 import com.scalke.portfolio.backend.publication.domain.model.PublicationStatus;
 import com.scalke.portfolio.backend.publication.domain.model.PublicationType;
@@ -26,7 +28,9 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Set;
 
+import static com.scalke.portfolio.backend.media.MediaFixtures.image;
 import static com.scalke.portfolio.backend.publication.PublicationFixtures.article;
+import static com.scalke.portfolio.backend.publication.PublicationFixtures.withCover;
 import static com.scalke.portfolio.backend.testsupport.FixedClockConfiguration.NOW;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -50,6 +54,9 @@ class GetVisiblePublicationUseCaseIT extends AbstractIntegrationTest {
     EntityManager entityManager;
 
     @Autowired
+    MediaRepository mediaRepository;
+
+    @Autowired
     EntityManagerFactory entityManagerFactory;
 
     private Publication published;
@@ -66,7 +73,7 @@ class GetVisiblePublicationUseCaseIT extends AbstractIntegrationTest {
             null, PublicationType.ARTICLE, "Construire une API", Slug.of("construire-une-api"), "Résumé", "## Contenu",
             PublicationStatus.PUBLISHED, NOW.minus(Duration.ofDays(2)), NOW.minus(Duration.ofDays(2)), true, backend.id(),
             Set.of(springBoot.id(), java.id()), "Titre SEO", null,
-            NOW.minus(Duration.ofDays(3)), NOW.minus(Duration.ofDays(2))));
+            NOW.minus(Duration.ofDays(3)), NOW.minus(Duration.ofDays(2)), null));
         publicationRepository.create(article("planifiee-passee", PublicationStatus.SCHEDULED, NOW.minusSeconds(1)));
         publicationRepository.create(article("planifiee-future", PublicationStatus.SCHEDULED, NOW.plus(Duration.ofDays(1))));
         publicationRepository.create(article("brouillon", PublicationStatus.DRAFT, null));
@@ -83,6 +90,18 @@ class GetVisiblePublicationUseCaseIT extends AbstractIntegrationTest {
         assertThat(visible.publication()).isEqualTo(published);
         assertThat(visible.category()).isEqualTo(backend);
         assertThat(visible.tags()).containsExactly(java, springBoot);
+    }
+
+    @Test
+    void returns_a_publication_with_its_public_cover() {
+        Media cover = mediaRepository.create(image("Schéma"));
+        publicationRepository.create(withCover(
+            article("avec-couverture", PublicationStatus.PUBLISHED, NOW.minus(Duration.ofDays(1))), cover.id()));
+
+        VisiblePublication visible = getVisiblePublicationUseCase.execute("avec-couverture");
+
+        assertThat(visible.cover().url()).isEqualTo("/api/public/media/" + cover.storageKey().value());
+        assertThat(getVisiblePublicationUseCase.execute("construire-une-api").cover()).isNull();
     }
 
     @Test

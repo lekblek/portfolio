@@ -27,7 +27,8 @@ import java.util.regex.Pattern;
  * <p>
  * Classement (D-AN) : au plus une catégorie ({@code categoryId}, D20) et des tags ({@code tagIds}, un
  * ensemble : chaque tag au plus une fois). Les termes appartiennent au module {@code taxonomy} : la
- * publication n'en connaît que les identifiants. Couverture : étape 27.
+ * publication n'en connaît que les identifiants. Couverture ({@code coverMediaId}, facultative) : référence
+ * vers une image du catalogue {@code media}, par identifiant (ADR 0002, D-BY).
  */
 public record Publication(
     Long id,
@@ -45,7 +46,8 @@ public record Publication(
     String seoTitle,
     String seoDescription,
     Instant createdAt,
-    Instant updatedAt
+    Instant updatedAt,
+    Long coverMediaId
 ) {
 
     /**
@@ -153,7 +155,7 @@ public record Publication(
             case IN_REVIEW, ARCHIVED -> firstPublishedAt;
         };
         return new Publication(id, type, title, slug, summary, contentMarkdown, target, newPublishedAt,
-            newFirstPublishedAt, featured, categoryId, tagIds, seoTitle, seoDescription, createdAt, now);
+            newFirstPublishedAt, featured, categoryId, tagIds, seoTitle, seoDescription, createdAt, now, coverMediaId);
     }
 
     /**
@@ -174,7 +176,7 @@ public record Publication(
                 "Le slug d'une publication déjà publiée ne peut plus changer.");
         }
         return new Publication(id, type, title, newSlug, summary, contentMarkdown, status, publishedAt,
-            firstPublishedAt, featured, categoryId, tagIds, seoTitle, seoDescription, createdAt, now);
+            firstPublishedAt, featured, categoryId, tagIds, seoTitle, seoDescription, createdAt, now, coverMediaId);
     }
 
     private static BusinessRuleViolationException refused(String detail) {

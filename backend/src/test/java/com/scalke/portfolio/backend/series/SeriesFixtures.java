@@ -20,11 +20,19 @@ public final class SeriesFixtures {
         return series("Série " + slug, slug, publicationIds);
     }
 
+    /**
+     * La même série avec une couverture (identifiant d'un média déjà créé).
+     */
+    public static Series withCover(Series series, Long coverMediaId) {
+        return new Series(series.id(), series.title(), series.slug(), series.descriptionMarkdown(), series.items(),
+            coverMediaId);
+    }
+
     public static Series series(String title, String slug, Long... publicationIds) {
         List<SeriesItem> items = new ArrayList<>();
         for (Long publicationId : publicationIds) {
             items.add(new SeriesItem(publicationId, items.size() + 1));
         }
-        return new Series(null, title, Slug.of(slug), "Description de " + slug + ".", items);
+        return new Series(null, title, Slug.of(slug), "Description de " + slug + ".", items, null);
     }
 }

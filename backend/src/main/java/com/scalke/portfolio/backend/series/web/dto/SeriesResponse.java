@@ -1,5 +1,6 @@
 package com.scalke.portfolio.backend.series.web.dto;
 
+import com.scalke.portfolio.backend.media.application.query.PublicImage;
 import com.scalke.portfolio.backend.series.application.usecase.VisibleSeries;
 import com.scalke.portfolio.backend.series.domain.model.Series;
 
@@ -13,6 +14,7 @@ public record SeriesResponse(
     String title,
     String slug,
     String descriptionMarkdown,
+    PublicImage cover,
     List<SeriesChapterResponse> chapters
 ) {
 
@@ -22,6 +24,7 @@ public record SeriesResponse(
             series.title(),
             series.slug().value(),
             series.descriptionMarkdown(),
+            visible.cover(),
             visible.chapters().stream().map(SeriesChapterResponse::from).toList());
     }
 }

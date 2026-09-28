@@ -19,7 +19,8 @@ public final class SeriesPersistenceMapper {
             entity.getDescriptionMarkdown(),
             entity.getItems().stream()
                 .map(item -> new SeriesItem(item.getPublicationId(), item.getPosition()))
-                .toList());
+                .toList(),
+            entity.getCoverMediaId());
     }
 
     /**
@@ -33,6 +34,7 @@ public final class SeriesPersistenceMapper {
             .items(series.items().stream()
                 .map(item -> new SeriesItemEmbeddable(item.publicationId(), item.position()))
                 .toList())
+            .coverMediaId(series.coverMediaId())
             .build();
     }
 }

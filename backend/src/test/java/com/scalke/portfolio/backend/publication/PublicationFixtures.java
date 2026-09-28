@@ -36,6 +36,17 @@ public final class PublicationFixtures {
             categoryId, Set.of(tagIds));
     }
 
+    /**
+     * La même publication avec une couverture (identifiant d'un média déjà créé).
+     */
+    public static Publication withCover(Publication publication, Long coverMediaId) {
+        return new Publication(publication.id(), publication.type(), publication.title(), publication.slug(),
+            publication.summary(), publication.contentMarkdown(), publication.status(), publication.publishedAt(),
+            publication.firstPublishedAt(), publication.featured(), publication.categoryId(), publication.tagIds(),
+            publication.seoTitle(), publication.seoDescription(), publication.createdAt(), publication.updatedAt(),
+            coverMediaId);
+    }
+
     private static Publication publication(String slug, PublicationType type, PublicationStatus status,
                                            Instant publishedAt, Long categoryId, Set<Long> tagIds) {
         Instant now = FixedClockConfiguration.NOW;
@@ -55,6 +66,6 @@ public final class PublicationFixtures {
             null,
             null,
             now,
-            now);
+            now, null);
     }
 }

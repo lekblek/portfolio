@@ -133,7 +133,7 @@ class ChangePublicationStatusUseCaseIT extends AbstractIntegrationTest {
      */
     private Long create(String slug, PublicationStatus status, Instant publishedAt) {
         return publicationRepository.create(new Publication(null, PublicationType.ARTICLE, "Titre", Slug.of(slug), "Résumé",
-            "Contenu", status, publishedAt, publishedAt, false, null, Set.of(), null, null, CREATED, CREATED)).id();
+            "Contenu", status, publishedAt, publishedAt, false, null, Set.of(), null, null, CREATED, CREATED, null)).id();
     }
 
     private Publication reload(Long id) {

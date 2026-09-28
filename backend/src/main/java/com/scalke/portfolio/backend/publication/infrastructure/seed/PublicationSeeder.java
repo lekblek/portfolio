@@ -97,6 +97,6 @@ public class PublicationSeeder implements ApplicationRunner {
         return new Publication(null, type, title, Slug.fromText(title),
             "Publication de démonstration : " + title + ".",
             "## " + title + "\n\nContenu de démonstration.",
-            status, publishedAt, publishedAt, featured, categoryId, tagIds, null, null, now, now);
+            status, publishedAt, publishedAt, featured, categoryId, tagIds, null, null, now, now, null);
     }
 }

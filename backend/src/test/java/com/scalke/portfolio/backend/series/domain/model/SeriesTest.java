@@ -98,11 +98,11 @@ class SeriesTest {
 
     @Test
     void requires_a_slug() {
-        assertThatThrownBy(() -> new Series(null, "Titre", null, "Description", List.of()))
+        assertThatThrownBy(() -> new Series(null, "Titre", null, "Description", List.of(), null))
             .isInstanceOf(NullPointerException.class);
     }
 
     private static Series series(SeriesItem... items) {
-        return new Series(null, "Spring Boot", Slug.of("spring-boot"), "Description", List.of(items));
+        return new Series(null, "Spring Boot", Slug.of("spring-boot"), "Description", List.of(items), null);
     }
 }

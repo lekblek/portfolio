@@ -1,5 +1,6 @@
 package com.scalke.portfolio.backend.series.web.controller;
 
+import com.scalke.portfolio.backend.media.application.query.PublicImage;
 import com.scalke.portfolio.backend.publication.domain.model.Publication;
 import com.scalke.portfolio.backend.publication.domain.model.PublicationStatus;
 import com.scalke.portfolio.backend.publication.domain.model.PublicationType;
@@ -27,6 +28,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -40,12 +42,15 @@ class PublicSeriesControllerTest {
 
     private static final Series SPRING_BOOT = new Series(4L, "Spring Boot de zéro à la production",
         Slug.of("spring-boot-de-zero-a-la-production"), "## Une série",
-        List.of(new SeriesItem(42L, 1), new SeriesItem(43L, 3)));
+        List.of(new SeriesItem(42L, 1), new SeriesItem(43L, 3)), null);
 
     private static final Publication CHAPTER = new Publication(
         43L, PublicationType.ARTICLE, "Sécuriser l'API", Slug.of("securiser-l-api"), "Résumé", "## Contenu",
         PublicationStatus.PUBLISHED, Instant.parse("2026-06-01T09:00:00Z"), Instant.parse("2026-06-01T09:00:00Z"),
-        false, null, Set.of(), null, null, Instant.parse("2026-05-30T08:00:00Z"), Instant.parse("2026-06-01T09:00:00Z"));
+        false, null, Set.of(), null, null, Instant.parse("2026-05-30T08:00:00Z"), Instant.parse("2026-06-01T09:00:00Z"), null);
+
+    private static final PublicImage COVER = new PublicImage(
+        "/api/public/media/0123456789abcdef0123456789abcdef.png", 1200, 630, "Couverture de la série");
 
     @Autowired
     MockMvc mockMvc;
@@ -59,7 +64,7 @@ class PublicSeriesControllerTest {
     @Test
     void lists_series_as_a_page_of_summaries() throws Exception {
         given(listVisibleSeriesUseCase.execute(any()))
-            .willReturn(new PageResult<>(List.of(new SeriesSummary(SPRING_BOOT, 1)), 0, 10, 1));
+            .willReturn(new PageResult<>(List.of(new SeriesSummary(SPRING_BOOT, 1, COVER)), 0, 10, 1));
 
         mockMvc.perform(get("/api/public/series").contextPath("/api"))
             .andExpect(status().isOk())
@@ -67,6 +72,8 @@ class PublicSeriesControllerTest {
             .andExpect(jsonPath("$.content[0].slug").value("spring-boot-de-zero-a-la-production"))
             .andExpect(jsonPath("$.content[0].descriptionMarkdown").value("## Une série"))
             .andExpect(jsonPath("$.content[0].chapterCount").value(1))
+            .andExpect(jsonPath("$.content[0].cover.url").value("/api/public/media/0123456789abcdef0123456789abcdef.png"))
+            .andExpect(jsonPath("$.content[0].coverMediaId").doesNotHaveJsonPath())
             .andExpect(jsonPath("$.content[0].id").doesNotHaveJsonPath())
             .andExpect(jsonPath("$.content[0].items").doesNotHaveJsonPath())
             .andExpect(jsonPath("$.totalElements").value(1));
@@ -90,12 +97,14 @@ class PublicSeriesControllerTest {
     @Test
     void returns_the_series_with_its_table_of_contents() throws Exception {
         given(getVisibleSeriesUseCase.execute("spring-boot-de-zero-a-la-production"))
-            .willReturn(new VisibleSeries(SPRING_BOOT, List.of(new SeriesChapter(1, CHAPTER))));
+            .willReturn(new VisibleSeries(SPRING_BOOT, List.of(new SeriesChapter(1, CHAPTER)), null));
 
         mockMvc.perform(get("/api/public/series/spring-boot-de-zero-a-la-production").contextPath("/api"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.title").value("Spring Boot de zéro à la production"))
             .andExpect(jsonPath("$.descriptionMarkdown").value("## Une série"))
+            .andExpect(jsonPath("$.cover").hasJsonPath())
+            .andExpect(jsonPath("$.cover").value(nullValue()))
             .andExpect(jsonPath("$.chapters.length()").value(1))
             .andExpect(jsonPath("$.chapters[0].position").value(1))
             .andExpect(jsonPath("$.chapters[0].title").value("Sécuriser l'API"))
