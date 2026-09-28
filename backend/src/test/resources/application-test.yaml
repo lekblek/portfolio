@@ -3,7 +3,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        show_sql: true
+        # SQL journalisé une seule fois, par le logger org.hibernate.SQL ci-dessous (pas de show_sql).
         # Compteur de requêtes utilisé par GetProfileUseCaseIT (D-O). Profil test uniquement.
         generate_statistics: true
   flyway:
