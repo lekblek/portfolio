@@ -334,7 +334,7 @@ Le Markdown est la source canonique.
 
 Aucun `contentHtml` métier n'est nécessaire.
 
-État d’implémentation (étapes 19 à 22) : tous les attributs ci-dessus sauf `coverMedia` (étape 27) ; le temps de lecture est calculé à partir du Markdown (D12, D-AJ). Le slug est unique pour l’ensemble des publications (D-AL). `firstPublishedAt` retient la première apparition publique : provisoire tant qu’elle est future, elle ne change plus une fois passée (D-AZ) ; elle rend le slug définitif (§16).
+État d’implémentation (étapes 19 à 22 et 27.4) : tous les attributs ci-dessus, dont `coverMedia` (référence facultative vers le catalogue `Media`, D-BY) ; le temps de lecture est calculé à partir du Markdown (D12, D-AJ). Le slug est unique pour l’ensemble des publications (D-AL). `firstPublishedAt` retient la première apparition publique : provisoire tant qu’elle est future, elle ne change plus une fois passée (D-AZ) ; elle rend le slug définitif (§16).
 
 ---
 
@@ -481,7 +481,7 @@ Une série ne possède pas de workflow éditorial propre dans la V1.
 
 Elle organise des articles.
 
-État d’implémentation (étape 23) : tous les attributs ci-dessus sauf `coverMedia` (étape 27). Une série est publique si et seulement si au moins un de ses articles est visible ; sa table des matières ne montre que ces articles, numérotés à partir de 1 (D-BG). Lecture publique seulement : création et modification à l’étape 36 (D-BE).
+État d’implémentation (étapes 23 et 27.4) : tous les attributs ci-dessus, dont `coverMedia` (référence facultative, D-BY). Une série est publique si et seulement si au moins un de ses articles est visible ; sa table des matières ne montre que ces articles, numérotés à partir de 1 (D-BG). Lecture publique seulement : création et modification à l’étape 36 (D-BE).
 Depuis l’étape 24, un article visible d’une série connaît sa position, le nombre de chapitres visibles et ses voisins visibles précédent et suivant ; un article masqué est sauté (D-BL, D-BM).
 
 ---
@@ -782,7 +782,7 @@ Les règles suivantes doivent être garanties par le backend et, lorsque pertine
 26. le statut d'une `Publication` ne change que selon la table des transitions du §15 ;
 27. un `Project` référence au plus une fois le même média parmi ses captures.
 
-Les invariants 17 à 27 ont été ajoutés pendant l'implémentation (étapes 14 à 27) ; 27 est garanti par PostgreSQL et doublé par le modèle métier. Les invariants 17 à 25 sont garantis par PostgreSQL (`CHECK`, `UNIQUE`, clés étrangères) et, pour 17, 18, 21, 23 et 24, doublés par le modèle métier. L'invariant 26 (table des transitions) est **applicatif uniquement** : aucune contrainte SQL ne compare l'ancien et le nouveau statut ; il est garanti tant que le statut n'est écrit que par `ChangePublicationStatusUseCase` (seul appelant de `updateStatus`, D-AX). L'invariant 6 (slug stable) est lui aussi applicatif : `Publication.changeSlug` refuse le changement dès que `firstPublishedAt` est passée (D-BC) ; l'invariant 5 est garanti par les contraintes `UNIQUE` de PostgreSQL (D-X, D-AA, D-AL, D-AO). Les invariants 1 à 3 (séries) sont garantis par PostgreSQL depuis l'étape 23 (`V011`, D-BF) et, pour 3, doublés par le modèle métier. L'invariant 13 (média référencé non supprimable) est garanti par les clés étrangères `ON DELETE RESTRICT` des contenus vers `media`, depuis l'étape 27.2 pour les projets et 27.3 pour le profil (D-BV, D-BX). Les invariants 7 à 10 (visibilité des publications) sont appliqués par les lectures publiques depuis l'étape 19. Voir [`decisions/registre-implementation.md`](decisions/registre-implementation.md).
+Les invariants 17 à 27 ont été ajoutés pendant l'implémentation (étapes 14 à 27) ; 27 est garanti par PostgreSQL et doublé par le modèle métier. Les invariants 17 à 25 sont garantis par PostgreSQL (`CHECK`, `UNIQUE`, clés étrangères) et, pour 17, 18, 21, 23 et 24, doublés par le modèle métier. L'invariant 26 (table des transitions) est **applicatif uniquement** : aucune contrainte SQL ne compare l'ancien et le nouveau statut ; il est garanti tant que le statut n'est écrit que par `ChangePublicationStatusUseCase` (seul appelant de `updateStatus`, D-AX). L'invariant 6 (slug stable) est lui aussi applicatif : `Publication.changeSlug` refuse le changement dès que `firstPublishedAt` est passée (D-BC) ; l'invariant 5 est garanti par les contraintes `UNIQUE` de PostgreSQL (D-X, D-AA, D-AL, D-AO). Les invariants 1 à 3 (séries) sont garantis par PostgreSQL depuis l'étape 23 (`V011`, D-BF) et, pour 3, doublés par le modèle métier. L'invariant 13 (média référencé non supprimable) est garanti par les clés étrangères `ON DELETE RESTRICT` des contenus vers `media`, depuis l'étape 27.2 pour les projets, 27.3 pour le profil et 27.4 pour les publications et les séries (D-BV, D-BX, D-BY). Les invariants 7 à 10 (visibilité des publications) sont appliqués par les lectures publiques depuis l'étape 19. Voir [`decisions/registre-implementation.md`](decisions/registre-implementation.md).
 
 ---
 

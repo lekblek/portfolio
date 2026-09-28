@@ -1438,7 +1438,7 @@ Règles propres à ces contrats :
 * `cover` : `null` sans couverture, dans la liste et le détail ; `screenshots` : détail seulement, dans leur ordre d’affichage, `[]` si aucune ;
 * contrats vérifiés par `PublicProjectControllerTest` et `PublicProjectIT`.
 
-### `GET /api/public/publications` (étapes 19 et 20)
+### `GET /api/public/publications` (étapes 19, 20 et 27.4)
 
 ```text
 ?page=0&size=10          page 0-based ; size par défaut 10, plafonnée à 100 ; sort ignoré (ordre fixe)
@@ -1448,17 +1448,19 @@ Règles propres à ces contrats :
 200 → PageResponse<PublicationSummaryResponse>
 {
   content[] { type, title, slug, summary, publishedAt, featured, readingTimeMinutes,
+              cover { url, width, height, altText | null } | null,
               category { name, slug } | null, tags[] { name, slug } },
   page, size, totalElements, totalPages, first, last
 }
 ```
 
-### `GET /api/public/publications/{slug}` (étapes 19 et 20)
+### `GET /api/public/publications/{slug}` (étapes 19, 20 et 27.4)
 
 ```text
 200 → PublicationResponse
 {
   type, title, slug, summary, contentMarkdown, publishedAt, featured, readingTimeMinutes,
+  cover { url, width, height, altText | null } | null,
   category { name, slug } | null, tags[] { name, slug },
   seoTitle | null, seoDescription | null
 }
@@ -1474,26 +1476,27 @@ Règles propres à ces contrats :
 * `readingTimeMinutes` : calculé depuis le Markdown, 200 mots par minute, au moins 1 (D12) ;
 * ni `id`, ni `status`, ni dates d’audit (D-AJ) ; la liste n’inclut ni le contenu ni les champs SEO ;
 * `category` : `null` si non classée ; `tags` : triés par nom, `[]` si aucun ; les slugs servent de valeurs aux filtres (D-AP, D-AQ) ;
-* la couverture arrivera à l’étape 27 ;
+* `cover` : image publique (même forme que pour les projets, D-BW), `null` sans couverture (D-BY) ;
 * contrats vérifiés par `PublicPublicationControllerTest` et `PublicPublicationIT`.
 
-### `GET /api/public/series` (étape 23)
+### `GET /api/public/series` (étapes 23 et 27.4)
 
 ```text
 ?page=0&size=10          page 0-based ; size par défaut 10, plafonnée à 100 ; sort ignoré (ordre fixe)
 200 → PageResponse<SeriesSummaryResponse>
 {
-  content[] { title, slug, descriptionMarkdown, chapterCount },
+  content[] { title, slug, descriptionMarkdown, cover { url, width, height, altText | null } | null, chapterCount },
   page, size, totalElements, totalPages, first, last
 }
 ```
 
-### `GET /api/public/series/{slug}` (étape 23)
+### `GET /api/public/series/{slug}` (étapes 23 et 27.4)
 
 ```text
 200 → SeriesResponse
 {
   title, slug, descriptionMarkdown,
+  cover { url, width, height, altText | null } | null,
   chapters[] { position, title, slug, summary, publishedAt, readingTimeMinutes }
 }
 404 → ProblemDetail, code RESOURCE_NOT_FOUND (slug inconnu ou mal formé, série sans article visible : réponse identique)
@@ -1505,7 +1508,7 @@ Règles propres à ces contrats :
 * ordre fixe : titre sans tenir compte de la casse, puis identifiant (D-BI) ;
 * `chapterCount` et `chapters` ne comptent que les articles visibles ; `position` est leur rang dans la série à partir de 1, jamais la position stockée ;
 * `chapters[].slug` mène à `GET /api/public/publications/{slug}` ;
-* ni `id`, ni positions internes ; la couverture arrivera à l’étape 27 ;
+* ni `id`, ni positions internes ; `cover` : image publique, `null` sans couverture (D-BY) ;
 * contrats vérifiés par `PublicSeriesControllerTest` et `PublicSeriesIT`.
 
 ### `GET /api/public/publications/{slug}/series` (étape 24)
