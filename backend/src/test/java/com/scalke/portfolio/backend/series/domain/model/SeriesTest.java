@@ -56,6 +56,41 @@ class SeriesTest {
         assertThat(series.publicationIdsAmong(Set.of())).isEmpty();
     }
 
+    /**
+     * D-BM : précédent et suivant sont les voisins visibles ; la position est le rang parmi les visibles.
+     */
+    @Test
+    void navigates_among_the_given_articles_only() {
+        Series series = series(new SeriesItem(10L, 1), new SeriesItem(20L, 2), new SeriesItem(30L, 3),
+            new SeriesItem(40L, 4));
+        Set<Long> visible = Set.of(10L, 30L, 40L);
+
+        assertThat(series.navigationAround(30L, visible)).contains(new ChapterNavigation(2, 3, 10L, 40L));
+        assertThat(series.navigationAround(10L, visible)).contains(new ChapterNavigation(1, 3, null, 30L));
+        assertThat(series.navigationAround(40L, visible)).contains(new ChapterNavigation(3, 3, 30L, null));
+    }
+
+    @Test
+    void has_no_navigation_for_an_article_outside_the_given_set() {
+        Series series = series(new SeriesItem(10L, 1), new SeriesItem(20L, 2));
+
+        assertThat(series.navigationAround(20L, Set.of(10L))).isEmpty();
+        assertThat(series.navigationAround(99L, Set.of(10L, 20L, 99L))).isEmpty();
+    }
+
+    @Test
+    void a_single_visible_chapter_has_neither_previous_nor_next() {
+        assertThat(series(new SeriesItem(10L, 3)).navigationAround(10L, Set.of(10L)))
+            .contains(new ChapterNavigation(1, 1, null, null));
+    }
+
+    @Test
+    void rejects_an_inconsistent_navigation() {
+        assertThatThrownBy(() -> new ChapterNavigation(3, 2, 1L, null)).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new ChapterNavigation(1, 2, 1L, 2L)).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new ChapterNavigation(2, 2, 1L, 3L)).isInstanceOf(IllegalArgumentException.class);
+    }
+
     @Test
     void accepts_a_series_without_articles() {
         assertThat(series().publicationIds()).isEmpty();

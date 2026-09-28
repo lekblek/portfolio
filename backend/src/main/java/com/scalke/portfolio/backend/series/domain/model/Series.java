@@ -5,6 +5,7 @@ import com.scalke.portfolio.backend.shared.domain.model.Slug;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -61,5 +62,23 @@ public record Series(
             .map(SeriesItem::publicationId)
             .filter(publicationIds::contains)
             .toList();
+    }
+
+    /**
+     * Navigation autour de l'article {@code publicationId} parmi les articles de la série présents dans
+     * {@code publicationIds} (en pratique : les visibles), dans l'ordre des positions : un article masqué est
+     * sauté (D-BM). Vide si l'article n'en fait pas partie.
+     */
+    public Optional<ChapterNavigation> navigationAround(Long publicationId, Set<Long> publicationIds) {
+        List<Long> chapters = publicationIdsAmong(publicationIds);
+        int index = chapters.indexOf(publicationId);
+        if (index < 0) {
+            return Optional.empty();
+        }
+        return Optional.of(new ChapterNavigation(
+            index + 1,
+            chapters.size(),
+            index > 0 ? chapters.get(index - 1) : null,
+            index + 1 < chapters.size() ? chapters.get(index + 1) : null));
     }
 }
