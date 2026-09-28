@@ -11,7 +11,7 @@ import java.util.List;
 public record TechnologyResponse(String name, String slug) {
 
     static TechnologyResponse from(Technology technology) {
-        return new TechnologyResponse(technology.name(), technology.slug());
+        return new TechnologyResponse(technology.name(), technology.slug().value());
     }
 
     static List<TechnologyResponse> from(List<Technology> technologies) {

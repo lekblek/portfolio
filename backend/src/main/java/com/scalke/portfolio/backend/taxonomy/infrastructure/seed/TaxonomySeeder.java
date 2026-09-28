@@ -1,5 +1,6 @@
 package com.scalke.portfolio.backend.taxonomy.infrastructure.seed;
 
+import com.scalke.portfolio.backend.shared.domain.model.Slug;
 import com.scalke.portfolio.backend.taxonomy.domain.model.Category;
 import com.scalke.portfolio.backend.taxonomy.domain.model.Tag;
 import com.scalke.portfolio.backend.taxonomy.domain.port.CategoryRepository;
@@ -29,16 +30,11 @@ import java.util.List;
 public class TaxonomySeeder implements ApplicationRunner {
 
     static final List<Category> CATEGORIES = List.of(
-        new Category(null, "Backend", "backend", "Spring Boot, API, persistance."),
-        new Category(null, "Frontend", "frontend", "Angular, rendu serveur, accessibilité."),
-        new Category(null, "Architecture", "architecture", null));
+        category("Backend", "Spring Boot, API, persistance."),
+        category("Frontend", "Angular, rendu serveur, accessibilité."),
+        category("Architecture", null));
 
-    static final List<Tag> TAGS = List.of(
-        new Tag(null, "Java", "java"),
-        new Tag(null, "Spring Boot", "spring-boot"),
-        new Tag(null, "Angular", "angular"),
-        new Tag(null, "PostgreSQL", "postgresql"),
-        new Tag(null, "Tests", "tests"));
+    static final List<Tag> TAGS = List.of(tag("Java"), tag("Spring Boot"), tag("Angular"), tag("PostgreSQL"), tag("Tests"));
 
     private final CategoryRepository categoryRepository;
     private final TagRepository tagRepository;
@@ -62,5 +58,16 @@ public class TaxonomySeeder implements ApplicationRunner {
         if (created > 0) {
             log.info("{} catégories et tags de démonstration créés (profil dev)", created);
         }
+    }
+
+    /**
+     * Slug généré depuis le nom, comme le fera l'administration (D-BA).
+     */
+    private static Category category(String name, String description) {
+        return new Category(null, name, Slug.fromText(name), description);
+    }
+
+    private static Tag tag(String name) {
+        return new Tag(null, name, Slug.fromText(name));
     }
 }

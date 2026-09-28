@@ -34,7 +34,7 @@ public record PublicationResponse(
         return new PublicationResponse(
             publication.type(),
             publication.title(),
-            publication.slug(),
+            publication.slug().value(),
             publication.summary(),
             publication.contentMarkdown(),
             publication.publishedAt(),

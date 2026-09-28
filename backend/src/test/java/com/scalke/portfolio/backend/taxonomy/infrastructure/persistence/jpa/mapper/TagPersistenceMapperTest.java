@@ -1,5 +1,6 @@
 package com.scalke.portfolio.backend.taxonomy.infrastructure.persistence.jpa.mapper;
 
+import com.scalke.portfolio.backend.shared.domain.model.Slug;
 import com.scalke.portfolio.backend.taxonomy.domain.model.Tag;
 import org.junit.jupiter.api.Test;
 
@@ -9,7 +10,7 @@ class TagPersistenceMapperTest {
 
     @Test
     void keeps_every_field_through_a_round_trip() {
-        Tag tag = new Tag(null, "Spring Boot", "spring-boot");
+        Tag tag = new Tag(null, "Spring Boot", Slug.of("spring-boot"));
 
         assertThat(TagPersistenceMapper.toDomain(TagPersistenceMapper.toNewEntity(tag))).isEqualTo(tag);
     }

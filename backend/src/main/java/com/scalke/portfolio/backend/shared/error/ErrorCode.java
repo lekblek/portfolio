@@ -11,6 +11,7 @@ public enum ErrorCode {
     // publication
     SLUG_ALREADY_USED,
     INVALID_PUBLICATION_TRANSITION,
+    SLUG_LOCKED,
 
     // series
     SERIES_POSITION_ALREADY_USED,

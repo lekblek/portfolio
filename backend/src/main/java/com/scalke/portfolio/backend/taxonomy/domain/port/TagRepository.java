@@ -1,5 +1,6 @@
 package com.scalke.portfolio.backend.taxonomy.domain.port;
 
+import com.scalke.portfolio.backend.shared.domain.model.Slug;
 import com.scalke.portfolio.backend.taxonomy.domain.model.Tag;
 
 import java.util.Collection;
@@ -12,7 +13,7 @@ import java.util.Optional;
  */
 public interface TagRepository {
 
-    Optional<Tag> findBySlug(String slug);
+    Optional<Tag> findBySlug(Slug slug);
 
     List<Tag> findAllById(Collection<Long> ids);
 

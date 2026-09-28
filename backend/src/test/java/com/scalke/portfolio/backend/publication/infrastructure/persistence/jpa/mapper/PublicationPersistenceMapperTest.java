@@ -4,6 +4,7 @@ import com.scalke.portfolio.backend.publication.domain.model.Publication;
 import com.scalke.portfolio.backend.publication.domain.model.PublicationStatus;
 import com.scalke.portfolio.backend.publication.domain.model.PublicationType;
 import com.scalke.portfolio.backend.publication.infrastructure.persistence.jpa.entity.PublicationEntity;
+import com.scalke.portfolio.backend.shared.domain.model.Slug;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
@@ -19,11 +20,12 @@ class PublicationPersistenceMapperTest {
             null,
             PublicationType.NEWS,
             "Lancement du portfolio",
-            "lancement-du-portfolio",
+            Slug.of("lancement-du-portfolio"),
             "Résumé",
             "## Contenu",
             PublicationStatus.SCHEDULED,
             Instant.parse("2026-07-01T08:00:00Z"),
+            Instant.parse("2026-06-20T08:00:00Z"),
             true,
             7L,
             Set.of(1L, 2L),

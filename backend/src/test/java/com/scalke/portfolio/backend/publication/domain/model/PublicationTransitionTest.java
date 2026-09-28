@@ -1,5 +1,6 @@
 package com.scalke.portfolio.backend.publication.domain.model;
 
+import com.scalke.portfolio.backend.shared.domain.model.Slug;
 import com.scalke.portfolio.backend.shared.error.BusinessRuleViolationException;
 import com.scalke.portfolio.backend.shared.error.ErrorCode;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
@@ -21,7 +22,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Cycle de vie éditorial : {@link Publication#transitionTo} et {@link Publication#effectiveStatus}
- * (invariant 26, D-AV, D-AW).
+ * (invariant 26, D-AV, D-AW), mémoire de la première publication (D-AZ) et stabilité du slug
+ * (invariant 6, D11, D-BC).
  */
 class PublicationTransitionTest {
 
@@ -123,6 +125,103 @@ class PublicationTransitionTest {
     }
 
     @Test
+    void the_first_publication_date_follows_the_publication_date_until_it_has_passed() {
+        Publication scheduled = in(DRAFT).transitionTo(SCHEDULED, LATER, NOW);
+        Publication rescheduled = scheduled.transitionTo(SCHEDULED, FUTURE, NOW);
+
+        assertThat(scheduled.firstPublishedAt()).isEqualTo(LATER);
+        assertThat(rescheduled.firstPublishedAt()).isEqualTo(FUTURE);
+        assertThat(rescheduled.transitionTo(PUBLISHED, null, NOW).firstPublishedAt()).isEqualTo(NOW);
+        assertThat(rescheduled.transitionTo(DRAFT, null, NOW).firstPublishedAt()).isNull();
+        assertThat(rescheduled.hasBeenPublic(NOW)).isFalse();
+    }
+
+    /**
+     * Audit A01 : aucune suite de transitions n'efface le fait d'avoir été publique. Avant D-AZ, cette
+     * séquence effaçait {@code publishedAt} et la publication paraissait n'avoir jamais été publiée.
+     */
+    @Test
+    void no_sequence_of_transitions_forgets_a_past_publication() {
+        Publication reworked = in(PUBLISHED)
+            .transitionTo(ARCHIVED, null, NOW)
+            .transitionTo(DRAFT, null, NOW)
+            .transitionTo(SCHEDULED, LATER, NOW)
+            .transitionTo(DRAFT, null, NOW);
+
+        assertThat(reworked.status()).isEqualTo(DRAFT);
+        assertThat(reworked.publishedAt()).isNull();
+        assertThat(reworked.firstPublishedAt()).isEqualTo(PAST);
+        assertThat(reworked.hasBeenPublic(NOW)).isTrue();
+    }
+
+    @Test
+    void republishing_keeps_the_first_publication_date() {
+        Publication rescheduled = in(PUBLISHED)
+            .transitionTo(ARCHIVED, null, NOW)
+            .transitionTo(DRAFT, null, NOW)
+            .transitionTo(SCHEDULED, LATER, NOW);
+
+        assertThat(rescheduled.publishedAt()).isEqualTo(LATER);
+        assertThat(rescheduled.firstPublishedAt()).isEqualTo(PAST);
+    }
+
+    /**
+     * Une planification échue a été publique sans qu'aucune écriture ne l'enregistre : c'est la date,
+     * pas le statut stocké, qui fait foi.
+     */
+    @Test
+    void a_planned_publication_whose_date_has_passed_has_been_public() {
+        assertThat(publication(SCHEDULED, PAST).hasBeenPublic(NOW)).isTrue();
+        assertThat(in(SCHEDULED).hasBeenPublic(NOW)).isFalse();
+        assertThat(in(DRAFT).hasBeenPublic(NOW)).isFalse();
+    }
+
+    @Test
+    void the_slug_can_change_until_the_first_publication() {
+        Publication renamed = in(DRAFT).changeSlug(Slug.of("nouveau-titre"), NOW);
+
+        assertThat(renamed.slug()).isEqualTo(Slug.of("nouveau-titre"));
+        assertThat(renamed.updatedAt()).isEqualTo(NOW);
+        assertThat(in(IN_REVIEW).changeSlug(Slug.of("nouveau-titre"), NOW).slug()).isEqualTo(Slug.of("nouveau-titre"));
+        assertThat(in(SCHEDULED).changeSlug(Slug.of("nouveau-titre"), NOW).slug()).isEqualTo(Slug.of("nouveau-titre"));
+    }
+
+    /**
+     * Invariant 6 (D11) : les liens publiés restent valides, même après archivage, retour en brouillon
+     * ou échéance d'une planification.
+     */
+    @Test
+    void the_slug_is_locked_once_the_publication_has_been_public() {
+        Publication reworked = in(PUBLISHED).transitionTo(ARCHIVED, null, NOW).transitionTo(DRAFT, null, NOW);
+
+        assertSlugLocked(() -> in(PUBLISHED).changeSlug(Slug.of("nouveau-titre"), NOW));
+        assertSlugLocked(() -> in(ARCHIVED).changeSlug(Slug.of("nouveau-titre"), NOW));
+        assertSlugLocked(() -> reworked.changeSlug(Slug.of("nouveau-titre"), NOW));
+        assertSlugLocked(() -> publication(SCHEDULED, PAST).changeSlug(Slug.of("nouveau-titre"), NOW));
+    }
+
+    @Test
+    void keeping_the_same_slug_is_always_allowed() {
+        Publication published = in(PUBLISHED);
+
+        assertThat(published.changeSlug(Slug.of("titre"), NOW)).isSameAs(published);
+    }
+
+    @Test
+    void rejects_a_first_publication_date_after_the_publication_date() {
+        assertThatThrownBy(() -> new Publication(1L, PublicationType.ARTICLE, "Titre", Slug.of("titre"), "Résumé",
+            "Contenu", PUBLISHED, PAST, NOW, false, null, Set.of(), null, null, CREATED, CREATED))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void a_publication_date_requires_a_first_publication_date() {
+        assertThatThrownBy(() -> new Publication(1L, PublicationType.ARTICLE, "Titre", Slug.of("titre"), "Résumé",
+            "Contenu", ARCHIVED, PAST, null, false, null, Set.of(), null, null, CREATED, CREATED))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
     void a_transition_only_changes_the_status_the_date_and_updatedAt() {
         Publication draft = in(DRAFT);
 
@@ -144,13 +243,19 @@ class PublicationTransitionTest {
     }
 
     private static Publication publication(PublicationStatus status, Instant publishedAt) {
-        return new Publication(1L, PublicationType.ARTICLE, "Titre", "titre", "Résumé", "Contenu",
-            status, publishedAt, false, 3L, Set.of(4L), "SEO", null, CREATED, CREATED);
+        return new Publication(1L, PublicationType.ARTICLE, "Titre", Slug.of("titre"), "Résumé", "Contenu",
+            status, publishedAt, publishedAt, false, 3L, Set.of(4L), "SEO", null, CREATED, CREATED);
     }
 
     private static void assertRefused(ThrowingCallable transition) {
         assertThatThrownBy(transition)
             .isInstanceOfSatisfying(BusinessRuleViolationException.class, exception ->
                 assertThat(exception.errorCode()).isEqualTo(ErrorCode.INVALID_PUBLICATION_TRANSITION));
+    }
+
+    private static void assertSlugLocked(ThrowingCallable change) {
+        assertThatThrownBy(change)
+            .isInstanceOfSatisfying(BusinessRuleViolationException.class, exception ->
+                assertThat(exception.errorCode()).isEqualTo(ErrorCode.SLUG_LOCKED));
     }
 }

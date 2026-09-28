@@ -2,6 +2,7 @@ package com.scalke.portfolio.backend.project.application.usecase;
 
 import com.scalke.portfolio.backend.project.domain.model.Project;
 import com.scalke.portfolio.backend.project.domain.port.ProjectRepository;
+import com.scalke.portfolio.backend.shared.domain.model.Slug;
 import com.scalke.portfolio.backend.shared.error.ErrorCode;
 import com.scalke.portfolio.backend.shared.error.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,8 @@ public class GetPublishedProjectUseCase {
      */
     @Transactional(readOnly = true)
     public Project execute(String slug) {
-        return projectRepository.findPublishedBySlug(slug)
+        return Slug.parse(slug)
+            .flatMap(projectRepository::findPublishedBySlug)
             .orElseThrow(() -> new ResourceNotFoundException(
                 ErrorCode.RESOURCE_NOT_FOUND, "Projet introuvable."));
     }

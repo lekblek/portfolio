@@ -1,6 +1,7 @@
 package com.scalke.portfolio.backend.publication.application.usecase;
 
 import com.scalke.portfolio.backend.publication.domain.port.PublicationRepository;
+import com.scalke.portfolio.backend.shared.domain.model.Slug;
 import com.scalke.portfolio.backend.shared.error.ErrorCode;
 import com.scalke.portfolio.backend.shared.error.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,8 @@ public class GetVisiblePublicationUseCase {
      */
     @Transactional(readOnly = true)
     public VisiblePublication execute(String slug) {
-        return publicationRepository.findVisibleBySlug(slug, clock.instant())
+        return Slug.parse(slug)
+            .flatMap(visibleSlug -> publicationRepository.findVisibleBySlug(visibleSlug, clock.instant()))
             .map(assembler::assemble)
             .orElseThrow(() -> new ResourceNotFoundException(
                 ErrorCode.RESOURCE_NOT_FOUND, "Publication introuvable."));

@@ -7,6 +7,7 @@ import com.scalke.portfolio.backend.project.domain.model.Technology;
 import com.scalke.portfolio.backend.project.domain.port.ProjectRepository;
 import com.scalke.portfolio.backend.project.domain.port.TechnologyRepository;
 import com.scalke.portfolio.backend.shared.domain.model.DateRange;
+import com.scalke.portfolio.backend.shared.domain.model.Slug;
 import com.scalke.portfolio.backend.shared.error.ResourceNotFoundException;
 import com.scalke.portfolio.backend.testsupport.AbstractIntegrationTest;
 import jakarta.persistence.EntityManager;
@@ -44,7 +45,7 @@ class GetPublishedProjectUseCaseIT extends AbstractIntegrationTest {
         Technology java = technologyRepository.create(technology("Java", "java", 0));
         Technology postgresql = technologyRepository.create(technology("PostgreSQL", "postgresql", 1));
         Project stored = projectRepository.create(new Project(
-            null, "Portfolio full-stack", "portfolio-full-stack", "Résumé", "## Description",
+            null, "Portfolio full-stack", Slug.of("portfolio-full-stack"), "Résumé", "## Description",
             ProjectStage.COMPLETED, ProjectVisibility.PUBLISHED,
             DateRange.between(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 6, 30)),
             "https://example.test/repo", null, true, 0,
@@ -61,10 +62,10 @@ class GetPublishedProjectUseCaseIT extends AbstractIntegrationTest {
     }
 
     /**
-     * D-U : un projet non publié est indiscernable d'un projet inexistant.
+     * D-U : un projet non publié est indiscernable d'un projet inexistant ; un slug mal formé aussi (D-BB).
      */
     @ParameterizedTest
-    @ValueSource(strings = {"brouillon", "archive", "inconnu"})
+    @ValueSource(strings = {"brouillon", "archive", "inconnu", "Brouillon", "../brouillon"})
     void fails_for_a_project_that_is_not_published(String slug) {
         projectRepository.create(project("brouillon", ProjectVisibility.DRAFT,
             DateRange.ongoingSince(LocalDate.of(2026, 1, 1)), 0));

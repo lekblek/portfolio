@@ -5,6 +5,7 @@ import com.scalke.portfolio.backend.project.domain.model.ProjectStage;
 import com.scalke.portfolio.backend.project.domain.model.ProjectVisibility;
 import com.scalke.portfolio.backend.project.domain.model.Technology;
 import com.scalke.portfolio.backend.shared.domain.model.DateRange;
+import com.scalke.portfolio.backend.shared.domain.model.Slug;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -23,7 +24,7 @@ public final class ProjectFixtures {
         return new Project(
             null,
             "Projet " + slug,
-            slug,
+            Slug.of(slug),
             "Résumé de " + slug,
             "# " + slug,
             period.isOngoing() ? ProjectStage.IN_PROGRESS : ProjectStage.COMPLETED,
@@ -45,6 +46,6 @@ public final class ProjectFixtures {
      * l'associer à un projet persisté.
      */
     public static Technology technology(String name, String slug, int displayOrder) {
-        return new Technology(null, name, slug, displayOrder);
+        return new Technology(null, name, Slug.of(slug), displayOrder);
     }
 }

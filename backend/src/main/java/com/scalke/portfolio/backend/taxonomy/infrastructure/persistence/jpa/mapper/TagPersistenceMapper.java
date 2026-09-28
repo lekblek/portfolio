@@ -1,5 +1,6 @@
 package com.scalke.portfolio.backend.taxonomy.infrastructure.persistence.jpa.mapper;
 
+import com.scalke.portfolio.backend.shared.domain.model.Slug;
 import com.scalke.portfolio.backend.taxonomy.domain.model.Tag;
 import com.scalke.portfolio.backend.taxonomy.infrastructure.persistence.jpa.entity.TagEntity;
 
@@ -9,7 +10,7 @@ public final class TagPersistenceMapper {
     }
 
     public static Tag toDomain(TagEntity entity) {
-        return new Tag(entity.getId(), entity.getName(), entity.getSlug());
+        return new Tag(entity.getId(), entity.getName(), Slug.of(entity.getSlug()));
     }
 
     /**
@@ -18,7 +19,7 @@ public final class TagPersistenceMapper {
     public static TagEntity toNewEntity(Tag tag) {
         return TagEntity.builder()
             .name(tag.name())
-            .slug(tag.slug())
+            .slug(tag.slug().value())
             .build();
     }
 }

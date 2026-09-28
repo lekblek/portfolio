@@ -7,6 +7,7 @@ import com.scalke.portfolio.backend.publication.infrastructure.persistence.jpa.e
 import com.scalke.portfolio.backend.publication.infrastructure.persistence.jpa.mapper.PublicationPersistenceMapper;
 import com.scalke.portfolio.backend.shared.domain.model.PageQuery;
 import com.scalke.portfolio.backend.shared.domain.model.PageResult;
+import com.scalke.portfolio.backend.shared.domain.model.Slug;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -53,8 +54,8 @@ public class PublicationRepositoryAdapter implements PublicationRepository {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Publication> findVisibleBySlug(String slug, Instant now) {
-        return repository.findOne(visibleAt(now).and(hasSlug(slug))).map(PublicationPersistenceMapper::toDomain);
+    public Optional<Publication> findVisibleBySlug(Slug slug, Instant now) {
+        return repository.findOne(visibleAt(now).and(hasSlug(slug.value()))).map(PublicationPersistenceMapper::toDomain);
     }
 
     @Override
@@ -87,7 +88,8 @@ public class PublicationRepositoryAdapter implements PublicationRepository {
     public Publication updateStatus(Publication publication) {
         PublicationEntity entity = repository.findById(publication.id())
             .orElseThrow(() -> new IllegalStateException("publication " + publication.id() + " does not exist"));
-        entity.changeStatus(publication.status(), publication.publishedAt(), publication.updatedAt());
+        entity.changeStatus(publication.status(), publication.publishedAt(), publication.firstPublishedAt(),
+            publication.updatedAt());
         return PublicationPersistenceMapper.toDomain(entity);
     }
 }

@@ -2,6 +2,7 @@ package com.scalke.portfolio.backend.publication.infrastructure.persistence.jpa.
 
 import com.scalke.portfolio.backend.publication.domain.model.Publication;
 import com.scalke.portfolio.backend.publication.infrastructure.persistence.jpa.entity.PublicationEntity;
+import com.scalke.portfolio.backend.shared.domain.model.Slug;
 
 import java.util.Set;
 
@@ -19,11 +20,12 @@ public final class PublicationPersistenceMapper {
             entity.getId(),
             entity.getType(),
             entity.getTitle(),
-            entity.getSlug(),
+            Slug.of(entity.getSlug()),
             entity.getSummary(),
             entity.getContentMarkdown(),
             entity.getStatus(),
             entity.getPublishedAt(),
+            entity.getFirstPublishedAt(),
             entity.isFeatured(),
             entity.getCategoryId(),
             Set.copyOf(entity.getTagIds()),
@@ -41,11 +43,12 @@ public final class PublicationPersistenceMapper {
         return PublicationEntity.builder()
             .type(publication.type())
             .title(publication.title())
-            .slug(publication.slug())
+            .slug(publication.slug().value())
             .summary(publication.summary())
             .contentMarkdown(publication.contentMarkdown())
             .status(publication.status())
             .publishedAt(publication.publishedAt())
+            .firstPublishedAt(publication.firstPublishedAt())
             .featured(publication.featured())
             .categoryId(publication.categoryId())
             .tagIds(publication.tagIds())

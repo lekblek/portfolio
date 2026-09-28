@@ -1,5 +1,6 @@
 package com.scalke.portfolio.backend.taxonomy.application.query;
 
+import com.scalke.portfolio.backend.shared.domain.model.Slug;
 import com.scalke.portfolio.backend.taxonomy.domain.model.Category;
 import com.scalke.portfolio.backend.taxonomy.domain.model.Tag;
 import com.scalke.portfolio.backend.taxonomy.domain.port.CategoryRepository;
@@ -30,12 +31,18 @@ public class TaxonomyQueryService {
     private final CategoryRepository categoryRepository;
     private final TagRepository tagRepository;
 
+    /**
+     * Vide si la valeur ne peut pas être un slug : aucune requête n'est alors exécutée.
+     */
     public Optional<Category> findCategoryBySlug(String slug) {
-        return categoryRepository.findBySlug(slug);
+        return Slug.parse(slug).flatMap(categoryRepository::findBySlug);
     }
 
+    /**
+     * Vide si la valeur ne peut pas être un slug : aucune requête n'est alors exécutée.
+     */
     public Optional<Tag> findTagBySlug(String slug) {
-        return tagRepository.findBySlug(slug);
+        return Slug.parse(slug).flatMap(tagRepository::findBySlug);
     }
 
     /**

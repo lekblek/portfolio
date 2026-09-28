@@ -7,6 +7,7 @@ import com.scalke.portfolio.backend.project.domain.model.Technology;
 import com.scalke.portfolio.backend.project.domain.port.ProjectRepository;
 import com.scalke.portfolio.backend.project.domain.port.TechnologyRepository;
 import com.scalke.portfolio.backend.shared.domain.model.DateRange;
+import com.scalke.portfolio.backend.shared.domain.model.Slug;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
@@ -41,28 +42,28 @@ public class ProjectSeeder implements ApplicationRunner {
         if (projectRepository.existsAny()) {
             return;
         }
-        Technology java = technologyRepository.create(new Technology(null, "Java", "java", 0));
-        Technology springBoot = technologyRepository.create(new Technology(null, "Spring Boot", "spring-boot", 1));
-        Technology angular = technologyRepository.create(new Technology(null, "Angular", "angular", 2));
-        Technology postgresql = technologyRepository.create(new Technology(null, "PostgreSQL", "postgresql", 3));
-        Technology docker = technologyRepository.create(new Technology(null, "Docker", "docker", 4));
+        Technology java = technologyRepository.create(technology("Java", 0));
+        Technology springBoot = technologyRepository.create(technology("Spring Boot", 1));
+        Technology angular = technologyRepository.create(technology("Angular", 2));
+        Technology postgresql = technologyRepository.create(technology("PostgreSQL", 3));
+        Technology docker = technologyRepository.create(technology("Docker", 4));
 
         List.of(
-            new Project(null, "Portfolio full-stack", "portfolio-full-stack",
+            new Project(null, "Portfolio full-stack", Slug.fromText("Portfolio full-stack"),
                 "Portfolio professionnel : Spring Boot, Angular SSR et PostgreSQL.",
                 "## Objectif\n\nProjet de démonstration.",
                 ProjectStage.IN_PROGRESS, ProjectVisibility.PUBLISHED,
                 DateRange.ongoingSince(LocalDate.of(2026, 9, 1)),
                 "https://example.test/portfolio", null, true, 0,
                 List.of(java, springBoot, angular, postgresql, docker)),
-            new Project(null, "Projet terminé de démonstration", "projet-termine-de-demonstration",
+            new Project(null, "Projet terminé de démonstration", Slug.fromText("Projet terminé de démonstration"),
                 "Projet de démonstration terminé.",
                 "## Bilan\n\nProjet de démonstration.",
                 ProjectStage.COMPLETED, ProjectVisibility.PUBLISHED,
                 DateRange.between(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 6, 30)),
                 null, "https://example.test/demo", false, 1,
                 List.of(java, postgresql)),
-            new Project(null, "Brouillon de démonstration", "brouillon-de-demonstration",
+            new Project(null, "Brouillon de démonstration", Slug.fromText("Brouillon de démonstration"),
                 "Projet non publié : absent de l'API publique.",
                 "Brouillon.",
                 ProjectStage.IN_PROGRESS, ProjectVisibility.DRAFT,
@@ -71,5 +72,12 @@ public class ProjectSeeder implements ApplicationRunner {
                 List.of(angular))
         ).forEach(projectRepository::create);
         log.info("Technologies et projets de démonstration créés (profil dev)");
+    }
+
+    /**
+     * Slugs générés depuis les noms et les titres, comme le fera l'administration (D-BA).
+     */
+    private static Technology technology(String name, int displayOrder) {
+        return new Technology(null, name, Slug.fromText(name), displayOrder);
     }
 }

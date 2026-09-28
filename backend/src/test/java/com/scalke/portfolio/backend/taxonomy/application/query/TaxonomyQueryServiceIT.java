@@ -1,5 +1,6 @@
 package com.scalke.portfolio.backend.taxonomy.application.query;
 
+import com.scalke.portfolio.backend.shared.domain.model.Slug;
 import com.scalke.portfolio.backend.taxonomy.domain.model.Category;
 import com.scalke.portfolio.backend.taxonomy.domain.model.Tag;
 import com.scalke.portfolio.backend.taxonomy.domain.port.CategoryRepository;
@@ -35,8 +36,8 @@ class TaxonomyQueryServiceIT extends AbstractIntegrationTest {
 
     @Test
     void finds_a_category_and_a_tag_by_slug() {
-        Category backend = categoryRepository.create(new Category(null, "Backend", "backend", "Spring Boot"));
-        Tag java = tagRepository.create(new Tag(null, "Java", "java"));
+        Category backend = categoryRepository.create(new Category(null, "Backend", Slug.of("backend"), "Spring Boot"));
+        Tag java = tagRepository.create(new Tag(null, "Java", Slug.of("java")));
 
         assertThat(taxonomyQueryService.findCategoryBySlug("backend")).contains(backend);
         assertThat(taxonomyQueryService.findTagBySlug("java")).contains(java);
@@ -44,14 +45,27 @@ class TaxonomyQueryServiceIT extends AbstractIntegrationTest {
         assertThat(taxonomyQueryService.findTagBySlug("inconnu")).isEmpty();
     }
 
+    /**
+     * D-BB : un filtre {@code ?category=} ou {@code ?tag=} mal formé ne désigne aucun terme, sans requête SQL.
+     */
+    @Test
+    void a_malformed_slug_matches_no_term_without_querying_the_database() {
+        Statistics statistics = entityManagerFactory.unwrap(SessionFactory.class).getStatistics();
+        statistics.clear();
+
+        assertThat(taxonomyQueryService.findCategoryBySlug("Backend")).isEmpty();
+        assertThat(taxonomyQueryService.findTagBySlug("spring boot")).isEmpty();
+        assertThat(statistics.getPrepareStatementCount()).isZero();
+    }
+
     @Test
     void resolves_several_terms_by_id_in_one_query_each() {
-        Category backend = categoryRepository.create(new Category(null, "Backend", "backend", null));
-        Category frontend = categoryRepository.create(new Category(null, "Frontend", "frontend", null));
+        Category backend = categoryRepository.create(new Category(null, "Backend", Slug.of("backend"), null));
+        Category frontend = categoryRepository.create(new Category(null, "Frontend", Slug.of("frontend"), null));
         List<Tag> tags = List.of(
-            tagRepository.create(new Tag(null, "Java", "java")),
-            tagRepository.create(new Tag(null, "Angular", "angular")),
-            tagRepository.create(new Tag(null, "Tests", "tests")));
+            tagRepository.create(new Tag(null, "Java", Slug.of("java"))),
+            tagRepository.create(new Tag(null, "Angular", Slug.of("angular"))),
+            tagRepository.create(new Tag(null, "Tests", Slug.of("tests"))));
         Statistics statistics = entityManagerFactory.unwrap(SessionFactory.class).getStatistics();
         statistics.clear();
 

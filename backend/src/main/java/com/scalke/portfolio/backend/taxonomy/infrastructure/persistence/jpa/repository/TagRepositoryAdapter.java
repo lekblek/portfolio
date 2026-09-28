@@ -1,5 +1,6 @@
 package com.scalke.portfolio.backend.taxonomy.infrastructure.persistence.jpa.repository;
 
+import com.scalke.portfolio.backend.shared.domain.model.Slug;
 import com.scalke.portfolio.backend.taxonomy.domain.model.Tag;
 import com.scalke.portfolio.backend.taxonomy.domain.port.TagRepository;
 import com.scalke.portfolio.backend.taxonomy.infrastructure.persistence.jpa.mapper.TagPersistenceMapper;
@@ -22,8 +23,8 @@ public class TagRepositoryAdapter implements TagRepository {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Tag> findBySlug(String slug) {
-        return repository.findBySlug(slug).map(TagPersistenceMapper::toDomain);
+    public Optional<Tag> findBySlug(Slug slug) {
+        return repository.findBySlug(slug.value()).map(TagPersistenceMapper::toDomain);
     }
 
     @Override

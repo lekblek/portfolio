@@ -27,7 +27,7 @@ public record ProjectResponse(
     public static ProjectResponse from(Project project) {
         return new ProjectResponse(
             project.title(),
-            project.slug(),
+            project.slug().value(),
             project.shortDescription(),
             project.descriptionMarkdown(),
             project.stage(),

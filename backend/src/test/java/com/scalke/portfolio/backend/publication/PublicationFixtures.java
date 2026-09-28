@@ -3,13 +3,15 @@ package com.scalke.portfolio.backend.publication;
 import com.scalke.portfolio.backend.publication.domain.model.Publication;
 import com.scalke.portfolio.backend.publication.domain.model.PublicationStatus;
 import com.scalke.portfolio.backend.publication.domain.model.PublicationType;
+import com.scalke.portfolio.backend.shared.domain.model.Slug;
 import com.scalke.portfolio.backend.testsupport.FixedClockConfiguration;
 
 import java.time.Instant;
 import java.util.Set;
 
 /**
- * Publications du domaine pour les tests. Les dates d'audit valent l'instant fixe des tests d'intégration.
+ * Publications du domaine pour les tests. Les dates d'audit valent l'instant fixe des tests d'intégration ;
+ * la première publication, quand il y en a une, coïncide avec la date de publication.
  */
 public final class PublicationFixtures {
 
@@ -41,10 +43,11 @@ public final class PublicationFixtures {
             null,
             type,
             "Titre " + slug,
-            slug,
+            Slug.of(slug),
             "Résumé de " + slug,
             "# " + slug + "\n\nContenu.",
             status,
+            publishedAt,
             publishedAt,
             false,
             categoryId,

@@ -11,6 +11,7 @@ import com.scalke.portfolio.backend.shared.api.ApiPaging;
 import com.scalke.portfolio.backend.shared.domain.model.DateRange;
 import com.scalke.portfolio.backend.shared.domain.model.PageQuery;
 import com.scalke.portfolio.backend.shared.domain.model.PageResult;
+import com.scalke.portfolio.backend.shared.domain.model.Slug;
 import com.scalke.portfolio.backend.shared.error.ErrorCode;
 import com.scalke.portfolio.backend.shared.error.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
@@ -36,11 +37,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class PublicProjectControllerTest {
 
     private static final Project PORTFOLIO = new Project(
-        42L, "Portfolio full-stack", "portfolio-full-stack", "Résumé", "## Description",
+        42L, "Portfolio full-stack", Slug.of("portfolio-full-stack"), "Résumé", "## Description",
         ProjectStage.IN_PROGRESS, ProjectVisibility.PUBLISHED,
         DateRange.ongoingSince(LocalDate.of(2024, 1, 1)),
         "https://example.test/repo", null, true, 3,
-        List.of(new Technology(7L, "Java", "java", 0), new Technology(8L, "Angular", "angular", 1)));
+        List.of(new Technology(7L, "Java", Slug.of("java"), 0), new Technology(8L, "Angular", Slug.of("angular"), 1)));
 
     @Autowired
     MockMvc mockMvc;

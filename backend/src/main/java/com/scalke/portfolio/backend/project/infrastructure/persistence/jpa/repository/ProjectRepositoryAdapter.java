@@ -9,6 +9,7 @@ import com.scalke.portfolio.backend.project.infrastructure.persistence.jpa.entit
 import com.scalke.portfolio.backend.project.infrastructure.persistence.jpa.mapper.ProjectPersistenceMapper;
 import com.scalke.portfolio.backend.shared.domain.model.PageQuery;
 import com.scalke.portfolio.backend.shared.domain.model.PageResult;
+import com.scalke.portfolio.backend.shared.domain.model.Slug;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -59,8 +60,8 @@ public class ProjectRepositoryAdapter implements ProjectRepository {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Project> findPublishedBySlug(String slug) {
-        return repository.findBySlugAndVisibility(slug, PUBLISHED)
+    public Optional<Project> findPublishedBySlug(Slug slug) {
+        return repository.findBySlugAndVisibility(slug.value(), PUBLISHED)
             .map(ProjectPersistenceMapper::toDomain);
     }
 

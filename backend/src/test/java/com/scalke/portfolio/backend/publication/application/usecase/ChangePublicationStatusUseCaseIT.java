@@ -5,6 +5,7 @@ import com.scalke.portfolio.backend.publication.domain.model.PublicationStatus;
 import com.scalke.portfolio.backend.publication.domain.model.PublicationType;
 import com.scalke.portfolio.backend.publication.domain.port.PublicationRepository;
 import com.scalke.portfolio.backend.shared.domain.model.PageQuery;
+import com.scalke.portfolio.backend.shared.domain.model.Slug;
 import com.scalke.portfolio.backend.shared.error.BusinessRuleViolationException;
 import com.scalke.portfolio.backend.shared.error.ResourceNotFoundException;
 import com.scalke.portfolio.backend.testsupport.AbstractIntegrationTest;
@@ -52,6 +53,7 @@ class ChangePublicationStatusUseCaseIT extends AbstractIntegrationTest {
         Publication stored = reload(id);
         assertThat(stored.status()).isEqualTo(PublicationStatus.SCHEDULED);
         assertThat(stored.publishedAt()).isEqualTo(scheduledAt);
+        assertThat(stored.firstPublishedAt()).isEqualTo(scheduledAt);
         assertThat(stored.updatedAt()).isEqualTo(NOW);
     }
 
@@ -66,7 +68,7 @@ class ChangePublicationStatusUseCaseIT extends AbstractIntegrationTest {
         assertThat(listVisiblePublicationsUseCase.execute(PublicationCriteria.none(), new PageQuery(0, 10)).content())
             .singleElement()
             .satisfies(visible -> {
-                assertThat(visible.publication().slug()).isEqualTo("a-publier");
+                assertThat(visible.publication().slug()).isEqualTo(Slug.of("a-publier"));
                 assertThat(visible.publication().publishedAt()).isEqualTo(NOW);
             });
     }
@@ -83,6 +85,26 @@ class ChangePublicationStatusUseCaseIT extends AbstractIntegrationTest {
         assertThat(stored.publishedAt()).isEqualTo(publishedAt);
         assertThat(listVisiblePublicationsUseCase.execute(PublicationCriteria.none(), new PageQuery(0, 10)).content())
             .isEmpty();
+    }
+
+    /**
+     * D-AZ (audit A01) : la première publication survit en base au retour en brouillon.
+     */
+    @Test
+    void reworking_an_archive_keeps_its_first_publication_date() {
+        Instant publishedAt = NOW.minus(Duration.ofDays(1));
+        Long id = create("publiee", PublicationStatus.PUBLISHED, publishedAt);
+
+        changePublicationStatusUseCase.execute(id, PublicationStatus.ARCHIVED, null);
+        changePublicationStatusUseCase.execute(id, PublicationStatus.DRAFT, null);
+        changePublicationStatusUseCase.execute(id, PublicationStatus.SCHEDULED, NOW.plus(Duration.ofDays(3)));
+        changePublicationStatusUseCase.execute(id, PublicationStatus.DRAFT, null);
+
+        Publication stored = reload(id);
+        assertThat(stored.status()).isEqualTo(PublicationStatus.DRAFT);
+        assertThat(stored.publishedAt()).isNull();
+        assertThat(stored.firstPublishedAt()).isEqualTo(publishedAt);
+        assertThat(stored.hasBeenPublic(NOW)).isTrue();
     }
 
     @Test
@@ -110,8 +132,8 @@ class ChangePublicationStatusUseCaseIT extends AbstractIntegrationTest {
      * Publication créée avant « maintenant » : un changement de statut doit mettre {@code updatedAt} à {@code NOW}.
      */
     private Long create(String slug, PublicationStatus status, Instant publishedAt) {
-        return publicationRepository.create(new Publication(null, PublicationType.ARTICLE, "Titre", slug, "Résumé",
-            "Contenu", status, publishedAt, false, null, Set.of(), null, null, CREATED, CREATED)).id();
+        return publicationRepository.create(new Publication(null, PublicationType.ARTICLE, "Titre", Slug.of(slug), "Résumé",
+            "Contenu", status, publishedAt, publishedAt, false, null, Set.of(), null, null, CREATED, CREATED)).id();
     }
 
     private Publication reload(Long id) {

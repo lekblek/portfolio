@@ -7,6 +7,7 @@ import com.scalke.portfolio.backend.project.domain.model.Technology;
 import com.scalke.portfolio.backend.project.infrastructure.persistence.jpa.entity.ProjectEntity;
 import com.scalke.portfolio.backend.project.infrastructure.persistence.jpa.entity.TechnologyEntity;
 import com.scalke.portfolio.backend.shared.domain.model.DateRange;
+import com.scalke.portfolio.backend.shared.domain.model.Slug;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -18,12 +19,12 @@ class ProjectPersistenceMapperTest {
 
     @Test
     void keeps_every_field_through_a_round_trip() {
-        Technology java = new Technology(null, "Java", "java", 0);
-        Technology angular = new Technology(null, "Angular", "angular", 1);
+        Technology java = new Technology(null, "Java", Slug.of("java"), 0);
+        Technology angular = new Technology(null, "Angular", Slug.of("angular"), 1);
         Project project = new Project(
             null,
             "Portfolio full-stack",
-            "portfolio-full-stack",
+            Slug.of("portfolio-full-stack"),
             "Résumé",
             "## Description",
             ProjectStage.COMPLETED,

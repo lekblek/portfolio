@@ -29,7 +29,7 @@ public record PublicationSummaryResponse(
         return new PublicationSummaryResponse(
             publication.type(),
             publication.title(),
-            publication.slug(),
+            publication.slug().value(),
             publication.summary(),
             publication.publishedAt(),
             publication.featured(),

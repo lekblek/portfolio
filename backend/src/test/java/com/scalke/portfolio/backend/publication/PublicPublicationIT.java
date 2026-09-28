@@ -3,6 +3,7 @@ package com.scalke.portfolio.backend.publication;
 import com.scalke.portfolio.backend.publication.domain.model.PublicationStatus;
 import com.scalke.portfolio.backend.publication.domain.model.PublicationType;
 import com.scalke.portfolio.backend.publication.domain.port.PublicationRepository;
+import com.scalke.portfolio.backend.shared.domain.model.Slug;
 import com.scalke.portfolio.backend.taxonomy.domain.model.Category;
 import com.scalke.portfolio.backend.taxonomy.domain.model.Tag;
 import com.scalke.portfolio.backend.taxonomy.domain.port.CategoryRepository;
@@ -54,9 +55,9 @@ class PublicPublicationIT extends AbstractIntegrationTest {
 
     @BeforeEach
     void givenVisibleAndInvisiblePublications() {
-        Category backend = categoryRepository.create(new Category(null, "Backend", "backend", null));
-        Tag java = tagRepository.create(new Tag(null, "Java", "java"));
-        Tag tests = tagRepository.create(new Tag(null, "Tests", "tests"));
+        Category backend = categoryRepository.create(new Category(null, "Backend", Slug.of("backend"), null));
+        Tag java = tagRepository.create(new Tag(null, "Java", Slug.of("java")));
+        Tag tests = tagRepository.create(new Tag(null, "Tests", Slug.of("tests")));
         publicationRepository.create(classifiedArticle("article-publie", PUBLISHED_AT, backend.id(), tests.id(), java.id()));
         publicationRepository.create(publication("news-planifiee-passee", PublicationType.NEWS,
             PublicationStatus.SCHEDULED, NOW.minus(Duration.ofHours(1))));

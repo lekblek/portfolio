@@ -4,6 +4,7 @@ import com.scalke.portfolio.backend.project.domain.model.Project;
 import com.scalke.portfolio.backend.project.infrastructure.persistence.jpa.entity.ProjectEntity;
 import com.scalke.portfolio.backend.project.infrastructure.persistence.jpa.entity.TechnologyEntity;
 import com.scalke.portfolio.backend.shared.domain.model.DateRange;
+import com.scalke.portfolio.backend.shared.domain.model.Slug;
 
 import java.util.List;
 
@@ -20,7 +21,7 @@ public final class ProjectPersistenceMapper {
         return new Project(
             entity.getId(),
             entity.getTitle(),
-            entity.getSlug(),
+            Slug.of(entity.getSlug()),
             entity.getShortDescription(),
             entity.getDescriptionMarkdown(),
             entity.getStage(),
@@ -42,7 +43,7 @@ public final class ProjectPersistenceMapper {
     public static ProjectEntity toNewEntity(Project project, List<TechnologyEntity> technologies) {
         ProjectEntity entity = ProjectEntity.builder()
             .title(project.title())
-            .slug(project.slug())
+            .slug(project.slug().value())
             .shortDescription(project.shortDescription())
             .descriptionMarkdown(project.descriptionMarkdown())
             .stage(project.stage())

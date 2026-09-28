@@ -4,6 +4,7 @@ import com.scalke.portfolio.backend.publication.domain.model.Publication;
 import com.scalke.portfolio.backend.publication.domain.model.PublicationFilter;
 import com.scalke.portfolio.backend.shared.domain.model.PageQuery;
 import com.scalke.portfolio.backend.shared.domain.model.PageResult;
+import com.scalke.portfolio.backend.shared.domain.model.Slug;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -31,7 +32,7 @@ public interface PublicationRepository {
      * Vide si aucune publication ne porte ce slug ou si elle n'est pas visible à {@code now} :
      * les deux cas sont volontairement indiscernables.
      */
-    Optional<Publication> findVisibleBySlug(String slug, Instant now);
+    Optional<Publication> findVisibleBySlug(Slug slug, Instant now);
 
     boolean existsAny();
 

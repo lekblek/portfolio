@@ -9,6 +9,7 @@ import com.scalke.portfolio.backend.project.domain.port.TechnologyRepository;
 import com.scalke.portfolio.backend.shared.domain.model.DateRange;
 import com.scalke.portfolio.backend.shared.domain.model.PageQuery;
 import com.scalke.portfolio.backend.shared.domain.model.PageResult;
+import com.scalke.portfolio.backend.shared.domain.model.Slug;
 import com.scalke.portfolio.backend.testsupport.AbstractIntegrationTest;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -66,7 +67,7 @@ class ListPublishedProjectsUseCaseIT extends AbstractIntegrationTest {
         PageResult<Project> page = listPublishedProjectsUseCase.execute(ProjectFilter.none(), new PageQuery(0, 10));
 
         assertThat(page.content())
-            .extracting(Project::slug)
+            .extracting(project -> project.slug().value())
             .containsExactly("recent-a", "recent-b", "ancien", "mis-en-retrait");
         assertThat(page.totalElements()).isEqualTo(4);
     }
@@ -77,7 +78,7 @@ class ListPublishedProjectsUseCaseIT extends AbstractIntegrationTest {
 
         PageResult<Project> page = listPublishedProjectsUseCase.execute(ProjectFilter.none(), new PageQuery(1, 3));
 
-        assertThat(page.content()).extracting(Project::slug).containsExactly("mis-en-retrait");
+        assertThat(page.content()).extracting(project -> project.slug().value()).containsExactly("mis-en-retrait");
         assertThat(page.totalElements()).isEqualTo(4);
         assertThat(page.totalPages()).isEqualTo(2);
         assertThat(page.isLast()).isTrue();
@@ -94,7 +95,7 @@ class ListPublishedProjectsUseCaseIT extends AbstractIntegrationTest {
 
         PageResult<Project> page = listPublishedProjectsUseCase.execute(ProjectFilter.none(), new PageQuery(0, 10));
 
-        assertThat(page.content().get(0).technologies()).extracting(Technology::slug).containsExactly("java", "angular");
+        assertThat(page.content().get(0).technologies()).extracting(technology -> technology.slug().value()).containsExactly("java", "angular");
         assertThat(page.content().get(1).technologies()).isEmpty();
     }
 
@@ -114,10 +115,10 @@ class ListPublishedProjectsUseCaseIT extends AbstractIntegrationTest {
         PageResult<Project> page = listPublishedProjectsUseCase.execute(
             ProjectFilter.byTechnology("java"), new PageQuery(0, 10));
 
-        assertThat(page.content()).extracting(Project::slug).containsExactly("backend", "full-stack");
+        assertThat(page.content()).extracting(project -> project.slug().value()).containsExactly("backend", "full-stack");
         assertThat(page.totalElements()).isEqualTo(2);
         // le filtre restreint les projets, pas leurs technologies
-        assertThat(page.content().get(1).technologies()).extracting(Technology::slug)
+        assertThat(page.content().get(1).technologies()).extracting(technology -> technology.slug().value())
             .containsExactly("java", "angular");
     }
 

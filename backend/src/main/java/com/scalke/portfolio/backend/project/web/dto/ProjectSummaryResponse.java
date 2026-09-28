@@ -25,7 +25,7 @@ public record ProjectSummaryResponse(
     public static ProjectSummaryResponse from(Project project) {
         return new ProjectSummaryResponse(
             project.title(),
-            project.slug(),
+            project.slug().value(),
             project.shortDescription(),
             project.stage(),
             project.period().startDate(),

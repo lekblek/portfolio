@@ -10,6 +10,7 @@ import com.scalke.portfolio.backend.publication.domain.model.PublicationType;
 import com.scalke.portfolio.backend.shared.api.ApiPaging;
 import com.scalke.portfolio.backend.shared.domain.model.PageQuery;
 import com.scalke.portfolio.backend.shared.domain.model.PageResult;
+import com.scalke.portfolio.backend.shared.domain.model.Slug;
 import com.scalke.portfolio.backend.shared.error.ErrorCode;
 import com.scalke.portfolio.backend.shared.error.ResourceNotFoundException;
 import com.scalke.portfolio.backend.taxonomy.domain.model.Category;
@@ -40,16 +41,18 @@ class PublicPublicationControllerTest {
 
     private static final VisiblePublication ARTICLE = new VisiblePublication(
         new Publication(
-            42L, PublicationType.ARTICLE, "Construire une API", "construire-une-api", "Résumé", "## Contenu",
-            PublicationStatus.PUBLISHED, Instant.parse("2026-06-01T09:00:00Z"), true, 3L, Set.of(5L, 6L),
+            42L, PublicationType.ARTICLE, "Construire une API", Slug.of("construire-une-api"), "Résumé", "## Contenu",
+            PublicationStatus.PUBLISHED, Instant.parse("2026-06-01T09:00:00Z"),
+            Instant.parse("2026-06-01T09:00:00Z"), true, 3L, Set.of(5L, 6L),
             "Titre SEO", null, Instant.parse("2026-05-30T08:00:00Z"), Instant.parse("2026-06-01T09:00:00Z")),
-        new Category(3L, "Backend", "backend", "Spring Boot, API, persistance."),
-        List.of(new Tag(6L, "Java", "java"), new Tag(5L, "Spring Boot", "spring-boot")));
+        new Category(3L, "Backend", Slug.of("backend"), "Spring Boot, API, persistance."),
+        List.of(new Tag(6L, "Java", Slug.of("java")), new Tag(5L, "Spring Boot", Slug.of("spring-boot"))));
 
     private static final VisiblePublication UNCLASSIFIED_NEWS = new VisiblePublication(
         new Publication(
-            43L, PublicationType.NEWS, "Lancement", "lancement", "Résumé", "Contenu",
-            PublicationStatus.PUBLISHED, Instant.parse("2026-06-02T09:00:00Z"), false, null, Set.of(),
+            43L, PublicationType.NEWS, "Lancement", Slug.of("lancement"), "Résumé", "Contenu",
+            PublicationStatus.PUBLISHED, Instant.parse("2026-06-02T09:00:00Z"),
+            Instant.parse("2026-06-02T09:00:00Z"), false, null, Set.of(),
             null, null, Instant.parse("2026-06-02T09:00:00Z"), Instant.parse("2026-06-02T09:00:00Z")),
         null,
         List.of());

@@ -1,5 +1,6 @@
 package com.scalke.portfolio.backend.publication.domain.model;
 
+import com.scalke.portfolio.backend.shared.domain.model.Slug;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -58,8 +59,8 @@ class PublicationTest {
     @Test
     void keeps_an_immutable_copy_of_its_tags() {
         Set<Long> tags = new HashSet<>(Set.of(1L, 2L));
-        Publication publication = new Publication(null, PublicationType.ARTICLE, "Titre", "titre", "Résumé", "Contenu",
-            PublicationStatus.DRAFT, null, false, 7L, tags, null, null, AT, AT);
+        Publication publication = new Publication(null, PublicationType.ARTICLE, "Titre", Slug.of("titre"), "Résumé", "Contenu",
+            PublicationStatus.DRAFT, null, null, false, 7L, tags, null, null, AT, AT);
 
         tags.add(3L);
 
@@ -68,7 +69,7 @@ class PublicationTest {
     }
 
     private static Publication publication(PublicationStatus status, Instant publishedAt, String content) {
-        return new Publication(null, PublicationType.ARTICLE, "Titre", "titre", "Résumé", content,
-            status, publishedAt, false, null, Set.of(), null, null, AT, AT);
+        return new Publication(null, PublicationType.ARTICLE, "Titre", Slug.of("titre"), "Résumé", content,
+            status, publishedAt, publishedAt, false, null, Set.of(), null, null, AT, AT);
     }
 }

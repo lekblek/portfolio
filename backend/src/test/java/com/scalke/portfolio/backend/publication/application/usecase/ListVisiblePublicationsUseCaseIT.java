@@ -6,6 +6,7 @@ import com.scalke.portfolio.backend.publication.domain.model.PublicationType;
 import com.scalke.portfolio.backend.publication.domain.port.PublicationRepository;
 import com.scalke.portfolio.backend.shared.domain.model.PageQuery;
 import com.scalke.portfolio.backend.shared.domain.model.PageResult;
+import com.scalke.portfolio.backend.shared.domain.model.Slug;
 import com.scalke.portfolio.backend.taxonomy.domain.model.Category;
 import com.scalke.portfolio.backend.taxonomy.domain.model.Tag;
 import com.scalke.portfolio.backend.taxonomy.domain.port.CategoryRepository;
@@ -83,7 +84,7 @@ class ListVisiblePublicationsUseCaseIT extends AbstractIntegrationTest {
 
         Set<String> visibleByDomain = all.stream()
             .filter(publication -> publication.isVisibleAt(NOW))
-            .map(Publication::slug)
+            .map(publication -> publication.slug().value())
             .collect(Collectors.toSet());
         Set<String> visibleByQuery = list(PublicationCriteria.none(), new PageQuery(0, 100)).content().stream()
             .map(ListVisiblePublicationsUseCaseIT::slug)
@@ -202,7 +203,7 @@ class ListVisiblePublicationsUseCaseIT extends AbstractIntegrationTest {
     }
 
     private static String slug(VisiblePublication visible) {
-        return visible.publication().slug();
+        return visible.publication().slug().value();
     }
 
     private List<Publication> givenOnePublicationPerVisibilityCase() {
@@ -222,11 +223,11 @@ class ListVisiblePublicationsUseCaseIT extends AbstractIntegrationTest {
      * Deux articles classés (backend : java, tests ; frontend : angular, tests), un non classé, un brouillon.
      */
     private void givenClassifiedPublications() {
-        backend = categoryRepository.create(new Category(null, "Backend", "backend", null));
-        Category frontend = categoryRepository.create(new Category(null, "Frontend", "frontend", null));
-        java = tagRepository.create(new Tag(null, "Java", "java"));
-        Tag angular = tagRepository.create(new Tag(null, "Angular", "angular"));
-        tests = tagRepository.create(new Tag(null, "Tests", "tests"));
+        backend = categoryRepository.create(new Category(null, "Backend", Slug.of("backend"), null));
+        Category frontend = categoryRepository.create(new Category(null, "Frontend", Slug.of("frontend"), null));
+        java = tagRepository.create(new Tag(null, "Java", Slug.of("java")));
+        Tag angular = tagRepository.create(new Tag(null, "Angular", Slug.of("angular")));
+        tests = tagRepository.create(new Tag(null, "Tests", Slug.of("tests")));
         publicationRepository.create(classifiedArticle("api-spring", NOW.minus(Duration.ofDays(1)),
             backend.id(), java.id(), tests.id()));
         publicationRepository.create(classifiedArticle("ssr-angular", NOW.minus(Duration.ofDays(2)),

@@ -1,6 +1,7 @@
 package com.scalke.portfolio.backend.project.domain.model;
 
 import com.scalke.portfolio.backend.shared.domain.model.DateRange;
+import com.scalke.portfolio.backend.shared.domain.model.Slug;
 
 import java.util.HashSet;
 import java.util.List;
@@ -18,13 +19,14 @@ import java.util.Set;
  *   <li>une technologie apparaît au plus une fois (invariant 23). Doublé par {@code project_technology_pk}.</li>
  * </ul>
  * Les technologies sont des références vers un autre agrégat, toujours rangées dans l'ordre du
- * vocabulaire ({@link Technology#DISPLAY_ORDER}, D-Z). Le slug est unique et au format kebab-case,
- * garanti par PostgreSQL (D-X) ; sa génération et la gestion des collisions arrivent à l'étape 22.
+ * vocabulaire ({@link Technology#DISPLAY_ORDER}, D-Z). Le slug est un {@link Slug} (format vérifié par le
+ * domaine, D-BB), unique par PostgreSQL (D-X). Sa stabilité après publication (D11) sera appliquée avec
+ * la gestion de la visibilité des projets (administration, étape 36).
  */
 public record Project(
     Long id,
     String title,
-    String slug,
+    Slug slug,
     String shortDescription,
     String descriptionMarkdown,
     ProjectStage stage,
@@ -38,6 +40,7 @@ public record Project(
 ) {
 
     public Project {
+        Objects.requireNonNull(slug, "slug");
         Objects.requireNonNull(stage, "stage");
         Objects.requireNonNull(visibility, "visibility");
         Objects.requireNonNull(period, "period");
@@ -48,7 +51,7 @@ public record Project(
         technologies = Objects.requireNonNull(technologies, "technologies").stream()
             .sorted(Technology.DISPLAY_ORDER)
             .toList();
-        Set<String> slugs = new HashSet<>();
+        Set<Slug> slugs = new HashSet<>();
         for (Technology technology : technologies) {
             if (!slugs.add(technology.slug())) {
                 throw new IllegalArgumentException("technology " + technology.slug() + " appears twice");

@@ -9,13 +9,15 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.OffsetDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
- * Contraintes de {@code V006__create_publication.sql} (et {@code V009} pour la date des archives), vérifiées sans JPA.
+ * Contraintes de {@code V006__create_publication.sql}, {@code V009} (date des archives) et {@code V010}
+ * (première publication, D-AZ), vérifiées sans JPA.
  */
 @Transactional
 class PublicationSchemaIT extends AbstractIntegrationTest {
@@ -65,21 +67,54 @@ class PublicationSchemaIT extends AbstractIntegrationTest {
     @ParameterizedTest
     @ValueSource(strings = {"SCHEDULED", "PUBLISHED", "ARCHIVED"})
     void requires_a_publication_date_once_scheduled_published_or_archived(String status) {
-        assertThatThrownBy(() -> insert("article", "ARTICLE", status, null))
+        assertThatThrownBy(() -> insert("article", "ARTICLE", status, null, AT))
             .isInstanceOf(DataIntegrityViolationException.class)
             .hasMessageContaining("publication_published_at_check");
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"SCHEDULED", "PUBLISHED", "ARCHIVED"})
+    void requires_a_first_publication_date_once_scheduled_published_or_archived(String status) {
+        assertThatThrownBy(() -> insert("article", "ARTICLE", status, AT, null))
+            .isInstanceOf(DataIntegrityViolationException.class)
+            .hasMessageContaining("publication_first_published_at_check");
+    }
+
+    /**
+     * Une publication repassée en brouillon garde la mémoire de sa première publication (D-AZ, audit A01).
+     */
+    @Test
+    void accepts_a_draft_that_has_already_been_public() {
+        insert("reprise", "ARTICLE", "DRAFT", null, AT);
+
+        assertThat(jdbcClient.sql("SELECT first_published_at FROM publication").query(OffsetDateTime.class).single())
+            .isEqualTo(AT);
+    }
+
+    @Test
+    void rejects_a_first_publication_after_the_publication_date() {
+        assertThatThrownBy(() -> insert("article", "ARTICLE", "PUBLISHED", AT, AT.plus(Duration.ofDays(1))))
+            .isInstanceOf(DataIntegrityViolationException.class)
+            .hasMessageContaining("publication_first_published_before_published_check");
+    }
+
     private void insert(String slug, String type, String status, OffsetDateTime publishedAt) {
+        insert(slug, type, status, publishedAt, publishedAt);
+    }
+
+    private void insert(String slug, String type, String status, OffsetDateTime publishedAt,
+                        OffsetDateTime firstPublishedAt) {
         jdbcClient.sql("""
                     INSERT INTO publication (type, title, slug, summary, content_markdown, status,
-                                             published_at, created_at, updated_at)
-                    VALUES (:type, 'Titre', :slug, 'Résumé', '# Contenu', :status, :publishedAt, :at, :at)
+                                             published_at, first_published_at, created_at, updated_at)
+                    VALUES (:type, 'Titre', :slug, 'Résumé', '# Contenu', :status, :publishedAt,
+                            :firstPublishedAt, :at, :at)
                     """)
             .param("type", type)
             .param("slug", slug)
             .param("status", status)
             .param("publishedAt", publishedAt)
+            .param("firstPublishedAt", firstPublishedAt)
             .param("at", AT)
             .update();
     }

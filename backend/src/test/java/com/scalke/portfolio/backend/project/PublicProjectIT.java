@@ -7,6 +7,7 @@ import com.scalke.portfolio.backend.project.domain.model.Technology;
 import com.scalke.portfolio.backend.project.domain.port.ProjectRepository;
 import com.scalke.portfolio.backend.project.domain.port.TechnologyRepository;
 import com.scalke.portfolio.backend.shared.domain.model.DateRange;
+import com.scalke.portfolio.backend.shared.domain.model.Slug;
 import com.scalke.portfolio.backend.testsupport.AbstractIntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,7 +51,7 @@ class PublicProjectIT extends AbstractIntegrationTest {
         Technology java = technologyRepository.create(technology("Java", "java", 0));
         Technology postgresql = technologyRepository.create(technology("PostgreSQL", "postgresql", 1));
         projectRepository.create(new Project(
-            null, "Portfolio full-stack", "portfolio-full-stack", "Résumé", "## Description",
+            null, "Portfolio full-stack", Slug.of("portfolio-full-stack"), "Résumé", "## Description",
             ProjectStage.COMPLETED, ProjectVisibility.PUBLISHED,
             DateRange.between(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 6, 30)),
             null, "https://example.test/demo", false, 0,

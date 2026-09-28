@@ -15,7 +15,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Structure de persistance d'une publication ({@code V006}, {@code V008}). Les invariants vivent dans
+ * Structure de persistance d'une publication ({@code V006}, {@code V008}, {@code V010}). Les invariants vivent dans
  * {@code domain.model.Publication} et dans les contraintes de la table (ADR 0001).
  * <p>
  * {@code createdAt} et {@code updatedAt} sont fixés par l'application à partir de l'horloge applicative
@@ -54,6 +54,9 @@ public class PublicationEntity {
     @Column(name = "published_at")
     private Instant publishedAt;
 
+    @Column(name = "first_published_at")
+    private Instant firstPublishedAt;
+
     @Column(name = "featured", nullable = false)
     private boolean featured;
 
@@ -88,6 +91,7 @@ public class PublicationEntity {
     @Builder
     private PublicationEntity(PublicationType type, String title, String slug, String summary,
                               String contentMarkdown, PublicationStatus status, Instant publishedAt,
+                              Instant firstPublishedAt,
                               boolean featured, Long categoryId, Set<Long> tagIds,
                               String seoTitle, String seoDescription,
                               Instant createdAt, Instant updatedAt) {
@@ -98,6 +102,7 @@ public class PublicationEntity {
         this.contentMarkdown = contentMarkdown;
         this.status = status;
         this.publishedAt = publishedAt;
+        this.firstPublishedAt = firstPublishedAt;
         this.featured = featured;
         this.categoryId = categoryId;
         this.tagIds = new HashSet<>(tagIds);
@@ -111,9 +116,11 @@ public class PublicationEntity {
      * Seule écriture après création (D-AX) : les valeurs viennent d'une transition déjà validée par le
      * domaine ({@code Publication.transitionTo}).
      */
-    public void changeStatus(PublicationStatus status, Instant publishedAt, Instant updatedAt) {
+    public void changeStatus(PublicationStatus status, Instant publishedAt, Instant firstPublishedAt,
+                             Instant updatedAt) {
         this.status = status;
         this.publishedAt = publishedAt;
+        this.firstPublishedAt = firstPublishedAt;
         this.updatedAt = updatedAt;
     }
 }

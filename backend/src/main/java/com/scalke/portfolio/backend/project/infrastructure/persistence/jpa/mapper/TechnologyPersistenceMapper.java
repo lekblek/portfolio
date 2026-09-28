@@ -2,6 +2,7 @@ package com.scalke.portfolio.backend.project.infrastructure.persistence.jpa.mapp
 
 import com.scalke.portfolio.backend.project.domain.model.Technology;
 import com.scalke.portfolio.backend.project.infrastructure.persistence.jpa.entity.TechnologyEntity;
+import com.scalke.portfolio.backend.shared.domain.model.Slug;
 
 import java.util.List;
 
@@ -11,7 +12,7 @@ public final class TechnologyPersistenceMapper {
     }
 
     public static Technology toDomain(TechnologyEntity entity) {
-        return new Technology(entity.getId(), entity.getName(), entity.getSlug(), entity.getDisplayOrder());
+        return new Technology(entity.getId(), entity.getName(), Slug.of(entity.getSlug()), entity.getDisplayOrder());
     }
 
     public static List<Technology> map(List<TechnologyEntity> entities) {
@@ -24,7 +25,7 @@ public final class TechnologyPersistenceMapper {
     public static TechnologyEntity toNewEntity(Technology technology) {
         return TechnologyEntity.builder()
             .name(technology.name())
-            .slug(technology.slug())
+            .slug(technology.slug().value())
             .displayOrder(technology.displayOrder())
             .build();
     }

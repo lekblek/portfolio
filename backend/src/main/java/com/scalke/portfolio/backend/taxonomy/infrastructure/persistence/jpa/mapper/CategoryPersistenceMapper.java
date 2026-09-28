@@ -1,5 +1,6 @@
 package com.scalke.portfolio.backend.taxonomy.infrastructure.persistence.jpa.mapper;
 
+import com.scalke.portfolio.backend.shared.domain.model.Slug;
 import com.scalke.portfolio.backend.taxonomy.domain.model.Category;
 import com.scalke.portfolio.backend.taxonomy.infrastructure.persistence.jpa.entity.CategoryEntity;
 
@@ -9,7 +10,7 @@ public final class CategoryPersistenceMapper {
     }
 
     public static Category toDomain(CategoryEntity entity) {
-        return new Category(entity.getId(), entity.getName(), entity.getSlug(), entity.getDescription());
+        return new Category(entity.getId(), entity.getName(), Slug.of(entity.getSlug()), entity.getDescription());
     }
 
     /**
@@ -18,7 +19,7 @@ public final class CategoryPersistenceMapper {
     public static CategoryEntity toNewEntity(Category category) {
         return CategoryEntity.builder()
             .name(category.name())
-            .slug(category.slug())
+            .slug(category.slug().value())
             .description(category.description())
             .build();
     }

@@ -1,5 +1,6 @@
 package com.scalke.portfolio.backend.publication.domain.model;
 
+import com.scalke.portfolio.backend.shared.domain.model.Slug;
 import com.scalke.portfolio.backend.shared.error.BusinessRuleViolationException;
 import com.scalke.portfolio.backend.shared.error.ErrorCode;
 
@@ -12,10 +13,17 @@ import java.util.regex.Pattern;
  * Publication (racine d'agrégat), modèle commun à {@code ARTICLE} et {@code NEWS}. Le Markdown est la
  * source canonique : aucun HTML n'est stocké.
  * <p>
- * Invariant 24 (D-AI, D-AV) : une publication {@code SCHEDULED}, {@code PUBLISHED} ou {@code ARCHIVED} a une
- * date de publication. Doublé par {@code publication_published_at_check}. Invariant 26 : le statut ne change
- * que par {@link #transitionTo} (table dans {@link PublicationStatus}). Le slug est unique pour toutes les publications et
- * au format kebab-case, garanti par PostgreSQL (D-AL).
+ * Dates :
+ * <ul>
+ *   <li>{@code publishedAt} : date affichée et date de planification ; une replanification la remplace ;</li>
+ *   <li>{@code firstPublishedAt} (D-AZ) : première apparition publique. Provisoire tant qu'elle est future
+ *       (planification), elle ne change plus dès qu'elle est passée, quelles que soient les transitions
+ *       suivantes. C'est elle qui dit si la publication a déjà été publique ({@link #hasBeenPublic}).</li>
+ * </ul>
+ * Invariants : 24 (D-AI, D-AV, D-AZ) — {@code SCHEDULED}, {@code PUBLISHED} ou {@code ARCHIVED} ont
+ * {@code publishedAt} et {@code firstPublishedAt}, et {@code firstPublishedAt <= publishedAt} ; 26 — le statut
+ * ne change que par {@link #transitionTo} ; 6 (D11, D-BC) — le slug ne change plus après la première
+ * publication ({@link #changeSlug}). 24 est doublé par PostgreSQL ; 6 et 26 sont des règles applicatives.
  * <p>
  * Classement (D-AN) : au plus une catégorie ({@code categoryId}, D20) et des tags ({@code tagIds}, un
  * ensemble : chaque tag au plus une fois). Les termes appartiennent au module {@code taxonomy} : la
@@ -25,11 +33,12 @@ public record Publication(
     Long id,
     PublicationType type,
     String title,
-    String slug,
+    Slug slug,
     String summary,
     String contentMarkdown,
     PublicationStatus status,
     Instant publishedAt,
+    Instant firstPublishedAt,
     boolean featured,
     Long categoryId,
     Set<Long> tagIds,
@@ -52,13 +61,17 @@ public record Publication(
 
     public Publication {
         Objects.requireNonNull(type, "type");
+        Objects.requireNonNull(slug, "slug");
         Objects.requireNonNull(status, "status");
         Objects.requireNonNull(contentMarkdown, "contentMarkdown");
         Objects.requireNonNull(createdAt, "createdAt");
         Objects.requireNonNull(updatedAt, "updatedAt");
         tagIds = Set.copyOf(Objects.requireNonNull(tagIds, "tagIds"));
-        if (status.requiresPublicationDate() && publishedAt == null) {
-            throw new IllegalArgumentException("a " + status + " publication requires publishedAt");
+        if (status.requiresPublicationDate() && (publishedAt == null || firstPublishedAt == null)) {
+            throw new IllegalArgumentException("a " + status + " publication requires publishedAt and firstPublishedAt");
+        }
+        if (firstPublishedAt != null && publishedAt != null && firstPublishedAt.isAfter(publishedAt)) {
+            throw new IllegalArgumentException("firstPublishedAt must not be after publishedAt");
         }
     }
 
@@ -87,15 +100,26 @@ public record Publication(
     }
 
     /**
+     * Vrai si la publication a été publique au moins une fois avant {@code now}, même si elle ne l'est plus
+     * (archivée, repassée en brouillon, replanifiée) : sa première date de publication est passée (D-AZ).
+     */
+    public boolean hasBeenPublic(Instant now) {
+        return firstPublishedAt != null && !firstPublishedAt.isAfter(now);
+    }
+
+    /**
      * Change de statut éditorial (D-AV) et renvoie la publication modifiée ({@code updatedAt = now}).
      * <p>
      * Règles de date :
      * <ul>
      *   <li>{@code SCHEDULED} : {@code scheduledAt} obligatoire et strictement future ; elle devient la date de publication ;</li>
-     *   <li>{@code PUBLISHED} : date conservée si la publication a déjà été publique (date passée), sinon {@code now} ;</li>
+     *   <li>{@code PUBLISHED} : date conservée si elle est déjà passée (restauration d'une archive), sinon {@code now} ;</li>
      *   <li>{@code DRAFT} : une planification encore future est annulée (date effacée) ; une date passée est conservée ;</li>
      *   <li>{@code IN_REVIEW}, {@code ARCHIVED} : date inchangée.</li>
      * </ul>
+     * {@code firstPublishedAt} suit la date de publication tant que la publication n'a jamais été publique ;
+     * dès qu'elle l'a été, elle ne change plus (D-AZ).
+     * <p>
      * Toute transition refusée lève {@link BusinessRuleViolationException} avec
      * {@link ErrorCode#INVALID_PUBLICATION_TRANSITION} (409, D-AW).
      *
@@ -122,8 +146,35 @@ public record Publication(
             case DRAFT -> publishedAt != null && publishedAt.isAfter(now) ? null : publishedAt;
             case IN_REVIEW, ARCHIVED -> publishedAt;
         };
-        return new Publication(id, type, title, slug, summary, contentMarkdown, target, newPublishedAt, featured,
-            categoryId, tagIds, seoTitle, seoDescription, createdAt, now);
+        boolean alreadyPublic = hasBeenPublic(now);
+        Instant newFirstPublishedAt = switch (target) {
+            case SCHEDULED, PUBLISHED -> alreadyPublic ? firstPublishedAt : newPublishedAt;
+            case DRAFT -> alreadyPublic ? firstPublishedAt : null;
+            case IN_REVIEW, ARCHIVED -> firstPublishedAt;
+        };
+        return new Publication(id, type, title, slug, summary, contentMarkdown, target, newPublishedAt,
+            newFirstPublishedAt, featured, categoryId, tagIds, seoTitle, seoDescription, createdAt, now);
+    }
+
+    /**
+     * Change le slug (D11, D-BC) : permis tant que la publication n'a jamais été publique ; refusé ensuite
+     * avec {@link ErrorCode#SLUG_LOCKED} (409), pour que les liens publiés restent valides. Sans effet si le
+     * slug est identique. L'unicité est vérifiée par l'appelant ({@link Slug#firstAvailable}) et par la base.
+     * <p>
+     * Appelé par la modification d'une publication (administration, étape 36).
+     */
+    public Publication changeSlug(Slug newSlug, Instant now) {
+        Objects.requireNonNull(newSlug, "newSlug");
+        Objects.requireNonNull(now, "now");
+        if (newSlug.equals(slug)) {
+            return this;
+        }
+        if (hasBeenPublic(now)) {
+            throw new BusinessRuleViolationException(ErrorCode.SLUG_LOCKED,
+                "Le slug d'une publication déjà publiée ne peut plus changer.");
+        }
+        return new Publication(id, type, title, newSlug, summary, contentMarkdown, status, publishedAt,
+            firstPublishedAt, featured, categoryId, tagIds, seoTitle, seoDescription, createdAt, now);
     }
 
     private static BusinessRuleViolationException refused(String detail) {

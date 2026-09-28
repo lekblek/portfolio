@@ -1,5 +1,6 @@
 package com.scalke.portfolio.backend.taxonomy.infrastructure.persistence.jpa.repository;
 
+import com.scalke.portfolio.backend.shared.domain.model.Slug;
 import com.scalke.portfolio.backend.taxonomy.domain.model.Category;
 import com.scalke.portfolio.backend.taxonomy.domain.port.CategoryRepository;
 import com.scalke.portfolio.backend.taxonomy.infrastructure.persistence.jpa.mapper.CategoryPersistenceMapper;
@@ -22,8 +23,8 @@ public class CategoryRepositoryAdapter implements CategoryRepository {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Category> findBySlug(String slug) {
-        return repository.findBySlug(slug).map(CategoryPersistenceMapper::toDomain);
+    public Optional<Category> findBySlug(Slug slug) {
+        return repository.findBySlug(slug.value()).map(CategoryPersistenceMapper::toDomain);
     }
 
     @Override

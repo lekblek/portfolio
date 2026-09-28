@@ -4,6 +4,7 @@ import com.scalke.portfolio.backend.project.domain.model.Project;
 import com.scalke.portfolio.backend.project.domain.model.ProjectFilter;
 import com.scalke.portfolio.backend.shared.domain.model.PageQuery;
 import com.scalke.portfolio.backend.shared.domain.model.PageResult;
+import com.scalke.portfolio.backend.shared.domain.model.Slug;
 
 import java.util.Optional;
 
@@ -28,7 +29,7 @@ public interface ProjectRepository {
      * Vide si aucun projet ne porte ce slug ou s'il n'est pas {@code PUBLISHED} : les deux cas sont
      * volontairement indiscernables (D-U).
      */
-    Optional<Project> findPublishedBySlug(String slug);
+    Optional<Project> findPublishedBySlug(Slug slug);
 
     boolean existsAny();
 

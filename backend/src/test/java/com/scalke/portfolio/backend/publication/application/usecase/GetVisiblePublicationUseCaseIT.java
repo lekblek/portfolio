@@ -4,6 +4,7 @@ import com.scalke.portfolio.backend.publication.domain.model.Publication;
 import com.scalke.portfolio.backend.publication.domain.model.PublicationStatus;
 import com.scalke.portfolio.backend.publication.domain.model.PublicationType;
 import com.scalke.portfolio.backend.publication.domain.port.PublicationRepository;
+import com.scalke.portfolio.backend.shared.domain.model.Slug;
 import com.scalke.portfolio.backend.shared.error.ResourceNotFoundException;
 import com.scalke.portfolio.backend.taxonomy.domain.model.Category;
 import com.scalke.portfolio.backend.taxonomy.domain.model.Tag;
@@ -11,6 +12,9 @@ import com.scalke.portfolio.backend.taxonomy.domain.port.CategoryRepository;
 import com.scalke.portfolio.backend.taxonomy.domain.port.TagRepository;
 import com.scalke.portfolio.backend.testsupport.AbstractIntegrationTest;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import org.hibernate.SessionFactory;
+import org.hibernate.stat.Statistics;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -45,6 +49,9 @@ class GetVisiblePublicationUseCaseIT extends AbstractIntegrationTest {
     @Autowired
     EntityManager entityManager;
 
+    @Autowired
+    EntityManagerFactory entityManagerFactory;
+
     private Publication published;
     private Category backend;
     private Tag java;
@@ -52,12 +59,12 @@ class GetVisiblePublicationUseCaseIT extends AbstractIntegrationTest {
 
     @BeforeEach
     void givenPublicationsInEveryStatus() {
-        backend = categoryRepository.create(new Category(null, "Backend", "backend", "Spring Boot"));
-        springBoot = tagRepository.create(new Tag(null, "Spring Boot", "spring-boot"));
-        java = tagRepository.create(new Tag(null, "Java", "java"));
+        backend = categoryRepository.create(new Category(null, "Backend", Slug.of("backend"), "Spring Boot"));
+        springBoot = tagRepository.create(new Tag(null, "Spring Boot", Slug.of("spring-boot")));
+        java = tagRepository.create(new Tag(null, "Java", Slug.of("java")));
         published = publicationRepository.create(new Publication(
-            null, PublicationType.ARTICLE, "Construire une API", "construire-une-api", "Résumé", "## Contenu",
-            PublicationStatus.PUBLISHED, NOW.minus(Duration.ofDays(2)), true, backend.id(),
+            null, PublicationType.ARTICLE, "Construire une API", Slug.of("construire-une-api"), "Résumé", "## Contenu",
+            PublicationStatus.PUBLISHED, NOW.minus(Duration.ofDays(2)), NOW.minus(Duration.ofDays(2)), true, backend.id(),
             Set.of(springBoot.id(), java.id()), "Titre SEO", null,
             NOW.minus(Duration.ofDays(3)), NOW.minus(Duration.ofDays(2))));
         publicationRepository.create(article("planifiee-passee", PublicationStatus.SCHEDULED, NOW.minusSeconds(1)));
@@ -94,5 +101,20 @@ class GetVisiblePublicationUseCaseIT extends AbstractIntegrationTest {
         assertThatThrownBy(() -> getVisiblePublicationUseCase.execute(slug))
             .isInstanceOf(ResourceNotFoundException.class)
             .hasMessage("Publication introuvable.");
+    }
+
+    /**
+     * D-BB : un slug mal formé ne peut désigner aucune publication ; il est introuvable sans requête SQL.
+     */
+    @ParameterizedTest
+    @ValueSource(strings = {"Construire-une-API", "construire une api", "../admin", "construire--une-api"})
+    void a_malformed_slug_is_not_found_without_querying_the_database(String slug) {
+        Statistics statistics = entityManagerFactory.unwrap(SessionFactory.class).getStatistics();
+        statistics.clear();
+
+        assertThatThrownBy(() -> getVisiblePublicationUseCase.execute(slug))
+            .isInstanceOf(ResourceNotFoundException.class)
+            .hasMessage("Publication introuvable.");
+        assertThat(statistics.getPrepareStatementCount()).isZero();
     }
 }
