@@ -1,5 +1,9 @@
 package com.scalke.portfolio.backend.project;
 
+import com.scalke.portfolio.backend.media.application.usecase.MediaUpload;
+import com.scalke.portfolio.backend.media.application.usecase.UploadMediaUseCase;
+import com.scalke.portfolio.backend.media.domain.model.Media;
+import com.scalke.portfolio.backend.media.infrastructure.storage.MediaStorageProperties;
 import com.scalke.portfolio.backend.project.domain.model.Project;
 import com.scalke.portfolio.backend.project.domain.model.ProjectStage;
 import com.scalke.portfolio.backend.project.domain.model.ProjectVisibility;
@@ -18,11 +22,17 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.time.LocalDate;
 import java.util.List;
 
+import static com.scalke.portfolio.backend.media.MediaSamples.PNG;
 import static com.scalke.portfolio.backend.project.ProjectFixtures.project;
+import static com.scalke.portfolio.backend.project.ProjectFixtures.published;
 import static com.scalke.portfolio.backend.project.ProjectFixtures.technology;
+import static com.scalke.portfolio.backend.project.ProjectFixtures.withImages;
 import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -46,6 +56,12 @@ class PublicProjectIT extends AbstractIntegrationTest {
     @Autowired
     TechnologyRepository technologyRepository;
 
+    @Autowired
+    UploadMediaUseCase uploadMediaUseCase;
+
+    @Autowired
+    MediaStorageProperties mediaStorageProperties;
+
     @BeforeEach
     void givenOnePublishedOneDraftAndOneArchivedProject() {
         Technology java = technologyRepository.create(technology("Java", "java", 0));
@@ -55,7 +71,7 @@ class PublicProjectIT extends AbstractIntegrationTest {
             ProjectStage.COMPLETED, ProjectVisibility.PUBLISHED,
             DateRange.between(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 6, 30)),
             null, "https://example.test/demo", false, 0,
-            List.of(postgresql, java)));
+            List.of(postgresql, java), null, List.of()));
         projectRepository.create(project("brouillon", ProjectVisibility.DRAFT,
             DateRange.ongoingSince(LocalDate.of(2026, 1, 1)), 0, java));
         projectRepository.create(project("archive", ProjectVisibility.ARCHIVED,
@@ -102,6 +118,31 @@ class PublicProjectIT extends AbstractIntegrationTest {
             .andExpect(jsonPath("$.technologies.length()").value(2));
     }
 
+    /**
+     * D-BW : l'adresse publiée pour la couverture sert bien le fichier envoyé.
+     */
+    @Test
+    void publishes_a_cover_whose_url_serves_the_uploaded_image() throws Exception {
+        Media cover = uploadMediaUseCase.execute(new MediaUpload("couverture.png", "Écran d'accueil", new ByteArrayInputStream(PNG)));
+        try {
+            projectRepository.create(withImages(published("avec-couverture", LocalDate.of(2026, 3, 1), 0), cover.id()));
+            String url = "/api/public/media/" + cover.storageKey().value();
+
+            mockMvc.perform(get("/api/public/projects/avec-couverture").contextPath("/api"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.cover.url").value(url))
+                .andExpect(jsonPath("$.cover.width").value(3))
+                .andExpect(jsonPath("$.cover.altText").value("Écran d'accueil"))
+                .andExpect(jsonPath("$.screenshots").isEmpty());
+            mockMvc.perform(get(url).contextPath("/api"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.IMAGE_PNG))
+                .andExpect(content().bytes(PNG));
+        } finally {
+            deleteFile(cover);
+        }
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {"brouillon", "archive", "inconnu"})
     void hides_projects_that_are_not_published_behind_a_404(String slug) throws Exception {
@@ -110,5 +151,12 @@ class PublicProjectIT extends AbstractIntegrationTest {
             .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
             .andExpect(jsonPath("$.code").value("RESOURCE_NOT_FOUND"))
             .andExpect(jsonPath("$.detail").value("Projet introuvable."));
+    }
+
+    /**
+     * La transaction du test annule l'inscription au catalogue, pas l'écriture du fichier.
+     */
+    private void deleteFile(Media media) throws IOException {
+        Files.deleteIfExists(mediaStorageProperties.storageRoot().resolve(media.storageKey().value()));
     }
 }

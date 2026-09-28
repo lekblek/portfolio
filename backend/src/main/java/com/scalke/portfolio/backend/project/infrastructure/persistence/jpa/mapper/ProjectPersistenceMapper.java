@@ -1,7 +1,9 @@
 package com.scalke.portfolio.backend.project.infrastructure.persistence.jpa.mapper;
 
 import com.scalke.portfolio.backend.project.domain.model.Project;
+import com.scalke.portfolio.backend.project.domain.model.ProjectScreenshot;
 import com.scalke.portfolio.backend.project.infrastructure.persistence.jpa.entity.ProjectEntity;
+import com.scalke.portfolio.backend.project.infrastructure.persistence.jpa.entity.ProjectScreenshotEmbeddable;
 import com.scalke.portfolio.backend.project.infrastructure.persistence.jpa.entity.TechnologyEntity;
 import com.scalke.portfolio.backend.shared.domain.model.DateRange;
 import com.scalke.portfolio.backend.shared.domain.model.Slug;
@@ -15,7 +17,7 @@ public final class ProjectPersistenceMapper {
 
     /**
      * Reconstruit le {@link Project} du domaine : ses invariants sont revérifiés à chaque lecture.
-     * Parcourt les technologies : à appeler dans la transaction qui a chargé l'entité.
+     * Parcourt les technologies et les captures : à appeler dans la transaction qui a chargé l'entité.
      */
     public static Project toDomain(ProjectEntity entity) {
         return new Project(
@@ -31,8 +33,12 @@ public final class ProjectPersistenceMapper {
             entity.getDemoUrl(),
             entity.isFeatured(),
             entity.getDisplayOrder(),
-            TechnologyPersistenceMapper.map(entity.getTechnologies())
-        );
+            TechnologyPersistenceMapper.map(entity.getTechnologies()),
+            entity.getCoverMediaId(),
+            entity.getScreenshots().stream()
+                .map(screenshot -> new ProjectScreenshot(
+                    screenshot.getMediaId(), screenshot.getCaption(), screenshot.getDisplayOrder()))
+                .toList());
     }
 
     /**
@@ -54,6 +60,11 @@ public final class ProjectPersistenceMapper {
             .demoUrl(project.demoUrl())
             .featured(project.featured())
             .displayOrder(project.displayOrder())
+            .coverMediaId(project.coverMediaId())
+            .screenshots(project.screenshots().stream()
+                .map(screenshot -> new ProjectScreenshotEmbeddable(
+                    screenshot.mediaId(), screenshot.caption(), screenshot.displayOrder()))
+                .toList())
             .build();
         technologies.forEach(entity::addTechnology);
         return entity;

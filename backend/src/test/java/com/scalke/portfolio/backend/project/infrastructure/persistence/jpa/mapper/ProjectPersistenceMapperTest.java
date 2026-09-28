@@ -1,6 +1,7 @@
 package com.scalke.portfolio.backend.project.infrastructure.persistence.jpa.mapper;
 
 import com.scalke.portfolio.backend.project.domain.model.Project;
+import com.scalke.portfolio.backend.project.domain.model.ProjectScreenshot;
 import com.scalke.portfolio.backend.project.domain.model.ProjectStage;
 import com.scalke.portfolio.backend.project.domain.model.ProjectVisibility;
 import com.scalke.portfolio.backend.project.domain.model.Technology;
@@ -34,7 +35,9 @@ class ProjectPersistenceMapperTest {
             "https://example.test/demo",
             true,
             3,
-            List.of(java, angular));
+            List.of(java, angular),
+            5L,
+            List.of(new ProjectScreenshot(8L, "Accueil", 0), new ProjectScreenshot(9L, null, 1)));
         List<TechnologyEntity> technologies = project.technologies().stream()
             .map(TechnologyPersistenceMapper::toNewEntity)
             .toList();

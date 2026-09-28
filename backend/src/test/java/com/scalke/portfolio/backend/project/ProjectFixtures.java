@@ -1,6 +1,7 @@
 package com.scalke.portfolio.backend.project;
 
 import com.scalke.portfolio.backend.project.domain.model.Project;
+import com.scalke.portfolio.backend.project.domain.model.ProjectScreenshot;
 import com.scalke.portfolio.backend.project.domain.model.ProjectStage;
 import com.scalke.portfolio.backend.project.domain.model.ProjectVisibility;
 import com.scalke.portfolio.backend.project.domain.model.Technology;
@@ -34,11 +35,23 @@ public final class ProjectFixtures {
             null,
             false,
             displayOrder,
-            List.of(technologies));
+            List.of(technologies),
+            null,
+            List.of());
     }
 
     public static Project published(String slug, LocalDate start, int displayOrder, Technology... technologies) {
         return project(slug, ProjectVisibility.PUBLISHED, DateRange.ongoingSince(start), displayOrder, technologies);
+    }
+
+    /**
+     * Le même projet avec une couverture et des captures (identifiants de médias déjà créés).
+     */
+    public static Project withImages(Project project, Long coverMediaId, ProjectScreenshot... screenshots) {
+        return new Project(project.id(), project.title(), project.slug(), project.shortDescription(),
+            project.descriptionMarkdown(), project.stage(), project.visibility(), project.period(),
+            project.repositoryUrl(), project.demoUrl(), project.featured(), project.displayOrder(),
+            project.technologies(), coverMediaId, List.of(screenshots));
     }
 
     /**

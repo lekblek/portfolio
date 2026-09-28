@@ -14,15 +14,17 @@ import org.springframework.transaction.annotation.Transactional;
 public class GetPublishedProjectUseCase {
 
     private final ProjectRepository projectRepository;
+    private final PublishedProjectAssembler assembler;
 
     /**
      * Un projet inexistant et un projet non publié produisent la même erreur : l'API publique ne
      * confirme pas l'existence d'un contenu invisible ({@code docs/05-conventions-api.md} §9, D-U).
      */
     @Transactional(readOnly = true)
-    public Project execute(String slug) {
+    public PublishedProject execute(String slug) {
         return Slug.parse(slug)
             .flatMap(projectRepository::findPublishedBySlug)
+            .map(assembler::withAllImages)
             .orElseThrow(() -> new ResourceNotFoundException(
                 ErrorCode.RESOURCE_NOT_FOUND, "Projet introuvable."));
     }

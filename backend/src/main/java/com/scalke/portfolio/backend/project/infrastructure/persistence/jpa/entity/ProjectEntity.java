@@ -67,6 +67,21 @@ public class ProjectEntity {
     private int displayOrder;
 
     /**
+     * Identifiant d'une image du module {@code media} : jamais une entité de ce module (ADR 0002, D-BV).
+     */
+    @Column(name = "cover_media_id")
+    private Long coverMediaId;
+
+    /**
+     * Captures ({@code project_screenshot}) ; l'ordre est fixé par le domaine. {@code @BatchSize} : pour une
+     * page de projets, une seule requête charge les captures de tous les projets chargés.
+     */
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "project_screenshot", joinColumns = @JoinColumn(name = "project_id"))
+    @BatchSize(size = 100)
+    private List<ProjectScreenshotEmbeddable> screenshots = new ArrayList<>();
+
+    /**
      * Références vers un autre agrégat : aucune cascade, le projet ne crée ni ne supprime une technologie.
      * <p>
      * {@code @BatchSize} (D-AB) : pour une page de projets, les technologies de tous les projets chargés
@@ -84,7 +99,8 @@ public class ProjectEntity {
     @Builder
     private ProjectEntity(String title, String slug, String shortDescription, String descriptionMarkdown,
                           ProjectStage stage, ProjectVisibility visibility, LocalDate startDate, LocalDate endDate,
-                          String repositoryUrl, String demoUrl, boolean featured, int displayOrder) {
+                          String repositoryUrl, String demoUrl, boolean featured, int displayOrder,
+                          Long coverMediaId, List<ProjectScreenshotEmbeddable> screenshots) {
         this.title = title;
         this.slug = slug;
         this.shortDescription = shortDescription;
@@ -97,6 +113,8 @@ public class ProjectEntity {
         this.demoUrl = demoUrl;
         this.featured = featured;
         this.displayOrder = displayOrder;
+        this.coverMediaId = coverMediaId;
+        this.screenshots = new ArrayList<>(screenshots);
     }
 
     public void addTechnology(TechnologyEntity technology) {

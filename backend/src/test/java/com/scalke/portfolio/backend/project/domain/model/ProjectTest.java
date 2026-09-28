@@ -44,7 +44,7 @@ class ProjectTest {
     @Test
     void requires_a_visibility() {
         assertThatThrownBy(() -> new Project(null, "Titre", Slug.of("titre"), "Résumé", "# Titre",
-            ProjectStage.IN_PROGRESS, null, ONGOING, null, null, false, 0, List.of()))
+            ProjectStage.IN_PROGRESS, null, ONGOING, null, null, false, 0, List.of(), null, List.of()))
             .isInstanceOf(NullPointerException.class);
     }
 
@@ -65,13 +65,44 @@ class ProjectTest {
             .hasMessageContaining("java");
     }
 
+    @Test
+    void keeps_screenshots_in_display_order() {
+        Project project = withScreenshots(
+            new ProjectScreenshot(30L, null, 2), new ProjectScreenshot(20L, "Accueil", 0), new ProjectScreenshot(10L, null, 2));
+
+        assertThat(project.screenshots()).extracting(ProjectScreenshot::mediaId).containsExactly(20L, 10L, 30L);
+    }
+
+    /**
+     * Invariant 27.
+     */
+    @Test
+    void rejects_the_same_screenshot_twice() {
+        assertThatThrownBy(() -> withScreenshots(new ProjectScreenshot(10L, null, 0), new ProjectScreenshot(10L, null, 1)))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("screenshot 10");
+    }
+
+    @Test
+    void validates_each_screenshot() {
+        assertThatThrownBy(() -> new ProjectScreenshot(10L, null, -1)).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new ProjectScreenshot(10L, "a".repeat(301), 0)).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new ProjectScreenshot(null, null, 0)).isInstanceOf(NullPointerException.class);
+    }
+
+    private static Project withScreenshots(ProjectScreenshot... screenshots) {
+        return new Project(null, "Titre", Slug.of("titre"), "Résumé", "# Titre",
+            ProjectStage.IN_PROGRESS, ProjectVisibility.DRAFT, ONGOING, null, null, false, 0, List.of(),
+            7L, List.of(screenshots));
+    }
+
     private static Project project(ProjectStage stage, DateRange period) {
         return new Project(null, "Titre", Slug.of("titre"), "Résumé", "# Titre",
-            stage, ProjectVisibility.DRAFT, period, null, null, false, 0, List.of());
+            stage, ProjectVisibility.DRAFT, period, null, null, false, 0, List.of(), null, List.of());
     }
 
     private static Project project(List<Technology> technologies) {
         return new Project(null, "Titre", Slug.of("titre"), "Résumé", "# Titre",
-            ProjectStage.IN_PROGRESS, ProjectVisibility.DRAFT, ONGOING, null, null, false, 0, technologies);
+            ProjectStage.IN_PROGRESS, ProjectVisibility.DRAFT, ONGOING, null, null, false, 0, technologies, null, List.of());
     }
 }

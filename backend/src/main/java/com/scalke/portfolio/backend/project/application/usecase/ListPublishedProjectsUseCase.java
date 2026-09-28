@@ -14,9 +14,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class ListPublishedProjectsUseCase {
 
     private final ProjectRepository projectRepository;
+    private final PublishedProjectAssembler assembler;
 
+    /**
+     * Projets publiés et leur couverture (D-BW) : une requête de plus pour toute la page, aucune si aucun projet
+     * de la page n'a de couverture.
+     */
     @Transactional(readOnly = true)
-    public PageResult<Project> execute(ProjectFilter filter, PageQuery query) {
-        return projectRepository.findPublished(filter, query);
+    public PageResult<PublishedProject> execute(ProjectFilter filter, PageQuery query) {
+        PageResult<Project> page = projectRepository.findPublished(filter, query);
+        return new PageResult<>(assembler.withCovers(page.content()), page.page(), page.size(), page.totalElements());
     }
 }

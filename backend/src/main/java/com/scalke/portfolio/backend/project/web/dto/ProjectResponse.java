@@ -1,5 +1,7 @@
 package com.scalke.portfolio.backend.project.web.dto;
 
+import com.scalke.portfolio.backend.media.application.query.PublicImage;
+import com.scalke.portfolio.backend.project.application.usecase.PublishedProject;
 import com.scalke.portfolio.backend.project.domain.model.Project;
 import com.scalke.portfolio.backend.project.domain.model.ProjectStage;
 
@@ -8,7 +10,8 @@ import java.util.List;
 
 /**
  * Détail public d'un projet ({@code GET /api/public/projects/{slug}}, D-W). Les champs optionnels
- * sont présents avec {@code null} (C10) ; la période est aplatie comme pour le parcours (D-P).
+ * sont présents avec {@code null} (C10) ; la période est aplatie comme pour le parcours (D-P). Couverture
+ * ({@code null} si aucune) et captures ({@code []} si aucune) sous leur forme publique (D-BW).
  */
 public record ProjectResponse(
     String title,
@@ -21,10 +24,13 @@ public record ProjectResponse(
     String repositoryUrl,
     String demoUrl,
     boolean featured,
+    PublicImage cover,
+    List<ProjectScreenshotResponse> screenshots,
     List<TechnologyResponse> technologies
 ) {
 
-    public static ProjectResponse from(Project project) {
+    public static ProjectResponse from(PublishedProject published) {
+        Project project = published.project();
         return new ProjectResponse(
             project.title(),
             project.slug().value(),
@@ -36,6 +42,8 @@ public record ProjectResponse(
             project.repositoryUrl(),
             project.demoUrl(),
             project.featured(),
+            published.cover(),
+            ProjectScreenshotResponse.from(published.screenshots()),
             TechnologyResponse.from(project.technologies()));
     }
 }

@@ -1,9 +1,13 @@
 package com.scalke.portfolio.backend.project.web.controller;
 
+import com.scalke.portfolio.backend.media.application.query.PublicImage;
 import com.scalke.portfolio.backend.project.application.usecase.GetPublishedProjectUseCase;
 import com.scalke.portfolio.backend.project.application.usecase.ListPublishedProjectsUseCase;
+import com.scalke.portfolio.backend.project.application.usecase.PublishedProject;
+import com.scalke.portfolio.backend.project.application.usecase.PublishedScreenshot;
 import com.scalke.portfolio.backend.project.domain.model.Project;
 import com.scalke.portfolio.backend.project.domain.model.ProjectFilter;
+import com.scalke.portfolio.backend.project.domain.model.ProjectScreenshot;
 import com.scalke.portfolio.backend.project.domain.model.ProjectStage;
 import com.scalke.portfolio.backend.project.domain.model.ProjectVisibility;
 import com.scalke.portfolio.backend.project.domain.model.Technology;
@@ -41,7 +45,15 @@ class PublicProjectControllerTest {
         ProjectStage.IN_PROGRESS, ProjectVisibility.PUBLISHED,
         DateRange.ongoingSince(LocalDate.of(2024, 1, 1)),
         "https://example.test/repo", null, true, 3,
-        List.of(new Technology(7L, "Java", Slug.of("java"), 0), new Technology(8L, "Angular", Slug.of("angular"), 1)));
+        List.of(new Technology(7L, "Java", Slug.of("java"), 0), new Technology(8L, "Angular", Slug.of("angular"), 1)),
+        5L,
+        List.of(new ProjectScreenshot(6L, "Accueil", 0)));
+
+    private static final PublicImage COVER = new PublicImage(
+        "/api/public/media/3f2a9c0e8d7b4a1f9e6c5b4a3d2e1f0a.webp", 1200, 630, "Tableau de bord");
+
+    private static final PublicImage SCREENSHOT = new PublicImage(
+        "/api/public/media/0123456789abcdef0123456789abcdef.png", 1280, 800, null);
 
     @Autowired
     MockMvc mockMvc;
@@ -55,7 +67,7 @@ class PublicProjectControllerTest {
     @Test
     void lists_projects_as_a_page_of_summaries() throws Exception {
         given(listPublishedProjectsUseCase.execute(any(), any()))
-            .willReturn(new PageResult<>(List.of(PORTFOLIO), 0, 10, 1));
+            .willReturn(new PageResult<>(List.of(new PublishedProject(PORTFOLIO, COVER, List.of())), 0, 10, 1));
 
         mockMvc.perform(get("/api/public/projects").contextPath("/api"))
             .andExpect(status().isOk())
@@ -71,6 +83,13 @@ class PublicProjectControllerTest {
             .andExpect(jsonPath("$.content[0].technologies[1].slug").value("angular"))
             .andExpect(jsonPath("$.content[0].technologies[0].id").doesNotHaveJsonPath())
             .andExpect(jsonPath("$.content[0].technologies[0].displayOrder").doesNotHaveJsonPath())
+            // couverture sous forme publique (D-BW) ; ni identifiant ni captures dans la liste
+            .andExpect(jsonPath("$.content[0].cover.url").value("/api/public/media/3f2a9c0e8d7b4a1f9e6c5b4a3d2e1f0a.webp"))
+            .andExpect(jsonPath("$.content[0].cover.width").value(1200))
+            .andExpect(jsonPath("$.content[0].cover.height").value(630))
+            .andExpect(jsonPath("$.content[0].cover.altText").value("Tableau de bord"))
+            .andExpect(jsonPath("$.content[0].coverMediaId").doesNotHaveJsonPath())
+            .andExpect(jsonPath("$.content[0].screenshots").doesNotHaveJsonPath())
             // le détail n'est pas dans la liste
             .andExpect(jsonPath("$.content[0].descriptionMarkdown").doesNotHaveJsonPath())
             // aucun champ technique ni interne (C03, D-W)
@@ -129,7 +148,8 @@ class PublicProjectControllerTest {
 
     @Test
     void returns_the_project_detail_with_explicit_nulls() throws Exception {
-        given(getPublishedProjectUseCase.execute("portfolio-full-stack")).willReturn(PORTFOLIO);
+        given(getPublishedProjectUseCase.execute("portfolio-full-stack")).willReturn(new PublishedProject(
+            PORTFOLIO, null, List.of(new PublishedScreenshot(SCREENSHOT, "Accueil"))));
 
         mockMvc.perform(get("/api/public/projects/portfolio-full-stack").contextPath("/api"))
             .andExpect(status().isOk())
@@ -139,6 +159,12 @@ class PublicProjectControllerTest {
             .andExpect(jsonPath("$.demoUrl").hasJsonPath())
             .andExpect(jsonPath("$.demoUrl").value(nullValue()))
             .andExpect(jsonPath("$.technologies[0].slug").value("java"))
+            .andExpect(jsonPath("$.cover").hasJsonPath())
+            .andExpect(jsonPath("$.cover").value(nullValue()))
+            .andExpect(jsonPath("$.screenshots[0].image.url").value("/api/public/media/0123456789abcdef0123456789abcdef.png"))
+            .andExpect(jsonPath("$.screenshots[0].image.altText").hasJsonPath())
+            .andExpect(jsonPath("$.screenshots[0].image.altText").value(nullValue()))
+            .andExpect(jsonPath("$.screenshots[0].caption").value("Accueil"))
             .andExpect(jsonPath("$.id").doesNotHaveJsonPath())
             .andExpect(jsonPath("$.visibility").doesNotHaveJsonPath());
     }
