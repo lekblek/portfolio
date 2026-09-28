@@ -1,5 +1,8 @@
 package com.scalke.portfolio.backend.profile.web.dto;
 
+import com.scalke.portfolio.backend.media.application.query.PublicDocument;
+import com.scalke.portfolio.backend.media.application.query.PublicImage;
+import com.scalke.portfolio.backend.profile.application.usecase.PublicProfile;
 import com.scalke.portfolio.backend.profile.domain.model.Profile;
 import com.scalke.portfolio.backend.profile.domain.model.Skill;
 
@@ -11,7 +14,8 @@ import java.util.stream.Collectors;
  * Représentation publique du profil ({@code GET /api/public/profile}).
  * <p>
  * Tous les tableaux sont déjà triés dans l'ordre d'affichage et valent {@code []} lorsqu'ils sont vides ;
- * les champs optionnels sont présents avec {@code null} (C10).
+ * les champs optionnels sont présents avec {@code null} (C10). Avatar et CV sous leur forme publique
+ * ({@code null} si absents, D-BX).
  */
 public record ProfileResponse(
     String displayName,
@@ -20,6 +24,8 @@ public record ProfileResponse(
     String aboutMarkdown,
     String publicLocation,
     String publicEmail,
+    PublicImage avatar,
+    PublicDocument cv,
     List<ProfessionalLinkResponse> links,
     List<SkillGroupResponse> skillGroups,
     List<ExperienceResponse> experiences,
@@ -27,7 +33,8 @@ public record ProfileResponse(
     List<CertificationResponse> certifications
 ) {
 
-    public static ProfileResponse from(Profile profile) {
+    public static ProfileResponse from(PublicProfile published) {
+        Profile profile = published.profile();
         return new ProfileResponse(
             profile.displayName(),
             profile.professionalTitle(),
@@ -35,6 +42,8 @@ public record ProfileResponse(
             profile.aboutMarkdown(),
             profile.publicLocation(),
             profile.publicEmail(),
+            published.avatar(),
+            published.cv(),
             profile.links().stream().map(ProfessionalLinkResponse::from).toList(),
             groupSkillsByCategory(profile.skills()),
             profile.experiences().stream().map(ExperienceResponse::from).toList(),

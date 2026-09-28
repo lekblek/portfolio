@@ -20,8 +20,9 @@ public final class ProfilePersistenceMapper {
             SkillPersistenceMapper.map(entity.getSkills()),
             ExperiencePersistenceMapper.map(entity.getExperiences()),
             EducationPersistenceMapper.map(entity.getEducations()),
-            CertificationPersistenceMapper.map(entity.getCertifications())
-        );
+            CertificationPersistenceMapper.map(entity.getCertifications()),
+            entity.getAvatarMediaId(),
+            entity.getCvMediaId());
     }
 
     public static ProfileEntity toEntity(Profile profile) {
@@ -32,6 +33,8 @@ public final class ProfilePersistenceMapper {
         entity.setAboutMarkdown(profile.aboutMarkdown());
         entity.setPublicLocation(profile.publicLocation());
         entity.setPublicEmail(profile.publicEmail());
+        entity.setAvatarMediaId(profile.avatarMediaId());
+        entity.setCvMediaId(profile.cvMediaId());
 
         profile.links().forEach(link -> entity.addLink(link.label(), link.url(), link.displayOrder()));
         profile.skills().forEach(skill -> entity.addSkill(skill.name(), skill.category(), skill.displayOrder()));

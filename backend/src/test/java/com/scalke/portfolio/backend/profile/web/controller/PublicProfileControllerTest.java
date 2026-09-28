@@ -1,6 +1,8 @@
 package com.scalke.portfolio.backend.profile.web.controller;
 
+import com.scalke.portfolio.backend.media.application.query.PublicImage;
 import com.scalke.portfolio.backend.profile.application.usecase.GetProfileUseCase;
+import com.scalke.portfolio.backend.profile.application.usecase.PublicProfile;
 import com.scalke.portfolio.backend.profile.domain.model.ProfessionalLink;
 import com.scalke.portfolio.backend.profile.domain.model.Profile;
 import com.scalke.portfolio.backend.profile.domain.model.Skill;
@@ -31,7 +33,7 @@ class PublicProfileControllerTest {
 
     @Test
     void returns_the_public_profile() throws Exception {
-        given(getProfileUseCase.execute()).willReturn(new Profile(
+        given(getProfileUseCase.execute()).willReturn(new PublicProfile(new Profile(
             "Blek Gedeon Ngossanga",
             "Développeur full-stack",
             "Je conçois des solutions modernes et évolutives.",
@@ -44,7 +46,11 @@ class PublicProfileControllerTest {
                 new Skill(2L, "Angular", "Frontend", 1)),
             List.of(),
             List.of(),
-            List.of()));
+            List.of(),
+            5L,
+            6L),
+            new PublicImage("/api/public/media/3f2a9c0e8d7b4a1f9e6c5b4a3d2e1f0a.webp", 400, 400, "Portrait"),
+            null));
 
         mockMvc.perform(get("/api/public/profile").contextPath("/api"))
             .andExpect(status().isOk())
@@ -54,7 +60,14 @@ class PublicProfileControllerTest {
             .andExpect(jsonPath("$.id").doesNotExist())
             .andExpect(jsonPath("$.skillGroups[0].category").value("Backend"))
             .andExpect(jsonPath("$.skillGroups[0].skills[0].name").value("Spring Boot"))
-            .andExpect(jsonPath("$.skillGroups[0].skills[0].category").doesNotExist());
+            .andExpect(jsonPath("$.skillGroups[0].skills[0].category").doesNotExist())
+            // médias sous forme publique (D-BX) ; jamais leurs identifiants
+            .andExpect(jsonPath("$.avatar.url").value("/api/public/media/3f2a9c0e8d7b4a1f9e6c5b4a3d2e1f0a.webp"))
+            .andExpect(jsonPath("$.avatar.altText").value("Portrait"))
+            .andExpect(jsonPath("$.cv").hasJsonPath())
+            .andExpect(jsonPath("$.cv").value(nullValue()))
+            .andExpect(jsonPath("$.avatarMediaId").doesNotExist())
+            .andExpect(jsonPath("$.cvMediaId").doesNotExist());
     }
 
     @Test

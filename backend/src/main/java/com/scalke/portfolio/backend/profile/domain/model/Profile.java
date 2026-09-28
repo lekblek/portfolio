@@ -5,6 +5,9 @@ import java.util.List;
 /**
  * Agrégat du profil professionnel (singleton en V1). Les listes sont immuables et déjà
  * triées dans l'ordre d'affichage (D-L).
+ * <p>
+ * Avatar (une image) et CV (un PDF, D06) sont des références facultatives vers le catalogue {@code media},
+ * par identifiant (ADR 0002, D-BX) ; PostgreSQL interdit de supprimer un média ainsi référencé (invariant 13).
  */
 public record Profile(
     String displayName,
@@ -17,7 +20,9 @@ public record Profile(
     List<Skill> skills,
     List<Experience> experiences,
     List<Education> educations,
-    List<Certification> certifications
+    List<Certification> certifications,
+    Long avatarMediaId,
+    Long cvMediaId
 ) {
 
     public Profile {

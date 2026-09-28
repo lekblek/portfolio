@@ -1,5 +1,8 @@
 package com.scalke.portfolio.backend.profile.application.usecase;
 
+import com.scalke.portfolio.backend.media.application.query.PublicDocument;
+import com.scalke.portfolio.backend.media.domain.model.Media;
+import com.scalke.portfolio.backend.media.domain.port.MediaRepository;
 import com.scalke.portfolio.backend.profile.domain.model.Certification;
 import com.scalke.portfolio.backend.profile.domain.model.Education;
 import com.scalke.portfolio.backend.profile.domain.model.Experience;
@@ -22,6 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
+import static com.scalke.portfolio.backend.media.MediaFixtures.image;
+import static com.scalke.portfolio.backend.media.MediaFixtures.pdf;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -37,6 +42,9 @@ class GetProfileUseCaseIT extends AbstractIntegrationTest {
     @Autowired
     EntityManagerFactory entityManagerFactory;
 
+    @Autowired
+    MediaRepository mediaRepository;
+
     @Test
     void fails_when_no_profile_exists() {
         assertThatThrownBy(() -> getProfileUseCase.execute())
@@ -47,7 +55,7 @@ class GetProfileUseCaseIT extends AbstractIntegrationTest {
     void returns_the_profile_with_its_five_ordered_collections() {
         givenACompleteProfile();
 
-        Profile profile = getProfileUseCase.execute();
+        Profile profile = getProfileUseCase.execute().profile();
 
         assertThat(profile.links())
             .extracting(ProfessionalLink::label)
@@ -83,6 +91,47 @@ class GetProfileUseCaseIT extends AbstractIntegrationTest {
         getProfileUseCase.execute();
 
         assertThat(statistics.getPrepareStatementCount()).isEqualTo(1 + 5);
+    }
+
+    /**
+     * D-BX : avatar et CV sous forme publique, une requête de plus par média ; un avatar qui n'est pas une
+     * image ou un CV qui n'est pas un PDF n'est pas exposé.
+     */
+    @Test
+    void returns_the_avatar_and_the_cv_in_their_public_form() {
+        Media avatar = mediaRepository.create(image("Portrait"));
+        Media cv = mediaRepository.create(pdf());
+        givenAProfileWithMedia(avatar.id(), cv.id());
+        Statistics statistics = entityManagerFactory.unwrap(SessionFactory.class).getStatistics();
+        statistics.clear();
+
+        PublicProfile published = getProfileUseCase.execute();
+
+        assertThat(published.avatar().url()).isEqualTo("/api/public/media/" + avatar.storageKey().value());
+        assertThat(published.avatar().altText()).isEqualTo("Portrait");
+        assertThat(published.cv()).isEqualTo(new PublicDocument("/api/public/media/" + cv.storageKey().value(), 2_048));
+        assertThat(statistics.getPrepareStatementCount()).isEqualTo(1 + 5 + 2);
+    }
+
+    @Test
+    void does_not_expose_a_media_of_the_wrong_kind() {
+        Media image = mediaRepository.create(image(null));
+        Media document = mediaRepository.create(pdf());
+        givenAProfileWithMedia(document.id(), image.id());
+
+        PublicProfile published = getProfileUseCase.execute();
+
+        assertThat(published.avatar()).isNull();
+        assertThat(published.cv()).isNull();
+    }
+
+    private void givenAProfileWithMedia(Long avatarMediaId, Long cvMediaId) {
+        ProfileEntity profile = new ProfileEntity("Nom", "Titre", "Présentation.");
+        profile.setAvatarMediaId(avatarMediaId);
+        profile.setCvMediaId(cvMediaId);
+        entityManager.persist(profile);
+        entityManager.flush();
+        entityManager.clear();
     }
 
     private void givenACompleteProfile() {

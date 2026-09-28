@@ -34,7 +34,9 @@ class ProfilePersistenceMapperTest {
             List.of(new Education(null, "ENSA Tanger", "Ingénieur", "Informatique", "Tanger",
                 DateRange.between(LocalDate.of(2018, 9, 1), LocalDate.of(2023, 6, 30)), "Cycle ingénieur", 1)),
             List.of(new Certification(null, "Certification", "Émetteur",
-                LocalDate.of(2025, 1, 1), LocalDate.of(2027, 1, 1), "https://example.test/cert", 2)));
+                LocalDate.of(2025, 1, 1), LocalDate.of(2027, 1, 1), "https://example.test/cert", 2)),
+            3L,
+            4L);
 
         ProfileEntity entity = ProfilePersistenceMapper.toEntity(profile);
 

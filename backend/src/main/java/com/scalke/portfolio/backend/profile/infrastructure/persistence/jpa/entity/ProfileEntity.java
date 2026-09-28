@@ -49,6 +49,17 @@ public class ProfileEntity {
     @Column(name = "about_markdown", length = Length.LONG32, columnDefinition = "TEXT")
     private String aboutMarkdown;
 
+    /**
+     * Identifiants de médias du module {@code media} : jamais des entités de ce module (ADR 0002, D-BX).
+     */
+    @Setter
+    @Column(name = "avatar_media_id")
+    private Long avatarMediaId;
+
+    @Setter
+    @Column(name = "cv_media_id")
+    private Long cvMediaId;
+
     @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @OrderBy("displayOrder ASC, label ASC")
     private List<ProfessionalLinkEntity> links = new ArrayList<>();

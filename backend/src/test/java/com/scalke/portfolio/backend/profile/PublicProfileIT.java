@@ -1,5 +1,9 @@
 package com.scalke.portfolio.backend.profile;
 
+import com.scalke.portfolio.backend.media.application.usecase.MediaUpload;
+import com.scalke.portfolio.backend.media.application.usecase.UploadMediaUseCase;
+import com.scalke.portfolio.backend.media.domain.model.Media;
+import com.scalke.portfolio.backend.media.infrastructure.storage.MediaStorageProperties;
 import com.scalke.portfolio.backend.profile.infrastructure.persistence.jpa.entity.CertificationEntity;
 import com.scalke.portfolio.backend.profile.infrastructure.persistence.jpa.entity.ExperienceEntity;
 import com.scalke.portfolio.backend.profile.infrastructure.persistence.jpa.entity.ProfileEntity;
@@ -11,8 +15,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.time.LocalDate;
 
+import static com.scalke.portfolio.backend.media.MediaSamples.PDF;
+import static com.scalke.portfolio.backend.media.MediaSamples.PNG;
 import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -31,12 +40,51 @@ class PublicProfileIT extends AbstractIntegrationTest {
     @Autowired
     EntityManager entityManager;
 
+    @Autowired
+    UploadMediaUseCase uploadMediaUseCase;
+
+    @Autowired
+    MediaStorageProperties mediaStorageProperties;
+
     @Test
     void returns_404_as_problem_detail_when_no_profile_exists() throws Exception {
         mockMvc.perform(get("/api/public/profile").contextPath("/api"))
             .andExpect(status().isNotFound())
             .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
             .andExpect(jsonPath("$.code").value("RESOURCE_NOT_FOUND"));
+    }
+
+    /**
+     * D-BX : les adresses publiées pour l'avatar et le CV servent les fichiers envoyés.
+     */
+    @Test
+    void publishes_an_avatar_and_a_cv_whose_urls_serve_the_uploaded_files() throws Exception {
+        Media avatar = uploadMediaUseCase.execute(new MediaUpload("portrait.png", "Portrait", new ByteArrayInputStream(PNG)));
+        Media cv = uploadMediaUseCase.execute(new MediaUpload("cv.pdf", null, new ByteArrayInputStream(PDF)));
+        try {
+            ProfileEntity profile = new ProfileEntity("Blek Gedeon Ngossanga", "Développeur full-stack", "Bio courte");
+            profile.setAvatarMediaId(avatar.id());
+            profile.setCvMediaId(cv.id());
+            entityManager.persist(profile);
+            entityManager.flush();
+            entityManager.clear();
+            String cvUrl = "/api/public/media/" + cv.storageKey().value();
+
+            mockMvc.perform(get("/api/public/profile").contextPath("/api"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.avatar.url").value("/api/public/media/" + avatar.storageKey().value()))
+                .andExpect(jsonPath("$.avatar.width").value(3))
+                .andExpect(jsonPath("$.avatar.altText").value("Portrait"))
+                .andExpect(jsonPath("$.cv.url").value(cvUrl))
+                .andExpect(jsonPath("$.cv.sizeBytes").value(PDF.length));
+            mockMvc.perform(get(cvUrl).contextPath("/api"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_PDF))
+                .andExpect(content().bytes(PDF));
+        } finally {
+            deleteFile(avatar);
+            deleteFile(cv);
+        }
     }
 
     @Test
@@ -117,5 +165,12 @@ class PublicProfileIT extends AbstractIntegrationTest {
             .andExpect(jsonPath("$.experiences[0].displayOrder").doesNotHaveJsonPath())
             .andExpect(jsonPath("$.certifications[0].id").doesNotHaveJsonPath())
             .andExpect(jsonPath("$.certifications[0].displayOrder").doesNotHaveJsonPath());
+    }
+
+    /**
+     * La transaction du test annule l'inscription au catalogue, pas l'écriture du fichier.
+     */
+    private void deleteFile(Media media) throws IOException {
+        Files.deleteIfExists(mediaStorageProperties.storageRoot().resolve(media.storageKey().value()));
     }
 }
