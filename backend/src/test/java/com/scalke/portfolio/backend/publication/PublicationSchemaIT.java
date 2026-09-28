@@ -98,6 +98,26 @@ class PublicationSchemaIT extends AbstractIntegrationTest {
             .hasMessageContaining("publication_first_published_before_published_check");
     }
 
+    /**
+     * Invariant 13 (D-BY) : une couverture utilisée ne peut pas être supprimée.
+     */
+    @Test
+    void refuses_to_delete_a_cover() {
+        long media = jdbcClient.sql("""
+                    INSERT INTO media (storage_key, original_name, size_bytes, width, height, created_at)
+                    VALUES ('3f2a9c0e8d7b4a1f9e6c5b4a3d2e1f0a.png', 'couverture.png', 10, 1, 1, now())
+                    RETURNING id
+                    """)
+            .query(Long.class)
+            .single();
+        insert("article", "ARTICLE", "DRAFT", null);
+        jdbcClient.sql("UPDATE publication SET cover_media_id = :media").param("media", media).update();
+
+        assertThatThrownBy(() -> jdbcClient.sql("DELETE FROM media WHERE id = :media").param("media", media).update())
+            .isInstanceOf(DataIntegrityViolationException.class)
+            .hasMessageContaining("publication_cover_media_fk");
+    }
+
     private void insert(String slug, String type, String status, OffsetDateTime publishedAt) {
         insert(slug, type, status, publishedAt, publishedAt);
     }
