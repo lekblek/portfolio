@@ -2,25 +2,25 @@
 
 Ce fichier est la **seule** source de vérité sur l'avancement. Il ne répète pas le contenu des autres documents : il pointe vers eux.
 
-Dernière mise à jour : 2026-09-28 (étape 24 poussée, CI verte ; étape 25 terminée et vérifiée, commits à faire)
+Dernière mise à jour : 2026-09-28 (étape 25 poussée, CI verte ; étape 26 terminée et vérifiée, commits à faire)
 
 ---
 
 ## 1. État courant
 
 ```text
-Dernière étape terminée   : 25 — Abstraction MediaStorage (vérifiée, commits à faire) ; 24 poussée, CI verte (run 36460488555)
+Dernière étape terminée   : 26 — Envoi et validation des médias (vérifiée, commits à faire) ; 25 poussée, CI verte (run 36461821408)
 Étape en cours            : aucune
-Prochaine étape prévue    : 26 — Implémenter LocalMediaStorage (envoi, validation, suppression)
-État                      : PRÊT après commit et push de l'étape 25
+Prochaine étape prévue    : 27 — Construire le catalogue Media
+État                      : PRÊT après commit et push de l'étape 26
 Branche                   : develop
-Vérification              : ./mvnw clean verify → 361 tests verts (198 *Test, 163 *IT) à la fin de l'étape 25
+Vérification              : ./mvnw clean verify → 375 tests verts (211 *Test, 164 *IT) à la fin de l'étape 26
 ```
 
 ## 2. Prochaine action
 
-1. Committer et pousser l'étape 25, vérifier la CI, puis remplacer les 🟡 par ✅.
-2. Étape 26 : `MediaStorage.store` et `delete` avec leur appelant ; validation des formats par signature (jamais par le type annoncé) et des tailles (5 Mo images, 10 Mo PDF, D08) ; `UNSUPPORTED_MEDIA_FORMAT` (KI-23 : 409 à reconsidérer). Pas de route d'envoi avant l'authentification (D-AU).
+1. Committer et pousser l'étape 26, vérifier la CI, puis remplacer les 🟡 par ✅.
+2. Étape 27 : catalogue `Media` (métadonnées, dimensions des images), `delete` avec ses appelants (compensation, suppression contrôlée, D-BT), puis rattachement des médias reportés : couverture et captures des projets (D-AD), avatar et CV du profil (D-B), couvertures des publications et des séries.
 3. Confirmer ou infirmer D-T (cohérence `stage` ⇔ `endDate`) : `docs/decisions/registre-implementation.md`.
 
 ---
@@ -78,8 +78,9 @@ Légende : ✅ terminée et poussée · 🟡 terminée et vérifiée, commits à
 | 23.3 | API publique des séries et table des matières | ✅ | `9834423`, `97f0568` (CI : run 36458752968) |
 | 24.1 | Navigation dans le domaine : position publique, voisins visibles | ✅ | `b368ffb` |
 | 24.2 | `GET /api/public/publications/{slug}/series` : navigation et progression depuis un article | ✅ | `4d974c0`, `b2fb6c4`, `262925c` (CI : run 36460488555) |
-| 25 | Port `MediaStorage` (lecture), `LocalMediaStorage`, `GET /api/public/media/{storageKey}` | 🟡 | à committer |
-| 26 → 52 | Voir `docs/steps/liste_complete_etapes.md` | ⏳ | — |
+| 25 | Port `MediaStorage` (lecture), `LocalMediaStorage`, `GET /api/public/media/{storageKey}` | ✅ | `dbfe4ee`, `d1d1825` (CI : run 36461821408) |
+| 26 | Envoi validé (signature, taille par format), écriture atomique ; 415 / 413 | 🟡 | à committer |
+| 27 → 52 | Voir `docs/steps/liste_complete_etapes.md` | ⏳ | — |
 
 Après le push, remplacer les 🟡 par ✅ et noter les hashes.
 
@@ -106,6 +107,7 @@ Index : [`decisions/README.md`](decisions/README.md).
 | D-BE … D-BK | Périmètre de `series` (lecture seule avant l'étape 36) ; invariants 1 à 3 en SQL, NEWS exclue par clé composite ; série publique si un article est visible, positions publiques par rang ; façade `PublicationQueryService` ; contrat public ; 5 et 4 requêtes ; slug stable à l'étape 36 | Actives (23) |
 | D-BL … D-BN | Navigation servie par `series` sous `/publications/{slug}/series` ; voisins et position parmi les visibles, calculés par le domaine ; 6 requêtes | Actives (24) |
 | D-BO … D-BQ | Port `MediaStorage` livré avec son premier appelant (écart assumé avec la liste des étapes) ; clé opaque et lecture publique en cache immuable ; cas d'usage sans base non transactionnel | Actives (25) |
+| D-BR … D-BT | Format par signature, 5 / 10 Mio, lecture bornée, écriture atomique ; 415 et 413 (`MEDIA_TOO_LARGE`) ; suppression à l'étape 27 | Actives (26) |
 | 14.4 | Exposition publique de `publicEmail` | À confirmer |
 
 ## 5. Problèmes connus
@@ -121,10 +123,15 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | KI-20 | AMÉLIORATION | `GlobalExceptionHandler` : le gestionnaire `Exception` interceptera `AccessDeniedException` (→ 500) | étape 32 |
 | KI-21 | AMÉLIORATION | `@types/node ^20` alors que Node 24 est la cible | étape 37 |
 | KI-22 | AMÉLIORATION | SSR : `security.allowedHosts` vide | étape 52 (déploiement) |
-| KI-23 | AMÉLIORATION | `UNSUPPORTED_MEDIA_FORMAT` mappé en 409 (415 ou 400 plus juste) | étape 27 |
 | KI-16 | OPTIONNEL | `V001` : virgule manquante avant `CONSTRAINT profile_single_row` (comportement identique) ; migration appliquée, non modifiable | aucun |
 | KI-29 | OPTIONNEL | Surface sans appelant : `ProfileEntity.removeLink` / `removeSkill`, `App.title` (frontend) ; codes d'erreur des séries et médias déclarés d'avance | au plus tard avec l'administration du profil (étape 36) et le frontend (37) |
 | KI-30 | OPTIONNEL | Les `*IT` transactionnels (écriture de statut, lectures publiques) ne prouvent pas le comportement après commit | à reprendre si un défaut de transaction apparaît |
+
+### Résolus le 2026-09-28 (étape 26)
+
+| ID | Problème | Résolution |
+|---|---|---|
+| KI-23 | `UNSUPPORTED_MEDIA_FORMAT` prévu en 409 | 415, et `MEDIA_TOO_LARGE` en 413 (D-BS) |
 
 ### Résolus le 2026-09-28 (audit du 2026-09-25, étape 22)
 
@@ -182,7 +189,8 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | Création et modification avec slug libre (`firstAvailable`), `SLUG_ALREADY_USED` sur conflit `UNIQUE` | Étape 36 | D-BD : aucun appelant avant l'administration |
 | Écriture des séries (création, chapitres, `NEWS_CANNOT_JOIN_SERIES`, `SERIES_POSITION_ALREADY_USED`) et stabilité de leur slug | Étape 36 | D-BE, D-BK : aucune route d'administration sans authentification |
 | Séries mises en avant sur l'accueil | si le modèle l'adopte | D-BI : absent de `02` §19 |
-| Écriture et suppression de fichiers, validation des formats et tailles | Étape 26 | D-BO : chaque méthode du port arrive avec son appelant |
+| Suppression de fichiers (`MediaStorage.delete`) | Étape 27 | D-BT : arrive avec ses appelants |
+| Route d'envoi et limite multipart à 10 Mio | Étape 36 | D-BR, D-BS : aucune route d'administration sans authentification |
 | Médias privés (fichier visible seulement si le contenu qui l'utilise l'est) | si le besoin apparaît | D-BP : clé imprévisible jugée suffisante |
 | Temps de lecture précalculé (colonne) si la liste devient coûteuse | Étape 52.6 | D-AJ : calculé à la lecture, contenu chargé dans la liste |
 | Prérendu route par route | Étape 52.1 | D22 |

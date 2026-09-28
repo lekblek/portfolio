@@ -512,6 +512,12 @@ transition éditoriale interdite
 
 ---
 
+## 413 — Content Too Large et 415 — Unsupported Media Type
+
+Utilisés pour un fichier envoyé (D-BS) : `MEDIA_TOO_LARGE` (413) au-delà de la taille permise pour son format, `UNSUPPORTED_MEDIA_FORMAT` (415) si son contenu n’est pas un format accepté (PNG, JPEG, WebP, PDF, reconnus par signature).
+
+---
+
 ## 500 — Internal Server Error
 
 Utilisé pour un défaut inattendu du serveur.
@@ -1780,7 +1786,8 @@ Elles sont simplement inutiles pour le périmètre actuel.
 | `SERIES_POSITION_ALREADY_USED`   |  409 | Position déjà occupée dans une série          |
 | `NEWS_CANNOT_JOIN_SERIES`        |  409 | Une `NEWS` ne peut pas appartenir à une série |
 | `MEDIA_STILL_REFERENCED`         |  409 | Média encore référencé                        |
-| `UNSUPPORTED_MEDIA_FORMAT`       |  409 | Format de média non accepté                   |
+| `UNSUPPORTED_MEDIA_FORMAT`       |  415 | Format de média non accepté                   |
+| `MEDIA_TOO_LARGE`                |  413 | Fichier trop volumineux pour son format       |
 ---
 
 # 38. Règles fondamentales

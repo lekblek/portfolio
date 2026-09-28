@@ -546,7 +546,7 @@ storageKey
 
 mais pas le chemin physique utilisé par `LocalMediaStorage`.
 
-État d’implémentation (étape 25) : `StorageKey` (UUID aléatoire et extension du format, D-BP) et lecture publique d’un fichier par sa clé ; les autres attributs (catalogue) arrivent à l’étape 27, l’envoi et sa validation (formats, tailles) à l’étape 26.
+État d’implémentation (étape 25) : `StorageKey` (UUID aléatoire et extension du format, D-BP) et lecture publique d’un fichier par sa clé ; les autres attributs (catalogue) arrivent à l’étape 27. Depuis l’étape 26, un fichier envoyé est reconnu par sa signature et limité à 5 Mio (image) ou 10 Mio (PDF) ; il reçoit une nouvelle clé (D-BR).
 
 ---
 
