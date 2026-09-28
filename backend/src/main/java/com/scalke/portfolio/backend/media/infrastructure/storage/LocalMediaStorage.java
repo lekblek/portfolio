@@ -69,6 +69,15 @@ public class LocalMediaStorage implements MediaStorage {
         }
     }
 
+    @Override
+    public void delete(StorageKey key) {
+        try {
+            Files.deleteIfExists(resolve(key));
+        } catch (IOException e) {
+            throw new UncheckedIOException("cannot delete media " + key, e);
+        }
+    }
+
     /**
      * Le format de la clé exclut déjà toute sortie de la racine ; cette vérification est une seconde barrière.
      */

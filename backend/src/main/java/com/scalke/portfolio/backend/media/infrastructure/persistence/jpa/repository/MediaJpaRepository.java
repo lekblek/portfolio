@@ -3,10 +3,21 @@ package com.scalke.portfolio.backend.media.infrastructure.persistence.jpa.reposi
 import com.scalke.portfolio.backend.media.infrastructure.persistence.jpa.entity.MediaEntity;
 import org.springframework.data.repository.Repository;
 
+import java.util.List;
+import java.util.Optional;
+
 /**
  * Accès Spring Data au catalogue. Seules les méthodes utilisées par l'adaptateur sont déclarées.
  */
 public interface MediaJpaRepository extends Repository<MediaEntity, Long> {
 
     MediaEntity save(MediaEntity entity);
+
+    Optional<MediaEntity> findById(Long id);
+
+    List<MediaEntity> findAllById(Iterable<Long> ids);
+
+    void deleteById(Long id);
+
+    void flush();
 }

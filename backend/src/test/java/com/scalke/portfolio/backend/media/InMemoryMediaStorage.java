@@ -34,6 +34,11 @@ public class InMemoryMediaStorage implements MediaStorage {
         }
     }
 
+    @Override
+    public void delete(StorageKey key) {
+        files.remove(key);
+    }
+
     public Map<StorageKey, byte[]> files() {
         return files;
     }

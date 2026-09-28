@@ -95,6 +95,16 @@ class LocalMediaStorageTest {
     }
 
     @Test
+    void deletes_a_stored_file_and_ignores_a_missing_one() {
+        storage().store(KEY, new byte[]{1});
+
+        storage().delete(KEY);
+        storage().delete(KEY);
+
+        assertThat(root.resolve(KEY.value())).doesNotExist();
+    }
+
+    @Test
     void refuses_an_empty_root() {
         assertThatThrownBy(() -> new MediaStorageProperties(Path.of("")))
             .isInstanceOf(IllegalArgumentException.class);
