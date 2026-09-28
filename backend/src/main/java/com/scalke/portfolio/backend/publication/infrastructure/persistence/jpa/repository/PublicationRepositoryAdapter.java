@@ -8,6 +8,10 @@ import com.scalke.portfolio.backend.publication.infrastructure.persistence.jpa.m
 import com.scalke.portfolio.backend.shared.domain.model.PageQuery;
 import com.scalke.portfolio.backend.shared.domain.model.PageResult;
 import com.scalke.portfolio.backend.shared.domain.model.Slug;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,8 +20,12 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
+import static com.scalke.portfolio.backend.publication.infrastructure.persistence.jpa.repository.PublicationSpecifications.hasIdIn;
 import static com.scalke.portfolio.backend.publication.infrastructure.persistence.jpa.repository.PublicationSpecifications.hasSlug;
 import static com.scalke.portfolio.backend.publication.infrastructure.persistence.jpa.repository.PublicationSpecifications.visibleAt;
 
@@ -42,6 +50,7 @@ public class PublicationRepositoryAdapter implements PublicationRepository {
         Sort.Order.desc("id"));
 
     private final PublicationJpaRepository repository;
+    private final EntityManager entityManager;
 
     @Override
     @Transactional(readOnly = true)
@@ -56,6 +65,33 @@ public class PublicationRepositoryAdapter implements PublicationRepository {
     @Transactional(readOnly = true)
     public Optional<Publication> findVisibleBySlug(Slug slug, Instant now) {
         return repository.findOne(visibleAt(now).and(hasSlug(slug.value()))).map(PublicationPersistenceMapper::toDomain);
+    }
+
+    /**
+     * Projection sur l'identifiant, avec la même règle de visibilité que les autres lectures ({@code visibleAt}).
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Set<Long> findVisibleIds(Collection<Long> ids, Instant now) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> query = cb.createQuery(Long.class);
+        Root<PublicationEntity> root = query.from(PublicationEntity.class);
+        query.select(root.get("id")).where(visibleAt(now).and(hasIdIn(ids)).toPredicate(root, query, cb));
+        return Set.copyOf(entityManager.createQuery(query).getResultList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Publication> findVisibleByIds(Collection<Long> ids, Instant now) {
+        return repository.findAll(visibleAt(now).and(hasIdIn(ids))).stream()
+            .map(PublicationPersistenceMapper::toDomain)
+            .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Publication> findBySlug(Slug slug) {
+        return repository.findOne(hasSlug(slug.value())).map(PublicationPersistenceMapper::toDomain);
     }
 
     @Override

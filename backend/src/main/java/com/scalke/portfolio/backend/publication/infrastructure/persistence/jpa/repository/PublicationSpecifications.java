@@ -6,6 +6,7 @@ import com.scalke.portfolio.backend.publication.infrastructure.persistence.jpa.e
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -50,5 +51,9 @@ final class PublicationSpecifications {
 
     static Specification<PublicationEntity> hasSlug(String slug) {
         return (root, query, cb) -> cb.equal(root.get("slug"), slug);
+    }
+
+    static Specification<PublicationEntity> hasIdIn(Collection<Long> ids) {
+        return (root, query, cb) -> root.get("id").in(ids);
     }
 }
