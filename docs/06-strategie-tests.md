@@ -754,9 +754,9 @@ Cette vérification démontre que les tests ne dépendent pas d’un état manue
 | `application.usecase` sans accès à la base (D-BQ) | unitaire pur | `*Test` | stockage et catalogue en mémoire (`InMemoryMediaStorage`, `InMemoryMediaRepository`) | `OpenMediaFileUseCaseTest`, `UploadMediaUseCaseTest` (dont la lecture bornée d'un flux sans fin) |
 | adaptateur de stockage de fichiers | unitaire pur | `*Test` | JUnit `@TempDir` | `LocalMediaStorageTest` |
 | `infrastructure.persistence` (mapping, tri, requêtes) | intégration | `*IT` | `AbstractIntegrationTest` + `EntityManager` | `ProfileMappingIT` |
-| schéma (contraintes SQL) | intégration | `*IT` | `JdbcClient` | `ProfileSchemaIT`, `ProjectSchemaIT`, `TechnologySchemaIT`, `PublicationSchemaIT`, `TaxonomySchemaIT`, `PublicationTaxonomySchemaIT`, `SeriesSchemaIT`, `MediaSchemaIT`, `ProjectMediaSchemaIT` |
+| schéma (contraintes SQL) | intégration | `*IT` | `JdbcClient` | `ProfileSchemaIT`, `ProjectSchemaIT`, `TechnologySchemaIT`, `PublicationSchemaIT`, `TaxonomySchemaIT`, `PublicationTaxonomySchemaIT`, `SeriesSchemaIT`, `MediaSchemaIT`, `ProjectMediaSchemaIT`, `ProfileMediaSchemaIT` |
 | `web` (contrat JSON, codes HTTP, erreurs, bornes de pagination) | tranche | `*Test` | `@WebMvcTest` + `@MockitoBean` du cas d’usage | `PublicProfileControllerTest`, `PublicProjectControllerTest`, `PublicPublicationControllerTest`, `PublicSeriesControllerTest`, `PublicSeriesNavigationControllerTest`, `PublicMediaControllerTest` |
-| parcours HTTP complet (contrôleur → base) | intégration | `*IT` | `AbstractIntegrationTest` + `MockMvc` | `PublicProfileIT`, `PublicProjectIT` (l'adresse publiée d'une couverture sert le fichier), `PublicPublicationIT`, `PublicSeriesIT`, `PublicMediaIT` (envoi puis lecture, racine de stockage `target/test-media`) |
+| parcours HTTP complet (contrôleur → base) | intégration | `*IT` | `AbstractIntegrationTest` + `MockMvc` | `PublicProfileIT` (avatar et CV servis par leurs adresses), `PublicProjectIT` (l'adresse publiée d'une couverture sert le fichier), `PublicPublicationIT`, `PublicSeriesIT`, `PublicMediaIT` (envoi puis lecture, racine de stockage `target/test-media`) |
 | architecture | unitaire | `*Test` | ArchUnit | `ModuleBoundariesTest`, `ModuleLayersTest`, `ApiConventionsTest` |
 
 Règles :

@@ -115,6 +115,8 @@ Profile 1 → 0..* Certification
 Profile 1 → 0..* ProfessionalLink
 ```
 
+État d’implémentation (étapes 14 à 16 et 27.3) : tous les attributs et collections ci-dessus. `avatarMedia` (une image) et `cvMedia` (un PDF, D06) sont facultatifs : des références vers le catalogue `Media` (D-BX).
+
 ---
 
 # 5. Skill
@@ -780,7 +782,7 @@ Les règles suivantes doivent être garanties par le backend et, lorsque pertine
 26. le statut d'une `Publication` ne change que selon la table des transitions du §15 ;
 27. un `Project` référence au plus une fois le même média parmi ses captures.
 
-Les invariants 17 à 27 ont été ajoutés pendant l'implémentation (étapes 14 à 27) ; 27 est garanti par PostgreSQL et doublé par le modèle métier. Les invariants 17 à 25 sont garantis par PostgreSQL (`CHECK`, `UNIQUE`, clés étrangères) et, pour 17, 18, 21, 23 et 24, doublés par le modèle métier. L'invariant 26 (table des transitions) est **applicatif uniquement** : aucune contrainte SQL ne compare l'ancien et le nouveau statut ; il est garanti tant que le statut n'est écrit que par `ChangePublicationStatusUseCase` (seul appelant de `updateStatus`, D-AX). L'invariant 6 (slug stable) est lui aussi applicatif : `Publication.changeSlug` refuse le changement dès que `firstPublishedAt` est passée (D-BC) ; l'invariant 5 est garanti par les contraintes `UNIQUE` de PostgreSQL (D-X, D-AA, D-AL, D-AO). Les invariants 1 à 3 (séries) sont garantis par PostgreSQL depuis l'étape 23 (`V011`, D-BF) et, pour 3, doublés par le modèle métier. L'invariant 13 (média référencé non supprimable) est garanti par les clés étrangères `ON DELETE RESTRICT` des contenus vers `media`, depuis l'étape 27.2 pour les projets (D-BV). Les invariants 7 à 10 (visibilité des publications) sont appliqués par les lectures publiques depuis l'étape 19. Voir [`decisions/registre-implementation.md`](decisions/registre-implementation.md).
+Les invariants 17 à 27 ont été ajoutés pendant l'implémentation (étapes 14 à 27) ; 27 est garanti par PostgreSQL et doublé par le modèle métier. Les invariants 17 à 25 sont garantis par PostgreSQL (`CHECK`, `UNIQUE`, clés étrangères) et, pour 17, 18, 21, 23 et 24, doublés par le modèle métier. L'invariant 26 (table des transitions) est **applicatif uniquement** : aucune contrainte SQL ne compare l'ancien et le nouveau statut ; il est garanti tant que le statut n'est écrit que par `ChangePublicationStatusUseCase` (seul appelant de `updateStatus`, D-AX). L'invariant 6 (slug stable) est lui aussi applicatif : `Publication.changeSlug` refuse le changement dès que `firstPublishedAt` est passée (D-BC) ; l'invariant 5 est garanti par les contraintes `UNIQUE` de PostgreSQL (D-X, D-AA, D-AL, D-AO). Les invariants 1 à 3 (séries) sont garantis par PostgreSQL depuis l'étape 23 (`V011`, D-BF) et, pour 3, doublés par le modèle métier. L'invariant 13 (média référencé non supprimable) est garanti par les clés étrangères `ON DELETE RESTRICT` des contenus vers `media`, depuis l'étape 27.2 pour les projets et 27.3 pour le profil (D-BV, D-BX). Les invariants 7 à 10 (visibilité des publications) sont appliqués par les lectures publiques depuis l'étape 19. Voir [`decisions/registre-implementation.md`](decisions/registre-implementation.md).
 
 ---
 

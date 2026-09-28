@@ -1372,13 +1372,15 @@ La présence dans cette liste ne signifie pas que tous les endpoints doivent êt
 
 ## Contrats implémentés
 
-### `GET /api/public/profile` (étapes 14 à 16)
+### `GET /api/public/profile` (étapes 14 à 16 et 27.3)
 
 ```text
 200 → ProfileResponse
 {
   displayName, professionalTitle, shortBio,
   aboutMarkdown | null, publicLocation | null, publicEmail | null,
+  avatar { url, width, height, altText | null } | null,
+  cv { url, sizeBytes } | null,
   links[]          { label, url },
   skillGroups[]    { category, skills[] { name } },
   experiences[]    { organization, title, location, startDate, endDate | null, description },
@@ -1394,6 +1396,7 @@ Règles propres à ce contrat :
 * ni identifiant technique ni `displayOrder` exposés (C03, D-R) : l’ordre du tableau fait foi ;
 * `endDate: null` signifie « en cours » ; `expiresAt: null` signifie « sans expiration » (D-P) ;
 * dates au format `YYYY-MM-DD` (§26) ;
+* `avatar` : image publique, même forme que les images des projets (D-BW) ; `cv` : document PDF, `url` vers `GET /api/public/media/{storageKey}` et taille en octets (D-BX) ; `null` s’ils sont absents ;
 * contrat vérifié par `PublicProfileIT` sur la sérialisation réelle.
 
 ### `GET /api/public/projects` (étapes 17 et 18)

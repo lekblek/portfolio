@@ -2,7 +2,7 @@
 
 Ce fichier est la **seule** source de vérité sur l'avancement. Il ne répète pas le contenu des autres documents : il pointe vers eux.
 
-Dernière mise à jour : 2026-09-28 (27.1 poussée, CI verte ; 27.2 terminée et vérifiée, commits à faire)
+Dernière mise à jour : 2026-09-28 (27.2 poussée, CI verte ; 27.3 terminée et vérifiée, commits à faire)
 
 ---
 
@@ -10,17 +10,17 @@ Dernière mise à jour : 2026-09-28 (27.1 poussée, CI verte ; 27.2 terminée et
 
 ```text
 Dernière étape terminée   : 26 — Envoi et validation des médias (poussée, CI verte : run 36462754639)
-Étape en cours            : 27 — Catalogue Media : 27.1 poussée (CI verte : run 36464422452) ; 27.2 vérifiée, commits à faire ; 27.3 et 27.4 à faire
-Prochaine étape prévue    : 27.3 — Avatar et CV du profil
-État                      : PRÊT après commit et push de 27.2
+Étape en cours            : 27 — Catalogue Media : 27.1 et 27.2 poussées (CI verte : run 36466269701) ; 27.3 vérifiée, commits à faire ; 27.4 à faire
+Prochaine étape prévue    : 27.4 — Couvertures des publications et des séries
+État                      : PRÊT après commit et push de 27.3
 Branche                   : develop
-Vérification              : ./mvnw clean verify → 423 tests verts (231 *Test, 192 *IT) à la fin de 27.2
+Vérification              : ./mvnw clean verify → 429 tests verts (231 *Test, 198 *IT) à la fin de 27.3
 ```
 
 ## 2. Prochaine action
 
-1. Committer et pousser 27.2, vérifier la CI, puis remplacer les 🟡 par ✅.
-2. 27.3 : avatar (image) et CV (PDF) du profil (D-B), références `ON DELETE RESTRICT` comme D-BV ; le CV demande une forme publique de fichier (adresse, taille) à côté de `PublicImage`. Puis 27.4 : couvertures des publications et des séries.
+1. Committer et pousser 27.3, vérifier la CI, puis remplacer les 🟡 par ✅.
+2. 27.4 : couvertures des publications (D-AF) et des séries (D-BE), références `ON DELETE RESTRICT` comme D-BV, `cover` dans leurs contrats publics (listes et détails) ; clôture de l'étape 27.
 3. Confirmer ou infirmer D-T (cohérence `stage` ⇔ `endDate`) : `docs/decisions/registre-implementation.md`.
 
 ---
@@ -81,8 +81,9 @@ Légende : ✅ terminée et poussée · 🟡 terminée et vérifiée, commits à
 | 25 | Port `MediaStorage` (lecture), `LocalMediaStorage`, `GET /api/public/media/{storageKey}` | ✅ | `dbfe4ee`, `d1d1825` (CI : run 36461821408) |
 | 26 | Envoi validé (signature, taille par format), écriture atomique ; 415 / 413 | ✅ | `3d26cf9`, `05d0e0c`, `5127e41` (CI : run 36462754639) |
 | 27.1 | Catalogue `media` (`V012`), dimensions des images, envoi transactionnel | ✅ | `2e55819`, `85ac21e`, `b3e051d` (CI : run 36464422452) |
-| 27.2 | Couverture et captures des projets (`V013`), façade `MediaQueryService`, suppression contrôlée | 🟡 | à committer |
-| 27.3, 27.4 | Rattachements : profil ; publications et séries | ⏳ | — |
+| 27.2 | Couverture et captures des projets (`V013`), façade `MediaQueryService`, suppression contrôlée | ✅ | `3266bec`, `9afc18c`, `2689282`, `0a9e707` (CI : run 36466269701) |
+| 27.3 | Avatar et CV du profil (`V014`), `PublicDocument` | 🟡 | à committer |
+| 27.4 | Couvertures des publications et des séries | ⏳ | — |
 | 28 → 52 | Voir `docs/steps/liste_complete_etapes.md` | ⏳ | — |
 
 Après le push, remplacer les 🟡 par ✅ et noter les hashes.
@@ -113,6 +114,7 @@ Index : [`decisions/README.md`](decisions/README.md).
 | D-BR … D-BT | Format par signature, 5 / 10 Mio, lecture bornée, écriture atomique ; 415 et 413 (`MEDIA_TOO_LARGE`) ; suppression à l'étape 27 | Actives (26) ; D-BT remplacée en partie par D-BU |
 | D-BU | Catalogue `media`, dimensions lues dans l'en-tête, envoi transactionnel sans compensation | Active (27.1) |
 | D-BV, D-BW | Références aux médias par clé étrangère `RESTRICT`, suppression contrôlée ; `PublicImage` par la façade, couverture et captures des projets | Actives (27.2) |
+| D-BX | Avatar et CV du profil ; `PublicDocument` pour les PDF | Active (27.3) |
 | 14.4 | Exposition publique de `publicEmail` | À confirmer |
 
 ## 5. Problèmes connus
@@ -183,7 +185,6 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | Sujet | Reporté à | Raison |
 |---|---|---|
 | Filtre `featured` sur `GET /api/public/projects` | Étape 40 | aucun écran ne l'utilise encore (le filtre `technology` est fait : D-AC) |
-| Avatar et CV du profil | Étape 27.3 | D-B |
 | Couvertures des publications et des séries | Étape 27.4 | D-AF, D-BE |
 | Vérifier qu'une couverture ou une capture est une image à l'écriture | Étape 36 | D-BV : pas de garantie SQL ; la façade n'expose que des images |
 | Liste publique des technologies (`/api/public/technologies`) | Étape 42 | D-AE : les technologies sont exposées par projet |
