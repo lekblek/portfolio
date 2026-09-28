@@ -1,7 +1,10 @@
 # ------------------ No IA marks --------------
 CLAUDE.md
+AGENTS.md
 .mcp.json
 .claude/
+.codex/
+docs/codex/
 graphify-out/
 
 
@@ -44,6 +47,7 @@ coverage/
 !.vscode/extensions.json
 .project
 .classpath
+.factorypath
 .settings/
 
 # ---------- Système ----------
