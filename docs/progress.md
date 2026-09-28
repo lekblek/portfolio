@@ -2,25 +2,25 @@
 
 Ce fichier est la **seule** source de vérité sur l'avancement. Il ne répète pas le contenu des autres documents : il pointe vers eux.
 
-Dernière mise à jour : 2026-09-28 (étape 25 poussée, CI verte ; étape 26 terminée et vérifiée, commits à faire)
+Dernière mise à jour : 2026-09-28 (étape 26 poussée, CI verte ; étape 27.1 terminée et vérifiée, commits à faire)
 
 ---
 
 ## 1. État courant
 
 ```text
-Dernière étape terminée   : 26 — Envoi et validation des médias (vérifiée, commits à faire) ; 25 poussée, CI verte (run 36461821408)
-Étape en cours            : aucune
-Prochaine étape prévue    : 27 — Construire le catalogue Media
-État                      : PRÊT après commit et push de l'étape 26
+Dernière étape terminée   : 26 — Envoi et validation des médias (poussée, CI verte : run 36462754639)
+Étape en cours            : 27 — Catalogue Media : 27.1 (catalogue) vérifiée, commits à faire ; 27.2 à 27.4 à faire
+Prochaine étape prévue    : 27.2 — Couverture et captures des projets, suppression contrôlée
+État                      : PRÊT après commit et push de 27.1
 Branche                   : develop
-Vérification              : ./mvnw clean verify → 375 tests verts (211 *Test, 164 *IT) à la fin de l'étape 26
+Vérification              : ./mvnw clean verify → 406 tests verts (227 *Test, 179 *IT) à la fin de 27.1
 ```
 
 ## 2. Prochaine action
 
-1. Committer et pousser l'étape 26, vérifier la CI, puis remplacer les 🟡 par ✅.
-2. Étape 27 : catalogue `Media` (métadonnées, dimensions des images), `delete` avec ses appelants (compensation, suppression contrôlée, D-BT), puis rattachement des médias reportés : couverture et captures des projets (D-AD), avatar et CV du profil (D-B), couvertures des publications et des séries.
+1. Committer et pousser 27.1, vérifier la CI, puis remplacer les 🟡 par ✅.
+2. 27.2 : couverture et captures des projets (D-AD) avec clés étrangères `ON DELETE RESTRICT` vers `media`, façade `MediaQueryService` et exposition publique ; suppression contrôlée d'un média (`MediaStorage.delete`, `MEDIA_STILL_REFERENCED`, D-BT). Puis 27.3 : avatar et CV du profil (D-B) ; 27.4 : couvertures des publications et des séries.
 3. Confirmer ou infirmer D-T (cohérence `stage` ⇔ `endDate`) : `docs/decisions/registre-implementation.md`.
 
 ---
@@ -79,8 +79,10 @@ Légende : ✅ terminée et poussée · 🟡 terminée et vérifiée, commits à
 | 24.1 | Navigation dans le domaine : position publique, voisins visibles | ✅ | `b368ffb` |
 | 24.2 | `GET /api/public/publications/{slug}/series` : navigation et progression depuis un article | ✅ | `4d974c0`, `b2fb6c4`, `262925c` (CI : run 36460488555) |
 | 25 | Port `MediaStorage` (lecture), `LocalMediaStorage`, `GET /api/public/media/{storageKey}` | ✅ | `dbfe4ee`, `d1d1825` (CI : run 36461821408) |
-| 26 | Envoi validé (signature, taille par format), écriture atomique ; 415 / 413 | 🟡 | à committer |
-| 27 → 52 | Voir `docs/steps/liste_complete_etapes.md` | ⏳ | — |
+| 26 | Envoi validé (signature, taille par format), écriture atomique ; 415 / 413 | ✅ | `3d26cf9`, `05d0e0c`, `5127e41` (CI : run 36462754639) |
+| 27.1 | Catalogue `media` (`V012`), dimensions des images, envoi transactionnel | 🟡 | à committer |
+| 27.2 → 27.4 | Rattachements : projets, profil, publications et séries ; suppression contrôlée | ⏳ | — |
+| 28 → 52 | Voir `docs/steps/liste_complete_etapes.md` | ⏳ | — |
 
 Après le push, remplacer les 🟡 par ✅ et noter les hashes.
 
@@ -107,7 +109,8 @@ Index : [`decisions/README.md`](decisions/README.md).
 | D-BE … D-BK | Périmètre de `series` (lecture seule avant l'étape 36) ; invariants 1 à 3 en SQL, NEWS exclue par clé composite ; série publique si un article est visible, positions publiques par rang ; façade `PublicationQueryService` ; contrat public ; 5 et 4 requêtes ; slug stable à l'étape 36 | Actives (23) |
 | D-BL … D-BN | Navigation servie par `series` sous `/publications/{slug}/series` ; voisins et position parmi les visibles, calculés par le domaine ; 6 requêtes | Actives (24) |
 | D-BO … D-BQ | Port `MediaStorage` livré avec son premier appelant (écart assumé avec la liste des étapes) ; clé opaque et lecture publique en cache immuable ; cas d'usage sans base non transactionnel | Actives (25) |
-| D-BR … D-BT | Format par signature, 5 / 10 Mio, lecture bornée, écriture atomique ; 415 et 413 (`MEDIA_TOO_LARGE`) ; suppression à l'étape 27 | Actives (26) |
+| D-BR … D-BT | Format par signature, 5 / 10 Mio, lecture bornée, écriture atomique ; 415 et 413 (`MEDIA_TOO_LARGE`) ; suppression à l'étape 27 | Actives (26) ; D-BT remplacée en partie par D-BU |
+| D-BU | Catalogue `media`, dimensions lues dans l'en-tête, envoi transactionnel sans compensation | Active (27.1) |
 | 14.4 | Exposition publique de `publicEmail` | À confirmer |
 
 ## 5. Problèmes connus
@@ -189,7 +192,7 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | Création et modification avec slug libre (`firstAvailable`), `SLUG_ALREADY_USED` sur conflit `UNIQUE` | Étape 36 | D-BD : aucun appelant avant l'administration |
 | Écriture des séries (création, chapitres, `NEWS_CANNOT_JOIN_SERIES`, `SERIES_POSITION_ALREADY_USED`) et stabilité de leur slug | Étape 36 | D-BE, D-BK : aucune route d'administration sans authentification |
 | Séries mises en avant sur l'accueil | si le modèle l'adopte | D-BI : absent de `02` §19 |
-| Suppression de fichiers (`MediaStorage.delete`) | Étape 27 | D-BT : arrive avec ses appelants |
+| Suppression contrôlée d'un média (`MediaStorage.delete`, `MEDIA_STILL_REFERENCED`) | Étape 27.2 | D-BT, D-BU : arrive avec la première référence |
 | Route d'envoi et limite multipart à 10 Mio | Étape 36 | D-BR, D-BS : aucune route d'administration sans authentification |
 | Médias privés (fichier visible seulement si le contenu qui l'utilise l'est) | si le besoin apparaît | D-BP : clé imprévisible jugée suffisante |
 | Temps de lecture précalculé (colonne) si la liste devient coûteuse | Étape 52.6 | D-AJ : calculé à la lecture, contenu chargé dans la liste |
