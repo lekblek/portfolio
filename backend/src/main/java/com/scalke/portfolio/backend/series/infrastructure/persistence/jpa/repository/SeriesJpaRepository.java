@@ -41,6 +41,12 @@ public interface SeriesJpaRepository extends Repository<SeriesEntity, Long> {
 
     Optional<SeriesEntity> findBySlug(String slug);
 
+    /**
+     * Au plus une ligne : un article n'appartient qu'à une série ({@code series_item_publication_unique}).
+     */
+    @Query("select series from SeriesEntity series join series.items item where item.publicationId = :publicationId")
+    Optional<SeriesEntity> findByPublicationId(Long publicationId);
+
     long count();
 
     SeriesEntity save(SeriesEntity entity);

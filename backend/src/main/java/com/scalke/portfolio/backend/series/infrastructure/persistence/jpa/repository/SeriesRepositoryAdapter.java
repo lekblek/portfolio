@@ -54,6 +54,12 @@ public class SeriesRepositoryAdapter implements SeriesRepository {
 
     @Override
     @Transactional(readOnly = true)
+    public Optional<Series> findByPublicationId(Long publicationId) {
+        return repository.findByPublicationId(publicationId).map(SeriesPersistenceMapper::toDomain);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public boolean existsAny() {
         return repository.count() > 0;
     }

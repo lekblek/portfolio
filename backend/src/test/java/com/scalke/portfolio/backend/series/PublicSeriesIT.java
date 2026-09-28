@@ -18,6 +18,7 @@ import java.time.Instant;
 import static com.scalke.portfolio.backend.publication.PublicationFixtures.article;
 import static com.scalke.portfolio.backend.series.SeriesFixtures.series;
 import static com.scalke.portfolio.backend.testsupport.FixedClockConfiguration.NOW;
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -71,6 +72,27 @@ class PublicSeriesIT extends AbstractIntegrationTest {
             .andExpect(jsonPath("$.chapters[0].publishedAt").value("2026-06-10T08:30:00Z"))
             .andExpect(jsonPath("$.chapters[1].position").value(2))
             .andExpect(jsonPath("$.chapters[1].slug").value("securiser-l-api"));
+    }
+
+    /**
+     * D-BL : depuis un article, sa série et ses voisins visibles (l'article planifié plus tard est sauté).
+     */
+    @Test
+    void returns_the_series_navigation_of_an_article() throws Exception {
+        mockMvc.perform(get("/api/public/publications/securiser-l-api/series").contextPath("/api"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.series.slug").value("spring-boot-de-zero-a-la-production"))
+            .andExpect(jsonPath("$.position").value(2))
+            .andExpect(jsonPath("$.chapterCount").value(2))
+            .andExpect(jsonPath("$.previous.slug").value("installer-spring-boot"))
+            .andExpect(jsonPath("$.next").value(nullValue()));
+    }
+
+    @Test
+    void hides_the_series_navigation_of_an_invisible_article() throws Exception {
+        mockMvc.perform(get("/api/public/publications/chapitre-a-venir/series").contextPath("/api"))
+            .andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.detail").value("Publication introuvable."));
     }
 
     @ParameterizedTest

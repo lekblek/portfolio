@@ -13,7 +13,8 @@ import java.util.Set;
  * <p>
  * Ne contient que les méthodes utilisées par un appelant existant (ADR 0001) : {@code findAllPublicationIds}
  * et {@code findHavingAnyPublication} par {@code ListVisibleSeriesUseCase}, {@code findBySlug} par
- * {@code GetVisibleSeriesUseCase}, {@code existsAny} et {@code create} par le seed de développement.
+ * {@code GetVisibleSeriesUseCase}, {@code findByPublicationId} par {@code GetSeriesNavigationUseCase},
+ * {@code existsAny} et {@code create} par le seed de développement.
  * <p>
  * Le port ne connaît pas la visibilité des articles, qui appartient au module {@code publication} : les
  * cas d'usage la lui demandent par sa façade et transmettent des identifiants (D-BG, D-BJ).
@@ -35,6 +36,11 @@ public interface SeriesRepository {
      * Toute série portant ce slug, visible ou non : la visibilité est décidée par l'appelant.
      */
     Optional<Series> findBySlug(Slug slug);
+
+    /**
+     * La série contenant cet article ; au plus une (invariant 2, D05).
+     */
+    Optional<Series> findByPublicationId(Long publicationId);
 
     boolean existsAny();
 
