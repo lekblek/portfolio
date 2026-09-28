@@ -478,6 +478,7 @@ Une série ne possède pas de workflow éditorial propre dans la V1.
 Elle organise des articles.
 
 État d’implémentation (étape 23) : tous les attributs ci-dessus sauf `coverMedia` (étape 27). Une série est publique si et seulement si au moins un de ses articles est visible ; sa table des matières ne montre que ces articles, numérotés à partir de 1 (D-BG). Lecture publique seulement : création et modification à l’étape 36 (D-BE).
+Depuis l’étape 24, un article visible d’une série connaît sa position, le nombre de chapitres visibles et ses voisins visibles précédent et suivant ; un article masqué est sauté (D-BL, D-BM).
 
 ---
 

@@ -1350,6 +1350,7 @@ Les principales ressources publiques de la V1 sont conceptuellement :
 
 /api/public/series
 /api/public/series/{slug}
+/api/public/publications/{slug}/series
 
 /api/public/categories
 /api/public/tags
@@ -1489,8 +1490,30 @@ Règles propres à ces contrats :
 * ordre fixe : titre sans tenir compte de la casse, puis identifiant (D-BI) ;
 * `chapterCount` et `chapters` ne comptent que les articles visibles ; `position` est leur rang dans la série à partir de 1, jamais la position stockée ;
 * `chapters[].slug` mène à `GET /api/public/publications/{slug}` ;
-* ni `id`, ni positions internes ; la couverture arrivera à l’étape 27, la navigation précédent / suivant à l’étape 24 ;
+* ni `id`, ni positions internes ; la couverture arrivera à l’étape 27 ;
 * contrats vérifiés par `PublicSeriesControllerTest` et `PublicSeriesIT`.
+
+### `GET /api/public/publications/{slug}/series` (étape 24)
+
+```text
+200 → SeriesNavigationResponse
+{
+  series { title, slug },
+  position, chapterCount,
+  previous { position, title, slug } | null,
+  next { position, title, slug } | null
+}
+404 → ProblemDetail, code RESOURCE_NOT_FOUND
+      « Publication introuvable. »                        slug inconnu ou mal formé, publication invisible
+      « Cette publication n'appartient à aucune série. »  publication visible hors série (NEWS comprises)
+```
+
+Règles propres à ce contrat :
+
+* sous-ressource d’une publication servie par le module `series`, qui possède la relation (D-BL) ;
+* positions et voisins calculés parmi les seuls articles visibles : un article masqué est sauté (D-BM) ;
+* progression : `position` sur `chapterCount`, calculée par le client ;
+* contrat vérifié par `PublicSeriesNavigationControllerTest` et `PublicSeriesIT`.
 
 Chaque module introduit ses routes lors de son étape d’implémentation.
 

@@ -118,6 +118,14 @@ Statuts : **Active** · **Remplacée** (préciser par quoi) · **À confirmer** 
 | D-BK | 23 | Slug de série : `Slug` (D-BA), `UNIQUE` + `CHECK` comme D-X. Stabilité (D11) avec la modification d'une série (étape 36) : slug verrouillé dès qu'un de ses articles a été public (`firstPublishedAt`, D-AZ) | Active — règle à appliquer à l'étape 36 | `V011`, `Series` |
 | — | 23 | Seeds `dev` ordonnés : taxonomie (`@Order(0)`), publications (1), séries (2). Deux séries de démonstration : une visible (deux chapitres publics sur trois articles), une invisible (brouillon et relecture) | Active | `SeriesSeeder`, `PublicationSeeder` |
 
+## Module `series` — étape 24 (navigation)
+
+| Réf | Étape | Décision | Statut | Preuve dans le code |
+|---|---|---|---|---|
+| D-BL | 24 | Route `GET /api/public/publications/{slug}/series`, servie par le module `series` : `publication` ignore les séries (`04` §5), c'est le module propriétaire de la relation qui répond. Elle sert la page d'un article, qui ne connaît pas sa série. Réponse `{ series { title, slug }, position, chapterCount, previous \| null, next \| null }`, voisins `{ position, title, slug }`. 404 « Publication introuvable. », identique à la lecture publique, si la publication est inconnue, invisible ou au slug mal formé ; 404 « Cette publication n'appartient à aucune série. » si elle est visible hors série (`NEWS` comprises) : rien de caché n'est révélé | Active | `PublicSeriesNavigationController`, `GetSeriesNavigationUseCase`, `PublicSeriesIT` |
+| D-BM | 24 | Navigation calculée par le domaine (`Series.navigationAround`, `ChapterNavigation`) sur les seuls articles visibles : un article masqué est sauté, la position est le rang public (D-BG), la progression (`position` / `chapterCount`) est laissée au client. `ChapterNavigation` refuse une combinaison incohérente (position hors bornes, voisin absent ailleurs qu'aux extrémités). Validé par mutation (navigation sur tous les articles : tests rouges) | Active | `Series`, `ChapterNavigation`, `SeriesTest`, `GetSeriesNavigationUseCaseIT` |
+| D-BN | 24 | Façade `PublicationQueryService` enrichie de `findVisibleBySlug` ; port `SeriesRepository.findByPublicationId` (au plus une série, invariant 2). Coût constant : 6 requêtes (article et ses tags, série et ses articles, articles visibles et leurs tags), quelle que soit la longueur de la série | Active | `PublicationQueryService`, `SeriesRepositoryAdapter`, `GetSeriesNavigationUseCaseIT` |
+
 ## Décisions révélées par le code et non documentées ailleurs
 
 | Sujet | Constat | Où c'est désormais documenté |

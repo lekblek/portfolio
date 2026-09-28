@@ -235,7 +235,7 @@ series → media
 
 Une série référence des publications de type `ARTICLE`.
 
-État d’implémentation (étape 23) : `series` lit les articles par la façade `PublicationQueryService` (visibilité, publications) et ne lit que ses propres tables (`series`, `series_item`), D-BH.
+État d’implémentation (étape 23) : `series` lit les articles par la façade `PublicationQueryService` (visibilité, publications) et ne lit que ses propres tables (`series`, `series_item`), D-BH. Depuis l’étape 24, il sert aussi la navigation d’un article (`/public/publications/{slug}/series`) : sous-ressource d’une publication, mais relation possédée par `series` (D-BL).
 
 La dépendance est volontairement unidirectionnelle :
 

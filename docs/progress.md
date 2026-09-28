@@ -2,25 +2,25 @@
 
 Ce fichier est la **seule** source de vérité sur l'avancement. Il ne répète pas le contenu des autres documents : il pointe vers eux.
 
-Dernière mise à jour : 2026-09-28 (étape 22 poussée, CI verte ; étape 23 terminée et vérifiée, commits à faire)
+Dernière mise à jour : 2026-09-28 (étape 23 poussée, CI verte ; étape 24 terminée et vérifiée, commits à faire)
 
 ---
 
 ## 1. État courant
 
 ```text
-Dernière étape terminée   : 23 — Module Series (vérifiée, commits à faire) ; 22 poussée, CI verte (run 36451053100)
+Dernière étape terminée   : 24 — Navigation des chapitres (vérifiée, commits à faire) ; 23 poussée, CI verte (run 36458752968)
 Étape en cours            : aucune
-Prochaine étape prévue    : 24 — Ajouter ordre et navigation des chapitres
-État                      : PRÊT après commit et push de l'étape 23
+Prochaine étape prévue    : 25 — Créer l'abstraction MediaStorage
+État                      : PRÊT après commit et push de l'étape 24
 Branche                   : develop
-Vérification              : ./mvnw clean verify → 312 tests verts (164 *Test, 148 *IT) à la fin de l'étape 23
+Vérification              : ./mvnw clean verify → 331 tests verts (170 *Test, 161 *IT) à la fin de l'étape 24
 ```
 
 ## 2. Prochaine action
 
-1. Committer et pousser l'étape 23 (23.1 à 23.3), vérifier la CI, puis remplacer les 🟡 par ✅.
-2. Étape 24 : navigation précédent / suivant et progression dans une série, sur la base de la position publique (D-BG) et de la façade `PublicationQueryService` (D-BH).
+1. Committer et pousser l'étape 24 (24.1, 24.2), vérifier la CI, puis remplacer les 🟡 par ✅.
+2. Étape 25 : abstraction `MediaStorage` (module `media`) ; les couvertures et captures reportées (D-AD, D-B, D-BE) en dépendent à l'étape 27.
 3. Confirmer ou infirmer D-T (cohérence `stage` ⇔ `endDate`) : `docs/decisions/registre-implementation.md`.
 
 ---
@@ -73,10 +73,12 @@ Légende : ✅ terminée et poussée · 🟡 terminée et vérifiée, commits à
 | 22.2 | Objet de valeur `Slug` : format, génération, collisions | ✅ | `338a042` |
 | 22.3 | `Slug` dans les modèles ; première publication (`V010`) ; slug stable après publication (D11) | ✅ | `b6f257c` |
 | — | Corrections documentaires de l'audit du 2026-09-25 | ✅ | `124d9cc` (CI : run 36451053100) |
-| 23.1 | Schéma `V011` : séries, articles d'une série, NEWS exclues par clé étrangère composite | 🟡 | à committer |
-| 23.2 | Façade `PublicationQueryService` ; domaine, persistance, cas d'usage et seed des séries | 🟡 | à committer |
-| 23.3 | API publique des séries et table des matières | 🟡 | à committer |
-| 24 → 52 | Voir `docs/steps/liste_complete_etapes.md` | ⏳ | — |
+| 23.1 | Schéma `V011` : séries, articles d'une série, NEWS exclues par clé étrangère composite | ✅ | `631df54` |
+| 23.2 | Façade `PublicationQueryService` ; domaine, persistance, cas d'usage et seed des séries | ✅ | `6131151`, `3b1a378` |
+| 23.3 | API publique des séries et table des matières | ✅ | `9834423`, `97f0568` (CI : run 36458752968) |
+| 24.1 | Navigation dans le domaine : position publique, voisins visibles | 🟡 | à committer |
+| 24.2 | `GET /api/public/publications/{slug}/series` : navigation et progression depuis un article | 🟡 | à committer |
+| 25 → 52 | Voir `docs/steps/liste_complete_etapes.md` | ⏳ | — |
 
 Après le push, remplacer les 🟡 par ✅ et noter les hashes.
 
@@ -101,6 +103,7 @@ Index : [`decisions/README.md`](decisions/README.md).
 | D-AU … D-AY | Cycle de vie sans route HTTP avant l'étape 36 ; table des transitions sur le statut effectif ; 409 `INVALID_PUBLICATION_TRANSITION` ; écriture limitée au statut ; concordance règle Java / règle SQL | Actives (21) |
 | D-AZ … D-BD | Mémoire de la première publication (`V010`) ; objet de valeur `Slug` ; slug mal formé → 404 sans requête ; slug verrouillé après publication (409 `SLUG_LOCKED`) ; unicité par suffixe puis `UNIQUE` (appelants à l'étape 36) | Actives (22) |
 | D-BE … D-BK | Périmètre de `series` (lecture seule avant l'étape 36) ; invariants 1 à 3 en SQL, NEWS exclue par clé composite ; série publique si un article est visible, positions publiques par rang ; façade `PublicationQueryService` ; contrat public ; 5 et 4 requêtes ; slug stable à l'étape 36 | Actives (23) |
+| D-BL … D-BN | Navigation servie par `series` sous `/publications/{slug}/series` ; voisins et position parmi les visibles, calculés par le domaine ; 6 requêtes | Actives (24) |
 | 14.4 | Exposition publique de `publicEmail` | À confirmer |
 
 ## 5. Problèmes connus
@@ -176,7 +179,6 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | Stabilité du slug d'un projet après sa première publication (D11) | Étape 36 | D-BC : pas encore de mémoire de publication des projets ni de modification |
 | Création et modification avec slug libre (`firstAvailable`), `SLUG_ALREADY_USED` sur conflit `UNIQUE` | Étape 36 | D-BD : aucun appelant avant l'administration |
 | Écriture des séries (création, chapitres, `NEWS_CANNOT_JOIN_SERIES`, `SERIES_POSITION_ALREADY_USED`) et stabilité de leur slug | Étape 36 | D-BE, D-BK : aucune route d'administration sans authentification |
-| Navigation précédent / suivant et progression dans une série | Étape 24 | D-BE |
 | Séries mises en avant sur l'accueil | si le modèle l'adopte | D-BI : absent de `02` §19 |
 | Temps de lecture précalculé (colonne) si la liste devient coûteuse | Étape 52.6 | D-AJ : calculé à la lecture, contenu chargé dans la liste |
 | Prérendu route par route | Étape 52.1 | D22 |
