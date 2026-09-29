@@ -2,7 +2,7 @@
 
 Ce fichier est la **seule** source de vérité sur l'avancement. Il ne répète pas le contenu des autres documents : il pointe vers eux.
 
-Dernière mise à jour : 2026-09-29 (étape 36 close, CI verte ; dossier de référence `docs/project/v1` rédigé ; professionnalisation du backend P-B01 à P-B09 vérifiée, commits à faire)
+Dernière mise à jour : 2026-09-29 (étape 36 close, CI verte ; professionnalisation du backend : P-B01 à P-B09 commités, P-B10, P-B11 et P-B14 vérifiés, commits à faire)
 
 ---
 
@@ -10,17 +10,17 @@ Dernière mise à jour : 2026-09-29 (étape 36 close, CI verte ; dossier de réf
 
 ```text
 Dernière étape terminée   : 36 — API CRUD d'administration, poussée, CI verte (run 36608187827)
-Étape en cours            : professionnalisation du backend (lots P-B01 à P-B09), vérifiée, commits à faire
+Étape en cours            : professionnalisation du backend : P-B01 à P-B09 commités (à pousser), P-B10, P-B11, P-B14 vérifiés (commits à faire)
 Prochaine étape prévue    : 37 — Structurer Angular par fonctionnalités
 État                      : PRÊT après commit et push des lots
 Branche                   : develop
-Vérification              : ./mvnw clean verify → 732 tests verts (334 *Test, 398 *IT) à la fin de P-B08
+Vérification              : ./mvnw clean verify → 734 tests verts (335 *Test, 399 *IT) à la fin de P-B11
 ```
 
 ## 2. Prochaine action
 
-1. Committer les lots P-B01 à P-B09 (un commit par lot, puis la documentation), pousser, vérifier la CI, remplacer le 🟡 par ✅. Décisions : D-DA à D-DI.
-2. Étape 37 : structurer Angular par fonctionnalités (premier écran du frontend). Vue d'ensemble du projet à ce stade : [`project/v1/README.md`](project/v1/README.md).
+1. Committer P-B10, P-B11, P-B14 et la documentation, pousser, vérifier la CI, remplacer les 🟡 par ✅. Décisions : D-DA à D-DL.
+2. Étape 37 : structurer Angular par fonctionnalités (premier écran du frontend).
 3. Étape 36, close (rappel du découpage) :
 
    ```text
@@ -112,8 +112,8 @@ Légende : ✅ terminée et poussée · 🟡 terminée et vérifiée, commits à
 | 36.5 | Administration des technologies et des projets ; mémoire de publication et description bornée (`V023`) | ✅ | `7a24c9a`, `4bad8b8` (CI : run 36605811512) |
 | 36.6 | Administration du profil (remplacement complet, collections comprises) | ✅ | `3203055`, `c9b3297` (CI : run 36607262554) |
 | 36.7 | Administration des messages de contact | ✅ | `77ff96b`, `23aa08b` (CI : run 36608187827) |
-| — | Dossier de référence `docs/project/v1` (exigences, architecture, données, API, sécurité, tests, exploitation) | 🟡 | à committer |
-| P-B01 → P-B09 | Professionnalisation du backend : construction reproductible, diagnostic sûr, mandataire inverse, configuration de production explicite, cohérence des fichiers médias, journal de sécurité, contrat OpenAPI versionné, contraintes par nom structuré, Dependabot | 🟡 | à committer |
+| P-B01 → P-B09 | Professionnalisation du backend : construction reproductible, diagnostic sûr, mandataire inverse, configuration de production explicite, cohérence des fichiers médias, journal de sécurité, contrat OpenAPI versionné, contraintes par nom structuré, Dependabot | 🟡 | `aa5ed7f` … `bec418a`, à pousser |
+| P-B10, P-B11, P-B14 | Textes de l'API en français quel que soit le client ; bcrypt de coût 12 avec mise à niveau au démarrage ; actions GitHub épinglées par empreinte | 🟡 | à committer |
 | 37 → 52 | Voir `docs/steps/liste_complete_etapes.md` | ⏳ | — |
 
 Après le push, remplacer les 🟡 par ✅ et noter les hashes.
@@ -162,6 +162,7 @@ Index : [`decisions/README.md`](decisions/README.md).
 | D-CM, D-CN | Compte administrateur unique (invariant 30), empreinte bcrypt seule en SQL (invariant 15) ; configuration qui fait foi à chaque démarrage, mot de passe de 15 caractères à 72 octets | Actives (33) |
 | D-CK, D-CL | Séparation des routes (public, administration authentifiée, reste refusé), aucun utilisateur généré, aucune session anonyme, springdoc en `dev` ; refus de sécurité rendus par `GlobalExceptionHandler` (`AUTHENTICATION_REQUIRED`, `ACCESS_DENIED`, `MALFORMED_REQUEST`) | Actives (32) |
 | D-CI, D-CJ | Port `ContactNotificationSender`, courriel SMTP à l'administrateur (`Reply-To` visiteur, sujet sur une ligne) ; envoi après validation, échec journalisé sans donnée personnelle ; santé SMTP hors de l'état de l'application ; GreenMail en test, Mailpit en développement | Actives (31) |
+| D-DJ … D-DL | Textes de l'API en français (locale fixe, `messages.properties`) ; bcrypt 12 ; actions épinglées par empreinte | Actives (P-B10, P-B11, P-B14) |
 | D-DA … D-DI | Professionnalisation du backend : Enforcer et agent Mockito ; `X-Request-Id` et journal d'erreur sans message ; en-têtes du mandataire depuis un réseau de confiance ; aucune valeur de développement hors `dev` ; fichiers médias alignés sur la transaction ; événements de sécurité et écritures d'administration journalisés, JSON ECS facultatif ; contrat OpenAPI versionné ; nom structuré des contraintes ; Dependabot | Actives (P-B01 à P-B09) |
 | 14.4 | Exposition publique de `publicEmail` | À confirmer |
 
@@ -288,6 +289,8 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | `build-info`, point `info`, métriques et traces exportées | si une supervision est mise en place | D-DF : version présente au démarrage et dans les journaux JSON |
 | Comparaison de compatibilité du contrat (OpenAPI Diff) | si un client externe apparaît | D-DG : le diff de `docs/api/openapi.json` est relu |
 | CodeQL, SBOM (CycloneDX) | Étape 52 | D-DI |
+| Contrôle de la longueur de ligne (120, `.editorconfig`) à la construction | si un formateur est adopté | D-DL : 124 lignes à replier dans 78 fichiers |
+| Protection des branches `main` et `develop`, alertes Dependabot | paramètres du dépôt (propriétaire) | D-DI, D-DL |
 | Classement en base (fenêtre de pagination SQL) au lieu du classement en mémoire de tous les résultats | Étape 52.6, si le corpus dépasse quelques milliers de contenus | D-CD |
 
 ---

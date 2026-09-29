@@ -375,7 +375,7 @@ Aucun secret n'est versionné dans Git.
 
 Le choix précis de l'algorithme de hash appartient à l'étape d'implémentation sécurité.
 
-Choix de l'étape 33 (D-CN) : bcrypt (coût 10) par l'encodeur délégué de Spring Security, empreintes préfixées pour permettre un changement d'algorithme ; mot de passe de 15 caractères au moins et 72 octets au plus.
+Choix de l'étape 33 (D-CN) : bcrypt (coût 12 depuis D-DK, empreintes de coût 10 recalculées au démarrage) par l'encodeur délégué de Spring Security, empreintes préfixées pour permettre un changement d'algorithme ; mot de passe de 15 caractères au moins et 72 octets au plus.
 
 Depuis l'étape 34 (D-CO à D-CQ) : connexion par session serveur (`/api/admin/session`), cookie `HttpOnly`, CSRF par cookie `XSRF-TOKEN` et en-tête `X-XSRF-TOKEN`, 5 échecs par adresse en 15 minutes au plus. Depuis l'étape 35 (D-CR) : cookies `Secure` et `SameSite=Strict`, session de 30 minutes d'inactivité, en-têtes de sécurité HTTP.
 

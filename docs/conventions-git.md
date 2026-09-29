@@ -984,6 +984,8 @@ Les scripts exécutés sur Linux (`backend/mvnw`, `scripts/hooks/*`) doivent êt
 
 Dependabot (`.github/dependabot.yml`, D-DI) ouvre chaque semaine des pull requests vers `develop` : Maven, npm, GitHub Actions et images de `deploy/compose.dev.yaml`, mineures et correctifs groupés par écosystème, messages `build(deps): …` ou `ci: …`. Une telle pull request s'intègre comme les autres, CI verte. Restent manuelles : les majeures d'Angular (`ng update`), TypeScript, et l'image `postgres` (`03-versions-cibles.md` §10.3). Les alertes et mises à jour de sécurité s'activent dans les paramètres du dépôt GitHub.
 
+Les actions du workflow sont épinglées par empreinte de commit, la version figurant en commentaire (`actions/checkout@<sha> # v5.1.0`, D-DL) ; Dependabot met les deux à jour. Une nouvelle action s'ajoute de la même façon. La protection des branches `main` et `develop` (CI obligatoire avant intégration) se règle dans les paramètres du dépôt.
+
 ---
 
 # 33. Exemples de bons commits

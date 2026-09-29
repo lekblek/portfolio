@@ -630,6 +630,8 @@ if (error.detail === "Ce slug est déjà utilisé.") {
 
 Le texte peut évoluer ou être traduit.
 
+Langue (D-DJ) : tous les textes de l'API sont en français, quel que soit l'en-tête `Accept-Language` ou la langue du serveur (`spring.web.locale-resolver: fixed`, `spring.web.locale: fr`). Cela vaut pour les messages de Jakarta Validation (`errors[].message`, ex. « ne doit pas être vide ») et pour le `detail` des erreurs produites par Spring (corps illisible, paramètre absent, méthode non prise en charge…), défini dans `backend/src/main/resources/messages.properties` sous les clés `problemDetail.<classe de l'exception>`. Le `title` reste la phrase HTTP standard (`Bad Request`).
+
 Préférer conceptuellement :
 
 ```text
