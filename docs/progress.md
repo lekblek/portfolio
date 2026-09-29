@@ -2,25 +2,25 @@
 
 Ce fichier est la **seule** source de vérité sur l'avancement. Il ne répète pas le contenu des autres documents : il pointe vers eux.
 
-Dernière mise à jour : 2026-09-29 (étape 28 poussée, CI verte ; étape 29 terminée et vérifiée, commits à faire)
+Dernière mise à jour : 2026-09-29 (étape 29 poussée, CI verte ; étape 30 terminée et vérifiée, commits à faire)
 
 ---
 
 ## 1. État courant
 
 ```text
-Dernière étape terminée   : 29 — API de recherche (vérifiée, commits à faire) ; 28 poussée, CI verte (run 36559169148)
+Dernière étape terminée   : 30 — Module Contact (vérifiée, commits à faire) ; 29 poussée, CI verte (run 36560472534)
 Étape en cours            : aucune
-Prochaine étape prévue    : 30 — Construire le module Contact
-État                      : PRÊT après commit et push de l'étape 29
+Prochaine étape prévue    : 31 — Ajouter les notifications email
+État                      : PRÊT après commit et push de l'étape 30
 Branche                   : develop
-Vérification              : ./mvnw clean verify → 489 tests verts (242 *Test, 247 *IT) à la fin de l'étape 29
+Vérification              : ./mvnw clean verify → 535 tests verts (271 *Test, 264 *IT) à la fin de l'étape 30
 ```
 
 ## 2. Prochaine action
 
-1. Committer et pousser l'étape 29 (trois commits), vérifier la CI, puis remplacer le 🟡 par ✅.
-2. Étape 30 : module `contact` (persistance des messages, cycle `NEW → READ → PROCESSED → ARCHIVED` de `02` §24), sans route d'administration avant l'authentification (D-AU) ; la route publique d'envoi et l'anti-spam relèvent de l'étape 48.
+1. Committer et pousser l'étape 30 (deux commits), vérifier la CI, puis remplacer le 🟡 par ✅.
+2. Étape 31 : notification par e-mail après l'enregistrement d'un message (D14, `02` §25) : port de notification, envoi SMTP après la validation de la transaction, échec journalisé sans annuler le message ; aucun serveur SMTP requis pour les tests.
 3. Confirmer ou infirmer D-T (cohérence `stage` ⇔ `endDate`) : `docs/decisions/registre-implementation.md`.
 
 ---
@@ -86,8 +86,9 @@ Légende : ✅ terminée et poussée · 🟡 terminée et vérifiée, commits à
 | 27.4 | Couvertures des publications (`V015`) et des séries (`V016`) | ✅ | `4a09d87`, `31ca538`, `a024051` (CI : run 36469195120) |
 | 28.1 | Configuration `french_unaccent` (`V017`) ; documents de recherche pondérés et index GIN des publications (`V018`) et des projets (`V019`) | ✅ | `a4a4465` |
 | 28.2 | Recherche classée par les modules propriétaires (façades), cas d'usage `SearchPublicContentUseCase` | ✅ | `e80b3d2`, `a776fc9`, docs `de9829f` (CI : run 36559169148). Poussés dans le désordre : `e80b3d2` et `de9829f` ne compilent pas seuls (CI rouge : run 36557442643), l'arbre est correct à partir de `a776fc9` |
-| 29 | `GET /api/public/search` ; `ProblemDetail` des exceptions de Spring sans corps désormais codé | 🟡 | à committer |
-| 30 → 52 | Voir `docs/steps/liste_complete_etapes.md` | ⏳ | — |
+| 29 | `GET /api/public/search` ; `ProblemDetail` des exceptions de Spring sans corps désormais codé | ✅ | `b4a3f26`, `81ff5fc`, `45c23d8` (CI : run 36560472534) |
+| 30 | Module `contact` : `V020`, cycle de statut, cas d'usage sans route, seed `dev` | 🟡 | à committer |
+| 31 → 52 | Voir `docs/steps/liste_complete_etapes.md` | ⏳ | — |
 
 Après le push, remplacer les 🟡 par ✅ et noter les hashes.
 
@@ -122,6 +123,7 @@ Index : [`decisions/README.md`](decisions/README.md).
 | D-BZ … D-CB | Configuration `french_unaccent` ; document de recherche généré et index GIN dans chaque table propriétaire ; noms des tags et des technologies recopiés par PostgreSQL (invariant 28) | Actives (28.1) |
 | D-CC, D-CD | Recherche classée derrière les façades, règle de visibilité non réécrite ; module `search` sans table, classement commun et pagination | Actives (28.2) |
 | D-CE, D-CF | Route et contrat de la recherche publique ; `q` obligatoire, vide → page vide, 200 caractères au plus (`VALIDATION_FAILED`) ; code ajouté aux erreurs de Spring sans corps | Actives (29) |
+| D-CG, D-CH | Module `contact` sans route (envoi public à l'étape 48, administration à l'étape 36) ; règles du message doublées en SQL ; cycle en avant seulement (invariant 29, `INVALID_CONTACT_MESSAGE_TRANSITION`) | Actives (30) |
 | 14.4 | Exposition publique de `publicEmail` | À confirmer |
 
 ## 5. Problèmes connus
@@ -217,6 +219,9 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | Prérendu route par route | Étape 52.1 | D22 |
 | Cache du profil public | si le profil devient un chemin chaud | D-O |
 | Exposition de springdoc / Swagger UI | Étape 32 | KI-19 |
+| Route `POST /api/public/contact-messages` (piège à robots, limitation de débit, validation avec les bornes de `ContactMessage`) | Étape 48 | D-CG : `01` §13 place l'anti-spam avant la sauvegarde |
+| Routes d'administration des messages (liste, changement de statut) | Étape 36 | D-AU, D-CH |
+| Restaurer un message archivé, remettre un message « non lu » | si l'administration le demande | D-CH : cycle en avant seulement |
 | Filtre de la recherche par genre de contenu (`type`), extraits mis en évidence (`ts_headline`), recherche par préfixe pendant la saisie | si l'écran de recherche le demande (étape 47) | D-CE ; D-CC : `websearch_to_tsquery` n'accepte pas `:*` |
 | Catégorie dans le document de recherche | si le modèle l'adopte | D-CA : absente de `01` §11 |
 | Classement en base (fenêtre de pagination SQL) au lieu du classement en mémoire de tous les résultats | Étape 52.6, si le corpus dépasse quelques milliers de contenus | D-CD |

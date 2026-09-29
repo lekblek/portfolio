@@ -1823,6 +1823,7 @@ Elles sont simplement inutiles pour le périmètre actuel.
 | `MEDIA_STILL_REFERENCED`         |  409 | Média encore référencé                        |
 | `UNSUPPORTED_MEDIA_FORMAT`       |  415 | Format de média non accepté                   |
 | `MEDIA_TOO_LARGE`                |  413 | Fichier trop volumineux pour son format       |
+| `INVALID_CONTACT_MESSAGE_TRANSITION` | 409 | Retour en arrière dans le cycle d’un message de contact (D-CH) ; levé par le cas d’usage, route à l’étape 36 |
 ---
 
 # 38. Règles fondamentales

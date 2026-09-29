@@ -599,6 +599,8 @@ Aucune adresse IP n'est persistée par défaut.
 
 Le rate limiting est une préoccupation de sécurité de la requête, pas une propriété métier du message.
 
+État d'implémentation (étape 30, D-CG) : nom (100 caractères), adresse (254), sujet (200) et message (5 000) obligatoires et non blancs, adresse de forme `local@domaine.tld`, espaces de début et de fin retirés à la réception ; règles du domaine doublées par PostgreSQL (`V020`). Aucune route avant l'étape 48 (envoi public protégé) et l'étape 36 (administration).
+
 ---
 
 # 24. ContactStatus
@@ -621,6 +623,8 @@ PROCESSED
  ↓
 ARCHIVED
 ```
+
+Implémenté à l'étape 30 (invariant 29, D-CH) : le statut n'avance que dans cet ordre, en sautant éventuellement des étapes (un message indésirable s'archive directement) ; aucun retour en arrière.
 
 ---
 
@@ -784,8 +788,9 @@ Les règles suivantes doivent être garanties par le backend et, lorsque pertine
 26. le statut d'une `Publication` ne change que selon la table des transitions du §15 ;
 27. un `Project` référence au plus une fois le même média parmi ses captures.
 28. le document de recherche d'une `Publication` (titre, tags, résumé, contenu) et d'un `Project` (titre, technologies, description courte, description) reflète toujours leur état courant, y compris après le renommage d'un tag ou d'une technologie.
+29. le statut d'un `ContactMessage` n'avance que dans l'ordre `NEW → READ → PROCESSED → ARCHIVED`, sans retour en arrière (étapes sautables).
 
-Les invariants 17 à 28 ont été ajoutés pendant l'implémentation (étapes 14 à 28) ; 27 est garanti par PostgreSQL et doublé par le modèle métier ; 28 est garanti par PostgreSQL seul (colonnes générées et déclencheurs, `V018`, `V019`, D-CA, D-CB), l'application n'écrivant jamais le document. Les invariants 17 à 25 sont garantis par PostgreSQL (`CHECK`, `UNIQUE`, clés étrangères) et, pour 17, 18, 21, 23 et 24, doublés par le modèle métier. L'invariant 26 (table des transitions) est **applicatif uniquement** : aucune contrainte SQL ne compare l'ancien et le nouveau statut ; il est garanti tant que le statut n'est écrit que par `ChangePublicationStatusUseCase` (seul appelant de `updateStatus`, D-AX). L'invariant 6 (slug stable) est lui aussi applicatif : `Publication.changeSlug` refuse le changement dès que `firstPublishedAt` est passée (D-BC) ; l'invariant 5 est garanti par les contraintes `UNIQUE` de PostgreSQL (D-X, D-AA, D-AL, D-AO). Les invariants 1 à 3 (séries) sont garantis par PostgreSQL depuis l'étape 23 (`V011`, D-BF) et, pour 3, doublés par le modèle métier. L'invariant 13 (média référencé non supprimable) est garanti par les clés étrangères `ON DELETE RESTRICT` des contenus vers `media`, depuis l'étape 27.2 pour les projets, 27.3 pour le profil et 27.4 pour les publications et les séries (D-BV, D-BX, D-BY). Les invariants 7 à 10 (visibilité des publications) sont appliqués par les lectures publiques depuis l'étape 19. Voir [`decisions/registre-implementation.md`](decisions/registre-implementation.md).
+Les invariants 17 à 29 ont été ajoutés pendant l'implémentation (étapes 14 à 30) ; 27 est garanti par PostgreSQL et doublé par le modèle métier ; 28 est garanti par PostgreSQL seul (colonnes générées et déclencheurs, `V018`, `V019`, D-CA, D-CB), l'application n'écrivant jamais le document ; 29 est **applicatif** comme 26 : il tient tant que le statut d'un message n'est écrit que par `ChangeContactMessageStatusUseCase` (D-CH). Les invariants 17 à 25 sont garantis par PostgreSQL (`CHECK`, `UNIQUE`, clés étrangères) et, pour 17, 18, 21, 23 et 24, doublés par le modèle métier. L'invariant 26 (table des transitions) est **applicatif uniquement** : aucune contrainte SQL ne compare l'ancien et le nouveau statut ; il est garanti tant que le statut n'est écrit que par `ChangePublicationStatusUseCase` (seul appelant de `updateStatus`, D-AX). L'invariant 6 (slug stable) est lui aussi applicatif : `Publication.changeSlug` refuse le changement dès que `firstPublishedAt` est passée (D-BC) ; l'invariant 5 est garanti par les contraintes `UNIQUE` de PostgreSQL (D-X, D-AA, D-AL, D-AO). Les invariants 1 à 3 (séries) sont garantis par PostgreSQL depuis l'étape 23 (`V011`, D-BF) et, pour 3, doublés par le modèle métier. L'invariant 13 (média référencé non supprimable) est garanti par les clés étrangères `ON DELETE RESTRICT` des contenus vers `media`, depuis l'étape 27.2 pour les projets, 27.3 pour le profil et 27.4 pour les publications et les séries (D-BV, D-BX, D-BY). Les invariants 7 à 10 (visibilité des publications) sont appliqués par les lectures publiques depuis l'étape 19. Voir [`decisions/registre-implementation.md`](decisions/registre-implementation.md).
 
 ---
 
