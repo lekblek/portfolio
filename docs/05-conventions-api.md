@@ -1719,6 +1719,54 @@ Règles propres à ces contrats (D-CV) :
 * pas de suppression ;
 * contrats vérifiés par `AdminSeriesIT`.
 
+### Technologies (étape 36.5)
+
+```text
+GET    /api/admin/technologies        200 AdminTechnologyResponse[] { id, name, slug, displayOrder }, ordre du vocabulaire
+POST   /api/admin/technologies        { name, slug?, displayOrder? } → 201 + Location, AdminTechnologyResponse
+PUT    /api/admin/technologies/{id}   { name, slug?, displayOrder? } → 200 AdminTechnologyResponse
+DELETE /api/admin/technologies/{id}   204
+400 VALIDATION_FAILED   nom vide ou sans lettre ni chiffre, plus de 80 caractères ; slug mal formé ; ordre négatif
+404 RESOURCE_NOT_FOUND  identifiant inconnu
+409 NAME_ALREADY_USED   nom déjà pris, casse ignorée ; 409 TERM_STILL_USED à la suppression d'une technologie utilisée
+```
+
+Mêmes règles que les tags (D-CS, D-CW) ; `displayOrder` absent → 0 ; contrats vérifiés par `AdminTechnologyIT`.
+
+### Projets (étape 36.5)
+
+```text
+GET    /api/admin/projects        200 PageResponse<AdminProjectSummaryResponse>
+                                  { id, title, slug, visibility, stage, featured, displayOrder }, 20 par page,
+                                  toutes visibilités, ordre d'affichage public
+GET    /api/admin/projects/{id}   200 AdminProjectResponse
+POST   /api/admin/projects        SaveProjectRequest → 201 + Location, AdminProjectResponse
+PUT    /api/admin/projects/{id}   SaveProjectRequest → 200 AdminProjectResponse
+
+SaveProjectRequest { title, slug?, shortDescription, descriptionMarkdown, stage, visibility, startDate, endDate?,
+                     repositoryUrl?, demoUrl?, featured?, displayOrder?, technologyIds?, coverMediaId?,
+                     screenshots?: [{ mediaId, caption? }] }
+AdminProjectResponse { id, title, slug, slugLocked, shortDescription, descriptionMarkdown, stage, visibility,
+                       startDate, endDate | null, repositoryUrl | null, demoUrl | null, featured, displayOrder,
+                       technologyIds, coverMediaId | null, screenshots: [{ mediaId, caption | null }] }
+
+400 VALIDATION_FAILED  bornes, slug mal formé, adresse qui n'est pas http(s), ordre négatif ; fin avant début
+                       (endDate), stage incohérent avec la date de fin (stage), technologie inconnue (technologyIds),
+                       couverture ou capture inconnue ou PDF, capture répétée (coverMediaId, screenshots)
+404 RESOURCE_NOT_FOUND identifiant inconnu
+409 SLUG_LOCKED        nouveau slug d'un projet déjà publié (D11)
+```
+
+Règles propres à ces contrats (D-CX) :
+
+* session de l’administrateur et jeton CSRF obligatoires (401 et 403 sinon) ;
+* une requête porte toute la saisie, visibilité comprise ; technologies et captures sont remplacées d’un bloc ; les captures sont affichées dans l’ordre de la liste ;
+* `IN_PROGRESS` exige l’absence de `endDate`, `COMPLETED` sa présence (invariant 21) ;
+* `slug` facultatif : généré depuis le titre à la création, conservé à la modification ; suffixé s’il est pris ; figé dès que le projet a été publié, même archivé ensuite (`slugLocked`) ;
+* bornes : `title` 160, `shortDescription` 500, `descriptionMarkdown` 100 000 caractères, adresses 2 048, `caption` 300 ;
+* pas de suppression : l’archivage retire un projet du site ;
+* contrats vérifiés par `AdminProjectIT`.
+
 # 31. Ressources administratives prévues
 
 Les principales ressources administratives sont conceptuellement :

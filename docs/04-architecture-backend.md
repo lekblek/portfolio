@@ -178,6 +178,8 @@ project → media
 
 Les technologies des projets restent distinctes des tags éditoriaux.
 
+État d’implémentation (étape 36.5) : administration du vocabulaire (`/api/admin/technologies`, D-CW) et des projets (`/api/admin/projects`, D-CX) ; couverture et captures vérifiées par la façade `MediaQueryService` avant l’écriture.
+
 ---
 
 ### 3.5 `publication`

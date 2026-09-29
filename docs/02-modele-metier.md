@@ -232,7 +232,7 @@ ARCHIVED
 
 Seul un projet `PUBLISHED` est exposé publiquement.
 
-État d’implémentation (étapes 17, 18 et 27.2) : tous les attributs ci-dessus, les technologies, la couverture et les captures (`ProjectScreenshot`, références vers le catalogue `Media`, D-BV). Le slug est unique et au format kebab-case, garanti par PostgreSQL (D-X).
+État d’implémentation (étapes 17, 18 et 27.2) : tous les attributs ci-dessus, les technologies, la couverture et les captures (`ProjectScreenshot`, références vers le catalogue `Media`, D-BV). Le slug est unique et au format kebab-case, garanti par PostgreSQL (D-X). Depuis l’étape 36.5 (D-CX) : un projet retient s’il a déjà été publié (`everPublished`, doublé par PostgreSQL) et son slug ne change plus ensuite (D11) ; titre de 160 caractères, description courte de 500, description de 100 000 (doublée par PostgreSQL), adresses `http(s)` de 2 048 ; couverture et captures sont des images.
 
 ---
 
