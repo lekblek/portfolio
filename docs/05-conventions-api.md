@@ -1551,6 +1551,31 @@ Règles propres à ce contrat :
 * un fichier est accessible à quiconque connaît sa clé, imprévisible ; les contenus publient ces adresses (`url` des images, depuis l’étape 27.2) ;
 * contrat vérifié par `PublicMediaControllerTest` et `PublicMediaIT`.
 
+### `GET /api/public/search` (étapes 28 et 29)
+
+```text
+?q=<texte>               obligatoire ; lu comme une recherche web : "expression", or, -exclusion ;
+                         absent → 400 MALFORMED_REQUEST ; plus de 200 caractères → 400 VALIDATION_FAILED ;
+                         vide ou blanc → page vide
+?page=0&size=10          page 0-based ; size par défaut 10, plafonnée à 100 ; sort ignoré (ordre fixe)
+200 → PageResponse<SearchResultResponse>
+{
+  content[] { type, title, slug, summary, publishedAt | null },
+  page, size, totalElements, totalPages, first, last
+}
+400 → ProblemDetail, code MALFORMED_REQUEST, ou VALIDATION_FAILED avec errors[] { field: "q", message }
+```
+
+Règles propres à ce contrat :
+
+* seuls les articles et news visibles (§29) et les projets `PUBLISHED` sont trouvés et comptés (D09, D-CC) ;
+* `type` : `ARTICLE`, `NEWS` ou `PROJECT` ; le lien se construit avec `slug` : `/api/public/publications/{slug}` pour une publication, `/api/public/projects/{slug}` pour un projet ;
+* `summary` : résumé d’une publication, description courte d’un projet ; `publishedAt` : instant ISO-8601 UTC (§26), `null` pour un projet ;
+* ordre fixe : pertinence décroissante (titre et tags ou technologies, puis résumé ou description courte, puis contenu), puis publications avant projets, puis le plus récemment créé (D-CD) ;
+* recherche insensible aux accents et à la casse, sur les racines des mots français (`développer` trouve `développement`), mots vides ignorés (D-BZ) ;
+* ni identifiant ni pertinence exposés (D-CE) ;
+* contrat vérifié par `PublicSearchControllerTest` et `PublicSearchIT`.
+
 Chaque module introduit ses routes lors de son étape d’implémentation.
 
 ---

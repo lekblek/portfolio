@@ -333,7 +333,7 @@ La recherche est une capacité de lecture.
 
 Les modules `publication` et `project` ne doivent jamais dépendre de `search`.
 
-État d’implémentation (étape 28) : le module `search` n’a aucune table. Chaque module propriétaire porte le document de recherche de ses contenus (colonne générée `search_vector`, index GIN, configuration `french_unaccent` : D-BZ, D-CA, D-CB) et cherche avec sa propre règle de visibilité, derrière sa façade (`PublicationQueryService.searchVisible`, `ProjectQueryService.searchPublished`, D-CC). `SearchPublicContentUseCase` classe l’ensemble et pagine (D-CD). Route publique : étape 29.
+État d’implémentation (étape 28) : le module `search` n’a aucune table. Chaque module propriétaire porte le document de recherche de ses contenus (colonne générée `search_vector`, index GIN, configuration `french_unaccent` : D-BZ, D-CA, D-CB) et cherche avec sa propre règle de visibilité, derrière sa façade (`PublicationQueryService.searchVisible`, `ProjectQueryService.searchPublished`, D-CC). `SearchPublicContentUseCase` classe l’ensemble et pagine (D-CD). Depuis l’étape 29 : route publique `GET /api/public/search` (`PublicSearchController`, D-CE, D-CF).
 
 ---
 
