@@ -891,7 +891,7 @@ Cette opération peut échouer avec :
 
 si la transition viole un invariant.
 
-État d’implémentation (étape 21, D-AU) : les règles de transition sont dans le domaine (`Publication.transitionTo`) et le cas d’usage `ChangePublicationStatusUseCase` existe ; la route ci-dessus sera exposée à l’étape 36, derrière l’authentification. Le champ `publishedAt` du corps n’est accepté que pour `SCHEDULED` (date strictement future) ; toute transition refusée donne 409 `INVALID_PUBLICATION_TRANSITION`. Table des transitions : `02-modele-metier.md` §15.
+État d’implémentation (étape 21, D-AU) : les règles de transition sont dans le domaine (`Publication.transitionTo`) et le cas d’usage `ChangePublicationStatusUseCase` existe ; la route ci-dessus est exposée depuis l’étape 36.3, derrière l’authentification (D-CU). Le champ `publishedAt` du corps n’est accepté que pour `SCHEDULED` (date strictement future) ; toute transition refusée donne 409 `INVALID_PUBLICATION_TRANSITION`. Table des transitions : `02-modele-metier.md` §15.
 
 L’objectif est d’éviter qu’un simple :
 
@@ -914,7 +914,7 @@ ne sont jamais retournées directement
 ne sont jamais acceptées directement comme corps HTTP
 ```
 
-Exemple d’organisation (structure de l’ADR 0001 ; les fichiers `Admin*` et `*Request` arriveront à l’étape 36) :
+Exemple d’organisation (structure de l’ADR 0001 ; fichiers `Admin*` et `*Request` réels depuis l’étape 36, par exemple `publication.web.dto`) :
 
 ```text
 project/
@@ -1652,6 +1652,41 @@ Règles propres à ces contrats (D-CT) :
 * seul le texte alternatif se modifie : remplacer un fichier, c’est envoyer un nouveau média ; `altText` vide ou absent → `null` ;
 * au-delà de 12 Mio, Tomcat coupe la connexion au lieu de répondre 413 : l’interface vérifie la taille avant l’envoi ;
 * contrats vérifiés par `AdminMediaIT` ; limite de la requête sur un vrai serveur par `HttpServerSecurityIT`.
+
+### Publications (étape 36.3)
+
+```text
+GET    /api/admin/publications              200 PageResponse<AdminPublicationSummaryResponse>, 20 par page,
+                                            tous statuts, les dernières modifiées d'abord
+GET    /api/admin/publications/{id}         200 AdminPublicationResponse
+POST   /api/admin/publications              { type, title, slug?, summary, contentMarkdown, featured?, categoryId?,
+                                              tagIds?, coverMediaId?, seoTitle?, seoDescription? }
+                                            → 201 + Location, AdminPublicationResponse (brouillon)
+PUT    /api/admin/publications/{id}         la même saisie sans type → 200 AdminPublicationResponse
+POST   /api/admin/publications/{id}/status  { status, publishedAt? } → 200 AdminPublicationResponse (§17)
+
+AdminPublicationResponse { id, type, title, slug, slugLocked, summary, contentMarkdown, status, publishedAt | null,
+                           featured, categoryId | null, tagIds, coverMediaId | null, seoTitle | null,
+                           seoDescription | null, createdAt, updatedAt }
+AdminPublicationSummaryResponse { id, type, title, slug, status, publishedAt | null, featured, updatedAt }
+
+400 VALIDATION_FAILED               titre vide ou sans lettre ni chiffre, bornes dépassées, slug mal formé, type ou
+                                    statut absent ; catégorie, tag ou couverture inconnus, couverture PDF (champ)
+400 MALFORMED_REQUEST               JSON illisible, type ou statut inexistant
+404 RESOURCE_NOT_FOUND              identifiant inconnu
+409 SLUG_LOCKED                     nouveau slug d'une publication déjà publiée (D11)
+409 INVALID_PUBLICATION_TRANSITION  transition interdite ou date de planification non future
+```
+
+Règles propres à ces contrats (D-CU) :
+
+* session de l’administrateur et jeton CSRF obligatoires (401 et 403 sinon) ;
+* une publication naît brouillon ; son type ne change plus ; son statut ne change que par la route `/status` ;
+* `slug` facultatif : généré depuis le titre à la création, conservé à la modification ; s’il est pris, le premier suffixe libre est ajouté ; après la première publication, un slug différent est refusé ;
+* `status` est le statut observable : une publication planifiée dont la date est passée est `PUBLISHED` ; `slugLocked` dit si le slug peut encore changer ;
+* bornes : `title` 160, `summary` 500, `contentMarkdown` 100 000 caractères (vide permis), `seoTitle` 120, `seoDescription` 300 ; champs SEO vides → `null`, `tagIds` absent → aucun tag, `featured` absent → `false` ;
+* pas de suppression : l’archivage (`ARCHIVED`) retire une publication du site ;
+* contrats vérifiés par `AdminPublicationIT`.
 
 # 31. Ressources administratives prévues
 

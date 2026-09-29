@@ -215,6 +215,8 @@ publication → taxonomy
 
 Une publication doit pouvoir exister indépendamment d’une série.
 
+État d’implémentation (étape 36.3) : administration `/api/admin/publications` (liste de tous les statuts, création en brouillon, modification de la saisie, route du cycle éditorial, D-CU) ; catégorie, tags et couverture vérifiés avant l’écriture par les façades `TaxonomyQueryService` et `MediaQueryService`.
+
 ---
 
 ### 3.6 `series`

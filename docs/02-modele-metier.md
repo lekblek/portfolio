@@ -334,7 +334,7 @@ Le Markdown est la source canonique.
 
 Aucun `contentHtml` métier n'est nécessaire.
 
-État d’implémentation (étapes 19 à 22 et 27.4) : tous les attributs ci-dessus, dont `coverMedia` (référence facultative vers le catalogue `Media`, D-BY) ; le temps de lecture est calculé à partir du Markdown (D12, D-AJ). Le slug est unique pour l’ensemble des publications (D-AL). `firstPublishedAt` retient la première apparition publique : provisoire tant qu’elle est future, elle ne change plus une fois passée (D-AZ) ; elle rend le slug définitif (§16).
+État d’implémentation (étapes 19 à 22 et 27.4) : tous les attributs ci-dessus, dont `coverMedia` (référence facultative vers le catalogue `Media`, D-BY) ; le temps de lecture est calculé à partir du Markdown (D12, D-AJ). Le slug est unique pour l’ensemble des publications (D-AL). `firstPublishedAt` retient la première apparition publique : provisoire tant qu’elle est future, elle ne change plus une fois passée (D-AZ) ; elle rend le slug définitif (§16). Depuis l’étape 36.3 (D-CU) : une publication naît brouillon et garde son type ; titre (160 caractères), résumé (500), contenu (100 000, borne doublée par PostgreSQL) et champs SEO (120 et 300) sont bornés ; la couverture est une image.
 
 ---
 
