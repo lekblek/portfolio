@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.firewall.RequestRejectedHandler;
 import org.springframework.security.web.savedrequest.NullRequestCache;
@@ -45,6 +47,15 @@ public class SecurityConfiguration {
                 .accessDeniedHandler((request, response, exception) ->
                     exceptionResolver.resolveException(request, response, null, exception)))
             .build();
+    }
+
+    /**
+     * Encodeur délégué de Spring Security (D-CN) : bcrypt aujourd'hui, empreintes préfixées ({@code {bcrypt}}) pour
+     * pouvoir changer d'algorithme sans invalider les empreintes existantes.
+     */
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
     /**

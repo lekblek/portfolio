@@ -40,6 +40,10 @@ portfolio:
     # Racine du stockage local des médias (D-BO) : relative au répertoire de travail en développement,
     # volume persistant en production (étape 52).
     storage-root: ${MEDIA_STORAGE_ROOT:uploads}
+  admin:
+    # Compte administrateur unique (D18, D-CN) : la configuration fait foi à chaque démarrage. Vides : non initialisé.
+    username: ${ADMIN_USERNAME:}
+    password: ${ADMIN_PASSWORD:}
   contact:
     notification:
       # Expéditeur et destinataire (l'administrateur) des notifications de contact (D-CI).
