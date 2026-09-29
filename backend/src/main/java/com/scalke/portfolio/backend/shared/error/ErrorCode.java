@@ -20,5 +20,8 @@ public enum ErrorCode {
     // media
     MEDIA_STILL_REFERENCED,
     UNSUPPORTED_MEDIA_FORMAT,
-    MEDIA_TOO_LARGE
+    MEDIA_TOO_LARGE,
+
+    // contact
+    INVALID_CONTACT_MESSAGE_TRANSITION
 }
