@@ -1,0 +1,3481 @@
+{
+  "components" : {
+    "schemas" : {
+      "AdminCategoryResponse" : {
+        "properties" : {
+          "description" : {
+            "type" : "string"
+          },
+          "id" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "slug" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "AdminContactMessageResponse" : {
+        "properties" : {
+          "createdAt" : {
+            "format" : "date-time",
+            "type" : "string"
+          },
+          "email" : {
+            "type" : "string"
+          },
+          "id" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "message" : {
+            "type" : "string"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "status" : {
+            "enum" : [ "NEW", "READ", "PROCESSED", "ARCHIVED" ],
+            "type" : "string"
+          },
+          "subject" : {
+            "type" : "string"
+          },
+          "updatedAt" : {
+            "format" : "date-time",
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "AdminContactMessageSummaryResponse" : {
+        "properties" : {
+          "createdAt" : {
+            "format" : "date-time",
+            "type" : "string"
+          },
+          "email" : {
+            "type" : "string"
+          },
+          "id" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "status" : {
+            "enum" : [ "NEW", "READ", "PROCESSED", "ARCHIVED" ],
+            "type" : "string"
+          },
+          "subject" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "AdminMediaResponse" : {
+        "properties" : {
+          "altText" : {
+            "type" : "string"
+          },
+          "createdAt" : {
+            "format" : "date-time",
+            "type" : "string"
+          },
+          "format" : {
+            "enum" : [ "PNG", "JPEG", "WEBP", "PDF" ],
+            "type" : "string"
+          },
+          "height" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "id" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "mimeType" : {
+            "type" : "string"
+          },
+          "originalName" : {
+            "type" : "string"
+          },
+          "sizeBytes" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "url" : {
+            "type" : "string"
+          },
+          "width" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        },
+        "type" : "object"
+      },
+      "AdminProfileResponse" : {
+        "properties" : {
+          "aboutMarkdown" : {
+            "type" : "string"
+          },
+          "avatarMediaId" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "certifications" : {
+            "items" : {
+              "$ref" : "#/components/schemas/Certification"
+            },
+            "type" : "array"
+          },
+          "cvMediaId" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "displayName" : {
+            "type" : "string"
+          },
+          "educations" : {
+            "items" : {
+              "$ref" : "#/components/schemas/Education"
+            },
+            "type" : "array"
+          },
+          "experiences" : {
+            "items" : {
+              "$ref" : "#/components/schemas/Experience"
+            },
+            "type" : "array"
+          },
+          "links" : {
+            "items" : {
+              "$ref" : "#/components/schemas/Link"
+            },
+            "type" : "array"
+          },
+          "professionalTitle" : {
+            "type" : "string"
+          },
+          "publicEmail" : {
+            "type" : "string"
+          },
+          "publicLocation" : {
+            "type" : "string"
+          },
+          "shortBio" : {
+            "type" : "string"
+          },
+          "skills" : {
+            "items" : {
+              "$ref" : "#/components/schemas/Skill"
+            },
+            "type" : "array"
+          }
+        },
+        "type" : "object"
+      },
+      "AdminProjectResponse" : {
+        "properties" : {
+          "coverMediaId" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "demoUrl" : {
+            "type" : "string"
+          },
+          "descriptionMarkdown" : {
+            "type" : "string"
+          },
+          "displayOrder" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "endDate" : {
+            "format" : "date",
+            "type" : "string"
+          },
+          "featured" : {
+            "type" : "boolean"
+          },
+          "id" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "repositoryUrl" : {
+            "type" : "string"
+          },
+          "screenshots" : {
+            "items" : {
+              "$ref" : "#/components/schemas/Screenshot"
+            },
+            "type" : "array"
+          },
+          "shortDescription" : {
+            "type" : "string"
+          },
+          "slug" : {
+            "type" : "string"
+          },
+          "slugLocked" : {
+            "type" : "boolean"
+          },
+          "stage" : {
+            "enum" : [ "IN_PROGRESS", "COMPLETED" ],
+            "type" : "string"
+          },
+          "startDate" : {
+            "format" : "date",
+            "type" : "string"
+          },
+          "technologyIds" : {
+            "items" : {
+              "format" : "int64",
+              "type" : "integer"
+            },
+            "type" : "array"
+          },
+          "title" : {
+            "type" : "string"
+          },
+          "visibility" : {
+            "enum" : [ "DRAFT", "PUBLISHED", "ARCHIVED" ],
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "AdminProjectSummaryResponse" : {
+        "properties" : {
+          "displayOrder" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "featured" : {
+            "type" : "boolean"
+          },
+          "id" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "slug" : {
+            "type" : "string"
+          },
+          "stage" : {
+            "enum" : [ "IN_PROGRESS", "COMPLETED" ],
+            "type" : "string"
+          },
+          "title" : {
+            "type" : "string"
+          },
+          "visibility" : {
+            "enum" : [ "DRAFT", "PUBLISHED", "ARCHIVED" ],
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "AdminPublicationResponse" : {
+        "properties" : {
+          "categoryId" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "contentMarkdown" : {
+            "type" : "string"
+          },
+          "coverMediaId" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "createdAt" : {
+            "format" : "date-time",
+            "type" : "string"
+          },
+          "featured" : {
+            "type" : "boolean"
+          },
+          "id" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "publishedAt" : {
+            "format" : "date-time",
+            "type" : "string"
+          },
+          "seoDescription" : {
+            "type" : "string"
+          },
+          "seoTitle" : {
+            "type" : "string"
+          },
+          "slug" : {
+            "type" : "string"
+          },
+          "slugLocked" : {
+            "type" : "boolean"
+          },
+          "status" : {
+            "enum" : [ "DRAFT", "IN_REVIEW", "SCHEDULED", "PUBLISHED", "ARCHIVED" ],
+            "type" : "string"
+          },
+          "summary" : {
+            "type" : "string"
+          },
+          "tagIds" : {
+            "items" : {
+              "format" : "int64",
+              "type" : "integer"
+            },
+            "type" : "array"
+          },
+          "title" : {
+            "type" : "string"
+          },
+          "type" : {
+            "enum" : [ "ARTICLE", "NEWS" ],
+            "type" : "string"
+          },
+          "updatedAt" : {
+            "format" : "date-time",
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "AdminPublicationSummaryResponse" : {
+        "properties" : {
+          "featured" : {
+            "type" : "boolean"
+          },
+          "id" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "publishedAt" : {
+            "format" : "date-time",
+            "type" : "string"
+          },
+          "slug" : {
+            "type" : "string"
+          },
+          "status" : {
+            "enum" : [ "DRAFT", "IN_REVIEW", "SCHEDULED", "PUBLISHED", "ARCHIVED" ],
+            "type" : "string"
+          },
+          "title" : {
+            "type" : "string"
+          },
+          "type" : {
+            "enum" : [ "ARTICLE", "NEWS" ],
+            "type" : "string"
+          },
+          "updatedAt" : {
+            "format" : "date-time",
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "AdminSeriesResponse" : {
+        "properties" : {
+          "chapters" : {
+            "items" : {
+              "$ref" : "#/components/schemas/Chapter"
+            },
+            "type" : "array"
+          },
+          "coverMediaId" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "descriptionMarkdown" : {
+            "type" : "string"
+          },
+          "id" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "slug" : {
+            "type" : "string"
+          },
+          "slugLocked" : {
+            "type" : "boolean"
+          },
+          "title" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "AdminSeriesSummaryResponse" : {
+        "properties" : {
+          "chapterCount" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "id" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "slug" : {
+            "type" : "string"
+          },
+          "title" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "AdminSessionResponse" : {
+        "properties" : {
+          "lastLoginAt" : {
+            "format" : "date-time",
+            "type" : "string"
+          },
+          "login" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "AdminTagResponse" : {
+        "properties" : {
+          "id" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "slug" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "AdminTechnologyResponse" : {
+        "properties" : {
+          "displayOrder" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "id" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "slug" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "Certification" : {
+        "properties" : {
+          "credentialUrl" : {
+            "maxLength" : 2048,
+            "minLength" : 0,
+            "pattern" : "https?://\\S+",
+            "type" : "string"
+          },
+          "expiresAt" : {
+            "format" : "date",
+            "type" : "string"
+          },
+          "issuedAt" : {
+            "format" : "date",
+            "type" : "string"
+          },
+          "issuer" : {
+            "maxLength" : 120,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "name" : {
+            "maxLength" : 160,
+            "minLength" : 0,
+            "type" : "string"
+          }
+        },
+        "required" : [ "issuedAt", "issuer", "name" ],
+        "type" : "object"
+      },
+      "CertificationResponse" : {
+        "properties" : {
+          "credentialUrl" : {
+            "type" : "string"
+          },
+          "expiresAt" : {
+            "format" : "date",
+            "type" : "string"
+          },
+          "issuedAt" : {
+            "format" : "date",
+            "type" : "string"
+          },
+          "issuer" : {
+            "type" : "string"
+          },
+          "name" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "ChangeContactMessageStatusRequest" : {
+        "properties" : {
+          "status" : {
+            "enum" : [ "NEW", "READ", "PROCESSED", "ARCHIVED" ],
+            "type" : "string"
+          }
+        },
+        "required" : [ "status" ],
+        "type" : "object"
+      },
+      "ChangePublicationStatusRequest" : {
+        "properties" : {
+          "publishedAt" : {
+            "format" : "date-time",
+            "type" : "string"
+          },
+          "status" : {
+            "enum" : [ "DRAFT", "IN_REVIEW", "SCHEDULED", "PUBLISHED", "ARCHIVED" ],
+            "type" : "string"
+          }
+        },
+        "required" : [ "status" ],
+        "type" : "object"
+      },
+      "ChangeSeriesChaptersRequest" : {
+        "properties" : {
+          "publicationIds" : {
+            "items" : {
+              "format" : "int64",
+              "type" : "integer"
+            },
+            "type" : "array"
+          }
+        },
+        "required" : [ "publicationIds" ],
+        "type" : "object"
+      },
+      "Chapter" : {
+        "properties" : {
+          "position" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "publicationId" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "slug" : {
+            "type" : "string"
+          },
+          "status" : {
+            "enum" : [ "DRAFT", "IN_REVIEW", "SCHEDULED", "PUBLISHED", "ARCHIVED" ],
+            "type" : "string"
+          },
+          "title" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "ChapterLinkResponse" : {
+        "properties" : {
+          "position" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "slug" : {
+            "type" : "string"
+          },
+          "title" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "CreatePublicationRequest" : {
+        "properties" : {
+          "categoryId" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "contentMarkdown" : {
+            "maxLength" : 100000,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "coverMediaId" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "featured" : {
+            "type" : "boolean"
+          },
+          "seoDescription" : {
+            "maxLength" : 300,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "seoTitle" : {
+            "maxLength" : 120,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "slug" : {
+            "maxLength" : 160,
+            "minLength" : 0,
+            "pattern" : "[a-z0-9]+(-[a-z0-9]+)*",
+            "type" : "string"
+          },
+          "summary" : {
+            "maxLength" : 500,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "tagIds" : {
+            "items" : {
+              "format" : "int64",
+              "type" : "integer"
+            },
+            "type" : "array",
+            "uniqueItems" : true
+          },
+          "title" : {
+            "maxLength" : 160,
+            "minLength" : 0,
+            "pattern" : "(?s).*[\\p{L}\\p{N}].*",
+            "type" : "string"
+          },
+          "type" : {
+            "enum" : [ "ARTICLE", "NEWS" ],
+            "type" : "string"
+          }
+        },
+        "required" : [ "contentMarkdown", "summary", "title", "type" ],
+        "type" : "object"
+      },
+      "Education" : {
+        "properties" : {
+          "degree" : {
+            "maxLength" : 160,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "description" : {
+            "maxLength" : 10000,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "endDate" : {
+            "format" : "date",
+            "type" : "string"
+          },
+          "field" : {
+            "maxLength" : 160,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "institution" : {
+            "maxLength" : 160,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "location" : {
+            "maxLength" : 120,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "startDate" : {
+            "format" : "date",
+            "type" : "string"
+          }
+        },
+        "required" : [ "degree", "description", "field", "institution", "location", "startDate" ],
+        "type" : "object"
+      },
+      "EducationResponse" : {
+        "properties" : {
+          "degree" : {
+            "type" : "string"
+          },
+          "description" : {
+            "type" : "string"
+          },
+          "endDate" : {
+            "format" : "date",
+            "type" : "string"
+          },
+          "field" : {
+            "type" : "string"
+          },
+          "institution" : {
+            "type" : "string"
+          },
+          "location" : {
+            "type" : "string"
+          },
+          "startDate" : {
+            "format" : "date",
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "Experience" : {
+        "properties" : {
+          "description" : {
+            "maxLength" : 10000,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "endDate" : {
+            "format" : "date",
+            "type" : "string"
+          },
+          "location" : {
+            "maxLength" : 120,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "organization" : {
+            "maxLength" : 120,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "startDate" : {
+            "format" : "date",
+            "type" : "string"
+          },
+          "title" : {
+            "maxLength" : 120,
+            "minLength" : 0,
+            "type" : "string"
+          }
+        },
+        "required" : [ "description", "location", "organization", "startDate", "title" ],
+        "type" : "object"
+      },
+      "ExperienceResponse" : {
+        "properties" : {
+          "description" : {
+            "type" : "string"
+          },
+          "endDate" : {
+            "format" : "date",
+            "type" : "string"
+          },
+          "location" : {
+            "type" : "string"
+          },
+          "organization" : {
+            "type" : "string"
+          },
+          "startDate" : {
+            "format" : "date",
+            "type" : "string"
+          },
+          "title" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "Link" : {
+        "properties" : {
+          "label" : {
+            "maxLength" : 80,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "url" : {
+            "maxLength" : 2048,
+            "minLength" : 0,
+            "pattern" : "https?://\\S+",
+            "type" : "string"
+          }
+        },
+        "required" : [ "label", "url" ],
+        "type" : "object"
+      },
+      "OpenAdminSessionRequest" : {
+        "properties" : {
+          "login" : {
+            "maxLength" : 100,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "password" : {
+            "maxLength" : 200,
+            "minLength" : 0,
+            "type" : "string"
+          }
+        },
+        "required" : [ "login", "password" ],
+        "type" : "object"
+      },
+      "PageResponseAdminContactMessageSummaryResponse" : {
+        "properties" : {
+          "content" : {
+            "items" : {
+              "$ref" : "#/components/schemas/AdminContactMessageSummaryResponse"
+            },
+            "type" : "array"
+          },
+          "first" : {
+            "type" : "boolean"
+          },
+          "last" : {
+            "type" : "boolean"
+          },
+          "page" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "size" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "totalElements" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "totalPages" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        },
+        "type" : "object"
+      },
+      "PageResponseAdminMediaResponse" : {
+        "properties" : {
+          "content" : {
+            "items" : {
+              "$ref" : "#/components/schemas/AdminMediaResponse"
+            },
+            "type" : "array"
+          },
+          "first" : {
+            "type" : "boolean"
+          },
+          "last" : {
+            "type" : "boolean"
+          },
+          "page" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "size" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "totalElements" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "totalPages" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        },
+        "type" : "object"
+      },
+      "PageResponseAdminProjectSummaryResponse" : {
+        "properties" : {
+          "content" : {
+            "items" : {
+              "$ref" : "#/components/schemas/AdminProjectSummaryResponse"
+            },
+            "type" : "array"
+          },
+          "first" : {
+            "type" : "boolean"
+          },
+          "last" : {
+            "type" : "boolean"
+          },
+          "page" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "size" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "totalElements" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "totalPages" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        },
+        "type" : "object"
+      },
+      "PageResponseAdminPublicationSummaryResponse" : {
+        "properties" : {
+          "content" : {
+            "items" : {
+              "$ref" : "#/components/schemas/AdminPublicationSummaryResponse"
+            },
+            "type" : "array"
+          },
+          "first" : {
+            "type" : "boolean"
+          },
+          "last" : {
+            "type" : "boolean"
+          },
+          "page" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "size" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "totalElements" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "totalPages" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        },
+        "type" : "object"
+      },
+      "PageResponseAdminSeriesSummaryResponse" : {
+        "properties" : {
+          "content" : {
+            "items" : {
+              "$ref" : "#/components/schemas/AdminSeriesSummaryResponse"
+            },
+            "type" : "array"
+          },
+          "first" : {
+            "type" : "boolean"
+          },
+          "last" : {
+            "type" : "boolean"
+          },
+          "page" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "size" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "totalElements" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "totalPages" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        },
+        "type" : "object"
+      },
+      "PageResponseProjectSummaryResponse" : {
+        "properties" : {
+          "content" : {
+            "items" : {
+              "$ref" : "#/components/schemas/ProjectSummaryResponse"
+            },
+            "type" : "array"
+          },
+          "first" : {
+            "type" : "boolean"
+          },
+          "last" : {
+            "type" : "boolean"
+          },
+          "page" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "size" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "totalElements" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "totalPages" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        },
+        "type" : "object"
+      },
+      "PageResponsePublicationSummaryResponse" : {
+        "properties" : {
+          "content" : {
+            "items" : {
+              "$ref" : "#/components/schemas/PublicationSummaryResponse"
+            },
+            "type" : "array"
+          },
+          "first" : {
+            "type" : "boolean"
+          },
+          "last" : {
+            "type" : "boolean"
+          },
+          "page" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "size" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "totalElements" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "totalPages" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        },
+        "type" : "object"
+      },
+      "PageResponseSearchResultResponse" : {
+        "properties" : {
+          "content" : {
+            "items" : {
+              "$ref" : "#/components/schemas/SearchResultResponse"
+            },
+            "type" : "array"
+          },
+          "first" : {
+            "type" : "boolean"
+          },
+          "last" : {
+            "type" : "boolean"
+          },
+          "page" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "size" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "totalElements" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "totalPages" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        },
+        "type" : "object"
+      },
+      "PageResponseSeriesSummaryResponse" : {
+        "properties" : {
+          "content" : {
+            "items" : {
+              "$ref" : "#/components/schemas/SeriesSummaryResponse"
+            },
+            "type" : "array"
+          },
+          "first" : {
+            "type" : "boolean"
+          },
+          "last" : {
+            "type" : "boolean"
+          },
+          "page" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "size" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "totalElements" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "totalPages" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        },
+        "type" : "object"
+      },
+      "Pageable" : {
+        "properties" : {
+          "page" : {
+            "format" : "int32",
+            "minimum" : 0,
+            "type" : "integer"
+          },
+          "size" : {
+            "format" : "int32",
+            "minimum" : 1,
+            "type" : "integer"
+          },
+          "sort" : {
+            "items" : {
+              "type" : "string"
+            },
+            "type" : "array"
+          }
+        },
+        "type" : "object"
+      },
+      "ProfessionalLinkResponse" : {
+        "properties" : {
+          "label" : {
+            "type" : "string"
+          },
+          "url" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "ProfileResponse" : {
+        "properties" : {
+          "aboutMarkdown" : {
+            "type" : "string"
+          },
+          "avatar" : {
+            "$ref" : "#/components/schemas/PublicImage"
+          },
+          "certifications" : {
+            "items" : {
+              "$ref" : "#/components/schemas/CertificationResponse"
+            },
+            "type" : "array"
+          },
+          "cv" : {
+            "$ref" : "#/components/schemas/PublicDocument"
+          },
+          "displayName" : {
+            "type" : "string"
+          },
+          "educations" : {
+            "items" : {
+              "$ref" : "#/components/schemas/EducationResponse"
+            },
+            "type" : "array"
+          },
+          "experiences" : {
+            "items" : {
+              "$ref" : "#/components/schemas/ExperienceResponse"
+            },
+            "type" : "array"
+          },
+          "links" : {
+            "items" : {
+              "$ref" : "#/components/schemas/ProfessionalLinkResponse"
+            },
+            "type" : "array"
+          },
+          "professionalTitle" : {
+            "type" : "string"
+          },
+          "publicEmail" : {
+            "type" : "string"
+          },
+          "publicLocation" : {
+            "type" : "string"
+          },
+          "shortBio" : {
+            "type" : "string"
+          },
+          "skillGroups" : {
+            "items" : {
+              "$ref" : "#/components/schemas/SkillGroupResponse"
+            },
+            "type" : "array"
+          }
+        },
+        "type" : "object"
+      },
+      "ProjectResponse" : {
+        "properties" : {
+          "cover" : {
+            "$ref" : "#/components/schemas/PublicImage"
+          },
+          "demoUrl" : {
+            "type" : "string"
+          },
+          "descriptionMarkdown" : {
+            "type" : "string"
+          },
+          "endDate" : {
+            "format" : "date",
+            "type" : "string"
+          },
+          "featured" : {
+            "type" : "boolean"
+          },
+          "repositoryUrl" : {
+            "type" : "string"
+          },
+          "screenshots" : {
+            "items" : {
+              "$ref" : "#/components/schemas/ProjectScreenshotResponse"
+            },
+            "type" : "array"
+          },
+          "shortDescription" : {
+            "type" : "string"
+          },
+          "slug" : {
+            "type" : "string"
+          },
+          "stage" : {
+            "enum" : [ "IN_PROGRESS", "COMPLETED" ],
+            "type" : "string"
+          },
+          "startDate" : {
+            "format" : "date",
+            "type" : "string"
+          },
+          "technologies" : {
+            "items" : {
+              "$ref" : "#/components/schemas/TechnologyResponse"
+            },
+            "type" : "array"
+          },
+          "title" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "ProjectScreenshotResponse" : {
+        "properties" : {
+          "caption" : {
+            "type" : "string"
+          },
+          "image" : {
+            "$ref" : "#/components/schemas/PublicImage"
+          }
+        },
+        "type" : "object"
+      },
+      "ProjectSummaryResponse" : {
+        "properties" : {
+          "cover" : {
+            "$ref" : "#/components/schemas/PublicImage"
+          },
+          "endDate" : {
+            "format" : "date",
+            "type" : "string"
+          },
+          "featured" : {
+            "type" : "boolean"
+          },
+          "shortDescription" : {
+            "type" : "string"
+          },
+          "slug" : {
+            "type" : "string"
+          },
+          "stage" : {
+            "enum" : [ "IN_PROGRESS", "COMPLETED" ],
+            "type" : "string"
+          },
+          "startDate" : {
+            "format" : "date",
+            "type" : "string"
+          },
+          "technologies" : {
+            "items" : {
+              "$ref" : "#/components/schemas/TechnologyResponse"
+            },
+            "type" : "array"
+          },
+          "title" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "PublicDocument" : {
+        "properties" : {
+          "sizeBytes" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "url" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "PublicImage" : {
+        "properties" : {
+          "altText" : {
+            "type" : "string"
+          },
+          "height" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "url" : {
+            "type" : "string"
+          },
+          "width" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        },
+        "type" : "object"
+      },
+      "PublicationResponse" : {
+        "properties" : {
+          "category" : {
+            "$ref" : "#/components/schemas/TaxonomyTermResponse"
+          },
+          "contentMarkdown" : {
+            "type" : "string"
+          },
+          "cover" : {
+            "$ref" : "#/components/schemas/PublicImage"
+          },
+          "featured" : {
+            "type" : "boolean"
+          },
+          "publishedAt" : {
+            "format" : "date-time",
+            "type" : "string"
+          },
+          "readingTimeMinutes" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "seoDescription" : {
+            "type" : "string"
+          },
+          "seoTitle" : {
+            "type" : "string"
+          },
+          "slug" : {
+            "type" : "string"
+          },
+          "summary" : {
+            "type" : "string"
+          },
+          "tags" : {
+            "items" : {
+              "$ref" : "#/components/schemas/TaxonomyTermResponse"
+            },
+            "type" : "array"
+          },
+          "title" : {
+            "type" : "string"
+          },
+          "type" : {
+            "enum" : [ "ARTICLE", "NEWS" ],
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "PublicationSummaryResponse" : {
+        "properties" : {
+          "category" : {
+            "$ref" : "#/components/schemas/TaxonomyTermResponse"
+          },
+          "cover" : {
+            "$ref" : "#/components/schemas/PublicImage"
+          },
+          "featured" : {
+            "type" : "boolean"
+          },
+          "publishedAt" : {
+            "format" : "date-time",
+            "type" : "string"
+          },
+          "readingTimeMinutes" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "slug" : {
+            "type" : "string"
+          },
+          "summary" : {
+            "type" : "string"
+          },
+          "tags" : {
+            "items" : {
+              "$ref" : "#/components/schemas/TaxonomyTermResponse"
+            },
+            "type" : "array"
+          },
+          "title" : {
+            "type" : "string"
+          },
+          "type" : {
+            "enum" : [ "ARTICLE", "NEWS" ],
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "SampleRequest" : {
+        "properties" : {
+          "title" : {
+            "minLength" : 1,
+            "type" : "string"
+          }
+        },
+        "required" : [ "title" ],
+        "type" : "object"
+      },
+      "SaveCategoryRequest" : {
+        "properties" : {
+          "description" : {
+            "maxLength" : 500,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "name" : {
+            "maxLength" : 80,
+            "minLength" : 0,
+            "pattern" : "(?s).*[\\p{L}\\p{N}].*",
+            "type" : "string"
+          },
+          "slug" : {
+            "maxLength" : 80,
+            "minLength" : 0,
+            "pattern" : "[a-z0-9]+(-[a-z0-9]+)*",
+            "type" : "string"
+          }
+        },
+        "required" : [ "name" ],
+        "type" : "object"
+      },
+      "SaveProfileRequest" : {
+        "properties" : {
+          "aboutMarkdown" : {
+            "maxLength" : 10000,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "avatarMediaId" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "certifications" : {
+            "items" : {
+              "$ref" : "#/components/schemas/Certification"
+            },
+            "type" : "array"
+          },
+          "cvMediaId" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "displayName" : {
+            "maxLength" : 120,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "educations" : {
+            "items" : {
+              "$ref" : "#/components/schemas/Education"
+            },
+            "type" : "array"
+          },
+          "experiences" : {
+            "items" : {
+              "$ref" : "#/components/schemas/Experience"
+            },
+            "type" : "array"
+          },
+          "links" : {
+            "items" : {
+              "$ref" : "#/components/schemas/Link"
+            },
+            "type" : "array"
+          },
+          "professionalTitle" : {
+            "maxLength" : 160,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "publicEmail" : {
+            "format" : "email",
+            "maxLength" : 255,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "publicLocation" : {
+            "maxLength" : 120,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "shortBio" : {
+            "maxLength" : 500,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "skills" : {
+            "items" : {
+              "$ref" : "#/components/schemas/Skill"
+            },
+            "type" : "array"
+          }
+        },
+        "required" : [ "displayName", "professionalTitle", "shortBio" ],
+        "type" : "object"
+      },
+      "SaveProjectRequest" : {
+        "properties" : {
+          "coverMediaId" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "demoUrl" : {
+            "maxLength" : 2048,
+            "minLength" : 0,
+            "pattern" : "https?://\\S+",
+            "type" : "string"
+          },
+          "descriptionMarkdown" : {
+            "maxLength" : 100000,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "displayOrder" : {
+            "format" : "int32",
+            "minimum" : 0,
+            "type" : "integer"
+          },
+          "endDate" : {
+            "format" : "date",
+            "type" : "string"
+          },
+          "featured" : {
+            "type" : "boolean"
+          },
+          "repositoryUrl" : {
+            "maxLength" : 2048,
+            "minLength" : 0,
+            "pattern" : "https?://\\S+",
+            "type" : "string"
+          },
+          "screenshots" : {
+            "items" : {
+              "$ref" : "#/components/schemas/Screenshot"
+            },
+            "type" : "array"
+          },
+          "shortDescription" : {
+            "maxLength" : 500,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "slug" : {
+            "maxLength" : 160,
+            "minLength" : 0,
+            "pattern" : "[a-z0-9]+(-[a-z0-9]+)*",
+            "type" : "string"
+          },
+          "stage" : {
+            "enum" : [ "IN_PROGRESS", "COMPLETED" ],
+            "type" : "string"
+          },
+          "startDate" : {
+            "format" : "date",
+            "type" : "string"
+          },
+          "technologyIds" : {
+            "items" : {
+              "format" : "int64",
+              "type" : "integer"
+            },
+            "type" : "array",
+            "uniqueItems" : true
+          },
+          "title" : {
+            "maxLength" : 160,
+            "minLength" : 0,
+            "pattern" : "(?s).*[\\p{L}\\p{N}].*",
+            "type" : "string"
+          },
+          "visibility" : {
+            "enum" : [ "DRAFT", "PUBLISHED", "ARCHIVED" ],
+            "type" : "string"
+          }
+        },
+        "required" : [ "descriptionMarkdown", "shortDescription", "stage", "startDate", "title", "visibility" ],
+        "type" : "object"
+      },
+      "SaveSeriesRequest" : {
+        "properties" : {
+          "coverMediaId" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "descriptionMarkdown" : {
+            "maxLength" : 10000,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "slug" : {
+            "maxLength" : 160,
+            "minLength" : 0,
+            "pattern" : "[a-z0-9]+(-[a-z0-9]+)*",
+            "type" : "string"
+          },
+          "title" : {
+            "maxLength" : 160,
+            "minLength" : 0,
+            "pattern" : "(?s).*[\\p{L}\\p{N}].*",
+            "type" : "string"
+          }
+        },
+        "required" : [ "descriptionMarkdown", "title" ],
+        "type" : "object"
+      },
+      "SaveTagRequest" : {
+        "properties" : {
+          "name" : {
+            "maxLength" : 60,
+            "minLength" : 0,
+            "pattern" : "(?s).*[\\p{L}\\p{N}].*",
+            "type" : "string"
+          },
+          "slug" : {
+            "maxLength" : 60,
+            "minLength" : 0,
+            "pattern" : "[a-z0-9]+(-[a-z0-9]+)*",
+            "type" : "string"
+          }
+        },
+        "required" : [ "name" ],
+        "type" : "object"
+      },
+      "SaveTechnologyRequest" : {
+        "properties" : {
+          "displayOrder" : {
+            "format" : "int32",
+            "minimum" : 0,
+            "type" : "integer"
+          },
+          "name" : {
+            "maxLength" : 80,
+            "minLength" : 0,
+            "pattern" : "(?s).*[\\p{L}\\p{N}].*",
+            "type" : "string"
+          },
+          "slug" : {
+            "maxLength" : 80,
+            "minLength" : 0,
+            "pattern" : "[a-z0-9]+(-[a-z0-9]+)*",
+            "type" : "string"
+          }
+        },
+        "required" : [ "name" ],
+        "type" : "object"
+      },
+      "Screenshot" : {
+        "properties" : {
+          "caption" : {
+            "maxLength" : 300,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "mediaId" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        },
+        "required" : [ "mediaId" ],
+        "type" : "object"
+      },
+      "SearchResultResponse" : {
+        "properties" : {
+          "publishedAt" : {
+            "format" : "date-time",
+            "type" : "string"
+          },
+          "slug" : {
+            "type" : "string"
+          },
+          "summary" : {
+            "type" : "string"
+          },
+          "title" : {
+            "type" : "string"
+          },
+          "type" : {
+            "enum" : [ "ARTICLE", "NEWS", "PROJECT" ],
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "SeriesChapterResponse" : {
+        "properties" : {
+          "position" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "publishedAt" : {
+            "format" : "date-time",
+            "type" : "string"
+          },
+          "readingTimeMinutes" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "slug" : {
+            "type" : "string"
+          },
+          "summary" : {
+            "type" : "string"
+          },
+          "title" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "SeriesNavigationResponse" : {
+        "properties" : {
+          "chapterCount" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "next" : {
+            "$ref" : "#/components/schemas/ChapterLinkResponse"
+          },
+          "position" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "previous" : {
+            "$ref" : "#/components/schemas/ChapterLinkResponse"
+          },
+          "series" : {
+            "$ref" : "#/components/schemas/SeriesReferenceResponse"
+          }
+        },
+        "type" : "object"
+      },
+      "SeriesReferenceResponse" : {
+        "properties" : {
+          "slug" : {
+            "type" : "string"
+          },
+          "title" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "SeriesResponse" : {
+        "properties" : {
+          "chapters" : {
+            "items" : {
+              "$ref" : "#/components/schemas/SeriesChapterResponse"
+            },
+            "type" : "array"
+          },
+          "cover" : {
+            "$ref" : "#/components/schemas/PublicImage"
+          },
+          "descriptionMarkdown" : {
+            "type" : "string"
+          },
+          "slug" : {
+            "type" : "string"
+          },
+          "title" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "SeriesSummaryResponse" : {
+        "properties" : {
+          "chapterCount" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "cover" : {
+            "$ref" : "#/components/schemas/PublicImage"
+          },
+          "descriptionMarkdown" : {
+            "type" : "string"
+          },
+          "slug" : {
+            "type" : "string"
+          },
+          "title" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "Skill" : {
+        "properties" : {
+          "category" : {
+            "maxLength" : 60,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "name" : {
+            "maxLength" : 80,
+            "minLength" : 0,
+            "type" : "string"
+          }
+        },
+        "required" : [ "category", "name" ],
+        "type" : "object"
+      },
+      "SkillGroupResponse" : {
+        "properties" : {
+          "category" : {
+            "type" : "string"
+          },
+          "skills" : {
+            "items" : {
+              "$ref" : "#/components/schemas/SkillResponse"
+            },
+            "type" : "array"
+          }
+        },
+        "type" : "object"
+      },
+      "SkillResponse" : {
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "TaxonomyTermResponse" : {
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          },
+          "slug" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "TechnologyResponse" : {
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          },
+          "slug" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "UpdateMediaRequest" : {
+        "properties" : {
+          "altText" : {
+            "maxLength" : 300,
+            "minLength" : 0,
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "UpdatePublicationRequest" : {
+        "properties" : {
+          "categoryId" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "contentMarkdown" : {
+            "maxLength" : 100000,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "coverMediaId" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "featured" : {
+            "type" : "boolean"
+          },
+          "seoDescription" : {
+            "maxLength" : 300,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "seoTitle" : {
+            "maxLength" : 120,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "slug" : {
+            "maxLength" : 160,
+            "minLength" : 0,
+            "pattern" : "[a-z0-9]+(-[a-z0-9]+)*",
+            "type" : "string"
+          },
+          "summary" : {
+            "maxLength" : 500,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "tagIds" : {
+            "items" : {
+              "format" : "int64",
+              "type" : "integer"
+            },
+            "type" : "array",
+            "uniqueItems" : true
+          },
+          "title" : {
+            "maxLength" : 160,
+            "minLength" : 0,
+            "pattern" : "(?s).*[\\p{L}\\p{N}].*",
+            "type" : "string"
+          }
+        },
+        "required" : [ "contentMarkdown", "summary", "title" ],
+        "type" : "object"
+      }
+    }
+  },
+  "info" : {
+    "title" : "OpenAPI definition",
+    "version" : "v0"
+  },
+  "openapi" : "3.1.0",
+  "paths" : {
+    "/admin/categories" : {
+      "get" : {
+        "operationId" : "list_6",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/AdminCategoryResponse"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "admin-category-controller" ]
+      },
+      "post" : {
+        "operationId" : "create_5",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SaveCategoryRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AdminCategoryResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "admin-category-controller" ]
+      }
+    },
+    "/admin/categories/{id}" : {
+      "delete" : {
+        "operationId" : "delete_2",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        },
+        "tags" : [ "admin-category-controller" ]
+      },
+      "put" : {
+        "operationId" : "update_6",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SaveCategoryRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AdminCategoryResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "admin-category-controller" ]
+      }
+    },
+    "/admin/contact-messages" : {
+      "get" : {
+        "operationId" : "list_7",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "status",
+          "required" : false,
+          "schema" : {
+            "enum" : [ "NEW", "READ", "PROCESSED", "ARCHIVED" ],
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "pageable",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/Pageable"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageResponseAdminContactMessageSummaryResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "admin-contact-message-controller" ]
+      }
+    },
+    "/admin/contact-messages/{id}" : {
+      "get" : {
+        "operationId" : "get_5",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AdminContactMessageResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "admin-contact-message-controller" ]
+      }
+    },
+    "/admin/contact-messages/{id}/status" : {
+      "post" : {
+        "operationId" : "changeStatus_1",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ChangeContactMessageStatusRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AdminContactMessageResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "admin-contact-message-controller" ]
+      }
+    },
+    "/admin/media" : {
+      "get" : {
+        "operationId" : "list_5",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "pageable",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/Pageable"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageResponseAdminMediaResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "admin-media-controller" ]
+      },
+      "post" : {
+        "operationId" : "upload",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "altText",
+          "required" : false,
+          "schema" : {
+            "maxLength" : 300,
+            "minLength" : 0,
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "multipart/form-data" : {
+              "schema" : {
+                "properties" : {
+                  "file" : {
+                    "format" : "binary",
+                    "type" : "string"
+                  }
+                },
+                "required" : [ "file" ],
+                "type" : "object"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AdminMediaResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "admin-media-controller" ]
+      }
+    },
+    "/admin/media/{id}" : {
+      "delete" : {
+        "operationId" : "delete_3",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        },
+        "tags" : [ "admin-media-controller" ]
+      },
+      "get" : {
+        "operationId" : "get_4",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AdminMediaResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "admin-media-controller" ]
+      },
+      "patch" : {
+        "operationId" : "update_7",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/UpdateMediaRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AdminMediaResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "admin-media-controller" ]
+      }
+    },
+    "/admin/profile" : {
+      "get" : {
+        "operationId" : "get_3",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AdminProfileResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "admin-profile-controller" ]
+      },
+      "put" : {
+        "operationId" : "update_5",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SaveProfileRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AdminProfileResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "admin-profile-controller" ]
+      }
+    },
+    "/admin/projects" : {
+      "get" : {
+        "operationId" : "list_4",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "pageable",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/Pageable"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageResponseAdminProjectSummaryResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "admin-project-controller" ]
+      },
+      "post" : {
+        "operationId" : "create_4",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SaveProjectRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AdminProjectResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "admin-project-controller" ]
+      }
+    },
+    "/admin/projects/{id}" : {
+      "get" : {
+        "operationId" : "get_2",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AdminProjectResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "admin-project-controller" ]
+      },
+      "put" : {
+        "operationId" : "update_4",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SaveProjectRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AdminProjectResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "admin-project-controller" ]
+      }
+    },
+    "/admin/publications" : {
+      "get" : {
+        "operationId" : "list_3",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "pageable",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/Pageable"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageResponseAdminPublicationSummaryResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "admin-publication-controller" ]
+      },
+      "post" : {
+        "operationId" : "create_3",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreatePublicationRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AdminPublicationResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "admin-publication-controller" ]
+      }
+    },
+    "/admin/publications/{id}" : {
+      "get" : {
+        "operationId" : "get_1",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AdminPublicationResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "admin-publication-controller" ]
+      },
+      "put" : {
+        "operationId" : "update_3",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/UpdatePublicationRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AdminPublicationResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "admin-publication-controller" ]
+      }
+    },
+    "/admin/publications/{id}/status" : {
+      "post" : {
+        "operationId" : "changeStatus",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ChangePublicationStatusRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AdminPublicationResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "admin-publication-controller" ]
+      }
+    },
+    "/admin/series" : {
+      "get" : {
+        "operationId" : "list_2",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "pageable",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/Pageable"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageResponseAdminSeriesSummaryResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "admin-series-controller" ]
+      },
+      "post" : {
+        "operationId" : "create_2",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SaveSeriesRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AdminSeriesResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "admin-series-controller" ]
+      }
+    },
+    "/admin/series/{id}" : {
+      "get" : {
+        "operationId" : "get",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AdminSeriesResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "admin-series-controller" ]
+      },
+      "put" : {
+        "operationId" : "update_2",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SaveSeriesRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AdminSeriesResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "admin-series-controller" ]
+      }
+    },
+    "/admin/series/{id}/chapters" : {
+      "put" : {
+        "operationId" : "changeChapters",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ChangeSeriesChaptersRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AdminSeriesResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "admin-series-controller" ]
+      }
+    },
+    "/admin/session" : {
+      "get" : {
+        "operationId" : "current",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AdminSessionResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "admin-session-controller" ]
+      },
+      "post" : {
+        "operationId" : "open",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/OpenAdminSessionRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AdminSessionResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "admin-session-controller" ]
+      }
+    },
+    "/admin/tags" : {
+      "get" : {
+        "operationId" : "list_1",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/AdminTagResponse"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "admin-tag-controller" ]
+      },
+      "post" : {
+        "operationId" : "create_1",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SaveTagRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AdminTagResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "admin-tag-controller" ]
+      }
+    },
+    "/admin/tags/{id}" : {
+      "delete" : {
+        "operationId" : "delete_1",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        },
+        "tags" : [ "admin-tag-controller" ]
+      },
+      "put" : {
+        "operationId" : "update_1",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SaveTagRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AdminTagResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "admin-tag-controller" ]
+      }
+    },
+    "/admin/technologies" : {
+      "get" : {
+        "operationId" : "list",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/AdminTechnologyResponse"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "admin-technology-controller" ]
+      },
+      "post" : {
+        "operationId" : "create",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SaveTechnologyRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AdminTechnologyResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "admin-technology-controller" ]
+      }
+    },
+    "/admin/technologies/{id}" : {
+      "delete" : {
+        "operationId" : "delete",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        },
+        "tags" : [ "admin-technology-controller" ]
+      },
+      "put" : {
+        "operationId" : "update",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SaveTechnologyRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AdminTechnologyResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "admin-technology-controller" ]
+      }
+    },
+    "/public/media/{storageKey}" : {
+      "get" : {
+        "operationId" : "getMedia",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "storageKey",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "format" : "binary",
+                  "type" : "string"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "public-media-controller" ]
+      }
+    },
+    "/public/profile" : {
+      "get" : {
+        "operationId" : "getProfile",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProfileResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "public-profile-controller" ]
+      }
+    },
+    "/public/projects" : {
+      "get" : {
+        "operationId" : "listProjects",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "technology",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "pageable",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/Pageable"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageResponseProjectSummaryResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "public-project-controller" ]
+      }
+    },
+    "/public/projects/{slug}" : {
+      "get" : {
+        "operationId" : "getProject",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "slug",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProjectResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "public-project-controller" ]
+      }
+    },
+    "/public/publications" : {
+      "get" : {
+        "operationId" : "listPublications",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "type",
+          "required" : false,
+          "schema" : {
+            "enum" : [ "ARTICLE", "NEWS" ],
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "category",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "tag",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "pageable",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/Pageable"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageResponsePublicationSummaryResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "public-publication-controller" ]
+      }
+    },
+    "/public/publications/{slug}" : {
+      "get" : {
+        "operationId" : "getPublication",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "slug",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PublicationResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "public-publication-controller" ]
+      }
+    },
+    "/public/publications/{slug}/series" : {
+      "get" : {
+        "operationId" : "getSeriesNavigation",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "slug",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SeriesNavigationResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "public-series-navigation-controller" ]
+      }
+    },
+    "/public/search" : {
+      "get" : {
+        "operationId" : "search",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "q",
+          "required" : true,
+          "schema" : {
+            "maxLength" : 200,
+            "minLength" : 0,
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "pageable",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/Pageable"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageResponseSearchResultResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "public-search-controller" ]
+      }
+    },
+    "/public/series" : {
+      "get" : {
+        "operationId" : "listSeries",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "pageable",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/Pageable"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageResponseSeriesSummaryResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "public-series-controller" ]
+      }
+    },
+    "/public/series/{slug}" : {
+      "get" : {
+        "operationId" : "getSeries",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "slug",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SeriesResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "public-series-controller" ]
+      }
+    },
+    "/test-errors/access-denied" : {
+      "get" : {
+        "operationId" : "accessDenied",
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "error-handling-test-controller" ]
+      }
+    },
+    "/test-errors/boom" : {
+      "get" : {
+        "operationId" : "boom",
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "error-handling-test-controller" ]
+      }
+    },
+    "/test-errors/conflict" : {
+      "get" : {
+        "operationId" : "conflict",
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "error-handling-test-controller" ]
+      }
+    },
+    "/test-errors/invalid-input" : {
+      "get" : {
+        "operationId" : "invalidInput",
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "error-handling-test-controller" ]
+      }
+    },
+    "/test-errors/not-found" : {
+      "get" : {
+        "operationId" : "notFound",
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "error-handling-test-controller" ]
+      }
+    },
+    "/test-errors/required-param" : {
+      "get" : {
+        "operationId" : "requiredParam",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "value",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "error-handling-test-controller" ]
+      }
+    },
+    "/test-errors/too-large" : {
+      "get" : {
+        "operationId" : "tooLarge",
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "error-handling-test-controller" ]
+      }
+    },
+    "/test-errors/too-many" : {
+      "get" : {
+        "operationId" : "tooMany",
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "error-handling-test-controller" ]
+      }
+    },
+    "/test-errors/unauthenticated" : {
+      "get" : {
+        "operationId" : "unauthenticated",
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "error-handling-test-controller" ]
+      }
+    },
+    "/test-errors/unsupported-content" : {
+      "get" : {
+        "operationId" : "unsupportedContent",
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "error-handling-test-controller" ]
+      }
+    },
+    "/test-errors/validate" : {
+      "post" : {
+        "operationId" : "validate",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SampleRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "error-handling-test-controller" ]
+      }
+    },
+    "/test-errors/validate-param" : {
+      "get" : {
+        "operationId" : "validateParam",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "value",
+          "required" : true,
+          "schema" : {
+            "maxLength" : 3,
+            "minLength" : 0,
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "error-handling-test-controller" ]
+      }
+    }
+  }
+}
