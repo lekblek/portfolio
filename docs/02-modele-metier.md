@@ -644,7 +644,7 @@ tentative de notification email
 
 Une erreur SMTP ne peut pas annuler la sauvegarde.
 
-État d'implémentation (étape 31, D-CI, D-CJ) : événement `ContactMessageReceived` traité après la validation de la transaction ; courriel texte à l'administrateur, `Reply-To` vers le visiteur ; un échec est journalisé (identifiant du message seulement) et ignoré.
+État d'implémentation (étape 31, D-CI, D-CJ) : événement `ContactMessageReceived` traité après la validation de la transaction ; courriel texte à l'administrateur, `Reply-To` vers le visiteur ; un échec est journalisé (identifiant du message seulement) et ignoré. Depuis l'étape 36.7 (D-CZ), l'administrateur lit les messages (sans effet sur leur statut) et les fait avancer dans leur cycle.
 
 La V1 ne modélise pas un historique complet de livraison d'emails.
 

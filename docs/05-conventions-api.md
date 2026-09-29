@@ -1798,6 +1798,28 @@ Règles propres à ce contrat (D-CY) :
 * la réponse a la forme de la requête : un formulaire peut renvoyer ce qu’il a lu ;
 * contrat vérifié par `AdminProfileIT`.
 
+### Messages de contact (étape 36.7)
+
+```text
+GET  /api/admin/contact-messages[?status=]   200 PageResponse<AdminContactMessageSummaryResponse>
+                                             { id, name, email, subject, status, createdAt }, 20 par page,
+                                             les plus récents d'abord
+GET  /api/admin/contact-messages/{id}        200 AdminContactMessageResponse
+                                             { id, name, email, subject, message, status, createdAt, updatedAt }
+POST /api/admin/contact-messages/{id}/status { status } → 200 AdminContactMessageResponse
+
+400 MALFORMED_REQUEST                   statut inexistant (filtre ou corps) ; 400 VALIDATION_FAILED statut absent
+404 RESOURCE_NOT_FOUND                  identifiant inconnu
+409 INVALID_CONTACT_MESSAGE_TRANSITION  statut qui n'est pas après le statut actuel (NEW → READ → PROCESSED → ARCHIVED)
+```
+
+Règles propres à ces contrats (D-CZ) :
+
+* session de l’administrateur et jeton CSRF obligatoires (401 et 403 sinon) ;
+* lire un message ne change pas son statut ; le statut avance par sa route, en sautant éventuellement des étapes, jamais en arrière (invariant 29) ;
+* pas de suppression ;
+* contrats vérifiés par `AdminContactMessageIT`.
+
 # 31. Ressources administratives prévues
 
 Les principales ressources administratives sont conceptuellement :
