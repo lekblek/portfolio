@@ -481,7 +481,7 @@ Une série ne possède pas de workflow éditorial propre dans la V1.
 
 Elle organise des articles.
 
-État d’implémentation (étapes 23 et 27.4) : tous les attributs ci-dessus, dont `coverMedia` (référence facultative, D-BY). Une série est publique si et seulement si au moins un de ses articles est visible ; sa table des matières ne montre que ces articles, numérotés à partir de 1 (D-BG). Lecture publique seulement : création et modification à l’étape 36 (D-BE).
+État d’implémentation (étapes 23 et 27.4) : tous les attributs ci-dessus, dont `coverMedia` (référence facultative, D-BY). Une série est publique si et seulement si au moins un de ses articles est visible ; sa table des matières ne montre que ces articles, numérotés à partir de 1 (D-BG). Création et modification par l’administration depuis l’étape 36.4 (D-CV) : une série naît sans chapitre ; son slug ne change plus dès qu’un de ses articles a été public (D-BK) ; titre de 160 caractères, description de 10 000.
 Depuis l’étape 24, un article visible d’une série connaît sa position, le nombre de chapitres visibles et ses voisins visibles précédent et suivant ; un article masqué est sauté (D-BL, D-BM).
 
 ---
@@ -515,7 +515,7 @@ position > 0
 
 `SeriesItem` n'existe pas sans `Series`.
 
-État d’implémentation (étape 23) : les positions peuvent laisser des trous, seul leur ordre compte. Supprimer un article le retire de sa série ; un article rangé dans une série ne peut pas devenir une `NEWS` (D-BF).
+État d’implémentation (étape 23) : les positions peuvent laisser des trous, seul leur ordre compte. Supprimer un article le retire de sa série ; un article rangé dans une série ne peut pas devenir une `NEWS` (D-BF). Depuis l’étape 36.4, l’administration remplace la liste des chapitres d’un bloc et range les articles aux positions 1, 2, … (D-CV).
 
 ---
 

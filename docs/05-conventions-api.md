@@ -601,7 +601,7 @@ MEDIA_STILL_REFERENCED
 
 INVALID_PUBLICATION_TRANSITION
 
-SERIES_POSITION_ALREADY_USED
+NEWS_CANNOT_JOIN_SERIES
 ```
 
 Le frontend peut utiliser :
@@ -1688,6 +1688,37 @@ Règles propres à ces contrats (D-CU) :
 * pas de suppression : l’archivage (`ARCHIVED`) retire une publication du site ;
 * contrats vérifiés par `AdminPublicationIT`.
 
+### Séries (étape 36.4)
+
+```text
+GET    /api/admin/series                 200 PageResponse<AdminSeriesSummaryResponse> { id, title, slug, chapterCount },
+                                         20 par page, par titre
+GET    /api/admin/series/{id}            200 AdminSeriesResponse
+POST   /api/admin/series                 { title, slug?, descriptionMarkdown, coverMediaId? } → 201 + Location
+PUT    /api/admin/series/{id}            même saisie → 200 AdminSeriesResponse (chapitres inchangés)
+PUT    /api/admin/series/{id}/chapters   { publicationIds } → 200 AdminSeriesResponse (liste remplacée)
+
+AdminSeriesResponse { id, title, slug, slugLocked, descriptionMarkdown, coverMediaId | null,
+                      chapters: [{ position, publicationId, title, slug, status }] }
+
+400 VALIDATION_FAILED          titre vide ou sans lettre ni chiffre, bornes dépassées, slug mal formé ;
+                               article répété ou inconnu (publicationIds), couverture inconnue ou PDF (coverMediaId)
+404 RESOURCE_NOT_FOUND         identifiant inconnu
+409 SLUG_LOCKED                nouveau slug d'une série dont un article a déjà été public
+409 NEWS_CANNOT_JOIN_SERIES    une actualité parmi les chapitres
+409 ARTICLE_ALREADY_IN_SERIES  un article déjà rangé dans une autre série
+```
+
+Règles propres à ces contrats (D-CV) :
+
+* session de l’administrateur et jeton CSRF obligatoires (401 et 403 sinon) ;
+* une série naît sans chapitre, donc invisible sur le site tant qu’aucun de ses articles n’est visible (D-BG) ;
+* `publicationIds` donne l’ordre de lecture complet : la liste remplace l’ancienne, les positions valent 1, 2, … ; une liste vide retire tous les chapitres ;
+* `status` d’un chapitre est le statut observable de son article ; `slugLocked` dit si le slug peut encore changer ;
+* bornes : `title` 160, `descriptionMarkdown` 10 000 caractères (vide permis) ;
+* pas de suppression ;
+* contrats vérifiés par `AdminSeriesIT`.
+
 # 31. Ressources administratives prévues
 
 Les principales ressources administratives sont conceptuellement :
@@ -1932,8 +1963,8 @@ Elles sont simplement inutiles pour le périmètre actuel.
 | `TERM_STILL_USED`                |  409 | Terme encore utilisé par une publication (D-CS) |
 | `SLUG_LOCKED`                    |  409 | Slug d’un contenu déjà publié (D11)           |
 | `INVALID_PUBLICATION_TRANSITION` |  409 | Transition d’état de publication interdite    |
-| `SERIES_POSITION_ALREADY_USED`   |  409 | Position déjà occupée dans une série          |
 | `NEWS_CANNOT_JOIN_SERIES`        |  409 | Une `NEWS` ne peut pas appartenir à une série |
+| `ARTICLE_ALREADY_IN_SERIES`      |  409 | Article déjà rangé dans une autre série (D-CV) |
 | `MEDIA_STILL_REFERENCED`         |  409 | Média encore référencé                        |
 | `UNSUPPORTED_MEDIA_FORMAT`       |  415 | Format de média non accepté                   |
 | `MEDIA_TOO_LARGE`                |  413 | Fichier trop volumineux (format ou requête)   |

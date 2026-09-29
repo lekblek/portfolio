@@ -2,31 +2,31 @@
 
 Ce fichier est la **seule** source de vérité sur l'avancement. Il ne répète pas le contenu des autres documents : il pointe vers eux.
 
-Dernière mise à jour : 2026-09-29 (étape 36.2 poussée, CI verte ; étape 36.3 terminée et vérifiée, commits à faire)
+Dernière mise à jour : 2026-09-29 (étape 36.3 poussée, CI verte ; étape 36.4 terminée et vérifiée, commits à faire)
 
 ---
 
 ## 1. État courant
 
 ```text
-Dernière étape terminée   : 36.2 — Administration des médias, poussée, CI verte (run 36599044081)
-Étape en cours            : 36 — API d'administration (36.3 publications vérifiée, commits à faire ; 36.4 à 36.7 à faire)
-Prochaine étape prévue    : 36.4 — Administration des séries
-État                      : PRÊT après commit et push de 36.3
+Dernière étape terminée   : 36.3 — Administration des publications, poussée, CI verte (run 36602134647)
+Étape en cours            : 36 — API d'administration (36.4 séries vérifiée, commits à faire ; 36.5 à 36.7 à faire)
+Prochaine étape prévue    : 36.5 — Administration des projets
+État                      : PRÊT après commit et push de 36.4
 Branche                   : develop
-Vérification              : ./mvnw clean verify → 650 tests verts (309 *Test, 341 *IT) à la fin de 36.3
+Vérification              : ./mvnw clean verify → 662 tests verts (313 *Test, 349 *IT) à la fin de 36.4
 ```
 
 ## 2. Prochaine action
 
-1. Committer et pousser 36.3 (deux commits), vérifier la CI, puis remplacer le 🟡 par ✅.
+1. Committer et pousser 36.4 (deux commits), vérifier la CI, puis remplacer le 🟡 par ✅.
 2. Suite de l'étape 36, dans l'ordre des dépendances (les termes et médias avant les contenus qui les référencent) :
 
    ```text
    36.1  Taxonomie : catégories et tags                                    ✔ poussée
    36.2  Médias : envoi (multipart 10 Mio), liste, texte alternatif, suppression contrôlée   ✔ poussée
-   36.3  Publications : liste tous statuts, création, modification (SLUG_LOCKED), statut, termes, couverture   ✔ vérifiée
-   36.4  Séries : création, chapitres (NEWS_CANNOT_JOIN_SERIES, SERIES_POSITION_ALREADY_USED)
+   36.3  Publications : liste tous statuts, création, modification (SLUG_LOCKED), statut, termes, couverture   ✔ poussée
+   36.4  Séries : création, chapitres remplacés d'un bloc (NEWS_CANNOT_JOIN_SERIES, ARTICLE_ALREADY_IN_SERIES)   ✔ vérifiée
    36.5  Projets : technologies, projets, couverture et captures, stabilité du slug
    36.6  Profil : profil et collections, avatar et CV
    36.7  Messages de contact : liste, détail, changement de statut
@@ -106,8 +106,9 @@ Légende : ✅ terminée et poussée · 🟡 terminée et vérifiée, commits à
 | 35 | Durcissement HTTP : attributs des cookies, en-têtes de sécurité, séparateur encodé (KI-33) | ✅ | `7e58f5e`, `4f41b01` (CI : run 36596138213) |
 | 36.1 | Administration de la taxonomie (catégories, tags) | ✅ | `abc2da9`, `7690e24` (CI : run 36597416828) |
 | 36.2 | Administration des médias (envoi multipart, liste, texte alternatif, suppression contrôlée) | ✅ | `b5e2bd8`, `bdb4178` (CI : run 36599044081) |
-| 36.3 | Administration des publications (brouillon, saisie, slug, cycle éditorial, références vérifiées) ; contenu borné (`V022`) | 🟡 | à committer |
-| 36.4 → 36.7 | Administration des séries, projets, profil, messages | ⏳ | — |
+| 36.3 | Administration des publications (brouillon, saisie, slug, cycle éditorial, références vérifiées) ; contenu borné (`V022`) | ✅ | `06dfef8`, `1cdec2a` (CI : run 36602134647) |
+| 36.4 | Administration des séries (saisie, slug, chapitres remplacés d'un bloc) | 🟡 | à committer |
+| 36.5 → 36.7 | Administration des projets, profil, messages | ⏳ | — |
 | 37 → 52 | Voir `docs/steps/liste_complete_etapes.md` | ⏳ | — |
 
 Après le push, remplacer les 🟡 par ✅ et noter les hashes.
@@ -147,6 +148,7 @@ Index : [`decisions/README.md`](decisions/README.md).
 | D-CS | Administration de la taxonomie : conventions des routes d'administration, slug généré, conservé ou suffixé dans la longueur de sa colonne, `NAME_ALREADY_USED`, `TERM_STILL_USED`, contraintes traduites | Active (36.1) |
 | D-CT | Administration des médias : envoi multipart, liste paginée des plus récents, texte alternatif seul modifiable, suppression contrôlée ; requête bornée à 11 Mio (413 `MEDIA_TOO_LARGE`), reste lu par Tomcat jusqu'à 12 Mio | Active (36.2) |
 | D-CU | Administration des publications : brouillon à la création, type fixé, saisie remplacée (slug conservé, suffixé ou `SLUG_LOCKED`), route du statut, pas de suppression ; contenu borné à 100 000 caractères (`V022`) ; références vérifiées (400 sur le champ, `InvalidInputException`) | Active (36.3) |
+| D-CV | Administration des séries : série créée sans chapitre, saisie remplacée (slug conservé, suffixé ou `SLUG_LOCKED`), chapitres remplacés d'un bloc et renumérotés, `ARTICLE_ALREADY_IN_SERIES` au lieu de `SERIES_POSITION_ALREADY_USED`, pas de suppression | Active (36.4) |
 | D-CR | Cookies `Secure` et `SameSite=Strict`, session de 30 minutes ; `frame-ancestors 'none'` et `Referrer-Policy: no-referrer` en plus des en-têtes par défaut ; `%2F` confié au pare-feu de Spring Security | Active (35) |
 | D-CO … D-CQ | Connexion par session, refus uniforme, identifiant de session renouvelé, garde des 72 octets de bcrypt ; CSRF par cookie réservé à l'administration (avancé de l'étape 35) ; 5 échecs par adresse en 15 minutes, sans verrouillage du compte | Actives (34) |
 | D-CM, D-CN | Compte administrateur unique (invariant 30), empreinte bcrypt seule en SQL (invariant 15) ; configuration qui fait foi à chaque démarrage, mot de passe de 15 caractères à 72 octets | Actives (33) |
@@ -166,7 +168,7 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | KI-21 | AMÉLIORATION | `@types/node ^20` alors que Node 24 est la cible | étape 37 |
 | KI-22 | AMÉLIORATION | SSR : `security.allowedHosts` vide | étape 52 (déploiement) |
 | KI-16 | OPTIONNEL | `V001` : virgule manquante avant `CONSTRAINT profile_single_row` (comportement identique) ; migration appliquée, non modifiable | aucun |
-| KI-29 | OPTIONNEL | Surface sans appelant : `ProfileEntity.removeLink` / `removeSkill`, `App.title` (frontend) ; codes d'erreur des séries et médias déclarés d'avance | au plus tard avec l'administration du profil (étape 36) et le frontend (37) |
+| KI-29 | OPTIONNEL | Surface sans appelant : `ProfileEntity.removeLink` / `removeSkill`, `App.title` (frontend) (les codes des séries et des médias sont désormais tous émis ; `SERIES_POSITION_ALREADY_USED` retiré, D-CV) | au plus tard avec l'administration du profil (étape 36) et le frontend (37) |
 | KI-30 | OPTIONNEL | Les `*IT` transactionnels (écriture de statut, lectures publiques) ne prouvent pas le comportement après commit | à reprendre si un défaut de transaction apparaît |
 
 ### Résolus le 2026-09-29 (étape 36.3)
@@ -246,16 +248,16 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | Sujet | Reporté à | Raison |
 |---|---|---|
 | Filtre `featured` sur `GET /api/public/projects` | Étape 40 | aucun écran ne l'utilise encore (le filtre `technology` est fait : D-AC) |
-| Vérifier qu'une couverture ou une capture est une image à l'écriture | Étapes 36.4 et 36.5 (séries, projets) | D-BV : pas de garantie SQL ; fait pour les publications (D-CU) |
+| Vérifier qu'une couverture ou une capture est une image à l'écriture | Étape 36.5 (projets) | D-BV : pas de garantie SQL ; fait pour les publications (D-CU) et les séries (D-CV) |
 | Liste publique des technologies (`/api/public/technologies`) | Étape 42 | D-AE : les technologies sont exposées par projet |
 | Tri choisi par le client (`sort`) | quand un écran le demande | D-V : ordre fixe, paramètre ignoré |
 | Rejet explicite (400) des paramètres de pagination hors bornes, au lieu de les ramener aux bornes | si un client en a besoin | comportement Spring Data retenu (D-V) |
 | Verrouillage optimiste des publications (`@Version`) | si plusieurs administrateurs | D-AX : un seul administrateur en V1 |
 | Routes publiques `/api/public/categories` et `/api/public/tags` | Étape 43 | D-AT : les termes sont exposés par publication |
 | Stabilité du slug d'un projet après sa première publication (D11) | Étape 36 | D-BC : pas encore de mémoire de publication des projets ni de modification |
-| Création et modification avec slug libre (`firstAvailable`), `SLUG_ALREADY_USED` sur conflit `UNIQUE` | Étapes 36.4 et 36.5 (séries, projets) | D-BD : fait pour les termes (D-CS) et les publications (D-CU) |
+| Création et modification avec slug libre (`firstAvailable`), `SLUG_ALREADY_USED` sur conflit `UNIQUE` | Étape 36.5 (projets) | D-BD : fait pour les termes (D-CS), les publications (D-CU) et les séries (D-CV) |
 | Suppression d'un brouillon de publication | si le besoin apparaît | D-CU : l'archivage retire une publication du site |
-| Écriture des séries (création, chapitres, `NEWS_CANNOT_JOIN_SERIES`, `SERIES_POSITION_ALREADY_USED`) et stabilité de leur slug | Étape 36 | D-BE, D-BK : aucune route d'administration sans authentification |
+| Suppression d'une série | si le besoin apparaît | D-CV : une série sans article visible n'apparaît pas sur le site |
 | Séries mises en avant sur l'accueil | si le modèle l'adopte | D-BI : absent de `02` §19 |
 | Médias privés (fichier visible seulement si le contenu qui l'utilise l'est) | si le besoin apparaît | D-BP : clé imprévisible jugée suffisante |
 | Temps de lecture précalculé (colonne) si la liste devient coûteuse | Étape 52.6 | D-AJ : calculé à la lecture, contenu chargé dans la liste |
