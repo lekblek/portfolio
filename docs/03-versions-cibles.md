@@ -400,6 +400,8 @@ Une montée de version majeure exige en plus une procédure de migration des don
 
 `V000__init_schema.sql` installe `unaccent` (recherche plein texte, étape 28). En production, l'utilisateur applicatif doit avoir le droit de créer l'extension, ou l'extension doit être créée au provisionnement.
 
+`V017__create_french_text_search_configuration.sql` crée à partir de cette extension le dictionnaire `french_stopwords` et la configuration `french_unaccent` (D-BZ) : objets ordinaires du schéma, sans droit particulier. Ils reposent sur des fichiers livrés avec PostgreSQL (`french.stop`, `unaccent.rules`), présents dans l'image officielle.
+
 ---
 
 # 11. Dépendances notables effectivement installées

@@ -333,6 +333,8 @@ La recherche est une capacité de lecture.
 
 Les modules `publication` et `project` ne doivent jamais dépendre de `search`.
 
+État d’implémentation (étape 28) : le module `search` n’a aucune table. Chaque module propriétaire porte le document de recherche de ses contenus (colonne générée `search_vector`, index GIN, configuration `french_unaccent` : D-BZ, D-CA, D-CB) et cherche avec sa propre règle de visibilité, derrière sa façade (`PublicationQueryService.searchVisible`, `ProjectQueryService.searchPublished`, D-CC). `SearchPublicContentUseCase` classe l’ensemble et pagine (D-CD). Route publique : étape 29.
+
 ---
 
 ### 3.10 `contact`
@@ -573,7 +575,7 @@ La visibilité package-private participe à l’encapsulation du monolithe modul
 
 Un module ne doit pas exposer ses détails internes inutilement.
 
-> Depuis l’étape 20, ce principe est une règle vérifiée : voir [ADR 0002](decisions/0002-communication-entre-modules.md) et §12.5. Façades : `taxonomy.application.query.TaxonomyQueryService`, utilisée par `publication` (étape 20) ; `publication.application.query.PublicationQueryService`, utilisée par `series` (étape 23).
+> Depuis l’étape 20, ce principe est une règle vérifiée : voir [ADR 0002](decisions/0002-communication-entre-modules.md) et §12.5. Façades : `taxonomy.application.query.TaxonomyQueryService`, utilisée par `publication` (étape 20) ; `publication.application.query.PublicationQueryService`, utilisée par `series` (étape 23) et `search` (étape 28) ; `media.application.query.MediaQueryService`, utilisée par `profile`, `project`, `publication` et `series` (étape 27) ; `project.application.query.ProjectQueryService`, utilisée par `search` (étape 28).
 
 Les dépendances entre modules passent par :
 
@@ -803,7 +805,7 @@ Un module n’utilise d’un autre module que ses records `domain.model` et ses 
 
 ## 13. Arborescence initiale (étape 10)
 
-L’étape 10 a créé uniquement les packages racines. Les modules implémentés (`profile` depuis l’étape 14, `project` depuis l’étape 17, `publication` depuis l’étape 19, `taxonomy` depuis l’étape 20) et `shared` suivent le §6 et le §3.1. Une façade de lecture destinée aux autres modules vit dans `<module>.application.query` (ADR 0002).
+L’étape 10 a créé uniquement les packages racines. Les modules implémentés (`profile` depuis l’étape 14, `project` depuis l’étape 17, `publication` depuis l’étape 19, `taxonomy` depuis l’étape 20, `series` depuis l’étape 23, `media` depuis l’étape 25, `search` depuis l’étape 28) et `shared` suivent le §6 et le §3.1. Une façade de lecture destinée aux autres modules vit dans `<module>.application.query` (ADR 0002).
 
 ```text
 backend/

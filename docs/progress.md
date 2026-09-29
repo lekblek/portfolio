@@ -2,25 +2,25 @@
 
 Ce fichier est la **seule** source de vérité sur l'avancement. Il ne répète pas le contenu des autres documents : il pointe vers eux.
 
-Dernière mise à jour : 2026-09-28 (27.3 poussée, CI verte ; 27.4 terminée et vérifiée, commits à faire : étape 27 complète)
+Dernière mise à jour : 2026-09-29 (27.4 poussée, CI verte : étape 27 close ; étape 28 terminée et vérifiée, commits à faire)
 
 ---
 
 ## 1. État courant
 
 ```text
-Dernière étape terminée   : 27 — Catalogue Media (27.1 à 27.3 poussées, CI verte : run 36467187039 ; 27.4 vérifiée, commits à faire)
+Dernière étape terminée   : 28 — PostgreSQL Full-Text Search (28.1 et 28.2 vérifiées, commits à faire)
 Étape en cours            : aucune
-Prochaine étape prévue    : 28 — Implémenter PostgreSQL Full-Text Search
-État                      : PRÊT après commit et push de 27.4
+Prochaine étape prévue    : 29 — Construire l'API de recherche
+État                      : PRÊT après commit et push de l'étape 28
 Branche                   : develop
-Vérification              : ./mvnw clean verify → 434 tests verts (231 *Test, 203 *IT) à la fin de l'étape 27
+Vérification              : ./mvnw clean verify → 478 tests verts (235 *Test, 243 *IT) à la fin de l'étape 28
 ```
 
 ## 2. Prochaine action
 
-1. Committer et pousser 27.4, vérifier la CI, puis remplacer les 🟡 par ✅.
-2. Étape 28 : recherche plein texte PostgreSQL (`tsvector`, index GIN, classement, pondération) sur les publications visibles et les projets publiés (D09) ; module `search` (graphe : `search → shared, publication, project`), qui passera par les façades (ADR 0002) et ne réécrira pas les règles de visibilité.
+1. Committer et pousser l'étape 28 (quatre commits), vérifier la CI, puis remplacer les 🟡 par ✅.
+2. Étape 29 : route `GET /api/public/search?q=` sur `SearchPublicContentUseCase` (D-CD) : contrat de réponse, `q` obligatoire et de longueur bornée (400), pagination publique (10 par page), filtre par genre de contenu à décider, contrat dans `05`, `PublicSearchControllerTest` et `PublicSearchIT`.
 3. Confirmer ou infirmer D-T (cohérence `stage` ⇔ `endDate`) : `docs/decisions/registre-implementation.md`.
 
 ---
@@ -83,8 +83,10 @@ Légende : ✅ terminée et poussée · 🟡 terminée et vérifiée, commits à
 | 27.1 | Catalogue `media` (`V012`), dimensions des images, envoi transactionnel | ✅ | `2e55819`, `85ac21e`, `b3e051d` (CI : run 36464422452) |
 | 27.2 | Couverture et captures des projets (`V013`), façade `MediaQueryService`, suppression contrôlée | ✅ | `3266bec`, `9afc18c`, `2689282`, `0a9e707` (CI : run 36466269701) |
 | 27.3 | Avatar et CV du profil (`V014`), `PublicDocument` | ✅ | `ae74c63`, `05a6e53`, `ae3820c`, `685760c` (CI : run 36467187039) |
-| 27.4 | Couvertures des publications (`V015`) et des séries (`V016`) | 🟡 | à committer |
-| 28 → 52 | Voir `docs/steps/liste_complete_etapes.md` | ⏳ | — |
+| 27.4 | Couvertures des publications (`V015`) et des séries (`V016`) | ✅ | `4a09d87`, `31ca538`, `a024051` (CI : run 36469195120) |
+| 28.1 | Configuration `french_unaccent` (`V017`) ; documents de recherche pondérés et index GIN des publications (`V018`) et des projets (`V019`) | 🟡 | à committer |
+| 28.2 | Recherche classée par les modules propriétaires (façades), cas d'usage `SearchPublicContentUseCase` sans route | 🟡 | à committer |
+| 29 → 52 | Voir `docs/steps/liste_complete_etapes.md` | ⏳ | — |
 
 Après le push, remplacer les 🟡 par ✅ et noter les hashes.
 
@@ -116,6 +118,8 @@ Index : [`decisions/README.md`](decisions/README.md).
 | D-BV, D-BW | Références aux médias par clé étrangère `RESTRICT`, suppression contrôlée ; `PublicImage` par la façade, couverture et captures des projets | Actives (27.2) |
 | D-BX | Avatar et CV du profil ; `PublicDocument` pour les PDF | Active (27.3) |
 | D-BY | Couvertures des publications et des séries | Active (27.4) |
+| D-BZ … D-CB | Configuration `french_unaccent` ; document de recherche généré et index GIN dans chaque table propriétaire ; noms des tags et des technologies recopiés par PostgreSQL (invariant 28) | Actives (28.1) |
+| D-CC, D-CD | Recherche classée derrière les façades, règle de visibilité non réécrite ; module `search` sans table, classement commun et pagination ; route à l'étape 29 | Actives (28.2) |
 | 14.4 | Exposition publique de `publicEmail` | À confirmer |
 
 ## 5. Problèmes connus
@@ -134,6 +138,7 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | KI-16 | OPTIONNEL | `V001` : virgule manquante avant `CONSTRAINT profile_single_row` (comportement identique) ; migration appliquée, non modifiable | aucun |
 | KI-29 | OPTIONNEL | Surface sans appelant : `ProfileEntity.removeLink` / `removeSkill`, `App.title` (frontend) ; codes d'erreur des séries et médias déclarés d'avance | au plus tard avec l'administration du profil (étape 36) et le frontend (37) |
 | KI-30 | OPTIONNEL | Les `*IT` transactionnels (écriture de statut, lectures publiques) ne prouvent pas le comportement après commit | à reprendre si un défaut de transaction apparaît |
+| KI-31 | OPTIONNEL | Un `tsvector` est limité à 1 Mio (positions plafonnées à 16 383) : un contenu Markdown démesuré serait refusé par PostgreSQL à l'écriture (500), faute de longueur maximale du contenu en V1 | étape 36 : borner la longueur du contenu à l'écriture (administration) |
 
 ### Résolus le 2026-09-28 (étape 26)
 
@@ -203,6 +208,10 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | Prérendu route par route | Étape 52.1 | D22 |
 | Cache du profil public | si le profil devient un chemin chaud | D-O |
 | Exposition de springdoc / Swagger UI | Étape 32 | KI-19 |
+| Route `GET /api/public/search`, contrat et validation de `q` | Étape 29 | D-CD : le cas d'usage est prêt et testé sans HTTP |
+| Extraits mis en évidence (`ts_headline`), recherche par préfixe pendant la saisie | si un écran le demande (étape 47) | D-CC : `websearch_to_tsquery` n'accepte pas `:*` |
+| Catégorie dans le document de recherche | si le modèle l'adopte | D-CA : absente de `01` §11 |
+| Classement en base (fenêtre de pagination SQL) au lieu du classement en mémoire de tous les résultats | Étape 52.6, si le corpus dépasse quelques milliers de contenus | D-CD |
 
 ---
 
