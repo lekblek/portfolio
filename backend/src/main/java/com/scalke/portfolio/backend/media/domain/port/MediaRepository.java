@@ -1,6 +1,8 @@
 package com.scalke.portfolio.backend.media.domain.port;
 
 import com.scalke.portfolio.backend.media.domain.model.Media;
+import com.scalke.portfolio.backend.shared.domain.model.PageQuery;
+import com.scalke.portfolio.backend.shared.domain.model.PageResult;
 
 import java.util.Collection;
 import java.util.List;
@@ -9,7 +11,8 @@ import java.util.Optional;
 /**
  * Port de persistance du catalogue. Ne contient que les méthodes utilisées (ADR 0001) : {@code create} par
  * {@code UploadMediaUseCase}, {@code findById} et {@code delete} par {@code DeleteMediaUseCase},
- * {@code findAllById} par la façade {@code MediaQueryService}.
+ * {@code findAllById} par la façade {@code MediaQueryService}, {@code findPage}, {@code findById} et
+ * {@code updateAltText} par l'administration (D-CT).
  */
 public interface MediaRepository {
 
@@ -30,4 +33,14 @@ public interface MediaRepository {
      *         {@code MEDIA_STILL_REFERENCED} si un contenu l'utilise encore (invariant 13)
      */
     void delete(Media media);
+
+    /**
+     * Les plus récents d'abord (date de création puis identifiant décroissants : ordre total).
+     */
+    PageResult<Media> findPage(PageQuery query);
+
+    /**
+     * Enregistre le texte alternatif : seule écriture après l'envoi.
+     */
+    Media updateAltText(Media media);
 }

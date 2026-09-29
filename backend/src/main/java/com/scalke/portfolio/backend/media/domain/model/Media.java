@@ -43,6 +43,23 @@ public record Media(
         }
     }
 
+    /**
+     * Texte alternatif saisi, sans espaces de début et de fin ; vide ou absent : aucun.
+     */
+    public static String normalizeAltText(String announced) {
+        if (announced == null || announced.isBlank()) {
+            return null;
+        }
+        return announced.strip();
+    }
+
+    /**
+     * Même média avec un autre texte alternatif ({@code null} : aucun), seule donnée modifiable (D-CT).
+     */
+    public Media withAltText(String newAltText) {
+        return new Media(id, storageKey, originalName, size, dimensions, newAltText, createdAt);
+    }
+
     public MediaFormat format() {
         return storageKey.format();
     }

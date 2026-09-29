@@ -14,19 +14,21 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Ce que seul un vrai serveur montre (D-CR) : attributs des cookies posés par Tomcat, traitement d'un séparateur
- * encodé par Tomcat (KI-33). MockMvc ne passe ni par Tomcat ni par sa configuration de session. Contexte distinct de
+ * Ce que seul un vrai serveur montre (D-CR, D-CT) : attributs des cookies posés par Tomcat, traitement d'un séparateur
+ * encodé par Tomcat (KI-33), limite d'une requête multipart. MockMvc ne passe ni par Tomcat ni par sa configuration de session. Contexte distinct de
  * {@code AbstractIntegrationTest} (serveur sur un port aléatoire).
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -77,17 +79,49 @@ class HttpServerSecurityIT {
         String csrfCookie = cookie(first, "XSRF-TOKEN").orElseThrow();
         assertThat(csrfCookie).contains("Secure").containsIgnoringCase("SameSite=Strict").doesNotContain("HttpOnly");
 
-        String token = csrfCookie.substring("XSRF-TOKEN=".length(), csrfCookie.indexOf(';'));
-        HttpResponse<String> login = send(HttpRequest.newBuilder(uri("/api/admin/session"))
-            .header("Content-Type", "application/json")
-            .header("Cookie", "XSRF-TOKEN=" + token)
-            .header("X-XSRF-TOKEN", token)
-            .POST(HttpRequest.BodyPublishers.ofString(
-                "{\"login\":\"admin\",\"password\":\"" + PASSWORD + "\"}")));
+        HttpResponse<String> login = login(value(csrfCookie));
 
         assertThat(login.statusCode()).isEqualTo(200);
         assertThat(cookie(login, "JSESSIONID")).hasValueSatisfying(session -> assertThat(session)
             .contains("HttpOnly").contains("Secure").containsIgnoringCase("SameSite=Strict"));
+    }
+
+    /**
+     * D-CT : un fichier au-delà de 10 Mio est refusé par un 413 codé, et non par une connexion coupée : Tomcat lit
+     * la fin de la requête refusée ({@code server.tomcat.max-swallow-size}) avant de répondre.
+     */
+    @Test
+    void refuses_an_oversized_upload_with_a_coded_error() throws Exception {
+        String token = value(cookie(send(HttpRequest.newBuilder(uri("/api/admin/session"))), "XSRF-TOKEN")
+            .orElseThrow());
+        String session = value(cookie(login(token), "JSESSIONID").orElseThrow());
+        String boundary = "limite-de-la-requete";
+        byte[] head = ("--" + boundary + "\r\nContent-Disposition: form-data; name=\"file\"; filename=\"cv.pdf\"\r\n"
+            + "Content-Type: application/pdf\r\n\r\n%PDF-1.7").getBytes(StandardCharsets.US_ASCII);
+        byte[] tail = ("\r\n--" + boundary + "--\r\n").getBytes(StandardCharsets.US_ASCII);
+        ByteArrayOutputStream body = new ByteArrayOutputStream();
+        body.writeBytes(head);
+        body.writeBytes(new byte[11 * 1024 * 1024]);
+        body.writeBytes(tail);
+
+        // Longueur annoncée, comme un navigateur : Tomcat refuse la requête avant d'en lire le corps.
+        HttpResponse<String> response = send(HttpRequest.newBuilder(uri("/api/admin/media"))
+            .header("Content-Type", "multipart/form-data; boundary=" + boundary)
+            .header("Cookie", "XSRF-TOKEN=" + token + "; JSESSIONID=" + session)
+            .header("X-XSRF-TOKEN", token)
+            .POST(HttpRequest.BodyPublishers.ofByteArray(body.toByteArray())));
+
+        assertThat(response.statusCode()).isEqualTo(413);
+        assertThat(response.body()).contains("\"code\":\"MEDIA_TOO_LARGE\"");
+    }
+
+    private HttpResponse<String> login(String csrfToken) throws IOException, InterruptedException {
+        return send(HttpRequest.newBuilder(uri("/api/admin/session"))
+            .header("Content-Type", "application/json")
+            .header("Cookie", "XSRF-TOKEN=" + csrfToken)
+            .header("X-XSRF-TOKEN", csrfToken)
+            .POST(HttpRequest.BodyPublishers.ofString(
+                "{\"login\":\"admin\",\"password\":\"" + PASSWORD + "\"}")));
     }
 
     private HttpResponse<String> send(HttpRequest.Builder request) throws IOException, InterruptedException {
@@ -96,6 +130,13 @@ class HttpServerSecurityIT {
 
     private URI uri(String path) {
         return URI.create("http://localhost:" + port + path);
+    }
+
+    /**
+     * Valeur d'un en-tête {@code Set-Cookie} : entre le nom et le premier attribut.
+     */
+    private static String value(String setCookie) {
+        return setCookie.substring(setCookie.indexOf('=') + 1, setCookie.indexOf(';'));
     }
 
     private static Optional<String> cookie(HttpResponse<?> response, String name) {

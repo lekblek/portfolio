@@ -1,6 +1,8 @@
 package com.scalke.portfolio.backend.media.infrastructure.persistence.jpa.repository;
 
 import com.scalke.portfolio.backend.media.infrastructure.persistence.jpa.entity.MediaEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.Repository;
 
 import java.util.List;
@@ -16,6 +18,8 @@ public interface MediaJpaRepository extends Repository<MediaEntity, Long> {
     Optional<MediaEntity> findById(Long id);
 
     List<MediaEntity> findAllById(Iterable<Long> ids);
+
+    Page<MediaEntity> findAll(Pageable pageable);
 
     void deleteById(Long id);
 

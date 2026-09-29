@@ -2,6 +2,8 @@ package com.scalke.portfolio.backend.media;
 
 import com.scalke.portfolio.backend.media.domain.model.Media;
 import com.scalke.portfolio.backend.media.domain.port.MediaRepository;
+import com.scalke.portfolio.backend.shared.domain.model.PageQuery;
+import com.scalke.portfolio.backend.shared.domain.model.PageResult;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,6 +40,20 @@ public class InMemoryMediaRepository implements MediaRepository {
     @Override
     public void delete(Media deleted) {
         media.removeIf(stored -> stored.id().equals(deleted.id()));
+    }
+
+    /**
+     * Non utilisée par les tests unitaires : la pagination se teste en intégration.
+     */
+    @Override
+    public PageResult<Media> findPage(PageQuery query) {
+        throw new UnsupportedOperationException("paging is tested against PostgreSQL");
+    }
+
+    @Override
+    public Media updateAltText(Media updated) {
+        media.replaceAll(stored -> stored.id().equals(updated.id()) ? updated : stored);
+        return updated;
     }
 
     public List<Media> media() {

@@ -1,6 +1,7 @@
 package com.scalke.portfolio.backend.media.application.query;
 
 import com.scalke.portfolio.backend.media.domain.model.Media;
+import com.scalke.portfolio.backend.media.domain.model.StorageKey;
 import com.scalke.portfolio.backend.media.domain.port.MediaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,13 @@ public class MediaQueryService {
      * Préfixe public des fichiers : chemin de {@code PublicMediaController} sous le contexte {@code /api}.
      */
     static final String PUBLIC_PATH = "/api/public/media/";
+
+    /**
+     * Adresse publique du fichier de cette clé : la même pour le site et l'administration (D-BW, D-CT).
+     */
+    public static String publicUrl(StorageKey key) {
+        return PUBLIC_PATH + key.value();
+    }
 
     private final MediaRepository mediaRepository;
 

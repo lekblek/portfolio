@@ -36,8 +36,7 @@ public class UploadMediaUseCase {
      * <p>
      * Ordre : insertion d'abord, écriture du fichier ensuite. Un échec d'écriture annule l'insertion (même
      * transaction) ; un échec de validation de la transaction laisse au pire un fichier orphelin, jamais
-     * publié puisque sa clé n'est connue de personne. Pas de route HTTP avant l'administration protégée
-     * (étape 36, comme D-AU).
+     * publié puisque sa clé n'est connue de personne. Route : {@code POST /api/admin/media} (D-CT).
      *
      * @throws UnsupportedContentException format non reconnu ou image illisible ({@code UNSUPPORTED_MEDIA_FORMAT}, 415)
      * @throws ContentTooLargeException fichier trop volumineux pour son format ({@code MEDIA_TOO_LARGE}, 413)
@@ -57,7 +56,7 @@ public class UploadMediaUseCase {
             : null;
         StorageKey key = StorageKey.random(format);
         Media media = mediaRepository.create(new Media(null, key, fileName(upload.originalName(), format),
-            bytes.length, dimensions, altText(upload.altText()), clock.instant()));
+            bytes.length, dimensions, Media.normalizeAltText(upload.altText()), clock.instant()));
         mediaStorage.store(key, bytes);
         return media;
     }
@@ -73,13 +72,6 @@ public class UploadMediaUseCase {
             return "media." + format.extension();
         }
         return name.length() > Media.MAX_ORIGINAL_NAME_LENGTH ? name.substring(0, Media.MAX_ORIGINAL_NAME_LENGTH) : name;
-    }
-
-    private static String altText(String announced) {
-        if (announced == null || announced.isBlank()) {
-            return null;
-        }
-        return announced.strip();
     }
 
     private static byte[] readAtMost(InputStream content, long limit) {

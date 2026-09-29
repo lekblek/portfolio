@@ -19,6 +19,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -132,6 +133,22 @@ class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             .toList());
 
         return handleExceptionInternal(ex, body, headers, status, request);
+    }
+
+    /**
+     * Requête multipart plus grande que la limite ({@code spring.servlet.multipart}, D-CT) : même code qu'un fichier
+     * trop volumineux pour son format (D-BS).
+     */
+    @Override
+    protected ResponseEntity<Object> handleMaxUploadSizeExceededException(
+        MaxUploadSizeExceededException ex,
+        HttpHeaders headers,
+        HttpStatusCode status,
+        WebRequest request) {
+
+        ProblemDetail body = problem(HttpStatus.CONTENT_TOO_LARGE, "Fichier trop volumineux : 10 Mo au plus.",
+            ErrorCode.MEDIA_TOO_LARGE);
+        return handleExceptionInternal(ex, body, headers, HttpStatus.CONTENT_TOO_LARGE, request);
     }
 
     /**

@@ -18,6 +18,12 @@ spring:
         # Taille de page maximale pour toute l'API (ApiPaging.MAX_PAGE_SIZE, 05-conventions-api.md §13) :
         # une valeur supérieure est ramenée à ce plafond. La taille par défaut se déclare par contrôleur.
         max-page-size: 100
+  servlet:
+    multipart:
+      # Envoi d'un média (D-CT) : 10 Mio au plus, la plus grande taille acceptée (PDF, D-BR) ; la limite propre à
+      # chaque format reste vérifiée par UploadMediaUseCase.
+      max-file-size: 10MB
+      max-request-size: 11MB
   mail:
     # Notification des messages de contact (D-CI). Par défaut : Mailpit de deploy/compose.dev.yaml.
     host: ${MAIL_HOST:localhost}
@@ -32,6 +38,10 @@ spring:
       mail.smtp.writetimeout: 5000
 
 server:
+  tomcat:
+    # Une requête multipart trop grande est refusée avant d'être lue ; Tomcat en lit puis ignore jusqu'à 12 Mio pour
+    # que le navigateur reçoive la 413. Au-delà, la connexion est coupée (D-CT).
+    max-swallow-size: 12MB
   servlet:
     context-path: /api
     session:

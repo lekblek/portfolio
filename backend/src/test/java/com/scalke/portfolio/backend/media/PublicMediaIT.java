@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * Parcours complet : envoi (cas d'usage, sans route avant l'étape 36) puis lecture HTTP, sur le stockage
+ * Parcours complet : envoi (cas d'usage ; la route est testée par {@code AdminMediaIT}) puis lecture HTTP, sur le stockage
  * local réel, dans la racine du profil {@code test} ({@code target/test-media}).
  */
 class PublicMediaIT extends AbstractIntegrationTest {

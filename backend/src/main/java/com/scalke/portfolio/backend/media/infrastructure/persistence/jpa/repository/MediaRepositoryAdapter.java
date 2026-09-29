@@ -2,11 +2,17 @@ package com.scalke.portfolio.backend.media.infrastructure.persistence.jpa.reposi
 
 import com.scalke.portfolio.backend.media.domain.model.Media;
 import com.scalke.portfolio.backend.media.domain.port.MediaRepository;
+import com.scalke.portfolio.backend.media.infrastructure.persistence.jpa.entity.MediaEntity;
 import com.scalke.portfolio.backend.media.infrastructure.persistence.jpa.mapper.MediaPersistenceMapper;
+import com.scalke.portfolio.backend.shared.domain.model.PageQuery;
+import com.scalke.portfolio.backend.shared.domain.model.PageResult;
 import com.scalke.portfolio.backend.shared.error.BusinessRuleViolationException;
 import com.scalke.portfolio.backend.shared.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +27,8 @@ import java.util.Optional;
 @Repository
 @RequiredArgsConstructor
 public class MediaRepositoryAdapter implements MediaRepository {
+
+    private static final Sort NEWEST_FIRST = Sort.by(Sort.Order.desc("createdAt"), Sort.Order.desc("id"));
 
     private final MediaJpaRepository repository;
 
@@ -43,6 +51,24 @@ public class MediaRepositoryAdapter implements MediaRepository {
     @Transactional(readOnly = true)
     public List<Media> findAllById(Collection<Long> ids) {
         return repository.findAllById(ids).stream().map(MediaPersistenceMapper::toDomain).toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResult<Media> findPage(PageQuery query) {
+        Page<Media> page = repository
+            .findAll(PageRequest.of(query.page(), query.size(), NEWEST_FIRST))
+            .map(MediaPersistenceMapper::toDomain);
+        return new PageResult<>(page.getContent(), page.getNumber(), page.getSize(), page.getTotalElements());
+    }
+
+    @Override
+    @Transactional
+    public Media updateAltText(Media media) {
+        MediaEntity entity = repository.findById(media.id())
+            .orElseThrow(() -> new IllegalStateException("media " + media.id() + " does not exist"));
+        entity.changeAltText(media.altText());
+        return MediaPersistenceMapper.toDomain(entity);
     }
 
     /**

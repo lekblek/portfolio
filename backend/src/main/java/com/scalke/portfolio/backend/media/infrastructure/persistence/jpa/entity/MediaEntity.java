@@ -54,4 +54,11 @@ public class MediaEntity {
         this.altText = altText;
         this.createdAt = createdAt;
     }
+
+    /**
+     * Seule donnée modifiable après l'envoi (D-CT), déjà validée par {@code Media}.
+     */
+    public void changeAltText(String altText) {
+        this.altText = altText;
+    }
 }
