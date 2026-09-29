@@ -70,11 +70,12 @@ class SecurityConfigurationIT extends AbstractIntegrationTest {
     }
 
     /**
-     * Authentifié, l'administrateur passe la sécurité : la route n'existe pas encore (étape 36), d'où la 404.
+     * Authentifié, l'administrateur passe la sécurité sur tout {@code /api/admin/**} : une route inexistante y donne la
+     * 404 du routage, et non un refus de sécurité.
      */
     @Test
     void lets_an_authenticated_administrator_reach_the_administration() throws Exception {
-        mockMvc.perform(get("/api/admin/projects").contextPath("/api").with(user("admin")))
+        mockMvc.perform(get("/api/admin/does-not-exist").contextPath("/api").with(user("admin")))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.code").value("RESOURCE_NOT_FOUND"));
     }

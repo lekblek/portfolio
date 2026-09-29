@@ -35,4 +35,13 @@ public class TechnologyEntity {
         this.slug = slug;
         this.displayOrder = displayOrder;
     }
+
+    /**
+     * Écriture de l'administration (D-CW), déjà validée par le domaine.
+     */
+    public void change(String name, String slug, int displayOrder) {
+        this.name = name;
+        this.slug = slug;
+        this.displayOrder = displayOrder;
+    }
 }

@@ -44,7 +44,16 @@ public interface ProjectJpaRepository extends Repository<ProjectEntity, Long> {
 
     long count();
 
-    ProjectEntity save(ProjectEntity entity);
+    Page<ProjectEntity> findAll(Pageable pageable);
+
+    Optional<ProjectEntity> findById(Long id);
+
+    @Query("select count(p) > 0 from ProjectEntity p where p.slug = :slug and (:excludedId is null or p.id <> :excludedId)")
+    boolean existsBySlug(String slug, Long excludedId);
+
+    ProjectEntity saveAndFlush(ProjectEntity entity);
+
+    void flush();
 
     /**
      * Ligne de {@link #search} : {@code ts_rank} renvoie un {@code real}.

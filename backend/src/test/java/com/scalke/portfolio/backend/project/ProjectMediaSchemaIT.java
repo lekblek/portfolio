@@ -28,7 +28,7 @@ class ProjectMediaSchemaIT extends AbstractIntegrationTest {
         project = jdbcClient.sql("""
                     INSERT INTO project (title, slug, short_description, description_markdown, stage, visibility,
                                          start_date, featured, display_order)
-                    VALUES ('Projet', 'projet', 'Résumé', '# Projet', 'IN_PROGRESS', 'PUBLISHED', DATE '2026-01-01',
+                    VALUES ('Projet', 'projet', 'Résumé', '# Projet', 'IN_PROGRESS', 'DRAFT', DATE '2026-01-01',
                             FALSE, 0)
                     RETURNING id
                     """)

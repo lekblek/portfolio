@@ -17,6 +17,13 @@ public final class InputPatterns {
     public static final String SLUG = "[a-z0-9]+(-[a-z0-9]+)*";
     public static final String SLUG_MESSAGE = "minuscules sans accent, chiffres et tirets simples";
 
+    /**
+     * Adresse web absolue (D-CX) : {@code http://} ou {@code https://}, sans espace. Exclut {@code javascript:} et les
+     * autres schémas qu'un lien publié ne doit pas porter.
+     */
+    public static final String HTTP_URL = "https?://\\S+";
+    public static final String HTTP_URL_MESSAGE = "adresse http:// ou https:// attendue";
+
     private InputPatterns() {
     }
 }

@@ -38,7 +38,7 @@ public final class ProjectPersistenceMapper {
             entity.getScreenshots().stream()
                 .map(screenshot -> new ProjectScreenshot(
                     screenshot.getMediaId(), screenshot.getCaption(), screenshot.getDisplayOrder()))
-                .toList());
+                .toList(), entity.isEverPublished());
     }
 
     /**
@@ -61,12 +61,17 @@ public final class ProjectPersistenceMapper {
             .featured(project.featured())
             .displayOrder(project.displayOrder())
             .coverMediaId(project.coverMediaId())
-            .screenshots(project.screenshots().stream()
-                .map(screenshot -> new ProjectScreenshotEmbeddable(
-                    screenshot.mediaId(), screenshot.caption(), screenshot.displayOrder()))
-                .toList())
+            .screenshots(screenshots(project))
+            .everPublished(project.everPublished())
             .build();
         technologies.forEach(entity::addTechnology);
         return entity;
+    }
+
+    public static List<ProjectScreenshotEmbeddable> screenshots(Project project) {
+        return project.screenshots().stream()
+            .map(screenshot -> new ProjectScreenshotEmbeddable(
+                screenshot.mediaId(), screenshot.caption(), screenshot.displayOrder()))
+            .toList();
     }
 }

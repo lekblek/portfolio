@@ -2,6 +2,8 @@ package com.scalke.portfolio.backend.project.domain.model;
 
 import com.scalke.portfolio.backend.shared.domain.model.DateRange;
 import com.scalke.portfolio.backend.shared.domain.model.Slug;
+import com.scalke.portfolio.backend.shared.error.BusinessRuleViolationException;
+import com.scalke.portfolio.backend.shared.error.ErrorCode;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -44,7 +46,7 @@ class ProjectTest {
     @Test
     void requires_a_visibility() {
         assertThatThrownBy(() -> new Project(null, "Titre", Slug.of("titre"), "Résumé", "# Titre",
-            ProjectStage.IN_PROGRESS, null, ONGOING, null, null, false, 0, List.of(), null, List.of()))
+            ProjectStage.IN_PROGRESS, null, ONGOING, null, null, false, 0, List.of(), null, List.of(), false))
             .isInstanceOf(NullPointerException.class);
     }
 
@@ -90,19 +92,69 @@ class ProjectTest {
         assertThatThrownBy(() -> new ProjectScreenshot(null, null, 0)).isInstanceOf(NullPointerException.class);
     }
 
+    /**
+     * D-CX : un projet publié l'a toujours été ; la mémoire survit au retour en brouillon.
+     */
+    @Test
+    void a_published_project_remembers_its_publication() {
+        assertThat(Project.newProject(Slug.of("titre"), content(ProjectVisibility.PUBLISHED)).everPublished()).isTrue();
+
+        Project draft = Project.newProject(Slug.of("titre"), content(ProjectVisibility.DRAFT));
+        assertThat(draft.everPublished()).isFalse();
+        Project published = draft.edit(Slug.of("titre"), content(ProjectVisibility.PUBLISHED));
+        assertThat(published.edit(Slug.of("titre"), content(ProjectVisibility.DRAFT)).everPublished()).isTrue();
+    }
+
+    /**
+     * D11 : le slug ne change plus après la publication ; avant, il peut changer, même dans la modification qui publie.
+     */
+    @Test
+    void locks_the_slug_once_published() {
+        Project draft = Project.newProject(Slug.of("titre"), content(ProjectVisibility.DRAFT));
+
+        Project published = draft.edit(Slug.of("nouveau"), content(ProjectVisibility.PUBLISHED));
+        assertThat(published.slug()).isEqualTo(Slug.of("nouveau"));
+        assertThat(published.edit(Slug.of("nouveau"), content(ProjectVisibility.ARCHIVED)).visibility())
+            .isEqualTo(ProjectVisibility.ARCHIVED);
+        assertThatThrownBy(() -> published.edit(Slug.of("autre"), content(ProjectVisibility.ARCHIVED)))
+            .isInstanceOfSatisfying(BusinessRuleViolationException.class, exception ->
+                assertThat(exception.errorCode()).isEqualTo(ErrorCode.SLUG_LOCKED));
+    }
+
+    @Test
+    void bounds_the_text_fields() {
+        assertThatThrownBy(() -> withText(" ", "Résumé", "")).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> withText("t".repeat(161), "Résumé", "")).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> withText("Titre", " ", "")).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> withText("Titre", "r".repeat(501), "")).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> withText("Titre", "Résumé", "d".repeat(100_001)))
+            .isInstanceOf(IllegalArgumentException.class);
+        assertThat(withText("t".repeat(160), "r".repeat(500), "d".repeat(100_000))).isNotNull();
+    }
+
+    private static ProjectContent content(ProjectVisibility visibility) {
+        return new ProjectContent("Titre", "Résumé", "# Titre", ProjectStage.IN_PROGRESS, visibility, ONGOING, null,
+            null, false, 0, List.of(JAVA), null, List.of());
+    }
+
+    private static Project withText(String title, String shortDescription, String description) {
+        return new Project(null, title, Slug.of("titre"), shortDescription, description, ProjectStage.IN_PROGRESS,
+            ProjectVisibility.DRAFT, ONGOING, null, null, false, 0, List.of(), null, List.of(), false);
+    }
+
     private static Project withScreenshots(ProjectScreenshot... screenshots) {
         return new Project(null, "Titre", Slug.of("titre"), "Résumé", "# Titre",
             ProjectStage.IN_PROGRESS, ProjectVisibility.DRAFT, ONGOING, null, null, false, 0, List.of(),
-            7L, List.of(screenshots));
+            7L, List.of(screenshots), false);
     }
 
     private static Project project(ProjectStage stage, DateRange period) {
         return new Project(null, "Titre", Slug.of("titre"), "Résumé", "# Titre",
-            stage, ProjectVisibility.DRAFT, period, null, null, false, 0, List.of(), null, List.of());
+            stage, ProjectVisibility.DRAFT, period, null, null, false, 0, List.of(), null, List.of(), false);
     }
 
     private static Project project(List<Technology> technologies) {
         return new Project(null, "Titre", Slug.of("titre"), "Résumé", "# Titre",
-            ProjectStage.IN_PROGRESS, ProjectVisibility.DRAFT, ONGOING, null, null, false, 0, technologies, null, List.of());
+            ProjectStage.IN_PROGRESS, ProjectVisibility.DRAFT, ONGOING, null, null, false, 0, technologies, null, List.of(), false);
     }
 }

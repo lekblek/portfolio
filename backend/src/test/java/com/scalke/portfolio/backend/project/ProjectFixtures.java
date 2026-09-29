@@ -37,7 +37,7 @@ public final class ProjectFixtures {
             displayOrder,
             List.of(technologies),
             null,
-            List.of());
+            List.of(), false);
     }
 
     public static Project published(String slug, LocalDate start, int displayOrder, Technology... technologies) {
@@ -51,7 +51,7 @@ public final class ProjectFixtures {
         return new Project(project.id(), project.title(), project.slug(), project.shortDescription(),
             project.descriptionMarkdown(), project.stage(), project.visibility(), project.period(),
             project.repositoryUrl(), project.demoUrl(), project.featured(), project.displayOrder(),
-            project.technologies(), coverMediaId, List.of(screenshots));
+            project.technologies(), coverMediaId, List.of(screenshots), project.everPublished());
     }
 
     /**
@@ -61,7 +61,7 @@ public final class ProjectFixtures {
         return new Project(project.id(), title, project.slug(), shortDescription, descriptionMarkdown,
             project.stage(), project.visibility(), project.period(), project.repositoryUrl(), project.demoUrl(),
             project.featured(), project.displayOrder(), project.technologies(), project.coverMediaId(),
-            project.screenshots());
+            project.screenshots(), project.everPublished());
     }
 
     /**

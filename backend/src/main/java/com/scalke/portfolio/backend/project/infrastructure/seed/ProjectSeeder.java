@@ -76,7 +76,7 @@ public class ProjectSeeder implements ApplicationRunner {
                 "https://example.test/portfolio", null, true, 0,
                 List.of(java, springBoot, angular, postgresql, docker),
                 cover.id(),
-                List.of(new ProjectScreenshot(screenshot.id(), "Liste des projets", 0))),
+                List.of(new ProjectScreenshot(screenshot.id(), "Liste des projets", 0)), false),
             new Project(null, "Projet terminé de démonstration", Slug.fromText("Projet terminé de démonstration"),
                 "Projet de démonstration terminé.",
                 "## Bilan\n\nProjet de démonstration.",
@@ -85,7 +85,7 @@ public class ProjectSeeder implements ApplicationRunner {
                 null, "https://example.test/demo", false, 1,
                 List.of(java, postgresql),
                 null,
-                List.of()),
+                List.of(), false),
             new Project(null, "Brouillon de démonstration", Slug.fromText("Brouillon de démonstration"),
                 "Projet non publié : absent de l'API publique.",
                 "Brouillon.",
@@ -94,7 +94,7 @@ public class ProjectSeeder implements ApplicationRunner {
                 null, null, false, 2,
                 List.of(angular),
                 null,
-                List.of())
+                List.of(), false)
         ).forEach(projectRepository::create);
         log.info("Technologies et projets de démonstration créés (profil dev)");
     }

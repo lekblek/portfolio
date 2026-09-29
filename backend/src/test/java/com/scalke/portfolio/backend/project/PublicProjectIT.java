@@ -71,7 +71,7 @@ class PublicProjectIT extends AbstractIntegrationTest {
             ProjectStage.COMPLETED, ProjectVisibility.PUBLISHED,
             DateRange.between(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 6, 30)),
             null, "https://example.test/demo", false, 0,
-            List.of(postgresql, java), null, List.of()));
+            List.of(postgresql, java), null, List.of(), false));
         projectRepository.create(project("brouillon", ProjectVisibility.DRAFT,
             DateRange.ongoingSince(LocalDate.of(2026, 1, 1)), 0, java));
         projectRepository.create(project("archive", ProjectVisibility.ARCHIVED,

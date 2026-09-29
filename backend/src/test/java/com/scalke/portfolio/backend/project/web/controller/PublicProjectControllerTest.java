@@ -50,7 +50,7 @@ class PublicProjectControllerTest {
         "https://example.test/repo", null, true, 3,
         List.of(new Technology(7L, "Java", Slug.of("java"), 0), new Technology(8L, "Angular", Slug.of("angular"), 1)),
         5L,
-        List.of(new ProjectScreenshot(6L, "Accueil", 0)));
+        List.of(new ProjectScreenshot(6L, "Accueil", 0)), false);
 
     private static final PublicImage COVER = new PublicImage(
         "/api/public/media/3f2a9c0e8d7b4a1f9e6c5b4a3d2e1f0a.webp", 1200, 630, "Tableau de bord");

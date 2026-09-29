@@ -13,7 +13,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
- * Contraintes de {@code V004__create_project.sql}, vérifiées sans JPA.
+ * Contraintes de {@code V004__create_project.sql} et {@code V023} (mémoire de publication, longueur de la
+ * description, D-CX), vérifiées sans JPA.
  */
 @Transactional
 class ProjectSchemaIT extends AbstractIntegrationTest {
@@ -78,12 +79,46 @@ class ProjectSchemaIT extends AbstractIntegrationTest {
             .hasMessageContaining("project_stage_matches_dates_check");
     }
 
+    /**
+     * D-CX : un projet publié a toujours été publié ; un projet archivé ou en brouillon peut l'avoir été.
+     */
+    @Test
+    void a_published_project_remembers_its_publication() {
+        insertProject("brouillon", "IN_PROGRESS", "DRAFT", START, null, false);
+        insertProject("archive", "IN_PROGRESS", "ARCHIVED", START, null, true);
+
+        assertThatThrownBy(() -> insertProject("portfolio", "IN_PROGRESS", "PUBLISHED", START, null, false))
+            .isInstanceOf(DataIntegrityViolationException.class)
+            .hasMessageContaining("project_ever_published_check");
+    }
+
+    /**
+     * D-CX, KI-31 : la description est bornée à 100 000 caractères (et non octets).
+     */
+    @Test
+    void bounds_the_description_length() {
+        insertProject("portfolio", "IN_PROGRESS", "DRAFT", START, null);
+
+        jdbcClient.sql("UPDATE project SET description_markdown = :text").param("text", "é".repeat(100_000)).update();
+        assertThatThrownBy(() -> jdbcClient.sql("UPDATE project SET description_markdown = :text")
+                .param("text", "é".repeat(100_001)).update())
+            .isInstanceOf(DataIntegrityViolationException.class)
+            .hasMessageContaining("project_description_length_check");
+    }
+
     private void insertProject(String slug, String stage, String visibility, LocalDate start, LocalDate end) {
+        insertProject(slug, stage, visibility, start, end, "PUBLISHED".equals(visibility));
+    }
+
+    private void insertProject(String slug, String stage, String visibility, LocalDate start, LocalDate end,
+                               boolean everPublished) {
         jdbcClient.sql("""
                     INSERT INTO project (title, slug, short_description, description_markdown,
-                                         stage, visibility, start_date, end_date)
-                    VALUES ('Titre', :slug, 'Résumé', '# Description', :stage, :visibility, :start, :end)
+                                         stage, visibility, start_date, end_date, ever_published)
+                    VALUES ('Titre', :slug, 'Résumé', '# Description', :stage, :visibility, :start, :end,
+                            :everPublished)
                     """)
+            .param("everPublished", everPublished)
             .param("slug", slug)
             .param("stage", stage)
             .param("visibility", visibility)

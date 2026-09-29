@@ -96,11 +96,17 @@ public class ProjectEntity {
     @BatchSize(size = 100)
     private List<TechnologyEntity> technologies = new ArrayList<>();
 
+    /**
+     * Mémoire de publication (D-CX) : le slug ne change plus une fois le projet publié.
+     */
+    @Column(name = "ever_published", nullable = false)
+    private boolean everPublished;
+
     @Builder
     private ProjectEntity(String title, String slug, String shortDescription, String descriptionMarkdown,
                           ProjectStage stage, ProjectVisibility visibility, LocalDate startDate, LocalDate endDate,
                           String repositoryUrl, String demoUrl, boolean featured, int displayOrder,
-                          Long coverMediaId, List<ProjectScreenshotEmbeddable> screenshots) {
+                          Long coverMediaId, List<ProjectScreenshotEmbeddable> screenshots, boolean everPublished) {
         this.title = title;
         this.slug = slug;
         this.shortDescription = shortDescription;
@@ -115,6 +121,36 @@ public class ProjectEntity {
         this.displayOrder = displayOrder;
         this.coverMediaId = coverMediaId;
         this.screenshots = new ArrayList<>(screenshots);
+        this.everPublished = everPublished;
+    }
+
+    /**
+     * Écriture de l'administration (D-CX), déjà validée par le domaine ({@code Project.edit}) : toute la saisie,
+     * technologies et captures remplacées d'un bloc, mémoire de publication.
+     */
+    public void revise(String title, String slug, String shortDescription, String descriptionMarkdown,
+                       ProjectStage stage, ProjectVisibility visibility, LocalDate startDate, LocalDate endDate,
+                       String repositoryUrl, String demoUrl, boolean featured, int displayOrder, Long coverMediaId,
+                       List<TechnologyEntity> technologies, List<ProjectScreenshotEmbeddable> screenshots,
+                       boolean everPublished) {
+        this.title = title;
+        this.slug = slug;
+        this.shortDescription = shortDescription;
+        this.descriptionMarkdown = descriptionMarkdown;
+        this.stage = stage;
+        this.visibility = visibility;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.repositoryUrl = repositoryUrl;
+        this.demoUrl = demoUrl;
+        this.featured = featured;
+        this.displayOrder = displayOrder;
+        this.coverMediaId = coverMediaId;
+        this.technologies.clear();
+        this.technologies.addAll(technologies);
+        this.screenshots.clear();
+        this.screenshots.addAll(screenshots);
+        this.everPublished = everPublished;
     }
 
     public void addTechnology(TechnologyEntity technology) {

@@ -37,7 +37,7 @@ class ProjectPersistenceMapperTest {
             3,
             List.of(java, angular),
             5L,
-            List.of(new ProjectScreenshot(8L, "Accueil", 0), new ProjectScreenshot(9L, null, 1)));
+            List.of(new ProjectScreenshot(8L, "Accueil", 0), new ProjectScreenshot(9L, null, 1)), false);
         List<TechnologyEntity> technologies = project.technologies().stream()
             .map(TechnologyPersistenceMapper::toNewEntity)
             .toList();

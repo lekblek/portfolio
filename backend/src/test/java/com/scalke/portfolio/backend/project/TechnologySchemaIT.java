@@ -92,7 +92,7 @@ class TechnologySchemaIT extends AbstractIntegrationTest {
         return jdbcClient.sql("""
                     INSERT INTO project (title, slug, short_description, description_markdown,
                                          stage, visibility, start_date)
-                    VALUES ('Titre', 'portfolio', 'Résumé', '# Description', 'IN_PROGRESS', 'PUBLISHED', DATE '2024-01-01')
+                    VALUES ('Titre', 'portfolio', 'Résumé', '# Description', 'IN_PROGRESS', 'DRAFT', DATE '2024-01-01')
                     RETURNING id
                     """)
             .query(Long.class)

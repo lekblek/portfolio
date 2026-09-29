@@ -61,7 +61,7 @@ class GetPublishedProjectUseCaseIT extends AbstractIntegrationTest {
             "https://example.test/repo", null, true, 0,
             List.of(postgresql, java),
             null,
-            List.of()));
+            List.of(), false));
         entityManager.flush();
         entityManager.clear();
 
