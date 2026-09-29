@@ -9,7 +9,10 @@ import com.scalke.portfolio.backend.media.domain.model.StorageKey;
 import com.scalke.portfolio.backend.shared.error.ContentTooLargeException;
 import com.scalke.portfolio.backend.shared.error.ErrorCode;
 import com.scalke.portfolio.backend.shared.error.UnsupportedContentException;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -28,7 +31,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
- * Validation et inscription d'un envoi (D-BR, D-BU), avec un catalogue et un stockage en mémoire.
+ * Validation et inscription d'un envoi (D-BR, D-BU), avec un catalogue et un stockage en mémoire. La synchronisation de
+ * transaction est ouverte à la main : le cas d'usage y inscrit la compensation d'un rollback (D-DE).
  */
 class UploadMediaUseCaseTest {
 
@@ -38,7 +42,17 @@ class UploadMediaUseCaseTest {
     private final InMemoryMediaStorage storage = new InMemoryMediaStorage();
     private final InMemoryMediaRepository repository = new InMemoryMediaRepository();
     private final UploadMediaUseCase uploadMediaUseCase =
-        new UploadMediaUseCase(storage, repository, Clock.fixed(NOW, ZoneOffset.UTC));
+        new UploadMediaUseCase(storage, repository, new MediaFileLifecycle(storage), Clock.fixed(NOW, ZoneOffset.UTC));
+
+    @BeforeEach
+    void openTransactionSynchronization() {
+        TransactionSynchronizationManager.initSynchronization();
+    }
+
+    @AfterEach
+    void closeTransactionSynchronization() {
+        TransactionSynchronizationManager.clearSynchronization();
+    }
 
     @Test
     void records_and_stores_an_image_with_its_dimensions() {
@@ -145,7 +159,8 @@ class UploadMediaUseCaseTest {
                 throw new IllegalStateException("disque plein");
             }
         };
-        UploadMediaUseCase useCase = new UploadMediaUseCase(failing, repository, Clock.fixed(NOW, ZoneOffset.UTC));
+        UploadMediaUseCase useCase =
+            new UploadMediaUseCase(failing, repository, new MediaFileLifecycle(failing), Clock.fixed(NOW, ZoneOffset.UTC));
 
         assertThatThrownBy(() -> useCase.execute(new MediaUpload("cv.pdf", null, new ByteArrayInputStream(PDF))))
             .hasMessage("disque plein");

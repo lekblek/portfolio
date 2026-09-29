@@ -27,6 +27,7 @@ public class UploadMediaUseCase {
 
     private final MediaStorage mediaStorage;
     private final MediaRepository mediaRepository;
+    private final MediaFileLifecycle mediaFileLifecycle;
     private final Clock clock;
 
     /**
@@ -35,8 +36,8 @@ public class UploadMediaUseCase {
      * plus grande taille acceptée. Le flux est lu, pas fermé : il appartient à l'appelant.
      * <p>
      * Ordre : insertion d'abord, écriture du fichier ensuite. Un échec d'écriture annule l'insertion (même
-     * transaction) ; un échec de validation de la transaction laisse au pire un fichier orphelin, jamais
-     * publié puisque sa clé n'est connue de personne. Route : {@code POST /api/admin/media} (D-CT).
+     * transaction) ; une transaction annulée après l'écriture supprime le fichier ({@link MediaFileLifecycle}, D-DE).
+     * Route : {@code POST /api/admin/media} (D-CT).
      *
      * @throws UnsupportedContentException format non reconnu ou image illisible ({@code UNSUPPORTED_MEDIA_FORMAT}, 415)
      * @throws ContentTooLargeException fichier trop volumineux pour son format ({@code MEDIA_TOO_LARGE}, 413)
@@ -58,6 +59,7 @@ public class UploadMediaUseCase {
         Media media = mediaRepository.create(new Media(null, key, fileName(upload.originalName(), format),
             bytes.length, dimensions, Media.normalizeAltText(upload.altText()), clock.instant()));
         mediaStorage.store(key, bytes);
+        mediaFileLifecycle.discardIfRolledBack(key);
         return media;
     }
 

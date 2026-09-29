@@ -12,7 +12,7 @@ import java.util.Optional;
  * <p>
  * Ne contient que les méthodes utilisées par un appelant existant (ADR 0001) : {@code open} par
  * {@code OpenMediaFileUseCase}, {@code store} par {@code UploadMediaUseCase}, {@code delete} par
- * {@code DeleteMediaUseCase}.
+ * {@code MediaFileLifecycle}, selon l'issue de la transaction (D-DE).
  */
 public interface MediaStorage {
 
