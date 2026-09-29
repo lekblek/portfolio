@@ -21,7 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -86,6 +88,22 @@ public class PublicationRepositoryAdapter implements PublicationRepository {
         return repository.findAll(visibleAt(now).and(hasIdIn(ids))).stream()
             .map(PublicationPersistenceMapper::toDomain)
             .toList();
+    }
+
+    /**
+     * Deux requêtes : la recherche plein texte, puis la règle de visibilité ({@code visibleAt}) sur les seuls
+     * identifiants trouvés, pour que cette règle reste écrite une fois (D-AH, D-CC). Aucune seconde requête si
+     * rien ne correspond.
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Map<Long, Double> searchVisible(String text, Instant now) {
+        Map<Long, Double> ranks = new HashMap<>();
+        repository.search(text).forEach(row -> ranks.put(row.getId(), row.getRank().doubleValue()));
+        if (!ranks.isEmpty()) {
+            ranks.keySet().retainAll(findVisibleIds(Set.copyOf(ranks.keySet()), now));
+        }
+        return Map.copyOf(ranks);
     }
 
     @Override

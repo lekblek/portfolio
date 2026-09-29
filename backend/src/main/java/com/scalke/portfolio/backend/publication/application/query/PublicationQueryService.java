@@ -54,6 +54,15 @@ public class PublicationQueryService {
     }
 
     /**
+     * Pertinence des publications visibles maintenant dont le document de recherche (titre et tags, résumé,
+     * contenu, du plus fort au plus faible) correspond à {@code text}, lu comme une recherche web, par
+     * identifiant (D-CC). Deux requêtes au plus ; vide si rien ne correspond.
+     */
+    public Map<Long, Double> searchVisible(String text) {
+        return publicationRepository.searchVisible(text, clock.instant());
+    }
+
+    /**
      * Publication visible maintenant portant ce slug ; vide si elle n'existe pas ou n'est pas visible (les deux
      * cas sont indiscernables, comme pour la lecture publique).
      */

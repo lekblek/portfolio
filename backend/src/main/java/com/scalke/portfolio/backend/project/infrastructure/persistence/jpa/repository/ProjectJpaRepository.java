@@ -4,8 +4,11 @@ import com.scalke.portfolio.backend.project.domain.model.ProjectVisibility;
 import com.scalke.portfolio.backend.project.infrastructure.persistence.jpa.entity.ProjectEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -24,7 +27,32 @@ public interface ProjectJpaRepository extends Repository<ProjectEntity, Long> {
 
     Optional<ProjectEntity> findBySlugAndVisibility(String slug, ProjectVisibility visibility);
 
+    List<ProjectEntity> findByVisibilityAndIdIn(ProjectVisibility visibility, Collection<Long> ids);
+
+    /**
+     * Pertinence de chaque projet de cette visibilité dont le document ({@code V019}) correspond à {@code text}
+     * lu comme une recherche web (D-CC). La visibilité est un paramètre, comme dans les requêtes dérivées
+     * (D-U) ; le filtre {@code @@} passe par l'index GIN.
+     */
+    @Query(value = """
+        SELECT p.id AS id, ts_rank(p.search_vector, query) AS rank
+          FROM project p, websearch_to_tsquery('french_unaccent', :text) AS query
+         WHERE p.visibility = :visibility
+           AND p.search_vector @@ query
+        """, nativeQuery = true)
+    List<SearchRank> search(String text, String visibility);
+
     long count();
 
     ProjectEntity save(ProjectEntity entity);
+
+    /**
+     * Ligne de {@link #search} : {@code ts_rank} renvoie un {@code real}.
+     */
+    interface SearchRank {
+
+        Long getId();
+
+        Float getRank();
+    }
 }

@@ -55,6 +55,16 @@ public final class ProjectFixtures {
     }
 
     /**
+     * Le même projet avec ce titre et ces descriptions (textes cherchés par la recherche plein texte).
+     */
+    public static Project withText(Project project, String title, String shortDescription, String descriptionMarkdown) {
+        return new Project(project.id(), title, project.slug(), shortDescription, descriptionMarkdown,
+            project.stage(), project.visibility(), project.period(), project.repositoryUrl(), project.demoUrl(),
+            project.featured(), project.displayOrder(), project.technologies(), project.coverMediaId(),
+            project.screenshots());
+    }
+
+    /**
      * Technologie non encore persistée : à créer par {@code TechnologyRepository.create} avant de
      * l'associer à un projet persisté.
      */

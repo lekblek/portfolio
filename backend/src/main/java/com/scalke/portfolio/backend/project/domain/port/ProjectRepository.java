@@ -6,6 +6,9 @@ import com.scalke.portfolio.backend.shared.domain.model.PageQuery;
 import com.scalke.portfolio.backend.shared.domain.model.PageResult;
 import com.scalke.portfolio.backend.shared.domain.model.Slug;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -13,8 +16,9 @@ import java.util.Optional;
  * <p>
  * Ne contient que les méthodes utilisées par un appelant existant (ADR 0001) :
  * {@code findPublished} par {@code ListPublishedProjectsUseCase}, {@code findPublishedBySlug} par
- * {@code GetPublishedProjectUseCase}, {@code existsAny} et {@code create} par le seed de développement.
- * La modification arrivera avec l'administration (étape 36).
+ * {@code GetPublishedProjectUseCase}, {@code existsAny} et {@code create} par le seed de développement,
+ * {@code searchPublished} et {@code findPublishedByIds} par la façade {@code ProjectQueryService} (autres
+ * modules, ADR 0002). La modification arrivera avec l'administration (étape 36).
  */
 public interface ProjectRepository {
 
@@ -30,6 +34,18 @@ public interface ProjectRepository {
      * volontairement indiscernables (D-U).
      */
     Optional<Project> findPublishedBySlug(Slug slug);
+
+    /**
+     * Projets {@code PUBLISHED} parmi {@code ids}, avec leurs technologies, dans un ordre quelconque.
+     */
+    List<Project> findPublishedByIds(Collection<Long> ids);
+
+    /**
+     * Pertinence ({@code ts_rank}, D-CC) des projets {@code PUBLISHED} dont le document de recherche (titre,
+     * technologies, description courte, description) correspond à {@code text}, lu comme une recherche web,
+     * par identifiant. Vide si aucun ne correspond ou si le texte ne contient aucun mot recherchable.
+     */
+    Map<Long, Double> searchPublished(String text);
 
     boolean existsAny();
 

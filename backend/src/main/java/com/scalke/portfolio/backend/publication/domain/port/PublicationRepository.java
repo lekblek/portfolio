@@ -9,6 +9,7 @@ import com.scalke.portfolio.backend.shared.domain.model.Slug;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -18,9 +19,9 @@ import java.util.Set;
  * Ne contient que les méthodes utilisées par un appelant existant (ADR 0001) : {@code findVisible} par
  * {@code ListVisiblePublicationsUseCase}, {@code findVisibleBySlug} par {@code GetVisiblePublicationUseCase},
  * {@code existsAny} et {@code create} par le seed de développement, {@code findById} et {@code updateStatus}
- * par {@code ChangePublicationStatusUseCase}, {@code findVisibleIds}, {@code findVisibleByIds} et
- * {@code findBySlug} par la façade {@code PublicationQueryService} (autres modules, ADR 0002), qui utilise
- * aussi {@code findVisibleBySlug}.
+ * par {@code ChangePublicationStatusUseCase}, {@code findVisibleIds}, {@code findVisibleByIds},
+ * {@code findBySlug} et {@code searchVisible} par la façade {@code PublicationQueryService} (autres modules,
+ * ADR 0002), qui utilise aussi {@code findVisibleBySlug}.
  * <p>
  * « Visible à {@code now} » (D-AH) : {@code PUBLISHED}, ou {@code SCHEDULED} avec {@code publishedAt <= now}.
  * {@code now} est fourni par l'appelant, qui le lit dans l'horloge applicative.
@@ -49,6 +50,13 @@ public interface PublicationRepository {
      * Publications visibles à {@code now} parmi {@code ids}, dans un ordre quelconque.
      */
     List<Publication> findVisibleByIds(Collection<Long> ids, Instant now);
+
+    /**
+     * Pertinence ({@code ts_rank}, D-CC) des publications visibles à {@code now} dont le document de recherche
+     * (titre, tags, résumé, contenu) correspond à {@code text}, lu comme une recherche web, par identifiant.
+     * Vide si aucune ne correspond ou si le texte ne contient aucun mot recherchable.
+     */
+    Map<Long, Double> searchVisible(String text, Instant now);
 
     /**
      * Toute publication portant ce slug, quel que soit son statut : jamais pour une lecture publique.

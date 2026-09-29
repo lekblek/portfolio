@@ -18,8 +18,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.scalke.portfolio.backend.project.domain.model.ProjectVisibility.PUBLISHED;
 
@@ -63,6 +66,22 @@ public class ProjectRepositoryAdapter implements ProjectRepository {
     public Optional<Project> findPublishedBySlug(Slug slug) {
         return repository.findBySlugAndVisibility(slug.value(), PUBLISHED)
             .map(ProjectPersistenceMapper::toDomain);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Project> findPublishedByIds(Collection<Long> ids) {
+        return repository.findByVisibilityAndIdIn(PUBLISHED, ids).stream()
+            .map(ProjectPersistenceMapper::toDomain)
+            .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<Long, Double> searchPublished(String text) {
+        return repository.search(text, PUBLISHED.name()).stream()
+            .collect(Collectors.toUnmodifiableMap(
+                ProjectJpaRepository.SearchRank::getId, row -> row.getRank().doubleValue()));
     }
 
     @Override

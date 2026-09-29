@@ -47,6 +47,17 @@ public final class PublicationFixtures {
             coverMediaId);
     }
 
+    /**
+     * La même publication avec ce titre, ce résumé et ce contenu (textes cherchés par la recherche plein texte).
+     */
+    public static Publication withText(Publication publication, String title, String summary, String contentMarkdown) {
+        return new Publication(publication.id(), publication.type(), title, publication.slug(), summary,
+            contentMarkdown, publication.status(), publication.publishedAt(), publication.firstPublishedAt(),
+            publication.featured(), publication.categoryId(), publication.tagIds(), publication.seoTitle(),
+            publication.seoDescription(), publication.createdAt(), publication.updatedAt(),
+            publication.coverMediaId());
+    }
+
     private static Publication publication(String slug, PublicationType type, PublicationStatus status,
                                            Instant publishedAt, Long categoryId, Set<Long> tagIds) {
         Instant now = FixedClockConfiguration.NOW;
