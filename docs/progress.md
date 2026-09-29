@@ -2,24 +2,24 @@
 
 Ce fichier est la **seule** source de vérité sur l'avancement. Il ne répète pas le contenu des autres documents : il pointe vers eux.
 
-Dernière mise à jour : 2026-09-29 (étape 36.4 poussée, CI verte ; étape 36.5 terminée et vérifiée, commits à faire)
+Dernière mise à jour : 2026-09-29 (étape 36.5 poussée, CI verte ; étape 36.6 terminée et vérifiée, commits à faire)
 
 ---
 
 ## 1. État courant
 
 ```text
-Dernière étape terminée   : 36.4 — Administration des séries, poussée, CI verte (run 36603771411)
-Étape en cours            : 36 — API d'administration (36.5 projets vérifiée, commits à faire ; 36.6 et 36.7 à faire)
-Prochaine étape prévue    : 36.6 — Administration du profil
-État                      : PRÊT après commit et push de 36.5
+Dernière étape terminée   : 36.5 — Administration des technologies et des projets, poussée, CI verte (run 36605811512)
+Étape en cours            : 36 — API d'administration (36.6 profil vérifiée, commits à faire ; 36.7 à faire)
+Prochaine étape prévue    : 36.7 — Administration des messages de contact
+État                      : PRÊT après commit et push de 36.6
 Branche                   : develop
-Vérification              : ./mvnw clean verify → 684 tests verts (316 *Test, 368 *IT) à la fin de 36.5
+Vérification              : ./mvnw clean verify → 690 tests verts (316 *Test, 374 *IT) à la fin de 36.6
 ```
 
 ## 2. Prochaine action
 
-1. Committer et pousser 36.5 (deux commits), vérifier la CI, puis remplacer le 🟡 par ✅.
+1. Committer et pousser 36.6 (deux commits), vérifier la CI, puis remplacer le 🟡 par ✅.
 2. Suite de l'étape 36, dans l'ordre des dépendances (les termes et médias avant les contenus qui les référencent) :
 
    ```text
@@ -27,8 +27,8 @@ Vérification              : ./mvnw clean verify → 684 tests verts (316 *Test,
    36.2  Médias : envoi (multipart 10 Mio), liste, texte alternatif, suppression contrôlée   ✔ poussée
    36.3  Publications : liste tous statuts, création, modification (SLUG_LOCKED), statut, termes, couverture   ✔ poussée
    36.4  Séries : création, chapitres remplacés d'un bloc (NEWS_CANNOT_JOIN_SERIES, ARTICLE_ALREADY_IN_SERIES)   ✔ poussée
-   36.5  Projets : technologies, projets, couverture et captures, stabilité du slug   ✔ vérifiée
-   36.6  Profil : profil et collections, avatar et CV
+   36.5  Projets : technologies, projets, couverture et captures, stabilité du slug   ✔ poussée
+   36.6  Profil : profil et collections, avatar et CV   ✔ vérifiée
    36.7  Messages de contact : liste, détail, changement de statut
    ```
 3. Confirmer ou infirmer D-T (cohérence `stage` ⇔ `endDate`) : `docs/decisions/registre-implementation.md`.
@@ -108,8 +108,9 @@ Légende : ✅ terminée et poussée · 🟡 terminée et vérifiée, commits à
 | 36.2 | Administration des médias (envoi multipart, liste, texte alternatif, suppression contrôlée) | ✅ | `b5e2bd8`, `bdb4178` (CI : run 36599044081) |
 | 36.3 | Administration des publications (brouillon, saisie, slug, cycle éditorial, références vérifiées) ; contenu borné (`V022`) | ✅ | `06dfef8`, `1cdec2a` (CI : run 36602134647) |
 | 36.4 | Administration des séries (saisie, slug, chapitres remplacés d'un bloc) | ✅ | `508313a`, `4ce7cf8` (CI : run 36603771411) |
-| 36.5 | Administration des technologies et des projets ; mémoire de publication et description bornée (`V023`) | 🟡 | à committer |
-| 36.6 → 36.7 | Administration du profil, messages | ⏳ | — |
+| 36.5 | Administration des technologies et des projets ; mémoire de publication et description bornée (`V023`) | ✅ | `7a24c9a`, `4bad8b8` (CI : run 36605811512) |
+| 36.6 | Administration du profil (remplacement complet, collections comprises) | 🟡 | à committer |
+| 36.7 | Administration des messages de contact | ⏳ | — |
 | 37 → 52 | Voir `docs/steps/liste_complete_etapes.md` | ⏳ | — |
 
 Après le push, remplacer les 🟡 par ✅ et noter les hashes.
@@ -151,6 +152,7 @@ Index : [`decisions/README.md`](decisions/README.md).
 | D-CU | Administration des publications : brouillon à la création, type fixé, saisie remplacée (slug conservé, suffixé ou `SLUG_LOCKED`), route du statut, pas de suppression ; contenu borné à 100 000 caractères (`V022`) ; références vérifiées (400 sur le champ, `InvalidInputException`) | Active (36.3) |
 | D-CV | Administration des séries : série créée sans chapitre, saisie remplacée (slug conservé, suffixé ou `SLUG_LOCKED`), chapitres remplacés d'un bloc et renumérotés, `ARTICLE_ALREADY_IN_SERIES` au lieu de `SERIES_POSITION_ALREADY_USED`, pas de suppression | Active (36.4) |
 | D-CW, D-CX | Administration des technologies (sur le modèle des tags) et des projets : toute la saisie en une requête, visibilité comprise ; mémoire de publication `ever_published` (`V023`) et slug figé ensuite ; période, adresses http(s) et références vérifiées sur leur champ ; description bornée à 100 000 caractères ; pas de suppression | Active (36.5) |
+| D-CY | Administration du profil : ressource unique, `PUT` qui crée ou remplace tout le profil, collections comprises, dans l'ordre saisi ; périodes, compétences (casse ignorée), avatar et CV vérifiés sur leur champ ; suppressions envoyées avant les insertions | Active (36.6) |
 | D-CR | Cookies `Secure` et `SameSite=Strict`, session de 30 minutes ; `frame-ancestors 'none'` et `Referrer-Policy: no-referrer` en plus des en-têtes par défaut ; `%2F` confié au pare-feu de Spring Security | Active (35) |
 | D-CO … D-CQ | Connexion par session, refus uniforme, identifiant de session renouvelé, garde des 72 octets de bcrypt ; CSRF par cookie réservé à l'administration (avancé de l'étape 35) ; 5 échecs par adresse en 15 minutes, sans verrouillage du compte | Actives (34) |
 | D-CM, D-CN | Compte administrateur unique (invariant 30), empreinte bcrypt seule en SQL (invariant 15) ; configuration qui fait foi à chaque démarrage, mot de passe de 15 caractères à 72 octets | Actives (33) |
@@ -170,7 +172,7 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | KI-21 | AMÉLIORATION | `@types/node ^20` alors que Node 24 est la cible | étape 37 |
 | KI-22 | AMÉLIORATION | SSR : `security.allowedHosts` vide | étape 52 (déploiement) |
 | KI-16 | OPTIONNEL | `V001` : virgule manquante avant `CONSTRAINT profile_single_row` (comportement identique) ; migration appliquée, non modifiable | aucun |
-| KI-29 | OPTIONNEL | Surface sans appelant : `ProfileEntity.removeLink` / `removeSkill`, `App.title` (frontend) (les codes des séries et des médias sont désormais tous émis ; `SERIES_POSITION_ALREADY_USED` retiré, D-CV) | au plus tard avec l'administration du profil (étape 36) et le frontend (37) |
+| KI-29 | OPTIONNEL | Surface sans appelant : `App.title` (frontend). Côté backend, résolu : codes des séries et des médias tous émis (`SERIES_POSITION_ALREADY_USED` retiré, D-CV), `ProfileEntity.removeLink` / `removeSkill` retirées (D-CY) | frontend (étape 37) |
 | KI-30 | OPTIONNEL | Les `*IT` transactionnels (écriture de statut, lectures publiques) ne prouvent pas le comportement après commit | à reprendre si un défaut de transaction apparaît |
 
 ### Résolus le 2026-09-29 (étape 36.3)

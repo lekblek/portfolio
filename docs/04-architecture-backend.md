@@ -154,6 +154,8 @@ profile → shared
 profile → media
 ```
 
+État d’implémentation (étape 36.6) : administration `/api/admin/profile` (lecture et remplacement complet, collections comprises, D-CY) ; avatar et CV vérifiés par la façade `MediaQueryService`.
+
 ---
 
 ### 3.4 `project`

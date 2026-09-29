@@ -1767,6 +1767,37 @@ Règles propres à ces contrats (D-CX) :
 * pas de suppression : l’archivage retire un projet du site ;
 * contrats vérifiés par `AdminProjectIT`.
 
+### Profil (étape 36.6)
+
+```text
+GET /api/admin/profile   200 AdminProfileResponse ; 404 RESOURCE_NOT_FOUND tant qu'aucun profil n'est enregistré
+PUT /api/admin/profile   SaveProfileRequest → 200 AdminProfileResponse (création ou remplacement complet)
+
+SaveProfileRequest = AdminProfileResponse {
+  displayName, professionalTitle, shortBio, aboutMarkdown?, publicLocation?, publicEmail?,
+  avatarMediaId?, cvMediaId?,
+  links?:          [{ label, url }],
+  skills?:         [{ name, category }],
+  experiences?:    [{ organization, title, location, startDate, endDate?, description }],
+  educations?:     [{ institution, degree, field, location, startDate, endDate?, description }],
+  certifications?: [{ name, issuer, issuedAt, expiresAt?, credentialUrl? }]
+}
+
+400 VALIDATION_FAILED  champ obligatoire vide, bornes des colonnes, textes longs de plus de 10 000 caractères,
+                       adresse qui n'est pas http(s), courriel mal formé ; fin avant début (experiences[i].endDate,
+                       educations[i].endDate), expiration avant délivrance (certifications[i].expiresAt),
+                       compétence répétée, casse ignorée (skills), avatar qui n'est pas une image (avatarMediaId),
+                       CV qui n'est pas un PDF (cvMediaId)
+```
+
+Règles propres à ce contrat (D-CY) :
+
+* session de l’administrateur et jeton CSRF obligatoires (401 et 403 sinon) ;
+* le profil est unique : `PUT` le crée s’il n’existe pas, sinon remplace tout, collections comprises ; une collection absente devient vide ;
+* chaque collection est affichée dans l’ordre de sa liste ; les lignes n’ont pas d’identifiant ;
+* la réponse a la forme de la requête : un formulaire peut renvoyer ce qu’il a lu ;
+* contrat vérifié par `AdminProfileIT`.
+
 # 31. Ressources administratives prévues
 
 Les principales ressources administratives sont conceptuellement :

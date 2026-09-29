@@ -115,7 +115,7 @@ Profile 1 → 0..* Certification
 Profile 1 → 0..* ProfessionalLink
 ```
 
-État d’implémentation (étapes 14 à 16 et 27.3) : tous les attributs et collections ci-dessus. `avatarMedia` (une image) et `cvMedia` (un PDF, D06) sont facultatifs : des références vers le catalogue `Media` (D-BX).
+État d’implémentation (étapes 14 à 16 et 27.3) : tous les attributs et collections ci-dessus. `avatarMedia` (une image) et `cvMedia` (un PDF, D06) sont facultatifs : des références vers le catalogue `Media` (D-BX). Depuis l’étape 36.6 (D-CY), l’administration remplace le profil d’un bloc, collections comprises, chacune dans l’ordre saisi ; une compétence n’y figure qu’une fois, casse ignorée.
 
 ---
 
