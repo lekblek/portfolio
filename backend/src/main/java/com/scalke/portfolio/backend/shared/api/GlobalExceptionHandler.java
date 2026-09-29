@@ -27,13 +27,14 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 @RestControllerAdvice
 @Slf4j
 class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-
     private static final String CODE_PROPERTY = "code";
+    private static final String REQUEST_ID_PROPERTY = "requestId";
 
     private static ProblemDetail problem(
         HttpStatus status, String detail, ErrorCode code) {
@@ -43,12 +44,21 @@ class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return problemDetail;
     }
 
+    /**
+     * 500 (D-DB) : le client reçoit un texte neutre et l'identifiant de la requête, à citer pour retrouver l'incident.
+     * Le journal garde le type de chaque exception et les piles d'appels, sans les messages ({@link RedactedThrowable}) ;
+     * le détail complet n'est écrit qu'au niveau DEBUG, activé en profil {@code dev} seulement.
+     */
     @ExceptionHandler(Exception.class)
     ProblemDetail handleUnexpected(Exception ex) {
-        log.error("Unhandled exception", ex);
-        return problem(HttpStatus.INTERNAL_SERVER_ERROR,
+        String requestId = RequestIdFilter.current().orElseGet(() -> UUID.randomUUID().toString());
+        log.error("Erreur inattendue, requête {}", requestId, RedactedThrowable.of(ex));
+        log.debug("Détail complet de l'erreur de la requête {}", requestId, ex);
+        ProblemDetail body = problem(HttpStatus.INTERNAL_SERVER_ERROR,
             "Une erreur inattendue est survenue.",
             ErrorCode.INTERNAL_ERROR);
+        body.setProperty(REQUEST_ID_PROPERTY, requestId);
+        return body;
     }
 
     /**

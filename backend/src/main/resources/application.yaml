@@ -38,6 +38,11 @@ spring:
       mail.smtp.writetimeout: 5000
 
 server:
+  # Mandataire inverse (Caddy, D-DC) : adresse du client et schéma lus dans X-Forwarded-For et X-Forwarded-Proto, mais
+  # seulement pour une requête venant d'un réseau de confiance (server.tomcat.remoteip.internal-proxies ; par défaut
+  # les réseaux privés et la boucle locale, où tourne le mandataire). Un client d'Internet ne peut donc pas falsifier
+  # son adresse, qui sert à la limite des essais de connexion.
+  forward-headers-strategy: native
   tomcat:
     # Une requête multipart trop grande est refusée avant d'être lue ; Tomcat en lit puis ignore jusqu'à 12 Mio pour
     # que le navigateur reçoive la 413. Au-delà, la connexion est coupée (D-CT).
@@ -88,3 +93,12 @@ management:
   endpoint:
     health:
       show-details: never
+
+logging:
+  pattern:
+    # Identifiant de la requête (RequestIdFilter, D-DB) après le niveau de chaque ligne ; vide hors requête HTTP.
+    level: "%5p [%X{requestId:-}]"
+  level:
+    # Un refus d'intégrité (unicité, clé étrangère) est traduit en 409 ou 400 par l'adaptateur : l'avertissement
+    # d'Hibernate, qui recopie les valeurs saisies, n'apporte que du bruit et des données (D-DB). Visible en dev.
+    org.hibernate.orm.jdbc.error: error

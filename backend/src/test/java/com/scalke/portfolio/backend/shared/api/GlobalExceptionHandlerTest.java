@@ -1,5 +1,6 @@
 package com.scalke.portfolio.backend.shared.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -7,8 +8,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
@@ -146,5 +151,24 @@ public class GlobalExceptionHandlerTest {
             .andExpect(content().string(
                 org.hamcrest.Matchers.not(
                     org.hamcrest.Matchers.containsString("s3cr3t"))));
+    }
+
+    /**
+     * D-DB : le journal d'une 500 permet de retrouver l'incident (identifiant renvoyé au client, type et pile de
+     * l'exception) sans écrire son message, qui contient ici un mot de passe.
+     */
+    @Test
+    @ExtendWith(OutputCaptureExtension.class)
+    void logs_an_unexpected_error_without_its_message(CapturedOutput output) throws Exception {
+        String requestId = JsonPath.read(mockMvc.perform(get("/test-errors/boom"))
+            .andExpect(status().isInternalServerError())
+            .andExpect(jsonPath("$.requestId").isNotEmpty())
+            .andReturn().getResponse().getContentAsString(), "$.requestId");
+
+        assertThat(output.getOut())
+            .contains("Erreur inattendue, requête " + requestId)
+            .contains("java.lang.IllegalStateException (message masqué)")
+            .contains(ErrorHandlingTestController.class.getName())
+            .doesNotContain("s3cr3t");
     }
 }
