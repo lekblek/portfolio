@@ -115,6 +115,46 @@
 
   <build>
     <plugins>
+      <!-- Outillage imposé : la construction échoue sur une JVM ou un Maven différents de ceux du projet
+           (wrapper backend/mvnw, docs/03-versions-cibles.md). -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>enforce-toolchain</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireJavaVersion>
+                  <version>[25,26)</version>
+                </requireJavaVersion>
+                <requireMavenVersion>
+                  <version>[3.9.16,)</version>
+                </requireMavenVersion>
+                <!-- Une bibliothèque tirée en deux versions par des chemins différents fait échouer la
+                     construction au lieu d'être tranchée silencieusement par Maven. -->
+                <dependencyConvergence/>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- Expose le chemin de chaque dépendance en propriété (${groupId:artifactId:jar}) : sert à déclarer l'agent
+           Mockito ci-dessous. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>properties</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
@@ -156,9 +196,24 @@
         </executions>
       </plugin>
 
+      <!-- Mockito chargé comme agent au démarrage de la JVM de test, et non auto-attaché pendant l'exécution :
+           le chargement dynamique d'agents sera refusé par défaut dans un prochain JDK (JEP 451). L'agent étend le
+           chemin d'amorçage, ce qui désactive de toute façon le partage de classes (CDS) : -Xshare:off le dit
+           explicitement au lieu d'un avertissement de la JVM. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <argLine>-javaagent:${org.mockito:mockito-core:jar} -Xshare:off</argLine>
+        </configuration>
+      </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
+        <configuration>
+          <argLine>-javaagent:${org.mockito:mockito-core:jar} -Xshare:off</argLine>
+        </configuration>
         <executions>
           <execution>
             <goals>
