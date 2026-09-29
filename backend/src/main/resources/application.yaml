@@ -25,9 +25,10 @@ spring:
       max-file-size: 10MB
       max-request-size: 11MB
   mail:
-    # Notification des messages de contact (D-CI). Par défaut : Mailpit de deploy/compose.dev.yaml.
-    host: ${MAIL_HOST:localhost}
-    port: ${MAIL_PORT:1025}
+    # Notification des messages de contact (D-CI). Aucune valeur par défaut hors dev (D-DD) : MAIL_HOST absent fait
+    # échouer le démarrage. Mailpit de deploy/compose.dev.yaml : application-dev.yaml.
+    host: ${MAIL_HOST:}
+    port: ${MAIL_PORT:587}
     username: ${MAIL_USERNAME:}
     password: ${MAIL_PASSWORD:}
     default-encoding: UTF-8

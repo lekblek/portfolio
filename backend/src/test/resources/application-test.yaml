@@ -13,6 +13,11 @@ portfolio:
   media:
     # Répertoire jetable sous target/ ; les tests y déposent leurs fichiers et les suppriment.
     storage-root: target/test-media
+  contact:
+    notification:
+      # Obligatoires hors dev (D-DD) ; le serveur SMTP de test est GreenMail (MailTestConfiguration).
+      from: portfolio@localhost
+      to: admin@localhost
 
 management:
   endpoint:

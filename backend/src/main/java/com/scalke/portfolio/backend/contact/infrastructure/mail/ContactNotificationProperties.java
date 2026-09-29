@@ -2,7 +2,6 @@ package com.scalke.portfolio.backend.contact.infrastructure.mail;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import java.util.Objects;
 
 /**
  * Adresses des notifications de contact ({@code portfolio.contact.notification.*}, D-CI) : {@code from},
@@ -12,13 +11,12 @@ import java.util.Objects;
 public record ContactNotificationProperties(String from, String to) {
 
     public ContactNotificationProperties {
-        requireAddress(from, "portfolio.contact.notification.from");
-        requireAddress(to, "portfolio.contact.notification.to");
+        requireAddress(from, "portfolio.contact.notification.from (MAIL_FROM)");
+        requireAddress(to, "portfolio.contact.notification.to (MAIL_TO)");
     }
 
     private static void requireAddress(String value, String property) {
-        Objects.requireNonNull(value, property);
-        if (value.isBlank()) {
+        if (value == null || value.isBlank()) {
             throw new IllegalArgumentException(property + " must not be empty");
         }
     }

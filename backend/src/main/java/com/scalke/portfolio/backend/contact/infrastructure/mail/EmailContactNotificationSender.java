@@ -2,11 +2,12 @@ package com.scalke.portfolio.backend.contact.infrastructure.mail;
 
 import com.scalke.portfolio.backend.contact.domain.model.ContactMessage;
 import com.scalke.portfolio.backend.contact.domain.port.ContactNotificationSender;
-import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 /**
  * Notification par courriel texte (D-CI) : à l'administrateur, avec l'adresse du visiteur en {@code Reply-To} pour
@@ -14,13 +15,25 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @EnableConfigurationProperties(ContactNotificationProperties.class)
-@RequiredArgsConstructor
 class EmailContactNotificationSender implements ContactNotificationSender {
 
     static final String SUBJECT_PREFIX = "[Portfolio] ";
 
     private final JavaMailSender mailSender;
     private final ContactNotificationProperties properties;
+
+    /**
+     * Un serveur SMTP sans hôte est une configuration manquante, non une panne : le démarrage échoue (D-DD), au lieu de
+     * perdre chaque notification en silence. Une panne SMTP en cours d'exécution reste sans effet sur l'application
+     * (D-CJ).
+     */
+    EmailContactNotificationSender(JavaMailSender mailSender, ContactNotificationProperties properties) {
+        if (mailSender instanceof JavaMailSenderImpl sender && !StringUtils.hasText(sender.getHost())) {
+            throw new IllegalStateException("spring.mail.host (MAIL_HOST) must not be empty");
+        }
+        this.mailSender = mailSender;
+        this.properties = properties;
+    }
 
     @Override
     public void messageReceived(ContactMessage message) {

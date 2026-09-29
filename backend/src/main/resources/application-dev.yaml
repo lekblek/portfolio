@@ -16,6 +16,20 @@ spring:
       hibernate:
         format_sql: false
 
+  mail:
+    # Mailpit de deploy/compose.dev.yaml (D-CI, D-DD) : reçoit les notifications sans rien envoyer.
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:1025}
+
+portfolio:
+  media:
+    # Relatif au répertoire de travail (ignoré par Git), ou MEDIA_STORAGE_ROOT (D-DD).
+    storage-root: ${MEDIA_STORAGE_ROOT:uploads}
+  contact:
+    notification:
+      from: ${MAIL_FROM:portfolio@localhost}
+      to: ${MAIL_TO:admin@localhost}
+
 springdoc:
   api-docs:
     enabled: true
@@ -26,3 +40,9 @@ management:
   endpoint:
     health:
       show-details: always
+
+logging:
+  level:
+    # Développement : message et pile complets d'une erreur 500, avertissements SQL d'Hibernate (D-DB).
+    com.scalke.portfolio.backend.shared.api.GlobalExceptionHandler: debug
+    org.hibernate.orm.jdbc.error: warn

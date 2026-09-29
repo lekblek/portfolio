@@ -4,10 +4,12 @@ import com.scalke.portfolio.backend.contact.domain.model.ContactMessage;
 import com.scalke.portfolio.backend.contact.domain.model.ContactStatus;
 import org.junit.jupiter.api.Test;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import java.time.Instant;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class EmailContactNotificationSenderTest {
 
@@ -37,5 +39,20 @@ class EmailContactNotificationSenderTest {
     @Test
     void keeps_the_subject_on_one_line() {
         assertThat(sender.toMail(MESSAGE).getSubject()).isEqualTo("[Portfolio] Mission Bcc: tous@example.com");
+    }
+
+    /**
+     * D-DD : sans hôte SMTP, le démarrage échoue en nommant la variable, au lieu de perdre chaque notification.
+     */
+    @Test
+    void refuses_a_mail_server_without_host() {
+        ContactNotificationProperties properties = new ContactNotificationProperties("a@b.dev", "c@d.dev");
+
+        assertThatThrownBy(() -> new EmailContactNotificationSender(new JavaMailSenderImpl(), properties))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessageContaining("MAIL_HOST");
+        JavaMailSenderImpl configured = new JavaMailSenderImpl();
+        configured.setHost("smtp.example.com");
+        assertThat(new EmailContactNotificationSender(configured, properties)).isNotNull();
     }
 }
