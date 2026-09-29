@@ -7,7 +7,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.session.ChangeSessionIdAuthenticationStrategy;
 import org.springframework.security.web.authentication.session.CompositeSessionAuthenticationStrategy;
@@ -17,6 +18,7 @@ import org.springframework.security.web.csrf.CsrfAuthenticationStrategy;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Authentification de l'administrateur (D-CN, D-CO, D-CQ) : encodeur, vérification des identifiants, stratégie de
@@ -27,12 +29,19 @@ import java.util.List;
 public class AdminAuthenticationConfiguration {
 
     /**
-     * Encodeur délégué de Spring Security (D-CN) : bcrypt aujourd'hui, empreintes préfixées ({@code {bcrypt}}) pour
-     * pouvoir changer d'algorithme sans invalider les empreintes existantes.
+     * Coût bcrypt (D-DK) : 2^12 tours, environ un quart de seconde par calcul ; au-dessus du minimum recommandé (10,
+     * défaut de Spring Security). Une connexion par administrateur unique, derrière une limite des essais (D-CQ).
+     */
+    static final int BCRYPT_COST = 12;
+
+    /**
+     * Encodeur délégué de Spring Security (D-CN) : empreintes préfixées ({@code {bcrypt}}) pour pouvoir changer
+     * d'algorithme sans invalider les empreintes existantes. Seul bcrypt est déclaré, comme en SQL (invariant 15). Une
+     * empreinte d'un coût inférieur est « à mettre à niveau » ({@code upgradeEncoding}) : recalculée au démarrage.
      */
     @Bean
     PasswordEncoder passwordEncoder() {
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+        return new DelegatingPasswordEncoder("bcrypt", Map.of("bcrypt", new BCryptPasswordEncoder(BCRYPT_COST)));
     }
 
     /**

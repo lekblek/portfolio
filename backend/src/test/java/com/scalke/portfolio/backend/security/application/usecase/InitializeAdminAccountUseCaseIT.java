@@ -8,6 +8,7 @@ import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.JdbcClient;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,7 +46,7 @@ class InitializeAdminAccountUseCaseIT extends AbstractIntegrationTest {
 
         AdminAccount account = adminAccountRepository.find().orElseThrow();
         assertThat(account.login()).isEqualTo("admin");
-        assertThat(account.passwordHash()).startsWith("{bcrypt}").doesNotContain(PASSWORD);
+        assertThat(account.passwordHash()).startsWith("{bcrypt}$2a$12$").doesNotContain(PASSWORD);
         assertThat(passwordEncoder.matches(PASSWORD, account.passwordHash())).isTrue();
         assertThat(account.createdAt()).isEqualTo(NOW);
     }
@@ -91,6 +92,23 @@ class InitializeAdminAccountUseCaseIT extends AbstractIntegrationTest {
         flushAndClear();
         assertThat(adminAccountRepository.find().orElseThrow().login()).isEqualTo("blek@example.com");
         assertThat(storedHash()).isEqualTo(hash);
+    }
+
+    /**
+     * D-DK : une empreinte d'un coût inférieur (10, défaut de Spring Security jusqu'ici) est recalculée au coût actuel
+     * au démarrage suivant, pour le même mot de passe.
+     */
+    @Test
+    void strengthens_a_hash_computed_with_a_lower_cost() {
+        String legacy = "{bcrypt}" + new BCryptPasswordEncoder(10).encode(PASSWORD);
+        adminAccountRepository.create(AdminAccount.create("admin", legacy, NOW));
+        flushAndClear();
+
+        assertThat(initializeAdminAccountUseCase.execute(new AdminCredentials("admin", PASSWORD)))
+            .isEqualTo(Outcome.UPDATED);
+        flushAndClear();
+        assertThat(storedHash()).startsWith("{bcrypt}$2a$12$");
+        assertThat(passwordEncoder.matches(PASSWORD, storedHash())).isTrue();
     }
 
     private String storedHash() {
