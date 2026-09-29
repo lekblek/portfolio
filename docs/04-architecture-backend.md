@@ -355,7 +355,7 @@ contact → shared
 
 L’envoi d’un email ne fait pas partie de la transaction de sauvegarde du message.
 
-État d’implémentation (étape 30) : table `contact_message` (`V020`), `SubmitContactMessageUseCase` et `ChangeContactMessageStatusUseCase` (cycle en avant seulement), sans route : envoi public à l’étape 48 (piège à robots, limitation de débit), administration à l’étape 36 (D-CG, D-CH). Notification : étape 31.
+État d’implémentation (étape 30) : table `contact_message` (`V020`), `SubmitContactMessageUseCase` et `ChangeContactMessageStatusUseCase` (cycle en avant seulement), sans route : envoi public à l’étape 48 (piège à robots, limitation de débit), administration à l’étape 36 (D-CG, D-CH). Depuis l’étape 31 : port `ContactNotificationSender`, envoi par SMTP (`contact.infrastructure.mail`) déclenché après la validation de la transaction ; un échec est journalisé et ignoré (D-CI, D-CJ).
 
 Un échec SMTP ne doit jamais annuler un message déjà enregistré.
 

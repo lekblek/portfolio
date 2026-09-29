@@ -54,12 +54,14 @@ cp deploy/.env.example deploy/.env
 # renseigner POSTGRES_PASSWORD (le fichier deploy/.env n'est jamais commité)
 ```
 
-### 3. PostgreSQL
+### 3. PostgreSQL et SMTP de développement
 
 ```bash
 docker compose -f deploy/compose.dev.yaml up -d
 docker compose -f deploy/compose.dev.yaml exec postgres psql -U portfolio -d portfolio
 ```
+
+Le compose démarre aussi Mailpit, serveur SMTP de développement qui reçoit les notifications de contact sans rien envoyer : interface sur `http://localhost:8025`. Sans variable `MAIL_*`, le backend lui écrit (`localhost:1025`). Un serveur SMTP absent n'empêche ni le démarrage ni l'enregistrement d'un message : l'échec est journalisé.
 
 ### 4. Backend
 
@@ -77,6 +79,7 @@ Dans IntelliJ : configuration d'exécution `Application` → *Active profiles* :
 - Santé : `http://localhost:8080/api/actuator/health`
 - Filtre par technologie : `http://localhost:8080/api/public/projects?technology=java`
 - Publications : `http://localhost:8080/api/public/publications` (filtres cumulables `?type=ARTICLE|NEWS`, `?category=backend`, `?tag=java`), `http://localhost:8080/api/public/publications/{slug}`
+- Recherche : `http://localhost:8080/api/public/search?q=angular`
 - En profil `dev`, `ProfileSeeder`, `ProjectSeeder`, `TaxonomySeeder` et `PublicationSeeder` créent des données de démonstration si la base n'en contient pas (technologies, projets dont un brouillon, catégories et tags, une publication par cas de visibilité).
 
 ### 5. Frontend

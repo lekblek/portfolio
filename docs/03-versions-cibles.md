@@ -413,7 +413,7 @@ Relevé du 2026-09-24 (`backend/pom.xml`, `frontend/package-lock.json`).
 | Dépendance | Version | Gestion |
 |---|---|---|
 | Spring Boot (parent) | 4.1.1 | BOM |
-| Starters : webmvc, data-jpa, validation, actuator, flyway | BOM | BOM |
+| Starters : webmvc, data-jpa, validation, actuator, flyway, mail | BOM | BOM |
 | `flyway-database-postgresql` | BOM | BOM |
 | Driver PostgreSQL | BOM | BOM |
 | Lombok | BOM | processeur d'annotations déclaré dans `maven-compiler-plugin` |
@@ -421,6 +421,8 @@ Relevé du 2026-09-24 (`backend/pom.xml`, `frontend/package-lock.json`).
 | ArchUnit | 1.5.0 | **hors BOM**, version fixée dans le `pom.xml` |
 | Testcontainers (`testcontainers-postgresql`) | BOM | BOM |
 | `spring-boot-devtools` | BOM | `runtime` |
+| GreenMail (`com.icegreen:greenmail`) | 2.1.14 | **hors BOM**, `test` : serveur SMTP en mémoire des tests d'intégration (D-CJ) |
+| Mailpit (image `axllent/mailpit`) | v1.31.3 | `deploy/compose.dev.yaml` : SMTP de développement (D-CI) |
 
 Toute dépendance hors BOM doit être vérifiée à chaque montée de Spring Boot.
 
