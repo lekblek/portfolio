@@ -137,6 +137,8 @@ GET    /api/admin/media
 autres routes  → refusées sauf exception explicitement configurée
 ```
 
+État d’implémentation (étape 32, D-CK, D-CL) : règle appliquée par `SecurityConfiguration` ; exceptions explicites : `/api/actuator/health` et, en profil `dev` seulement, la documentation OpenAPI (`/api/v3/api-docs`, `/api/swagger-ui/index.html`). Sans authentification, une route d’administration ou non déclarée donne 401 `AUTHENTICATION_REQUIRED` ; authentifié, une route non déclarée donne 403 `ACCESS_DENIED` ; un chemin ambigu (point-virgule, double barre oblique) donne 400 `MALFORMED_REQUEST`. Aucune session n’est créée pour un visiteur anonyme. Connexion et compte administrateur : étapes 33 et 34.
+
 ---
 
 # 4. Versionnement de l’API
@@ -1812,6 +1814,8 @@ Elles sont simplement inutiles pour le périmètre actuel.
 | Code                             | HTTP | Usage                                         |
 | -------------------------------- | ---: | --------------------------------------------- |
 | `RESOURCE_NOT_FOUND`             |  404 | Ressource inexistante ou non accessible       |
+| `AUTHENTICATION_REQUIRED`        |  401 | Authentification absente ou invalide (D-CL)   |
+| `ACCESS_DENIED`                  |  403 | Accès refusé, dont CSRF (D-CL)                |
 | `VALIDATION_FAILED`              |  400 | Échec de validation des champs                |
 | `MALFORMED_REQUEST`              |  400 | Requête HTTP ou JSON invalide                 |
 | `INTERNAL_ERROR`                 |  500 | Erreur serveur inattendue                     |

@@ -130,6 +130,8 @@ Les autres modules métier ne doivent pas dépendre directement de `security`.
 
 La sécurité protège principalement les points d’entrée HTTP et l’accès aux fonctionnalités administratives.
 
+État d’implémentation (étape 32) : `security.infrastructure.SecurityConfiguration` sépare routes publiques, d’administration et refusées ; les refus passent par `GlobalExceptionHandler` (D-CK, D-CL). Aucun module métier ne dépend de `security`. Compte administrateur, session et CSRF : étapes 33 à 35.
+
 ---
 
 ### 3.3 `profile`

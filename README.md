@@ -80,6 +80,8 @@ Dans IntelliJ : configuration d'exécution `Application` → *Active profiles* :
 - Filtre par technologie : `http://localhost:8080/api/public/projects?technology=java`
 - Publications : `http://localhost:8080/api/public/publications` (filtres cumulables `?type=ARTICLE|NEWS`, `?category=backend`, `?tag=java`), `http://localhost:8080/api/public/publications/{slug}`
 - Recherche : `http://localhost:8080/api/public/search?q=angular`
+- Documentation OpenAPI (profil `dev` seulement) : `http://localhost:8080/api/swagger-ui/index.html`
+- Administration (`/api/admin/**`) : 401 tant que la connexion n'existe pas (étapes 33 et 34)
 - En profil `dev`, `ProfileSeeder`, `ProjectSeeder`, `TaxonomySeeder` et `PublicationSeeder` créent des données de démonstration si la base n'en contient pas (technologies, projets dont un brouillon, catégories et tags, une publication par cas de visibilité).
 
 ### 5. Frontend

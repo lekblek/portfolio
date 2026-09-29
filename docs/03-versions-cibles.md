@@ -413,7 +413,7 @@ Relevé du 2026-09-24 (`backend/pom.xml`, `frontend/package-lock.json`).
 | Dépendance | Version | Gestion |
 |---|---|---|
 | Spring Boot (parent) | 4.1.1 | BOM |
-| Starters : webmvc, data-jpa, validation, actuator, flyway, mail | BOM | BOM |
+| Starters : webmvc, data-jpa, validation, actuator, flyway, mail, security (Spring Security 7.1) | BOM | BOM |
 | `flyway-database-postgresql` | BOM | BOM |
 | Driver PostgreSQL | BOM | BOM |
 | Lombok | BOM | processeur d'annotations déclaré dans `maven-compiler-plugin` |

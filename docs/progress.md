@@ -2,25 +2,25 @@
 
 Ce fichier est la **seule** source de vérité sur l'avancement. Il ne répète pas le contenu des autres documents : il pointe vers eux.
 
-Dernière mise à jour : 2026-09-29 (étape 30 poussée, CI verte ; étape 31 terminée et vérifiée, commits à faire)
+Dernière mise à jour : 2026-09-29 (étape 31 poussée, CI verte ; étape 32 terminée et vérifiée, commits à faire)
 
 ---
 
 ## 1. État courant
 
 ```text
-Dernière étape terminée   : 31 — Notifications email (vérifiée, commits à faire) ; 30 poussée, CI verte (run 36562833516)
+Dernière étape terminée   : 32 — Spring Security, séparation des routes (vérifiée, commits à faire) ; 31 poussée, CI verte (run 36565149687)
 Étape en cours            : aucune
-Prochaine étape prévue    : 32 — Ajouter Spring Security (phase 5 : sécurité et administration backend)
-État                      : PRÊT après commit et push de l'étape 31
+Prochaine étape prévue    : 33 — Implémenter le compte administrateur unique
+État                      : PRÊT après commit et push de l'étape 32
 Branche                   : develop
-Vérification              : ./mvnw clean verify → 543 tests verts (275 *Test, 268 *IT) à la fin de l'étape 31
+Vérification              : ./mvnw clean verify → 553 tests verts (277 *Test, 276 *IT) à la fin de l'étape 32
 ```
 
 ## 2. Prochaine action
 
-1. Committer et pousser l'étape 31 (deux commits), vérifier la CI, puis remplacer le 🟡 par ✅.
-2. Étape 32 : Spring Security, séparation `/api/public/**` (ouvert) et `/api/admin/**` (authentifié), toute autre route refusée (`05`) ; traiter KI-19 (exposition de springdoc / Swagger UI) et KI-20 (`AccessDeniedException` interceptée en 500) prévus à cette étape.
+1. Committer et pousser l'étape 32 (deux commits), vérifier la CI, puis remplacer le 🟡 par ✅.
+2. Étape 33 : compte administrateur unique initialisé depuis une configuration sécurisée (D18, `02` §26 `AdminAccount`) : `ADMIN_USERNAME`, `ADMIN_PASSWORD` de `deploy/env/backend.env.example`, mot de passe haché par le `PasswordEncoder` retenu (`01` §14), jamais en clair (invariant 15).
 3. Confirmer ou infirmer D-T (cohérence `stage` ⇔ `endDate`) : `docs/decisions/registre-implementation.md`.
 
 ---
@@ -88,8 +88,9 @@ Légende : ✅ terminée et poussée · 🟡 terminée et vérifiée, commits à
 | 28.2 | Recherche classée par les modules propriétaires (façades), cas d'usage `SearchPublicContentUseCase` | ✅ | `e80b3d2`, `a776fc9`, docs `de9829f` (CI : run 36559169148). Poussés dans le désordre : `e80b3d2` et `de9829f` ne compilent pas seuls (CI rouge : run 36557442643), l'arbre est correct à partir de `a776fc9` |
 | 29 | `GET /api/public/search` ; `ProblemDetail` des exceptions de Spring sans corps désormais codé | ✅ | `b4a3f26`, `81ff5fc`, `45c23d8` (CI : run 36560472534) |
 | 30 | Module `contact` : `V020`, cycle de statut, cas d'usage sans route, seed `dev` | ✅ | `12201b6`, `d3a767e` (CI : run 36562833516) |
-| 31 | Notification de l'administrateur après enregistrement d'un message (SMTP, après validation), Mailpit en développement | 🟡 | à committer |
-| 32 → 52 | Voir `docs/steps/liste_complete_etapes.md` | ⏳ | — |
+| 31 | Notification de l'administrateur après enregistrement d'un message (SMTP, après validation), Mailpit en développement | ✅ | `a21346b`, `51d4ce7` (CI : run 36565149687) |
+| 32 | Spring Security : routes publiques, d'administration et refusées ; refus codés (401, 403, 400) ; springdoc en `dev` seulement | 🟡 | à committer |
+| 33 → 52 | Voir `docs/steps/liste_complete_etapes.md` | ⏳ | — |
 
 Après le push, remplacer les 🟡 par ✅ et noter les hashes.
 
@@ -125,6 +126,7 @@ Index : [`decisions/README.md`](decisions/README.md).
 | D-CC, D-CD | Recherche classée derrière les façades, règle de visibilité non réécrite ; module `search` sans table, classement commun et pagination | Actives (28.2) |
 | D-CE, D-CF | Route et contrat de la recherche publique ; `q` obligatoire, vide → page vide, 200 caractères au plus (`VALIDATION_FAILED`) ; code ajouté aux erreurs de Spring sans corps | Actives (29) |
 | D-CG, D-CH | Module `contact` sans route (envoi public à l'étape 48, administration à l'étape 36) ; règles du message doublées en SQL ; cycle en avant seulement (invariant 29, `INVALID_CONTACT_MESSAGE_TRANSITION`) | Actives (30) |
+| D-CK, D-CL | Séparation des routes (public, administration authentifiée, reste refusé), aucun utilisateur généré, aucune session anonyme, springdoc en `dev` ; refus de sécurité rendus par `GlobalExceptionHandler` (`AUTHENTICATION_REQUIRED`, `ACCESS_DENIED`, `MALFORMED_REQUEST`) | Actives (32) |
 | D-CI, D-CJ | Port `ContactNotificationSender`, courriel SMTP à l'administrateur (`Reply-To` visiteur, sujet sur une ligne) ; envoi après validation, échec journalisé sans donnée personnelle ; santé SMTP hors de l'état de l'application ; GreenMail en test, Mailpit en développement | Actives (31) |
 | 14.4 | Exposition publique de `publicEmail` | À confirmer |
 
@@ -137,14 +139,20 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | ID | Priorité | Problème | Traitement prévu |
 |---|---|---|---|
 | KI-18 | AMÉLIORATION | `LICENSE` : titulaire et année non renseignés (`[year] [fullname]`) | à décider par le propriétaire du dépôt |
-| KI-19 | AMÉLIORATION | springdoc expose `/api/v3/api-docs` et Swagger UI sans décision documentée | étape 32 |
-| KI-20 | AMÉLIORATION | `GlobalExceptionHandler` : le gestionnaire `Exception` interceptera `AccessDeniedException` (→ 500) | étape 32 |
 | KI-21 | AMÉLIORATION | `@types/node ^20` alors que Node 24 est la cible | étape 37 |
 | KI-22 | AMÉLIORATION | SSR : `security.allowedHosts` vide | étape 52 (déploiement) |
 | KI-16 | OPTIONNEL | `V001` : virgule manquante avant `CONSTRAINT profile_single_row` (comportement identique) ; migration appliquée, non modifiable | aucun |
 | KI-29 | OPTIONNEL | Surface sans appelant : `ProfileEntity.removeLink` / `removeSkill`, `App.title` (frontend) ; codes d'erreur des séries et médias déclarés d'avance | au plus tard avec l'administration du profil (étape 36) et le frontend (37) |
 | KI-30 | OPTIONNEL | Les `*IT` transactionnels (écriture de statut, lectures publiques) ne prouvent pas le comportement après commit | à reprendre si un défaut de transaction apparaît |
+| KI-33 | AMÉLIORATION | Un séparateur encodé (`%2F`) dans le chemin est rejeté par Tomcat avant Spring : 400 en page HTML (sans version du serveur), et non `ProblemDetail` codé (D-CL) | étape 35 (durcissement HTTP) |
 | KI-31 | OPTIONNEL | Un `tsvector` est limité à 1 Mio (positions plafonnées à 16 383) : un contenu Markdown démesuré serait refusé par PostgreSQL à l'écriture (500), faute de longueur maximale du contenu en V1 | étape 36 : borner la longueur du contenu à l'écriture (administration) |
+
+### Résolus le 2026-09-29 (étape 32)
+
+| ID | Problème | Résolution |
+|---|---|---|
+| KI-19 | springdoc exposait `/api/v3/api-docs` et Swagger UI sans décision documentée | désactivés par défaut, activés en profil `dev` seulement (D-CK), vérifié par `SecurityConfigurationIT` |
+| KI-20 | Une `AccessDeniedException` levée par un contrôleur devenait une 500 (gestionnaire `Exception`) | 403 `ACCESS_DENIED` (D-CL), `GlobalExceptionHandlerTest` |
 
 ### Résolus le 2026-09-29 (étape 29)
 
@@ -220,7 +228,6 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | Temps de lecture précalculé (colonne) si la liste devient coûteuse | Étape 52.6 | D-AJ : calculé à la lecture, contenu chargé dans la liste |
 | Prérendu route par route | Étape 52.1 | D22 |
 | Cache du profil public | si le profil devient un chemin chaud | D-O |
-| Exposition de springdoc / Swagger UI | Étape 32 | KI-19 |
 | Route `POST /api/public/contact-messages` (piège à robots, limitation de débit, validation avec les bornes de `ContactMessage`) | Étape 48 | D-CG : `01` §13 place l'anti-spam avant la sauvegarde |
 | Routes d'administration des messages (liste, changement de statut) | Étape 36 | D-AU, D-CH |
 | Restaurer un message archivé, remettre un message « non lu » | si l'administration le demande | D-CH : cycle en avant seulement |
