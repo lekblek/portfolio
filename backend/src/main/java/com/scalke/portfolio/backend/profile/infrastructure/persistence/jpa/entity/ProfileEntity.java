@@ -14,7 +14,8 @@ import java.util.List;
  * Racine de persistance du profil (singleton : {@code id = 1}, garanti par {@code V001}).
  * <p>
  * Les collections sont initialisées à la déclaration et ne sont modifiées que par les
- * méthodes {@code addX}, qui positionnent toujours la référence arrière vers le profil.
+ * méthodes {@code addX}, qui positionnent toujours la référence arrière vers le profil, et par
+ * {@link #clearCollections()} (administration, D-CY : collections remplacées d'un bloc).
  */
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -91,16 +92,31 @@ public class ProfileEntity {
         links.add(new ProfessionalLinkEntity(this, label, url, displayOrder));
     }
 
-    public void removeLink(ProfessionalLinkEntity link) {
-        links.remove(link);
-    }
-
     public void addSkill(String name, String category, int displayOrder) {
         skills.add(new SkillEntity(this, name, category, displayOrder));
     }
 
-    public void removeSkill(SkillEntity skill) {
-        skills.remove(skill);
+    /**
+     * Remplace l'identité affichée (D-CY) ; les autres champs simples ont leurs accesseurs.
+     */
+    public void rename(String displayName, String professionalTitle, String shortBio) {
+        this.displayName = displayName;
+        this.professionalTitle = professionalTitle;
+        this.shortBio = shortBio;
+    }
+
+    /**
+     * Vide les cinq collections avant leur remplacement (D-CY) ; {@code orphanRemoval} supprime les lignes. Hibernate
+     * insère les nouvelles lignes avant de supprimer les orphelines : l'appelant envoie donc les suppressions
+     * ({@code flush}) avant de remplir les collections, sinon une compétence gardée sous le même nom heurterait
+     * {@code skill_unique_name}.
+     */
+    public void clearCollections() {
+        links.clear();
+        skills.clear();
+        experiences.clear();
+        educations.clear();
+        certifications.clear();
     }
 
     public void addExperience(ExperienceEntity experience) {

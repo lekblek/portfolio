@@ -14,4 +14,6 @@ public interface ProfileJpaRepository extends Repository<ProfileEntity, Long> {
     Optional<ProfileEntity> findById(Long id);
 
     ProfileEntity save(ProfileEntity entity);
+
+    void flush();
 }

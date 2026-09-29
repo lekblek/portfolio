@@ -30,6 +30,15 @@ public final class ProfilePersistenceMapper {
             profile.displayName(),
             profile.professionalTitle(),
             profile.shortBio());
+        fill(entity, profile);
+        return entity;
+    }
+
+    /**
+     * Recopie dans l'entité les champs facultatifs, les médias et les collections du profil (ajoutées à celles de
+     * l'entité : vides à la création, vidées par l'appelant avant un remplacement, D-CY).
+     */
+    public static void fill(ProfileEntity entity, Profile profile) {
         entity.setAboutMarkdown(profile.aboutMarkdown());
         entity.setPublicLocation(profile.publicLocation());
         entity.setPublicEmail(profile.publicEmail());
@@ -44,7 +53,5 @@ public final class ProfilePersistenceMapper {
             entity.addEducation(EducationPersistenceMapper.toEntity(education)));
         profile.certifications().forEach(certification ->
             entity.addCertification(CertificationPersistenceMapper.toEntity(certification)));
-
-        return entity;
     }
 }
