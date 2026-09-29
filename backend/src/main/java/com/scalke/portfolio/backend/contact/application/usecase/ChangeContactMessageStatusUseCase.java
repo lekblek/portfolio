@@ -14,8 +14,7 @@ import java.time.Clock;
 /**
  * Fait avancer un message dans son cycle de traitement (invariant 29, D-CH).
  * <p>
- * Opération d'administration : exposée à l'étape 36, derrière l'authentification (étapes 32 à 35), jamais avant
- * (D-AU). Seul appelant de {@code ContactMessageRepository.updateStatus} : c'est ce qui garantit l'invariant 29,
+ * Opération d'administration, exposée par {@code POST /api/admin/contact-messages/{id}/status} (D-AU, D-CZ). Seul appelant de {@code ContactMessageRepository.updateStatus} : c'est ce qui garantit l'invariant 29,
  * qu'aucune contrainte SQL ne peut vérifier. Message inconnu → 404 ; transition refusée → 409
  * {@code INVALID_CONTACT_MESSAGE_TRANSITION}.
  */

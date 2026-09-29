@@ -1,6 +1,9 @@
 package com.scalke.portfolio.backend.contact.infrastructure.persistence.jpa.repository;
 
+import com.scalke.portfolio.backend.contact.domain.model.ContactStatus;
 import com.scalke.portfolio.backend.contact.infrastructure.persistence.jpa.entity.ContactMessageEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.Repository;
 
 import java.util.Optional;
@@ -15,4 +18,8 @@ public interface ContactMessageJpaRepository extends Repository<ContactMessageEn
     long count();
 
     ContactMessageEntity save(ContactMessageEntity entity);
+
+    Page<ContactMessageEntity> findAll(Pageable pageable);
+
+    Page<ContactMessageEntity> findByStatus(ContactStatus status, Pageable pageable);
 }

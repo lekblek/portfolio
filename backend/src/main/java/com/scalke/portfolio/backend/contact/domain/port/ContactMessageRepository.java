@@ -1,6 +1,9 @@
 package com.scalke.portfolio.backend.contact.domain.port;
 
 import com.scalke.portfolio.backend.contact.domain.model.ContactMessage;
+import com.scalke.portfolio.backend.contact.domain.model.ContactStatus;
+import com.scalke.portfolio.backend.shared.domain.model.PageQuery;
+import com.scalke.portfolio.backend.shared.domain.model.PageResult;
 
 import java.util.Optional;
 
@@ -9,8 +12,8 @@ import java.util.Optional;
  * <p>
  * Ne contient que les méthodes utilisées par un appelant existant (ADR 0001) : {@code create} par
  * {@code SubmitContactMessageUseCase} et le seed de développement, {@code existsAny} par ce seed,
- * {@code findById} et {@code updateStatus} par {@code ChangeContactMessageStatusUseCase}. La liste des messages
- * arrivera avec l'administration (étape 36).
+ * {@code findById} et {@code updateStatus} par {@code ChangeContactMessageStatusUseCase}, {@code findById} aussi par
+ * {@code GetContactMessageUseCase}, {@code findPage} par {@code ListContactMessagesUseCase} (D-CZ).
  */
 public interface ContactMessageRepository {
 
@@ -25,4 +28,10 @@ public interface ContactMessageRepository {
     ContactMessage updateStatus(ContactMessage message);
 
     boolean existsAny();
+
+    /**
+     * Messages du statut donné ({@code null} : tous), les plus récents d'abord (date de réception puis identifiant
+     * décroissants : tri total).
+     */
+    PageResult<ContactMessage> findPage(ContactStatus status, PageQuery query);
 }

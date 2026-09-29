@@ -4,7 +4,14 @@ import com.scalke.portfolio.backend.contact.domain.model.ContactMessage;
 import com.scalke.portfolio.backend.contact.domain.port.ContactMessageRepository;
 import com.scalke.portfolio.backend.contact.infrastructure.persistence.jpa.entity.ContactMessageEntity;
 import com.scalke.portfolio.backend.contact.infrastructure.persistence.jpa.mapper.ContactMessagePersistenceMapper;
+import com.scalke.portfolio.backend.contact.domain.model.ContactStatus;
+import com.scalke.portfolio.backend.shared.domain.model.PageQuery;
+import com.scalke.portfolio.backend.shared.domain.model.PageResult;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +24,11 @@ import java.util.Optional;
 @Repository
 @RequiredArgsConstructor
 public class ContactMessageRepositoryAdapter implements ContactMessageRepository {
+
+    /**
+     * Les plus récents d'abord, tri total (D-CZ).
+     */
+    private static final Sort NEWEST_FIRST = Sort.by(Sort.Order.desc("createdAt"), Sort.Order.desc("id"));
 
     private final ContactMessageJpaRepository repository;
 
@@ -52,5 +64,14 @@ public class ContactMessageRepositoryAdapter implements ContactMessageRepository
     @Transactional(readOnly = true)
     public boolean existsAny() {
         return repository.count() > 0;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResult<ContactMessage> findPage(ContactStatus status, PageQuery query) {
+        Pageable pageable = PageRequest.of(query.page(), query.size(), NEWEST_FIRST);
+        Page<ContactMessage> page = (status == null ? repository.findAll(pageable) : repository.findByStatus(status, pageable))
+            .map(ContactMessagePersistenceMapper::toDomain);
+        return new PageResult<>(page.getContent(), page.getNumber(), page.getSize(), page.getTotalElements());
     }
 }
