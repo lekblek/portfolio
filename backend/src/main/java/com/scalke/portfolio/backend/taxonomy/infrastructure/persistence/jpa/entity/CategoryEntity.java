@@ -34,4 +34,13 @@ public class CategoryEntity {
         this.slug = slug;
         this.description = description;
     }
+
+    /**
+     * Seule écriture après création (D-CS) : les valeurs ont été validées par le domaine ({@code Category}).
+     */
+    public void change(String name, String slug, String description) {
+        this.name = name;
+        this.slug = slug;
+        this.description = description;
+    }
 }

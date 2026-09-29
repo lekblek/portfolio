@@ -12,6 +12,10 @@ public enum ErrorCode {
     MALFORMED_REQUEST,
     INTERNAL_ERROR,
 
+    // vocabulaires (taxonomie, technologies)
+    NAME_ALREADY_USED,
+    TERM_STILL_USED,
+
     // publication
     SLUG_ALREADY_USED,
     INVALID_PUBLICATION_TRANSITION,

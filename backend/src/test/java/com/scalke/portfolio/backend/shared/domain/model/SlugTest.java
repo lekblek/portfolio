@@ -116,4 +116,16 @@ class SlugTest {
         assertThatThrownBy(() -> Slug.of("api").firstAvailable(slug -> true))
             .isInstanceOf(IllegalStateException.class);
     }
+
+    /**
+     * D-CS : un vocabulaire à colonne courte (tags : 60) ne reçoit jamais un slug trop long, ni généré ni suffixé.
+     */
+    @Test
+    void respects_a_shorter_maximum_when_generating_and_when_suffixing() {
+        Slug generated = Slug.fromText("œ".repeat(60), 60);
+        assertThat(generated.value()).hasSize(60);
+
+        Slug suffixed = generated.firstAvailable(generated::equals, 60);
+        assertThat(suffixed.value()).hasSizeLessThanOrEqualTo(60).endsWith("-2");
+    }
 }

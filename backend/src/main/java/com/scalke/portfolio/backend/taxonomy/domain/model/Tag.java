@@ -12,10 +12,21 @@ import java.util.Comparator;
  */
 public record Tag(Long id, String name, Slug slug) {
 
+    public static final int NAME_MAX_LENGTH = 60;
+    public static final int SLUG_MAX_LENGTH = 60;
+
     /**
      * Ordre d'affichage des tags (ils n'ont pas d'ordre propre) : alphabétique, puis slug (unique).
      */
     public static final Comparator<Tag> BY_NAME = Comparator
         .comparing(Tag::name, String.CASE_INSENSITIVE_ORDER)
         .thenComparing(tag -> tag.slug().value());
+
+    /**
+     * Mêmes bornes que les colonnes de {@code V007} (D-CS).
+     */
+    public Tag {
+        Terms.requireName(name, NAME_MAX_LENGTH);
+        Terms.requireSlug(slug, SLUG_MAX_LENGTH);
+    }
 }

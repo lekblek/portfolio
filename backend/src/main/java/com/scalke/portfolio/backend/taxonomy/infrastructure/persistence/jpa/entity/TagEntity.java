@@ -30,4 +30,12 @@ public class TagEntity {
         this.name = name;
         this.slug = slug;
     }
+
+    /**
+     * Seule écriture après création (D-CS) : les valeurs ont été validées par le domaine ({@code Tag}).
+     */
+    public void change(String name, String slug) {
+        this.name = name;
+        this.slug = slug;
+    }
 }

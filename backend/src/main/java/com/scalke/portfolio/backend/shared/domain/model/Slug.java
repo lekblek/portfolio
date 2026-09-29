@@ -67,6 +67,14 @@ public record Slug(String value) {
      * @throws IllegalArgumentException si le texte ne contient ni lettre ni chiffre
      */
     public static Slug fromText(String text) {
+        return fromText(text, MAX_GENERATED_LENGTH);
+    }
+
+    /**
+     * Comme {@link #fromText(String)}, au plus {@code maxLength} caractères : pour un vocabulaire dont la colonne est
+     * plus courte (catégories 80, tags 60, D-CS).
+     */
+    public static Slug fromText(String text, int maxLength) {
         String lower = Objects.requireNonNull(text, "text").toLowerCase(Locale.ROOT);
         for (Map.Entry<String, String> ligature : LIGATURES.entrySet()) {
             lower = lower.replace(ligature.getKey(), ligature.getValue());
@@ -76,7 +84,7 @@ public record Slug(String value) {
         if (hyphenated.isEmpty()) {
             throw new IllegalArgumentException("no letter or digit to build a slug from: \"" + text + "\"");
         }
-        return new Slug(truncateBetweenWords(hyphenated, MAX_GENERATED_LENGTH));
+        return new Slug(truncateBetweenWords(hyphenated, Math.min(maxLength, MAX_GENERATED_LENGTH)));
     }
 
     /**
@@ -86,11 +94,18 @@ public record Slug(String value) {
      * @throws IllegalStateException si aucun suffixe n'est libre
      */
     public Slug firstAvailable(Predicate<Slug> isTaken) {
+        return firstAvailable(isTaken, MAX_LENGTH);
+    }
+
+    /**
+     * Comme {@link #firstAvailable(Predicate)}, le suffixe ne faisant jamais dépasser {@code maxLength} (D-CS).
+     */
+    public Slug firstAvailable(Predicate<Slug> isTaken, int maxLength) {
         if (!isTaken.test(this)) {
             return this;
         }
         for (int suffix = 2; suffix <= MAX_SUFFIX; suffix++) {
-            Slug candidate = withSuffix(suffix);
+            Slug candidate = withSuffix(suffix, maxLength);
             if (!isTaken.test(candidate)) {
                 return candidate;
             }
@@ -99,9 +114,13 @@ public record Slug(String value) {
     }
 
     Slug withSuffix(int suffix) {
+        return withSuffix(suffix, MAX_LENGTH);
+    }
+
+    Slug withSuffix(int suffix, int maxLength) {
         String end = "-" + suffix;
-        String base = value.length() + end.length() > MAX_LENGTH
-            ? trimHyphens(value.substring(0, MAX_LENGTH - end.length()))
+        String base = value.length() + end.length() > maxLength
+            ? trimHyphens(value.substring(0, maxLength - end.length()))
             : value;
         return new Slug(base + end);
     }

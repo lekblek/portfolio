@@ -2,8 +2,6 @@ package com.scalke.portfolio.backend.taxonomy.domain.model;
 
 import com.scalke.portfolio.backend.shared.domain.model.Slug;
 
-import java.util.Objects;
-
 /**
  * Catégorie éditoriale (racine d'agrégat). Une publication en possède au plus une (D20).
  * <p>
@@ -12,7 +10,19 @@ import java.util.Objects;
  */
 public record Category(Long id, String name, Slug slug, String description) {
 
+    public static final int NAME_MAX_LENGTH = 80;
+    public static final int SLUG_MAX_LENGTH = 80;
+    public static final int DESCRIPTION_MAX_LENGTH = 500;
+
+    /**
+     * Mêmes bornes que les colonnes de {@code V007} (D-CS) ; une valeur hors bornes est une erreur de programmation
+     * (la saisie est validée avant, par le contrat HTTP).
+     */
     public Category {
-        Objects.requireNonNull(slug, "slug");
+        Terms.requireName(name, NAME_MAX_LENGTH);
+        Terms.requireSlug(slug, SLUG_MAX_LENGTH);
+        if (description != null && description.length() > DESCRIPTION_MAX_LENGTH) {
+            throw new IllegalArgumentException("description must not exceed " + DESCRIPTION_MAX_LENGTH + " characters");
+        }
     }
 }
