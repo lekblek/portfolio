@@ -8,12 +8,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(controllers = ErrorHandlingTestController.class)
+// Rendu des erreurs seulement : les règles de sécurité sont testées par SecurityConfigurationIT.
+@AutoConfigureMockMvc(addFilters = false)
 @Import(GlobalExceptionHandler.class)
 public class GlobalExceptionHandlerTest {
 
@@ -85,6 +88,27 @@ public class GlobalExceptionHandlerTest {
             .andExpect(jsonPath("$.code").value("VALIDATION_FAILED"))
             .andExpect(jsonPath("$.errors[0].field").value("value"))
             .andExpect(jsonPath("$.errors[0].message").value("au plus 3 caractères"));
+    }
+
+    /**
+     * D-CL : une authentification absente ou invalide est une 401 codée.
+     */
+    @Test
+    void renders_a_missing_authentication_as_problem_detail() throws Exception {
+        mockMvc.perform(get("/test-errors/unauthenticated"))
+            .andExpect(status().isUnauthorized())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+            .andExpect(jsonPath("$.code").value("AUTHENTICATION_REQUIRED"));
+    }
+
+    /**
+     * KI-20 : un accès refusé est une 403 codée, pas une 500 du gestionnaire générique.
+     */
+    @Test
+    void renders_a_denied_access_as_forbidden() throws Exception {
+        mockMvc.perform(get("/test-errors/access-denied"))
+            .andExpect(status().isForbidden())
+            .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
     }
 
     @Test

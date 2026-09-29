@@ -6,11 +6,13 @@ import com.scalke.portfolio.backend.profile.application.usecase.PublicProfile;
 import com.scalke.portfolio.backend.profile.domain.model.ProfessionalLink;
 import com.scalke.portfolio.backend.profile.domain.model.Profile;
 import com.scalke.portfolio.backend.profile.domain.model.Skill;
+import com.scalke.portfolio.backend.security.infrastructure.SecurityConfiguration;
 import com.scalke.portfolio.backend.shared.error.ErrorCode;
 import com.scalke.portfolio.backend.shared.error.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -23,6 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(PublicProfileController.class)
+@Import(SecurityConfiguration.class)
 class PublicProfileControllerTest {
 
     @Autowired

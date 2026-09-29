@@ -4,6 +4,8 @@ public enum ErrorCode {
 
     // génériques
     RESOURCE_NOT_FOUND,
+    AUTHENTICATION_REQUIRED,
+    ACCESS_DENIED,
     VALIDATION_FAILED,
     MALFORMED_REQUEST,
     INTERNAL_ERROR,

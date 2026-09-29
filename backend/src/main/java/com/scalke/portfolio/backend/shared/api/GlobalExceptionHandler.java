@@ -8,6 +8,9 @@ import com.scalke.portfolio.backend.shared.error.UnsupportedContentException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.*;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.firewall.RequestRejectedException;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -40,6 +43,33 @@ class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return problem(HttpStatus.INTERNAL_SERVER_ERROR,
             "Une erreur inattendue est survenue.",
             ErrorCode.INTERNAL_ERROR);
+    }
+
+    /**
+     * 401 : route d'administration sans authentification (D-CL). Levée par les filtres de sécurité, transmise ici
+     * par {@code SecurityConfiguration} pour une réponse de même forme que les autres erreurs.
+     */
+    @ExceptionHandler(AuthenticationException.class)
+    ProblemDetail handleAuthentication(AuthenticationException ex) {
+        return problem(HttpStatus.UNAUTHORIZED, "Authentification requise.", ErrorCode.AUTHENTICATION_REQUIRED);
+    }
+
+    /**
+     * 403 : accès refusé à une identité connue, route non ouverte, ou jeton CSRF absent ou invalide (D-CL). Déclaré
+     * explicitement : sans lui, le gestionnaire de {@code Exception} en ferait une 500 (KI-20).
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    ProblemDetail handleAccessDenied(AccessDeniedException ex) {
+        return problem(HttpStatus.FORBIDDEN, "Accès refusé.", ErrorCode.ACCESS_DENIED);
+    }
+
+    /**
+     * 400 : requête rejetée par le pare-feu HTTP avant tout traitement (D-CL), par exemple un chemin contenant
+     * {@code %2F} ou {@code ..}.
+     */
+    @ExceptionHandler(RequestRejectedException.class)
+    ProblemDetail handleRequestRejected(RequestRejectedException ex) {
+        return problem(HttpStatus.BAD_REQUEST, "Requête refusée.", ErrorCode.MALFORMED_REQUEST);
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)

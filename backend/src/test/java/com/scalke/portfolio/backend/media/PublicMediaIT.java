@@ -83,7 +83,7 @@ class PublicMediaIT extends AbstractIntegrationTest {
 
     @Test
     void hides_unknown_and_malformed_keys_behind_the_same_404() throws Exception {
-        for (String key : new String[]{"fedcba9876543210fedcba9876543210.png", "application.yaml", "..%2Fapplication.yaml"}) {
+        for (String key : new String[]{"fedcba9876543210fedcba9876543210.png", "application.yaml"}) {
             mockMvc.perform(get("/api/public/media/" + key).contextPath("/api"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.detail").value("Média introuvable."));

@@ -11,6 +11,7 @@ import com.scalke.portfolio.backend.project.domain.model.ProjectScreenshot;
 import com.scalke.portfolio.backend.project.domain.model.ProjectStage;
 import com.scalke.portfolio.backend.project.domain.model.ProjectVisibility;
 import com.scalke.portfolio.backend.project.domain.model.Technology;
+import com.scalke.portfolio.backend.security.infrastructure.SecurityConfiguration;
 import com.scalke.portfolio.backend.shared.api.ApiPaging;
 import com.scalke.portfolio.backend.shared.domain.model.DateRange;
 import com.scalke.portfolio.backend.shared.domain.model.PageQuery;
@@ -21,6 +22,7 @@ import com.scalke.portfolio.backend.shared.error.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -38,6 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(PublicProjectController.class)
+@Import(SecurityConfiguration.class)
 class PublicProjectControllerTest {
 
     private static final Project PORTFOLIO = new Project(

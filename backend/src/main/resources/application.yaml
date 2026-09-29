@@ -4,6 +4,10 @@
 spring:
   application:
     name: portfolio-backend
+  autoconfigure:
+    # Pas d'utilisateur généré (ni mot de passe dans les journaux) : le compte administrateur unique arrive à
+    # l'étape 33 ; d'ici là, aucune authentification n'est possible (D-CK).
+    exclude: org.springframework.boot.security.autoconfigure.UserDetailsServiceAutoConfiguration
   jpa:
     open-in-view: false
     hibernate:
@@ -41,6 +45,13 @@ portfolio:
       # Expéditeur et destinataire (l'administrateur) des notifications de contact (D-CI).
       from: ${MAIL_FROM:portfolio@localhost}
       to: ${MAIL_TO:admin@localhost}
+
+# Documentation OpenAPI et Swagger UI : profil dev seulement (KI-19, D-CK).
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
 
 management:
   health:

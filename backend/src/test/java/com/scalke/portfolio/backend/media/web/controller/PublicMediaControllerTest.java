@@ -4,11 +4,13 @@ import com.scalke.portfolio.backend.media.application.usecase.MediaFile;
 import com.scalke.portfolio.backend.media.application.usecase.OpenMediaFileUseCase;
 import com.scalke.portfolio.backend.media.domain.model.MediaContent;
 import com.scalke.portfolio.backend.media.domain.model.MediaFormat;
+import com.scalke.portfolio.backend.security.infrastructure.SecurityConfiguration;
 import com.scalke.portfolio.backend.shared.error.ErrorCode;
 import com.scalke.portfolio.backend.shared.error.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -23,6 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(PublicMediaController.class)
+@Import(SecurityConfiguration.class)
 class PublicMediaControllerTest {
 
     private static final String KEY = "3f2a9c0e8d7b4a1f9e6c5b4a3d2e1f0a.pdf";

@@ -8,6 +8,7 @@ import com.scalke.portfolio.backend.publication.application.usecase.VisiblePubli
 import com.scalke.portfolio.backend.publication.domain.model.Publication;
 import com.scalke.portfolio.backend.publication.domain.model.PublicationStatus;
 import com.scalke.portfolio.backend.publication.domain.model.PublicationType;
+import com.scalke.portfolio.backend.security.infrastructure.SecurityConfiguration;
 import com.scalke.portfolio.backend.shared.api.ApiPaging;
 import com.scalke.portfolio.backend.shared.domain.model.PageQuery;
 import com.scalke.portfolio.backend.shared.domain.model.PageResult;
@@ -19,6 +20,7 @@ import com.scalke.portfolio.backend.taxonomy.domain.model.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -38,6 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(PublicPublicationController.class)
+@Import(SecurityConfiguration.class)
 class PublicPublicationControllerTest {
 
     private static final VisiblePublication ARTICLE = new VisiblePublication(

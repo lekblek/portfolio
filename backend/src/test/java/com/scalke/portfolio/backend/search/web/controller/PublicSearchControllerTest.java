@@ -2,6 +2,7 @@ package com.scalke.portfolio.backend.search.web.controller;
 
 import com.scalke.portfolio.backend.search.application.usecase.SearchPublicContentUseCase;
 import com.scalke.portfolio.backend.search.application.usecase.SearchResult;
+import com.scalke.portfolio.backend.security.infrastructure.SecurityConfiguration;
 import com.scalke.portfolio.backend.shared.api.ApiPaging;
 import com.scalke.portfolio.backend.shared.domain.model.PageQuery;
 import com.scalke.portfolio.backend.shared.domain.model.PageResult;
@@ -9,6 +10,7 @@ import com.scalke.portfolio.backend.shared.domain.model.Slug;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -27,6 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(PublicSearchController.class)
+@Import(SecurityConfiguration.class)
 class PublicSearchControllerTest {
 
     private static final SearchResult ARTICLE = new SearchResult(SearchResult.Type.ARTICLE, "Construire une API",

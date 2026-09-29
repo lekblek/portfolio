@@ -3,6 +3,7 @@ package com.scalke.portfolio.backend.series.web.controller;
 import com.scalke.portfolio.backend.publication.domain.model.Publication;
 import com.scalke.portfolio.backend.publication.domain.model.PublicationStatus;
 import com.scalke.portfolio.backend.publication.domain.model.PublicationType;
+import com.scalke.portfolio.backend.security.infrastructure.SecurityConfiguration;
 import com.scalke.portfolio.backend.series.application.usecase.GetSeriesNavigationUseCase;
 import com.scalke.portfolio.backend.series.application.usecase.SeriesChapter;
 import com.scalke.portfolio.backend.series.application.usecase.SeriesNavigation;
@@ -14,6 +15,7 @@ import com.scalke.portfolio.backend.shared.error.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -30,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(PublicSeriesNavigationController.class)
+@Import(SecurityConfiguration.class)
 class PublicSeriesNavigationControllerTest {
 
     private static final Series SPRING_BOOT = new Series(4L, "Spring Boot de zéro à la production",
