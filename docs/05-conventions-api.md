@@ -1582,6 +1582,24 @@ Chaque module introduit ses routes lors de son étape d’implémentation.
 
 ---
 
+### Session de l’administrateur (étape 34)
+
+```text
+POST   /api/admin/session     { login, password } → 200 AdminSessionResponse { login, lastLoginAt }
+                              401 INVALID_CREDENTIALS (identifiant inconnu, mauvais mot de passe, compte désactivé : même réponse)
+                              429 TOO_MANY_LOGIN_ATTEMPTS + Retry-After (5 échecs en 15 minutes depuis la même adresse)
+                              400 VALIDATION_FAILED (champ absent) ; 403 ACCESS_DENIED (jeton CSRF absent)
+GET    /api/admin/session     200 AdminSessionResponse ; 401 AUTHENTICATION_REQUIRED sans session
+DELETE /api/admin/session     204, session invalidée (jeton CSRF requis)
+```
+
+Règles propres à ce contrat (D-CO, D-CP, D-CQ) :
+
+* session serveur, cookie `JSESSIONID` `HttpOnly` ; aucune session pour un visiteur anonyme ; identifiant de session renouvelé à la connexion ;
+* CSRF : toute écriture envoie l’en-tête `X-XSRF-TOKEN` avec la valeur du cookie `XSRF-TOKEN`, déposé par les réponses de `/api/admin/**` et renouvelé à la connexion (comportement par défaut du `HttpClient` d’Angular) ;
+* `lastLoginAt` : instant ISO-8601 UTC de la connexion en cours ;
+* contrat vérifié par `AdminSessionIT`.
+
 # 31. Ressources administratives prévues
 
 Les principales ressources administratives sont conceptuellement :
@@ -1815,6 +1833,8 @@ Elles sont simplement inutiles pour le périmètre actuel.
 | -------------------------------- | ---: | --------------------------------------------- |
 | `RESOURCE_NOT_FOUND`             |  404 | Ressource inexistante ou non accessible       |
 | `AUTHENTICATION_REQUIRED`        |  401 | Authentification absente ou invalide (D-CL)   |
+| `INVALID_CREDENTIALS`            |  401 | Connexion refusée, cause jamais précisée (D-CO) |
+| `TOO_MANY_LOGIN_ATTEMPTS`        |  429 | Trop d’échecs de connexion, `Retry-After` (D-CQ) |
 | `ACCESS_DENIED`                  |  403 | Accès refusé, dont CSRF (D-CL)                |
 | `VALIDATION_FAILED`              |  400 | Échec de validation des champs                |
 | `MALFORMED_REQUEST`              |  400 | Requête HTTP ou JSON invalide                 |
