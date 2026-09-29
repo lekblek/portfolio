@@ -128,6 +128,15 @@ class AdminTechnologyIT extends AbstractIntegrationTest {
                 assertThat(exception.errorCode()).isEqualTo(ErrorCode.NAME_ALREADY_USED));
     }
 
+    @Test
+    void translates_a_slug_taken_meanwhile() {
+        technologyRepository.create(technology("Java", "java", 0));
+
+        assertThatThrownBy(() -> technologyRepository.create(technology("Autre", "java", 1)))
+            .isInstanceOfSatisfying(BusinessRuleViolationException.class, exception ->
+                assertThat(exception.errorCode()).isEqualTo(ErrorCode.SLUG_ALREADY_USED));
+    }
+
     private ResultActions create(String json) throws Exception {
         return mockMvc.perform(post("/api/admin/technologies").contextPath("/api").with(user("admin")).with(xsrf())
             .contentType(MediaType.APPLICATION_JSON).content(json));

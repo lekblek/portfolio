@@ -2,6 +2,9 @@ package com.scalke.portfolio.backend.profile.web.controller;
 
 import com.scalke.portfolio.backend.media.MediaFixtures;
 import com.scalke.portfolio.backend.media.domain.port.MediaRepository;
+import com.scalke.portfolio.backend.profile.domain.model.Profile;
+import com.scalke.portfolio.backend.profile.domain.port.ProfileRepository;
+import com.scalke.portfolio.backend.shared.error.InvalidInputException;
 import com.scalke.portfolio.backend.testsupport.AbstractIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +14,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static com.scalke.portfolio.backend.testsupport.CsrfTestSupport.xsrf;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -32,6 +38,9 @@ class AdminProfileIT extends AbstractIntegrationTest {
 
     @Autowired
     MediaRepository mediaRepository;
+
+    @Autowired
+    ProfileRepository profileRepository;
 
     @Autowired
     JdbcClient jdbcClient;
@@ -169,6 +178,28 @@ class AdminProfileIT extends AbstractIntegrationTest {
         save(profileJson(",\"cvMediaId\":999999"))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.errors[0].field").value("cvMediaId"));
+    }
+
+    /**
+     * D-DH : un média supprimé entre la vérification et l'écriture est rapporté sur son champ.
+     */
+    @Test
+    void translates_an_avatar_deleted_meanwhile() {
+        assertThatThrownBy(() -> profileRepository.save(profile(999_999L, null)))
+            .isInstanceOfSatisfying(InvalidInputException.class, exception ->
+                assertThat(exception.field()).isEqualTo("avatarMediaId"));
+    }
+
+    @Test
+    void translates_a_cv_deleted_meanwhile() {
+        assertThatThrownBy(() -> profileRepository.save(profile(null, 999_999L)))
+            .isInstanceOfSatisfying(InvalidInputException.class, exception ->
+                assertThat(exception.field()).isEqualTo("cvMediaId"));
+    }
+
+    private static Profile profile(Long avatarMediaId, Long cvMediaId) {
+        return new Profile("Camille Martin", "Développeuse", "Bio", "", "Lyon", "camille@example.com", List.of(),
+            List.of(), List.of(), List.of(), List.of(), avatarMediaId, cvMediaId);
     }
 
     private ResultActions save(String json) throws Exception {

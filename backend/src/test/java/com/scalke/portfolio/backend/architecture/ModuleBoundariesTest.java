@@ -60,7 +60,7 @@ class ModuleBoundariesTest {
      */
     @Test
     void modules_only_use_each_other_through_domain_models_and_application_services() {
-        for (String module : List.of("shared", "security", "profile", "project", "publication",
+        for (String module : List.of("security", "profile", "project", "publication",
             "series", "taxonomy", "media", "search", "contact")) {
             String root = BASE + "." + module;
             noClasses()
@@ -72,6 +72,24 @@ class ModuleBoundariesTest {
                 .allowEmptyShould(true)
                 .check(backendClasses);
         }
+    }
+
+    /**
+     * {@code shared} : même règle, sauf que l'infrastructure d'un module peut utiliser {@code shared.infrastructure}
+     * (lecture d'une contrainte refusée par PostgreSQL, D-DH) ; son domaine, ses cas d'usage et ses contrôleurs non.
+     */
+    @Test
+    void only_module_infrastructure_uses_shared_infrastructure() {
+        String shared = BASE + ".shared";
+        noClasses()
+            .that().resideOutsideOfPackage(shared + "..")
+            .should().dependOnClassesThat().resideInAnyPackage(shared + ".domain.port..", shared + ".web..")
+            .allowEmptyShould(true)
+            .check(backendClasses);
+        noClasses()
+            .that().resideOutsideOfPackages(shared + "..", BASE + ".*.infrastructure..")
+            .should().dependOnClassesThat().resideInAPackage(shared + ".infrastructure..")
+            .check(backendClasses);
     }
 
     /**

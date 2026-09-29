@@ -91,6 +91,15 @@ class AdminTagIT extends AbstractIntegrationTest {
                 assertThat(exception.errorCode()).isEqualTo(ErrorCode.NAME_ALREADY_USED));
     }
 
+    @Test
+    void translates_a_slug_taken_meanwhile() {
+        tagRepository.create(new Tag(null, "Java", Slug.of("java")));
+
+        assertThatThrownBy(() -> tagRepository.create(new Tag(null, "Autre", Slug.of("java"))))
+            .isInstanceOfSatisfying(BusinessRuleViolationException.class, exception ->
+                assertThat(exception.errorCode()).isEqualTo(ErrorCode.SLUG_ALREADY_USED));
+    }
+
     private ResultActions create(String json) throws Exception {
         return mockMvc.perform(post("/api/admin/tags").contextPath("/api").with(user("admin")).with(xsrf())
             .contentType(MediaType.APPLICATION_JSON).content(json));

@@ -5,6 +5,7 @@ import com.scalke.portfolio.backend.profile.domain.port.ProfileRepository;
 import com.scalke.portfolio.backend.profile.infrastructure.persistence.jpa.entity.ProfileEntity;
 import com.scalke.portfolio.backend.profile.infrastructure.persistence.jpa.mapper.ProfilePersistenceMapper;
 import com.scalke.portfolio.backend.shared.error.InvalidInputException;
+import com.scalke.portfolio.backend.shared.infrastructure.persistence.ViolatedConstraint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Repository;
@@ -67,13 +68,12 @@ public class ProfileRepositoryAdapter implements ProfileRepository {
     }
 
     private static RuntimeException translate(DataIntegrityViolationException e) {
-        String message = String.valueOf(e.getMostSpecificCause().getMessage());
-        if (message.contains("profile_avatar_media_fk")) {
-            return new InvalidInputException("avatarMediaId", "Image inconnue.");
-        }
-        if (message.contains("profile_cv_media_fk")) {
-            return new InvalidInputException("cvMediaId", "Document inconnu.");
-        }
-        return e;
+        return switch (ViolatedConstraint.of(e).orElse("")) {
+            case "profile_avatar_media_fk" ->
+                new InvalidInputException("avatarMediaId", "Image inconnue.");
+            case "profile_cv_media_fk" ->
+                new InvalidInputException("cvMediaId", "Document inconnu.");
+            default -> e;
+        };
     }
 }

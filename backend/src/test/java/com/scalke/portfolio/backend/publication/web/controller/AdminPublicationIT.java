@@ -326,6 +326,25 @@ class AdminPublicationIT extends AbstractIntegrationTest {
                 assertThat(exception.errorCode()).isEqualTo(ErrorCode.SLUG_ALREADY_USED));
     }
 
+    @Test
+    void translates_a_tag_deleted_meanwhile() {
+        assertThatThrownBy(() -> publicationRepository.create(draft(Set.of(999_999L), null)))
+            .isInstanceOfSatisfying(InvalidInputException.class, exception ->
+                assertThat(exception.field()).isEqualTo("tagIds"));
+    }
+
+    @Test
+    void translates_a_cover_deleted_meanwhile() {
+        assertThatThrownBy(() -> publicationRepository.create(draft(Set.of(), 999_999L)))
+            .isInstanceOfSatisfying(InvalidInputException.class, exception ->
+                assertThat(exception.field()).isEqualTo("coverMediaId"));
+    }
+
+    private static Publication draft(Set<Long> tagIds, Long coverMediaId) {
+        return new Publication(null, PublicationType.ARTICLE, "Titre", Slug.of("article"), "Résumé", "",
+            PublicationStatus.DRAFT, null, null, false, null, tagIds, null, null, NOW, NOW, coverMediaId);
+    }
+
     private ResultActions create(String json) throws Exception {
         return mockMvc.perform(post("/api/admin/publications").contextPath("/api").with(user("admin")).with(xsrf())
             .contentType(MediaType.APPLICATION_JSON).content(json));

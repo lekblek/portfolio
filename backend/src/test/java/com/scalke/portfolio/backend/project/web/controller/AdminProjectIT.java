@@ -3,6 +3,7 @@ package com.scalke.portfolio.backend.project.web.controller;
 import com.scalke.portfolio.backend.media.MediaFixtures;
 import com.scalke.portfolio.backend.media.domain.port.MediaRepository;
 import com.scalke.portfolio.backend.project.domain.model.Project;
+import com.scalke.portfolio.backend.project.domain.model.ProjectScreenshot;
 import com.scalke.portfolio.backend.project.domain.model.ProjectVisibility;
 import com.scalke.portfolio.backend.project.domain.model.Technology;
 import com.scalke.portfolio.backend.project.domain.port.ProjectRepository;
@@ -11,6 +12,7 @@ import com.scalke.portfolio.backend.shared.domain.model.DateRange;
 import com.scalke.portfolio.backend.shared.domain.model.Slug;
 import com.scalke.portfolio.backend.shared.error.BusinessRuleViolationException;
 import com.scalke.portfolio.backend.shared.error.ErrorCode;
+import com.scalke.portfolio.backend.shared.error.InvalidInputException;
 import com.scalke.portfolio.backend.testsupport.AbstractIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,7 @@ import java.time.LocalDate;
 import static com.scalke.portfolio.backend.project.ProjectFixtures.project;
 import static com.scalke.portfolio.backend.project.ProjectFixtures.published;
 import static com.scalke.portfolio.backend.project.ProjectFixtures.technology;
+import static com.scalke.portfolio.backend.project.ProjectFixtures.withImages;
 import static com.scalke.portfolio.backend.testsupport.CsrfTestSupport.xsrf;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -276,6 +279,32 @@ class AdminProjectIT extends AbstractIntegrationTest {
         assertThatThrownBy(() -> projectRepository.create(published("portfolio", START, 1)))
             .isInstanceOfSatisfying(BusinessRuleViolationException.class, exception ->
                 assertThat(exception.errorCode()).isEqualTo(ErrorCode.SLUG_ALREADY_USED));
+    }
+
+    /**
+     * D-DH : chaque référence supprimée entre la vérification et l'écriture est rapportée sur son champ.
+     */
+    @Test
+    void translates_a_technology_deleted_meanwhile() {
+        assertThatThrownBy(() -> projectRepository.create(published("portfolio", START, 0,
+            new Technology(999_999L, "Supprimée", Slug.of("supprimee"), 0))))
+            .isInstanceOfSatisfying(InvalidInputException.class, exception ->
+                assertThat(exception.field()).isEqualTo("technologyIds"));
+    }
+
+    @Test
+    void translates_a_cover_deleted_meanwhile() {
+        assertThatThrownBy(() -> projectRepository.create(withImages(published("portfolio", START, 0), 999_999L)))
+            .isInstanceOfSatisfying(InvalidInputException.class, exception ->
+                assertThat(exception.field()).isEqualTo("coverMediaId"));
+    }
+
+    @Test
+    void translates_a_screenshot_deleted_meanwhile() {
+        assertThatThrownBy(() -> projectRepository.create(
+            withImages(published("portfolio", START, 0), null, new ProjectScreenshot(999_999L, null, 0))))
+            .isInstanceOfSatisfying(InvalidInputException.class, exception ->
+                assertThat(exception.field()).isEqualTo("screenshots"));
     }
 
     private long image() {

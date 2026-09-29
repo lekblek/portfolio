@@ -13,6 +13,7 @@ import com.scalke.portfolio.backend.shared.domain.model.Slug;
 import com.scalke.portfolio.backend.shared.error.BusinessRuleViolationException;
 import com.scalke.portfolio.backend.shared.error.ErrorCode;
 import com.scalke.portfolio.backend.shared.error.InvalidInputException;
+import com.scalke.portfolio.backend.shared.infrastructure.persistence.ViolatedConstraint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -155,20 +156,17 @@ public class ProjectRepositoryAdapter implements ProjectRepository {
      * contrainte (D-CX).
      */
     private static RuntimeException translate(DataIntegrityViolationException e) {
-        String message = String.valueOf(e.getMostSpecificCause().getMessage());
-        if (message.contains("project_slug_unique")) {
-            return new BusinessRuleViolationException(ErrorCode.SLUG_ALREADY_USED, "Ce slug est déjà utilisé.");
-        }
-        if (message.contains("project_technology_technology_fk")) {
-            return new InvalidInputException("technologyIds", "Technologie inconnue.");
-        }
-        if (message.contains("project_cover_media_fk")) {
-            return new InvalidInputException("coverMediaId", "Image de couverture inconnue.");
-        }
-        if (message.contains("project_screenshot_media_fk")) {
-            return new InvalidInputException("screenshots", "Capture inconnue.");
-        }
-        return e;
+        return switch (ViolatedConstraint.of(e).orElse("")) {
+            case "project_slug_unique" ->
+                new BusinessRuleViolationException(ErrorCode.SLUG_ALREADY_USED, "Ce slug est déjà utilisé.");
+            case "project_technology_technology_fk" ->
+                new InvalidInputException("technologyIds", "Technologie inconnue.");
+            case "project_cover_media_fk" ->
+                new InvalidInputException("coverMediaId", "Image de couverture inconnue.");
+            case "project_screenshot_media_fk" ->
+                new InvalidInputException("screenshots", "Capture inconnue.");
+            default -> e;
+        };
     }
 
     private TechnologyEntity existingTechnology(Technology technology) {

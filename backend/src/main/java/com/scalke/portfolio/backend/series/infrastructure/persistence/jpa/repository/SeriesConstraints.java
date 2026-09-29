@@ -3,6 +3,7 @@ package com.scalke.portfolio.backend.series.infrastructure.persistence.jpa.repos
 import com.scalke.portfolio.backend.shared.error.BusinessRuleViolationException;
 import com.scalke.portfolio.backend.shared.error.ErrorCode;
 import com.scalke.portfolio.backend.shared.error.InvalidInputException;
+import com.scalke.portfolio.backend.shared.infrastructure.persistence.ViolatedConstraint;
 import org.springframework.dao.DataIntegrityViolationException;
 
 /**
@@ -16,17 +17,15 @@ final class SeriesConstraints {
     }
 
     static RuntimeException translate(DataIntegrityViolationException e) {
-        String message = String.valueOf(e.getMostSpecificCause().getMessage());
-        if (message.contains("series_slug_unique")) {
-            return new BusinessRuleViolationException(ErrorCode.SLUG_ALREADY_USED, "Ce slug est déjà utilisé.");
-        }
-        if (message.contains("series_item_publication_unique")) {
-            return new BusinessRuleViolationException(ErrorCode.ARTICLE_ALREADY_IN_SERIES,
-                "Un article appartient déjà à une autre série.");
-        }
-        if (message.contains("series_cover_media_fk")) {
-            return new InvalidInputException("coverMediaId", "Image de couverture inconnue.");
-        }
-        return e;
+        return switch (ViolatedConstraint.of(e).orElse("")) {
+            case "series_slug_unique" ->
+                new BusinessRuleViolationException(ErrorCode.SLUG_ALREADY_USED, "Ce slug est déjà utilisé.");
+            case "series_item_publication_unique" ->
+                new BusinessRuleViolationException(ErrorCode.ARTICLE_ALREADY_IN_SERIES,
+                    "Un article appartient déjà à une autre série.");
+            case "series_cover_media_fk" ->
+                new InvalidInputException("coverMediaId", "Image de couverture inconnue.");
+            default -> e;
+        };
     }
 }

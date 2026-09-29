@@ -7,6 +7,7 @@ import com.scalke.portfolio.backend.project.infrastructure.persistence.jpa.mappe
 import com.scalke.portfolio.backend.shared.domain.model.Slug;
 import com.scalke.portfolio.backend.shared.error.BusinessRuleViolationException;
 import com.scalke.portfolio.backend.shared.error.ErrorCode;
+import com.scalke.portfolio.backend.shared.infrastructure.persistence.ViolatedConstraint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Repository;
@@ -100,13 +101,12 @@ public class TechnologyRepositoryAdapter implements TechnologyRepository {
     }
 
     private static RuntimeException translate(DataIntegrityViolationException e) {
-        String message = String.valueOf(e.getMostSpecificCause().getMessage());
-        if (message.contains("technology_slug_unique")) {
-            return new BusinessRuleViolationException(ErrorCode.SLUG_ALREADY_USED, "Ce slug est déjà utilisé.");
-        }
-        if (message.contains("technology_name_unique_idx")) {
-            return new BusinessRuleViolationException(ErrorCode.NAME_ALREADY_USED, "Ce nom est déjà utilisé.");
-        }
-        return e;
+        return switch (ViolatedConstraint.of(e).orElse("")) {
+            case "technology_slug_unique" ->
+                new BusinessRuleViolationException(ErrorCode.SLUG_ALREADY_USED, "Ce slug est déjà utilisé.");
+            case "technology_name_unique_idx" ->
+                new BusinessRuleViolationException(ErrorCode.NAME_ALREADY_USED, "Ce nom est déjà utilisé.");
+            default -> e;
+        };
     }
 }

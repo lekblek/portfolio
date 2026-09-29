@@ -180,6 +180,19 @@ class AdminCategoryIT extends AbstractIntegrationTest {
                 assertThat(exception.errorCode()).isEqualTo(ErrorCode.SLUG_ALREADY_USED));
     }
 
+    /**
+     * D-DH : la contrainte se lit dans le champ dédié de l'erreur PostgreSQL, pas dans le texte du message, qui recopie
+     * les valeurs saisies ; un nom qui contient le nom d'une autre contrainte reste un conflit de nom.
+     */
+    @Test
+    void identifies_the_violated_constraint_whatever_the_submitted_values() {
+        categoryRepository.create(new Category(null, "x_slug_unique", Slug.of("premier"), null));
+
+        assertThatThrownBy(() -> categoryRepository.create(new Category(null, "X_SLUG_UNIQUE", Slug.of("second"), null)))
+            .isInstanceOfSatisfying(BusinessRuleViolationException.class, exception ->
+                assertThat(exception.errorCode()).isEqualTo(ErrorCode.NAME_ALREADY_USED));
+    }
+
     private ResultActions create(String json) throws Exception {
         return mockMvc.perform(post("/api/admin/categories").contextPath("/api").with(user("admin")).with(xsrf())
             .contentType(MediaType.APPLICATION_JSON).content(json));

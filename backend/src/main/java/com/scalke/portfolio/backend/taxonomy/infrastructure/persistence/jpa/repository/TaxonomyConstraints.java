@@ -2,6 +2,7 @@ package com.scalke.portfolio.backend.taxonomy.infrastructure.persistence.jpa.rep
 
 import com.scalke.portfolio.backend.shared.error.BusinessRuleViolationException;
 import com.scalke.portfolio.backend.shared.error.ErrorCode;
+import com.scalke.portfolio.backend.shared.infrastructure.persistence.ViolatedConstraint;
 import org.springframework.dao.DataIntegrityViolationException;
 
 /**
@@ -14,13 +15,12 @@ final class TaxonomyConstraints {
     }
 
     static RuntimeException translate(DataIntegrityViolationException e) {
-        String message = String.valueOf(e.getMostSpecificCause().getMessage());
-        if (message.contains("_slug_unique")) {
-            return new BusinessRuleViolationException(ErrorCode.SLUG_ALREADY_USED, "Ce slug est déjà utilisé.");
-        }
-        if (message.contains("_name_unique_idx")) {
-            return new BusinessRuleViolationException(ErrorCode.NAME_ALREADY_USED, "Ce nom est déjà utilisé.");
-        }
-        return e;
+        return switch (ViolatedConstraint.of(e).orElse("")) {
+            case "category_slug_unique", "tag_slug_unique" ->
+                new BusinessRuleViolationException(ErrorCode.SLUG_ALREADY_USED, "Ce slug est déjà utilisé.");
+            case "category_name_unique_idx", "tag_name_unique_idx" ->
+                new BusinessRuleViolationException(ErrorCode.NAME_ALREADY_USED, "Ce nom est déjà utilisé.");
+            default -> e;
+        };
     }
 }

@@ -54,7 +54,8 @@
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <scope>runtime</scope>
+      <!-- Compilé : ViolatedConstraint lit le nom structuré d'une contrainte refusée (D-DH) ; seule classe autorisée
+           à en dépendre (ModuleLayersTest). -->
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>

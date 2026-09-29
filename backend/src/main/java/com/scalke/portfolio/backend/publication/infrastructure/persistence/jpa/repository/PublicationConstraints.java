@@ -3,6 +3,7 @@ package com.scalke.portfolio.backend.publication.infrastructure.persistence.jpa.
 import com.scalke.portfolio.backend.shared.error.BusinessRuleViolationException;
 import com.scalke.portfolio.backend.shared.error.ErrorCode;
 import com.scalke.portfolio.backend.shared.error.InvalidInputException;
+import com.scalke.portfolio.backend.shared.infrastructure.persistence.ViolatedConstraint;
 import org.springframework.dao.DataIntegrityViolationException;
 
 /**
@@ -15,19 +16,16 @@ final class PublicationConstraints {
     }
 
     static RuntimeException translate(DataIntegrityViolationException e) {
-        String message = String.valueOf(e.getMostSpecificCause().getMessage());
-        if (message.contains("publication_slug_unique")) {
-            return new BusinessRuleViolationException(ErrorCode.SLUG_ALREADY_USED, "Ce slug est déjà utilisé.");
-        }
-        if (message.contains("publication_category_fk")) {
-            return new InvalidInputException("categoryId", "Catégorie inconnue.");
-        }
-        if (message.contains("publication_tag_tag_fk")) {
-            return new InvalidInputException("tagIds", "Tag inconnu.");
-        }
-        if (message.contains("publication_cover_media_fk")) {
-            return new InvalidInputException("coverMediaId", "Image de couverture inconnue.");
-        }
-        return e;
+        return switch (ViolatedConstraint.of(e).orElse("")) {
+            case "publication_slug_unique" ->
+                new BusinessRuleViolationException(ErrorCode.SLUG_ALREADY_USED, "Ce slug est déjà utilisé.");
+            case "publication_category_fk" ->
+                new InvalidInputException("categoryId", "Catégorie inconnue.");
+            case "publication_tag_tag_fk" ->
+                new InvalidInputException("tagIds", "Tag inconnu.");
+            case "publication_cover_media_fk" ->
+                new InvalidInputException("coverMediaId", "Image de couverture inconnue.");
+            default -> e;
+        };
     }
 }

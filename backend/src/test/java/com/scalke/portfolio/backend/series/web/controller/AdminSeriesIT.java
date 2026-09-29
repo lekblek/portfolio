@@ -11,6 +11,7 @@ import com.scalke.portfolio.backend.series.domain.port.SeriesRepository;
 import com.scalke.portfolio.backend.shared.domain.model.Slug;
 import com.scalke.portfolio.backend.shared.error.BusinessRuleViolationException;
 import com.scalke.portfolio.backend.shared.error.ErrorCode;
+import com.scalke.portfolio.backend.shared.error.InvalidInputException;
 import com.scalke.portfolio.backend.testsupport.AbstractIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import java.util.List;
 
 import static com.scalke.portfolio.backend.publication.PublicationFixtures.publication;
 import static com.scalke.portfolio.backend.series.SeriesFixtures.series;
+import static com.scalke.portfolio.backend.series.SeriesFixtures.withCover;
 import static com.scalke.portfolio.backend.testsupport.CsrfTestSupport.xsrf;
 import static com.scalke.portfolio.backend.testsupport.FixedClockConfiguration.NOW;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -214,6 +216,22 @@ class AdminSeriesIT extends AbstractIntegrationTest {
         assertThatThrownBy(() -> seriesRepository.update(series.withChapters(List.of(taken))))
             .isInstanceOfSatisfying(BusinessRuleViolationException.class, exception ->
                 assertThat(exception.errorCode()).isEqualTo(ErrorCode.ARTICLE_ALREADY_IN_SERIES));
+    }
+
+    @Test
+    void translates_a_slug_taken_meanwhile() {
+        seriesRepository.create(series("angular"));
+
+        assertThatThrownBy(() -> seriesRepository.create(series("angular")))
+            .isInstanceOfSatisfying(BusinessRuleViolationException.class, exception ->
+                assertThat(exception.errorCode()).isEqualTo(ErrorCode.SLUG_ALREADY_USED));
+    }
+
+    @Test
+    void translates_a_cover_deleted_meanwhile() {
+        assertThatThrownBy(() -> seriesRepository.create(withCover(series("angular"), 999_999L)))
+            .isInstanceOfSatisfying(InvalidInputException.class, exception ->
+                assertThat(exception.field()).isEqualTo("coverMediaId"));
     }
 
     private long createArticle(String slug, PublicationStatus status, Instant publishedAt) {

@@ -68,4 +68,15 @@ class ModuleLayersTest {
             .allowEmptyShould(true)
             .check(backendClasses);
     }
+
+    /**
+     * Le pilote JDBC est compilé pour lire le nom d'une contrainte refusée (D-DH), et pour rien d'autre.
+     */
+    @Test
+    void only_the_constraint_reader_should_depend_on_the_jdbc_driver() {
+        noClasses()
+            .that().doNotHaveFullyQualifiedName(BASE + ".shared.infrastructure.persistence.ViolatedConstraint")
+            .should().dependOnClassesThat().resideInAPackage("org.postgresql..")
+            .check(backendClasses);
+    }
 }
