@@ -5,9 +5,10 @@ import com.scalke.portfolio.backend.security.domain.model.AdminAccount;
 import java.util.Optional;
 
 /**
- * Port de persistance du compte administrateur unique. Méthodes utilisées par
- * {@code InitializeAdminAccountUseCase} ; la lecture pour la connexion et la date de dernière connexion arriveront
- * avec l'étape 34.
+ * Port de persistance du compte administrateur unique. Méthodes utilisées par {@code InitializeAdminAccountUseCase}
+ * ({@code find}, {@code create}, {@code updateCredentials}), par la connexion ({@code find} pour
+ * {@code AdminUserDetailsService}, {@code recordLogin} pour {@code AuthenticateAdminUseCase}) et par
+ * {@code GetAdminAccountUseCase} ({@code find}).
  */
 public interface AdminAccountRepository {
 
@@ -20,4 +21,10 @@ public interface AdminAccountRepository {
      * {@code updatedAt} sont écrits.
      */
     AdminAccount updateCredentials(AdminAccount account);
+
+    /**
+     * Enregistre la date de connexion : seul {@code lastLoginAt} est écrit ; {@code updatedAt} ne change pas (une
+     * connexion ne modifie pas le compte).
+     */
+    AdminAccount recordLogin(AdminAccount account);
 }

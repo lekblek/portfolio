@@ -3,6 +3,7 @@ package com.scalke.portfolio.backend.shared.api;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -99,6 +100,17 @@ public class GlobalExceptionHandlerTest {
             .andExpect(status().isUnauthorized())
             .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
             .andExpect(jsonPath("$.code").value("AUTHENTICATION_REQUIRED"));
+    }
+
+    /**
+     * D-CQ : 429 avec l'attente en secondes entières, arrondie au-dessus.
+     */
+    @Test
+    void renders_too_many_requests_with_a_retry_delay() throws Exception {
+        mockMvc.perform(get("/test-errors/too-many"))
+            .andExpect(status().isTooManyRequests())
+            .andExpect(header().string("Retry-After", "91"))
+            .andExpect(jsonPath("$.code").value("TOO_MANY_LOGIN_ATTEMPTS"));
     }
 
     /**

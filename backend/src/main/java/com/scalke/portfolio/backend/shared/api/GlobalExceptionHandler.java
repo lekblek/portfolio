@@ -4,11 +4,14 @@ import com.scalke.portfolio.backend.shared.error.BusinessRuleViolationException;
 import com.scalke.portfolio.backend.shared.error.ContentTooLargeException;
 import com.scalke.portfolio.backend.shared.error.ErrorCode;
 import com.scalke.portfolio.backend.shared.error.ResourceNotFoundException;
+import com.scalke.portfolio.backend.shared.error.TooManyRequestsException;
 import com.scalke.portfolio.backend.shared.error.UnsupportedContentException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.*;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AccountStatusException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.firewall.RequestRejectedException;
 import org.springframework.web.ErrorResponse;
@@ -46,6 +49,15 @@ class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     /**
+     * 401 : connexion refusée (D-CO). Même réponse pour un identifiant inconnu, un mauvais mot de passe ou un compte
+     * désactivé : rien n'est révélé sur le compte.
+     */
+    @ExceptionHandler({BadCredentialsException.class, AccountStatusException.class})
+    ProblemDetail handleInvalidCredentials(AuthenticationException ex) {
+        return problem(HttpStatus.UNAUTHORIZED, "Identifiant ou mot de passe incorrect.", ErrorCode.INVALID_CREDENTIALS);
+    }
+
+    /**
      * 401 : route d'administration sans authentification (D-CL). Levée par les filtres de sécurité, transmise ici
      * par {@code SecurityConfiguration} pour une réponse de même forme que les autres erreurs.
      */
@@ -70,6 +82,17 @@ class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(RequestRejectedException.class)
     ProblemDetail handleRequestRejected(RequestRejectedException ex) {
         return problem(HttpStatus.BAD_REQUEST, "Requête refusée.", ErrorCode.MALFORMED_REQUEST);
+    }
+
+    /**
+     * 429 : trop de tentatives (D-CQ) ; {@code Retry-After} en secondes, arrondi au-dessus.
+     */
+    @ExceptionHandler(TooManyRequestsException.class)
+    ResponseEntity<ProblemDetail> handleTooManyRequests(TooManyRequestsException ex) {
+        long seconds = Math.max(1, (ex.retryAfter().toMillis() + 999) / 1000);
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+            .header(HttpHeaders.RETRY_AFTER, Long.toString(seconds))
+            .body(problem(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage(), ex.errorCode()));
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)

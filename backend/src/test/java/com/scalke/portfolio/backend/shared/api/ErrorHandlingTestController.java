@@ -4,6 +4,7 @@ import com.scalke.portfolio.backend.shared.error.BusinessRuleViolationException;
 import com.scalke.portfolio.backend.shared.error.ContentTooLargeException;
 import com.scalke.portfolio.backend.shared.error.ErrorCode;
 import com.scalke.portfolio.backend.shared.error.ResourceNotFoundException;
+import com.scalke.portfolio.backend.shared.error.TooManyRequestsException;
 import com.scalke.portfolio.backend.shared.error.UnsupportedContentException;
 import jakarta.validation.Valid;
 import org.springframework.security.access.AccessDeniedException;
@@ -11,6 +12,8 @@ import org.springframework.security.authentication.InsufficientAuthenticationExc
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.Duration;
 
 @RestController
 @RequestMapping("/test-errors")
@@ -63,6 +66,12 @@ public class ErrorHandlingTestController {
     @GetMapping("/access-denied")
     void accessDenied() {
         throw new AccessDeniedException("refusé");
+    }
+
+    @GetMapping("/too-many")
+    void tooMany() {
+        throw new TooManyRequestsException(ErrorCode.TOO_MANY_LOGIN_ATTEMPTS, "Trop de tentatives.",
+            Duration.ofMillis(90_500));
     }
 
     @GetMapping("/boom")

@@ -57,6 +57,10 @@ public class AdminAccountEntity {
         this.updatedAt = updatedAt;
     }
 
+    public void recordLogin(Instant lastLoginAt) {
+        this.lastLoginAt = lastLoginAt;
+    }
+
     public void changeCredentials(String login, String passwordHash, Instant updatedAt) {
         this.login = login;
         this.passwordHash = passwordHash;

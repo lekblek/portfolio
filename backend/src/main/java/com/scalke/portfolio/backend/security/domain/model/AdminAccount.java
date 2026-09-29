@@ -60,6 +60,13 @@ public record AdminAccount(
     }
 
     /**
+     * Même compte, connecté à {@code now} (D-CO).
+     */
+    public AdminAccount loggedInAt(Instant now) {
+        return new AdminAccount(login, passwordHash, enabled, now, createdAt, updatedAt);
+    }
+
+    /**
      * Ne révèle jamais l'empreinte (journaux, messages d'erreur).
      */
     @Override

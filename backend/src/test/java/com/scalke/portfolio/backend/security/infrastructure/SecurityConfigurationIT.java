@@ -7,8 +7,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 
+import static com.scalke.portfolio.backend.testsupport.CsrfTestSupport.xsrf;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -85,7 +85,7 @@ class SecurityConfigurationIT extends AbstractIntegrationTest {
         mockMvc.perform(post("/api/public/search").contextPath("/api"))
             .andExpect(status().isForbidden())
             .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
-        mockMvc.perform(post("/api/public/search").contextPath("/api").with(csrf()))
+        mockMvc.perform(post("/api/public/search").contextPath("/api").with(xsrf()))
             .andExpect(status().isMethodNotAllowed());
     }
 

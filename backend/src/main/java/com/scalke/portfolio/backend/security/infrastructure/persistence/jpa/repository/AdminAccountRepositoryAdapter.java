@@ -43,4 +43,13 @@ public class AdminAccountRepositoryAdapter implements AdminAccountRepository {
         entity.changeCredentials(account.login(), account.passwordHash(), account.updatedAt());
         return AdminAccountPersistenceMapper.toDomain(entity);
     }
+
+    @Override
+    @Transactional
+    public AdminAccount recordLogin(AdminAccount account) {
+        AdminAccountEntity entity = repository.findById(AdminAccountEntity.SINGLETON_ID)
+            .orElseThrow(() -> new IllegalStateException("the administrator account does not exist"));
+        entity.recordLogin(account.lastLoginAt());
+        return AdminAccountPersistenceMapper.toDomain(entity);
+    }
 }
