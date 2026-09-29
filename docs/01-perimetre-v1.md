@@ -375,6 +375,8 @@ Aucun secret n'est versionné dans Git.
 
 Le choix précis de l'algorithme de hash appartient à l'étape d'implémentation sécurité.
 
+Choix de l'étape 33 (D-CN) : bcrypt (coût 10) par l'encodeur délégué de Spring Security, empreintes préfixées pour permettre un changement d'algorithme ; mot de passe de 15 caractères au moins et 72 octets au plus.
+
 ---
 
 ## 15. SEO

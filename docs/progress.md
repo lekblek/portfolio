@@ -2,25 +2,25 @@
 
 Ce fichier est la **seule** source de vérité sur l'avancement. Il ne répète pas le contenu des autres documents : il pointe vers eux.
 
-Dernière mise à jour : 2026-09-29 (étape 31 poussée, CI verte ; étape 32 terminée et vérifiée, commits à faire)
+Dernière mise à jour : 2026-09-29 (étape 32 poussée, CI verte ; étape 33 terminée et vérifiée, commits à faire)
 
 ---
 
 ## 1. État courant
 
 ```text
-Dernière étape terminée   : 32 — Spring Security, séparation des routes (vérifiée, commits à faire) ; 31 poussée, CI verte (run 36565149687)
+Dernière étape terminée   : 33 — Compte administrateur unique (vérifiée, commits à faire) ; 32 poussée, CI verte (run 36578007365)
 Étape en cours            : aucune
-Prochaine étape prévue    : 33 — Implémenter le compte administrateur unique
-État                      : PRÊT après commit et push de l'étape 32
+Prochaine étape prévue    : 34 — Authentification par session
+État                      : PRÊT après commit et push de l'étape 33
 Branche                   : develop
-Vérification              : ./mvnw clean verify → 553 tests verts (277 *Test, 276 *IT) à la fin de l'étape 32
+Vérification              : ./mvnw clean verify → 581 tests verts (295 *Test, 286 *IT) à la fin de l'étape 33
 ```
 
 ## 2. Prochaine action
 
-1. Committer et pousser l'étape 32 (deux commits), vérifier la CI, puis remplacer le 🟡 par ✅.
-2. Étape 33 : compte administrateur unique initialisé depuis une configuration sécurisée (D18, `02` §26 `AdminAccount`) : `ADMIN_USERNAME`, `ADMIN_PASSWORD` de `deploy/env/backend.env.example`, mot de passe haché par le `PasswordEncoder` retenu (`01` §14), jamais en clair (invariant 15).
+1. Committer et pousser l'étape 33 (deux commits), vérifier la CI, puis remplacer le 🟡 par ✅.
+2. Étape 34 : connexion par session (`01` §14 : session serveur, cookie sécurisé) : `UserDetailsService` sur `AdminAccount`, route de connexion et de déconnexion, date de dernière connexion, protection contre les essais répétés à décider ; CSRF et en-têtes à l'étape 35.
 3. Confirmer ou infirmer D-T (cohérence `stage` ⇔ `endDate`) : `docs/decisions/registre-implementation.md`.
 
 ---
@@ -89,8 +89,9 @@ Légende : ✅ terminée et poussée · 🟡 terminée et vérifiée, commits à
 | 29 | `GET /api/public/search` ; `ProblemDetail` des exceptions de Spring sans corps désormais codé | ✅ | `b4a3f26`, `81ff5fc`, `45c23d8` (CI : run 36560472534) |
 | 30 | Module `contact` : `V020`, cycle de statut, cas d'usage sans route, seed `dev` | ✅ | `12201b6`, `d3a767e` (CI : run 36562833516) |
 | 31 | Notification de l'administrateur après enregistrement d'un message (SMTP, après validation), Mailpit en développement | ✅ | `a21346b`, `51d4ce7` (CI : run 36565149687) |
-| 32 | Spring Security : routes publiques, d'administration et refusées ; refus codés (401, 403, 400) ; springdoc en `dev` seulement | 🟡 | à committer |
-| 33 → 52 | Voir `docs/steps/liste_complete_etapes.md` | ⏳ | — |
+| 32 | Spring Security : routes publiques, d'administration et refusées ; refus codés (401, 403, 400) ; springdoc en `dev` seulement | ✅ | `ae5bd94`, `fa8ebd8` (CI : run 36578007365) |
+| 33 | Compte administrateur unique (`V021`), initialisé depuis la configuration, empreinte bcrypt seule | 🟡 | à committer |
+| 34 → 52 | Voir `docs/steps/liste_complete_etapes.md` | ⏳ | — |
 
 Après le push, remplacer les 🟡 par ✅ et noter les hashes.
 
@@ -126,6 +127,7 @@ Index : [`decisions/README.md`](decisions/README.md).
 | D-CC, D-CD | Recherche classée derrière les façades, règle de visibilité non réécrite ; module `search` sans table, classement commun et pagination | Actives (28.2) |
 | D-CE, D-CF | Route et contrat de la recherche publique ; `q` obligatoire, vide → page vide, 200 caractères au plus (`VALIDATION_FAILED`) ; code ajouté aux erreurs de Spring sans corps | Actives (29) |
 | D-CG, D-CH | Module `contact` sans route (envoi public à l'étape 48, administration à l'étape 36) ; règles du message doublées en SQL ; cycle en avant seulement (invariant 29, `INVALID_CONTACT_MESSAGE_TRANSITION`) | Actives (30) |
+| D-CM, D-CN | Compte administrateur unique (invariant 30), empreinte bcrypt seule en SQL (invariant 15) ; configuration qui fait foi à chaque démarrage, mot de passe de 15 caractères à 72 octets | Actives (33) |
 | D-CK, D-CL | Séparation des routes (public, administration authentifiée, reste refusé), aucun utilisateur généré, aucune session anonyme, springdoc en `dev` ; refus de sécurité rendus par `GlobalExceptionHandler` (`AUTHENTICATION_REQUIRED`, `ACCESS_DENIED`, `MALFORMED_REQUEST`) | Actives (32) |
 | D-CI, D-CJ | Port `ContactNotificationSender`, courriel SMTP à l'administrateur (`Reply-To` visiteur, sujet sur une ligne) ; envoi après validation, échec journalisé sans donnée personnelle ; santé SMTP hors de l'état de l'application ; GreenMail en test, Mailpit en développement | Actives (31) |
 | 14.4 | Exposition publique de `publicEmail` | À confirmer |
@@ -232,6 +234,8 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | Routes d'administration des messages (liste, changement de statut) | Étape 36 | D-AU, D-CH |
 | Restaurer un message archivé, remettre un message « non lu » | si l'administration le demande | D-CH : cycle en avant seulement |
 | Notification asynchrone (hors du fil de la requête) | Étape 48, si la latence de la route publique le justifie | D-CJ : envoi synchrone borné à 5 s par délai SMTP |
+| Argon2id au lieu de bcrypt | si une dépendance BouncyCastle devient acceptable | D-CN : l'encodeur délégué permet la migration (empreintes préfixées, `upgradeEncoding`) |
+| Désactiver le compte (`enabled`) | si l'administration le demande | D-CM : colonne présente (`02` §26), toujours vraie |
 | Configuration SMTP de production (authentification, STARTTLS) | Étape 52 | D-CI : `MAIL_*` lues, sécurité du transport à fixer avec le fournisseur |
 | Filtre de la recherche par genre de contenu (`type`), extraits mis en évidence (`ts_headline`), recherche par préfixe pendant la saisie | si l'écran de recherche le demande (étape 47) | D-CE ; D-CC : `websearch_to_tsquery` n'accepte pas `:*` |
 | Catégorie dans le document de recherche | si le modèle l'adopte | D-CA : absente de `01` §11 |

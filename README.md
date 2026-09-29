@@ -81,7 +81,7 @@ Dans IntelliJ : configuration d'exécution `Application` → *Active profiles* :
 - Publications : `http://localhost:8080/api/public/publications` (filtres cumulables `?type=ARTICLE|NEWS`, `?category=backend`, `?tag=java`), `http://localhost:8080/api/public/publications/{slug}`
 - Recherche : `http://localhost:8080/api/public/search?q=angular`
 - Documentation OpenAPI (profil `dev` seulement) : `http://localhost:8080/api/swagger-ui/index.html`
-- Administration (`/api/admin/**`) : 401 tant que la connexion n'existe pas (étapes 33 et 34)
+- Administration (`/api/admin/**`) : 401 tant que la connexion n'existe pas (étape 34). Le compte administrateur est créé ou mis à jour à chaque démarrage depuis `ADMIN_USERNAME` et `ADMIN_PASSWORD` (`deploy/.env`, facultatifs : les deux ou aucun ; mot de passe de 15 caractères au moins)
 - En profil `dev`, `ProfileSeeder`, `ProjectSeeder`, `TaxonomySeeder` et `PublicationSeeder` créent des données de démonstration si la base n'en contient pas (technologies, projets dont un brouillon, catégories et tags, une publication par cas de visibilité).
 
 ### 5. Frontend
