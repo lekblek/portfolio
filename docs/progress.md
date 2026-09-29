@@ -2,29 +2,29 @@
 
 Ce fichier est la **seule** source de vérité sur l'avancement. Il ne répète pas le contenu des autres documents : il pointe vers eux.
 
-Dernière mise à jour : 2026-09-29 (étape 35 poussée, CI verte ; étape 36.1 terminée et vérifiée, commits à faire)
+Dernière mise à jour : 2026-09-29 (étape 36.1 poussée, CI verte ; étape 36.2 terminée et vérifiée, commits à faire)
 
 ---
 
 ## 1. État courant
 
 ```text
-Dernière étape terminée   : 35 — Durcissement HTTP, poussée, CI verte (run 36596138213)
-Étape en cours            : 36 — API d'administration (36.1 taxonomie vérifiée, commits à faire ; 36.2 à 36.7 à faire)
-Prochaine étape prévue    : 36.2 — Administration des médias
-État                      : PRÊT après commit et push de 36.1
+Dernière étape terminée   : 36.1 — Administration de la taxonomie, poussée, CI verte (run 36597416828)
+Étape en cours            : 36 — API d'administration (36.2 médias vérifiée, commits à faire ; 36.3 à 36.7 à faire)
+Prochaine étape prévue    : 36.3 — Administration des publications
+État                      : PRÊT après commit et push de 36.2
 Branche                   : develop
-Vérification              : ./mvnw clean verify → 618 tests verts (303 *Test, 315 *IT) à la fin de 36.1
+Vérification              : ./mvnw clean verify → 630 tests verts (303 *Test, 327 *IT) à la fin de 36.2
 ```
 
 ## 2. Prochaine action
 
-1. Committer et pousser 36.1 (deux commits), vérifier la CI, puis remplacer le 🟡 par ✅.
+1. Committer et pousser 36.2 (deux commits), vérifier la CI, puis remplacer le 🟡 par ✅.
 2. Suite de l'étape 36, dans l'ordre des dépendances (les termes et médias avant les contenus qui les référencent) :
 
    ```text
-   36.1  Taxonomie : catégories et tags                                    ✔ vérifiée
-   36.2  Médias : envoi (multipart 10 Mio), liste, texte alternatif, suppression contrôlée
+   36.1  Taxonomie : catégories et tags                                    ✔ poussée
+   36.2  Médias : envoi (multipart 10 Mio), liste, texte alternatif, suppression contrôlée   ✔ vérifiée
    36.3  Publications : liste tous statuts, création, modification (SLUG_LOCKED), statut, termes, couverture
    36.4  Séries : création, chapitres (NEWS_CANNOT_JOIN_SERIES, SERIES_POSITION_ALREADY_USED)
    36.5  Projets : technologies, projets, couverture et captures, stabilité du slug
@@ -104,8 +104,9 @@ Légende : ✅ terminée et poussée · 🟡 terminée et vérifiée, commits à
 | 34.1 | Connexion par session (`/api/admin/session`), CSRF d'application monopage, date de dernière connexion | ✅ | `72fda46`, `dbcbafa` (CI : run 36595141519) |
 | 34.2 | Limite des essais de connexion (5 échecs par adresse en 15 minutes, 429) | ✅ | `72fda46` (commit commun avec 34.1) |
 | 35 | Durcissement HTTP : attributs des cookies, en-têtes de sécurité, séparateur encodé (KI-33) | ✅ | `7e58f5e`, `4f41b01` (CI : run 36596138213) |
-| 36.1 | Administration de la taxonomie (catégories, tags) | 🟡 | à committer |
-| 36.2 → 36.7 | Administration des médias, publications, séries, projets, profil, messages | ⏳ | — |
+| 36.1 | Administration de la taxonomie (catégories, tags) | ✅ | `abc2da9`, `7690e24` (CI : run 36597416828) |
+| 36.2 | Administration des médias (envoi multipart, liste, texte alternatif, suppression contrôlée) | 🟡 | à committer |
+| 36.3 → 36.7 | Administration des publications, séries, projets, profil, messages | ⏳ | — |
 | 37 → 52 | Voir `docs/steps/liste_complete_etapes.md` | ⏳ | — |
 
 Après le push, remplacer les 🟡 par ✅ et noter les hashes.
@@ -143,6 +144,7 @@ Index : [`decisions/README.md`](decisions/README.md).
 | D-CE, D-CF | Route et contrat de la recherche publique ; `q` obligatoire, vide → page vide, 200 caractères au plus (`VALIDATION_FAILED`) ; code ajouté aux erreurs de Spring sans corps | Actives (29) |
 | D-CG, D-CH | Module `contact` sans route (envoi public à l'étape 48, administration à l'étape 36) ; règles du message doublées en SQL ; cycle en avant seulement (invariant 29, `INVALID_CONTACT_MESSAGE_TRANSITION`) | Actives (30) |
 | D-CS | Administration de la taxonomie : conventions des routes d'administration, slug généré, conservé ou suffixé dans la longueur de sa colonne, `NAME_ALREADY_USED`, `TERM_STILL_USED`, contraintes traduites | Active (36.1) |
+| D-CT | Administration des médias : envoi multipart, liste paginée des plus récents, texte alternatif seul modifiable, suppression contrôlée ; requête bornée à 11 Mio (413 `MEDIA_TOO_LARGE`), reste lu par Tomcat jusqu'à 12 Mio | Active (36.2) |
 | D-CR | Cookies `Secure` et `SameSite=Strict`, session de 30 minutes ; `frame-ancestors 'none'` et `Referrer-Policy: no-referrer` en plus des en-têtes par défaut ; `%2F` confié au pare-feu de Spring Security | Active (35) |
 | D-CO … D-CQ | Connexion par session, refus uniforme, identifiant de session renouvelé, garde des 72 octets de bcrypt ; CSRF par cookie réservé à l'administration (avancé de l'étape 35) ; 5 échecs par adresse en 15 minutes, sans verrouillage du compte | Actives (34) |
 | D-CM, D-CN | Compte administrateur unique (invariant 30), empreinte bcrypt seule en SQL (invariant 15) ; configuration qui fait foi à chaque démarrage, mot de passe de 15 caractères à 72 octets | Actives (33) |
@@ -248,7 +250,6 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | Création et modification avec slug libre (`firstAvailable`), `SLUG_ALREADY_USED` sur conflit `UNIQUE` | Étapes 36.3 à 36.5 (publications, séries, projets) | D-BD : fait pour les termes en 36.1 (D-CS) |
 | Écriture des séries (création, chapitres, `NEWS_CANNOT_JOIN_SERIES`, `SERIES_POSITION_ALREADY_USED`) et stabilité de leur slug | Étape 36 | D-BE, D-BK : aucune route d'administration sans authentification |
 | Séries mises en avant sur l'accueil | si le modèle l'adopte | D-BI : absent de `02` §19 |
-| Route d'envoi et limite multipart à 10 Mio | Étape 36 | D-BR, D-BS : aucune route d'administration sans authentification |
 | Médias privés (fichier visible seulement si le contenu qui l'utilise l'est) | si le besoin apparaît | D-BP : clé imprévisible jugée suffisante |
 | Temps de lecture précalculé (colonne) si la liste devient coûteuse | Étape 52.6 | D-AJ : calculé à la lecture, contenu chargé dans la liste |
 | Prérendu route par route | Étape 52.1 | D22 |

@@ -1625,6 +1625,34 @@ Règles propres à ces contrats (D-CS) :
 * bornes : catégorie `name` 80, `slug` 80, `description` 500 ; tag `name` 60, `slug` 60 ;
 * contrats vérifiés par `AdminCategoryIT` et `AdminTagIT`.
 
+### Médias (étape 36.2)
+
+```text
+POST   /api/admin/media        multipart/form-data : file, altText? → 201 + Location, AdminMediaResponse
+GET    /api/admin/media        200 PageResponse<AdminMediaResponse>, 20 par page, les plus récents d'abord
+GET    /api/admin/media/{id}   200 AdminMediaResponse
+PATCH  /api/admin/media/{id}   { altText } → 200 AdminMediaResponse
+DELETE /api/admin/media/{id}   204 (entrée et fichier supprimés)
+
+AdminMediaResponse { id, url, originalName, format (PNG | JPEG | WEBP | PDF), mimeType, sizeBytes,
+                     width | null, height | null, altText | null, createdAt }
+
+400 VALIDATION_FAILED         altText de plus de 300 caractères ; 400 MALFORMED_REQUEST sans partie file
+404 RESOURCE_NOT_FOUND        identifiant inconnu
+409 MEDIA_STILL_REFERENCED    suppression d'un média utilisé par un contenu
+413 MEDIA_TOO_LARGE           image de plus de 5 Mio, PDF de plus de 10 Mio, requête de plus de 11 Mio
+415 UNSUPPORTED_MEDIA_FORMAT  contenu qui n'est ni PNG, ni JPEG, ni WebP, ni PDF
+```
+
+Règles propres à ces contrats (D-CT) :
+
+* session de l’administrateur et jeton CSRF obligatoires (401 et 403 sinon), comme toute l’administration (D-CS) ;
+* le format est reconnu par le contenu, jamais par le nom ni par le type annoncé (D-BR) ; `originalName` est le dernier segment du nom envoyé ;
+* `url` est l’adresse publique du fichier (`GET /api/public/media/{storageKey}`) ; un contenu référence le média par son `id` ;
+* seul le texte alternatif se modifie : remplacer un fichier, c’est envoyer un nouveau média ; `altText` vide ou absent → `null` ;
+* au-delà de 12 Mio, Tomcat coupe la connexion au lieu de répondre 413 : l’interface vérifie la taille avant l’envoi ;
+* contrats vérifiés par `AdminMediaIT` ; limite de la requête sur un vrai serveur par `HttpServerSecurityIT`.
+
 # 31. Ressources administratives prévues
 
 Les principales ressources administratives sont conceptuellement :
@@ -1873,7 +1901,7 @@ Elles sont simplement inutiles pour le périmètre actuel.
 | `NEWS_CANNOT_JOIN_SERIES`        |  409 | Une `NEWS` ne peut pas appartenir à une série |
 | `MEDIA_STILL_REFERENCED`         |  409 | Média encore référencé                        |
 | `UNSUPPORTED_MEDIA_FORMAT`       |  415 | Format de média non accepté                   |
-| `MEDIA_TOO_LARGE`                |  413 | Fichier trop volumineux pour son format       |
+| `MEDIA_TOO_LARGE`                |  413 | Fichier trop volumineux (format ou requête)   |
 | `INVALID_CONTACT_MESSAGE_TRANSITION` | 409 | Retour en arrière dans le cycle d’un message de contact (D-CH) ; levé par le cas d’usage, route à l’étape 36 |
 ---
 
