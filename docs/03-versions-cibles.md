@@ -228,6 +228,8 @@ Version Maven Wrapper :
 3.3.4
 ```
 
+Garde-fou (D-DA) : `maven-enforcer-plugin` fait échouer la construction si la JVM n'est pas Java 25 (`[25,26)`), si Maven est antérieur à 3.9.16, ou si une dépendance arrive en deux versions par des chemins différents (`dependencyConvergence`).
+
 Le Maven installé globalement sur la machine n'est utilisé que pour les opérations initiales éventuelles.
 
 Ensuite :
@@ -415,7 +417,7 @@ Relevé du 2026-09-24 (`backend/pom.xml`, `frontend/package-lock.json`).
 | Spring Boot (parent) | 4.1.1 | BOM |
 | Starters : webmvc, data-jpa, validation, actuator, flyway, mail, security (Spring Security 7.1) | BOM | BOM |
 | `flyway-database-postgresql` | BOM | BOM |
-| Driver PostgreSQL | BOM | BOM |
+| Driver PostgreSQL | BOM | BOM ; portée `compile` pour lire le nom d'une contrainte refusée, dans une seule classe (D-DH) |
 | Lombok | BOM | processeur d'annotations déclaré dans `maven-compiler-plugin` |
 | `springdoc-openapi-starter-webmvc-ui` | 3.1.0 | **hors BOM**, version fixée dans le `pom.xml` |
 | ArchUnit | 1.5.0 | **hors BOM**, version fixée dans le `pom.xml` |
@@ -425,6 +427,8 @@ Relevé du 2026-09-24 (`backend/pom.xml`, `frontend/package-lock.json`).
 | Mailpit (image `axllent/mailpit`) | v1.31.3 | `deploy/compose.dev.yaml` : SMTP de développement (D-CI) |
 
 Toute dépendance hors BOM doit être vérifiée à chaque montée de Spring Boot.
+
+Dependabot propose chaque semaine les montées de ces dépendances, des paquets npm, des actions GitHub et de Mailpit (D-DI, `conventions-git.md` §32).
 
 ## 11.2 Frontend
 
@@ -447,6 +451,6 @@ Le moteur Node requis par Angular 22.1 est `^22.22.3 || ^24.15.0 || >=26.0.0`. L
 | Fichier | Contenu | Remarque |
 |---|---|---|
 | `.nvmrc` | `24` | Node 24 LTS |
-| `.sdkmanrc` | `java=25.0.4.1-tem`, `maven=3.9.15` | le Maven de référence reste celui du wrapper (3.9.16) ; la ligne `maven` de SDKMAN ne sert qu'aux opérations hors wrapper |
+| `.sdkmanrc` | `java=25.0.4.1-tem`, `maven=3.9.16` | aligné sur le wrapper (D-DA) ; la ligne `maven` de SDKMAN ne sert qu'aux opérations hors wrapper |
 | `backend/.mvn/wrapper/maven-wrapper.properties` | Maven 3.9.16, wrapper 3.3.4 | référence |
 | `frontend/package.json` → `packageManager` | `npm@11.16.0` | |

@@ -2,25 +2,26 @@
 
 Ce fichier est la **seule** source de vérité sur l'avancement. Il ne répète pas le contenu des autres documents : il pointe vers eux.
 
-Dernière mise à jour : 2026-09-29 (étape 36.6 poussée, CI verte ; étape 36.7 terminée et vérifiée, commits à faire : fin de l'étape 36)
+Dernière mise à jour : 2026-09-29 (étape 36 close, CI verte ; dossier de référence `docs/project/v1` rédigé ; professionnalisation du backend P-B01 à P-B09 vérifiée, commits à faire)
 
 ---
 
 ## 1. État courant
 
 ```text
-Dernière étape terminée   : 36.6 — Administration du profil, poussée, CI verte (run 36607262554)
-Étape en cours            : 36 — API d'administration (36.7 messages vérifiée, commits à faire : dernière sous-étape)
+Dernière étape terminée   : 36 — API CRUD d'administration, poussée, CI verte (run 36608187827)
+Étape en cours            : professionnalisation du backend (lots P-B01 à P-B09), vérifiée, commits à faire
 Prochaine étape prévue    : 37 — Structurer Angular par fonctionnalités
-État                      : PRÊT après commit et push de 36.7
+État                      : PRÊT après commit et push des lots
 Branche                   : develop
-Vérification              : ./mvnw clean verify → 694 tests verts (316 *Test, 378 *IT) à la fin de 36.7
+Vérification              : ./mvnw clean verify → 732 tests verts (334 *Test, 398 *IT) à la fin de P-B08
 ```
 
 ## 2. Prochaine action
 
-1. Committer et pousser 36.7 (deux commits), vérifier la CI, puis remplacer le 🟡 par ✅ : l'étape 36 est alors close.
-2. Étape 36, dans l'ordre des dépendances (les termes et médias avant les contenus qui les référencent) :
+1. Committer les lots P-B01 à P-B09 (un commit par lot, puis la documentation), pousser, vérifier la CI, remplacer le 🟡 par ✅. Décisions : D-DA à D-DI.
+2. Étape 37 : structurer Angular par fonctionnalités (premier écran du frontend). Vue d'ensemble du projet à ce stade : [`project/v1/README.md`](project/v1/README.md).
+3. Étape 36, close (rappel du découpage) :
 
    ```text
    36.1  Taxonomie : catégories et tags                                    ✔ poussée
@@ -29,9 +30,9 @@ Vérification              : ./mvnw clean verify → 694 tests verts (316 *Test,
    36.4  Séries : création, chapitres remplacés d'un bloc (NEWS_CANNOT_JOIN_SERIES, ARTICLE_ALREADY_IN_SERIES)   ✔ poussée
    36.5  Projets : technologies, projets, couverture et captures, stabilité du slug   ✔ poussée
    36.6  Profil : profil et collections, avatar et CV   ✔ poussée
-   36.7  Messages de contact : liste, détail, changement de statut   ✔ vérifiée
+   36.7  Messages de contact : liste, détail, changement de statut   ✔ poussée
    ```
-3. Confirmer ou infirmer D-T (cohérence `stage` ⇔ `endDate`) : `docs/decisions/registre-implementation.md`.
+4. Confirmer ou infirmer D-T (cohérence `stage` ⇔ `endDate`) : `docs/decisions/registre-implementation.md`.
 
 ---
 
@@ -110,7 +111,9 @@ Légende : ✅ terminée et poussée · 🟡 terminée et vérifiée, commits à
 | 36.4 | Administration des séries (saisie, slug, chapitres remplacés d'un bloc) | ✅ | `508313a`, `4ce7cf8` (CI : run 36603771411) |
 | 36.5 | Administration des technologies et des projets ; mémoire de publication et description bornée (`V023`) | ✅ | `7a24c9a`, `4bad8b8` (CI : run 36605811512) |
 | 36.6 | Administration du profil (remplacement complet, collections comprises) | ✅ | `3203055`, `c9b3297` (CI : run 36607262554) |
-| 36.7 | Administration des messages de contact | 🟡 | à committer |
+| 36.7 | Administration des messages de contact | ✅ | `77ff96b`, `23aa08b` (CI : run 36608187827) |
+| — | Dossier de référence `docs/project/v1` (exigences, architecture, données, API, sécurité, tests, exploitation) | 🟡 | à committer |
+| P-B01 → P-B09 | Professionnalisation du backend : construction reproductible, diagnostic sûr, mandataire inverse, configuration de production explicite, cohérence des fichiers médias, journal de sécurité, contrat OpenAPI versionné, contraintes par nom structuré, Dependabot | 🟡 | à committer |
 | 37 → 52 | Voir `docs/steps/liste_complete_etapes.md` | ⏳ | — |
 
 Après le push, remplacer les 🟡 par ✅ et noter les hashes.
@@ -159,6 +162,7 @@ Index : [`decisions/README.md`](decisions/README.md).
 | D-CM, D-CN | Compte administrateur unique (invariant 30), empreinte bcrypt seule en SQL (invariant 15) ; configuration qui fait foi à chaque démarrage, mot de passe de 15 caractères à 72 octets | Actives (33) |
 | D-CK, D-CL | Séparation des routes (public, administration authentifiée, reste refusé), aucun utilisateur généré, aucune session anonyme, springdoc en `dev` ; refus de sécurité rendus par `GlobalExceptionHandler` (`AUTHENTICATION_REQUIRED`, `ACCESS_DENIED`, `MALFORMED_REQUEST`) | Actives (32) |
 | D-CI, D-CJ | Port `ContactNotificationSender`, courriel SMTP à l'administrateur (`Reply-To` visiteur, sujet sur une ligne) ; envoi après validation, échec journalisé sans donnée personnelle ; santé SMTP hors de l'état de l'application ; GreenMail en test, Mailpit en développement | Actives (31) |
+| D-DA … D-DI | Professionnalisation du backend : Enforcer et agent Mockito ; `X-Request-Id` et journal d'erreur sans message ; en-têtes du mandataire depuis un réseau de confiance ; aucune valeur de développement hors `dev` ; fichiers médias alignés sur la transaction ; événements de sécurité et écritures d'administration journalisés, JSON ECS facultatif ; contrat OpenAPI versionné ; nom structuré des contraintes ; Dependabot | Actives (P-B01 à P-B09) |
 | 14.4 | Exposition publique de `publicEmail` | À confirmer |
 
 ## 5. Problèmes connus
@@ -256,7 +260,7 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | Liste publique des technologies (`/api/public/technologies`) | Étape 42 | D-AE : les technologies sont exposées par projet |
 | Tri choisi par le client (`sort`) | quand un écran le demande | D-V : ordre fixe, paramètre ignoré |
 | Rejet explicite (400) des paramètres de pagination hors bornes, au lieu de les ramener aux bornes | si un client en a besoin | comportement Spring Data retenu (D-V) |
-| Verrouillage optimiste des publications (`@Version`) | si plusieurs administrateurs | D-AX : un seul administrateur en V1 |
+| Verrouillage optimiste des saisies d'administration (`@Version`, `version` dans les `PUT`) | décision du propriétaire (contrat d'API) | D-AX : un seul administrateur en V1, mais deux onglets peuvent s'écraser (dernier `PUT` gagnant) |
 | Routes publiques `/api/public/categories` et `/api/public/tags` | Étape 43 | D-AT : les termes sont exposés par publication |
 | Création et modification avec slug libre (`firstAvailable`), `SLUG_ALREADY_USED` sur conflit `UNIQUE` | fait (36.1 à 36.5) | D-BD : fait pour les termes (D-CS), les publications (D-CU) et les séries (D-CV) |
 | Suppression d'un brouillon de publication | si le besoin apparaît | D-CU : l'archivage retire une publication du site |
@@ -273,13 +277,17 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | Notification asynchrone (hors du fil de la requête) | Étape 48, si la latence de la route publique le justifie | D-CJ : envoi synchrone borné à 5 s par délai SMTP |
 | Argon2id au lieu de bcrypt | si une dépendance BouncyCastle devient acceptable | D-CN : l'encodeur délégué permet la migration (empreintes préfixées, `upgradeEncoding`) |
 | Politique de sécurité du contenu (CSP complète) du site | Étapes 37 et 52 | D-CR : l'API n'envoie que `frame-ancestors 'none'` |
-| HSTS derrière le mandataire inverse (requête vue en HTTP par Tomcat) | Étape 52 | D-CR : Spring ne l'envoie qu'en HTTPS ; Caddy ou les en-têtes de transfert |
-| Adresse réelle du client derrière le mandataire inverse (en-têtes de transfert) pour la limite des essais | Étape 52 | D-CQ : `getRemoteAddr()` vaut l'adresse du mandataire en production |
+| HSTS derrière le mandataire inverse (requête vue en HTTP par Tomcat) | fait (P-B03) | D-DC : `X-Forwarded-Proto` accepté depuis un réseau de confiance |
+| Adresse réelle du client derrière le mandataire inverse (en-têtes de transfert) pour la limite des essais | fait (P-B03) | D-DC : `X-Forwarded-For` accepté depuis un réseau de confiance ; à vérifier avec le réseau Docker réel à l'étape 52 |
 | Limite des essais partagée entre plusieurs instances | si l'application passe à plusieurs instances | D-CQ : compteur en mémoire |
 | Désactiver le compte (`enabled`) | si l'administration le demande | D-CM : colonne présente (`02` §26), toujours vraie |
 | Configuration SMTP de production (authentification, STARTTLS) | Étape 52 | D-CI : `MAIL_*` lues, sécurité du transport à fixer avec le fournisseur |
 | Filtre de la recherche par genre de contenu (`type`), extraits mis en évidence (`ts_headline`), recherche par préfixe pendant la saisie | si l'écran de recherche le demande (étape 47) | D-CE ; D-CC : `websearch_to_tsquery` n'accepte pas `:*` |
 | Catégorie dans le document de recherche | si le modèle l'adopte | D-CA : absente de `01` §11 |
+| Rapprochement des fichiers médias orphelins (arrêt brutal entre l'écriture et la fin de la transaction) | si un orphelin est constaté | D-DE : un rollback ou une suppression validée gardent déjà la cohérence |
+| `build-info`, point `info`, métriques et traces exportées | si une supervision est mise en place | D-DF : version présente au démarrage et dans les journaux JSON |
+| Comparaison de compatibilité du contrat (OpenAPI Diff) | si un client externe apparaît | D-DG : le diff de `docs/api/openapi.json` est relu |
+| CodeQL, SBOM (CycloneDX) | Étape 52 | D-DI |
 | Classement en base (fenêtre de pagination SQL) au lieu du classement en mémoire de tous les résultats | Étape 52.6, si le corpus dépasse quelques milliers de contenus | D-CD |
 
 ---

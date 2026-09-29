@@ -103,6 +103,7 @@ Contenu actuel (étape 19) :
 | `shared.error` | `ErrorCode`, `ApplicationException` et sous-classes | erreurs métier stables |
 | `shared.domain.model` | `DateRange`, `PageQuery`, `PageResult`, `Slug` | objets de valeur utilisés par **plusieurs** modules ; soumis aux règles de `domain` (§12.4 : ni Spring ni JPA) |
 | `shared.infrastructure` | `ClockConfiguration` | horloge applicative (`Clock`, D03) : les cas d’usage lisent « maintenant » dans ce bean, jamais par `Instant.now()` ; horloge fixe dans les `*IT` (D-AG) |
+| `shared.infrastructure.persistence` | `ViolatedConstraint` | nom de la contrainte refusée par PostgreSQL, lu dans le champ structuré de l’erreur (D-DH) ; utilisable par l’**infrastructure** des modules seulement, seule classe à dépendre du pilote JDBC (ArchUnit) |
 
 Une classe n’entre dans `shared.domain.model` qu’au deuxième usage réel dans un autre module (ex. `DateRange` : `profile` puis `project`, D-S ; `Slug` : `project`, `publication` et `taxonomy`, D-BA).
 

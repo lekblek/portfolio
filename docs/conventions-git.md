@@ -982,6 +982,8 @@ frontend : Node (.nvmrc) → npm ci → npm test -- --watch=false → npm run bu
 
 Les scripts exécutés sur Linux (`backend/mvnw`, `scripts/hooks/*`) doivent être enregistrés exécutables dans Git (`git update-index --chmod=+x`).
 
+Dependabot (`.github/dependabot.yml`, D-DI) ouvre chaque semaine des pull requests vers `develop` : Maven, npm, GitHub Actions et images de `deploy/compose.dev.yaml`, mineures et correctifs groupés par écosystème, messages `build(deps): …` ou `ci: …`. Une telle pull request s'intègre comme les autres, CI verte. Restent manuelles : les majeures d'Angular (`ng update`), TypeScript, et l'image `postgres` (`03-versions-cibles.md` §10.3). Les alertes et mises à jour de sécurité s'activent dans les paramètres du dépôt GitHub.
+
 ---
 
 # 33. Exemples de bons commits

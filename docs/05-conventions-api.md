@@ -578,6 +578,8 @@ Le projet ajoute l’extension :
 code
 ```
 
+Depuis D-DB, chaque réponse (succès ou erreur, y compris un refus de sécurité) porte l’en-tête `X-Request-Id` ; une 500 `INTERNAL_ERROR` ajoute l’extension `requestId`, même valeur, à citer pour retrouver l’incident dans les journaux. Un `X-Request-Id` reçu du mandataire inverse est repris s’il ne contient que `[A-Za-z0-9._-]` (64 caractères au plus) ; sinon un identifiant aléatoire le remplace.
+
 ---
 
 # 11. Code d’erreur métier
@@ -1373,6 +1375,8 @@ Les principales ressources publiques de la V1 sont conceptuellement :
 La présence dans cette liste ne signifie pas que tous les endpoints doivent être créés immédiatement.
 
 ## Contrats implémentés
+
+Le contrat OpenAPI généré par springdoc est versionné dans [`docs/api/openapi.json`](api/openapi.json) (D-DG) : `OpenApiContractIT` échoue dès que l'API diffère du fichier. Après un changement voulu, régénérer avec `./mvnw verify -Dit.test=OpenApiContractIT -Dopenapi.update=true` et relire le diff du fichier avec le code. Les sections suivantes décrivent les règles que le schéma ne dit pas (visibilité, ordre, effets).
 
 ### `GET /api/public/profile` (étapes 14 à 16 et 27.3)
 
