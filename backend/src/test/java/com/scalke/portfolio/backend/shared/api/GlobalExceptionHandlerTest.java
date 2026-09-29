@@ -1,6 +1,7 @@
 package com.scalke.portfolio.backend.shared.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -93,7 +94,31 @@ public class GlobalExceptionHandlerTest {
             .andExpect(status().isBadRequest())
             .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
             .andExpect(jsonPath("$.code").value("MALFORMED_REQUEST"))
-            .andExpect(jsonPath("$.detail").value("Required parameter 'value' is not present."));
+            .andExpect(jsonPath("$.detail").value("Paramètre obligatoire absent : value."));
+    }
+
+    /**
+     * D-DJ : le site est en français (D01) ; les textes de l'API ne dépendent ni de la langue du navigateur ni de celle
+     * du serveur, y compris ceux produits par Spring et par Jakarta Validation.
+     */
+    @Test
+    void answers_in_french_whatever_the_client_language() throws Exception {
+        mockMvc.perform(post("/test-errors/validate").header("Accept-Language", "en")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"title\":\"  \"}"))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.detail").value("Certaines valeurs de la requête sont invalides."))
+            .andExpect(jsonPath("$.errors[0].message").value("ne doit pas être vide"));
+        mockMvc.perform(get("/test-errors/validate-param").header("Accept-Language", "en").param("value", "trop long"))
+            .andExpect(jsonPath("$.detail").value("Certaines valeurs de la requête sont invalides."));
+        mockMvc.perform(post("/test-errors/validate").header("Accept-Language", "en")
+                .contentType(MediaType.APPLICATION_JSON).content("{"))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.code").value("MALFORMED_REQUEST"))
+            .andExpect(jsonPath("$.detail").value("Corps de la requête illisible."));
+        mockMvc.perform(delete("/test-errors/not-found").header("Accept-Language", "en"))
+            .andExpect(status().isMethodNotAllowed())
+            .andExpect(jsonPath("$.detail").value("Méthode DELETE non prise en charge par cette adresse."));
     }
 
     /**

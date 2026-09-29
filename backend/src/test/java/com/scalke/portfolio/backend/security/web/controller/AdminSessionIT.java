@@ -156,12 +156,18 @@ class AdminSessionIT extends AbstractIntegrationTest {
             .andExpect(status().isOk());
     }
 
+    /**
+     * Messages en français même pour un navigateur anglais (D-DJ).
+     */
     @Test
     void requires_both_fields() throws Exception {
-        mockMvc.perform(post("/api/admin/session").contextPath("/api").with(xsrf())
+        mockMvc.perform(post("/api/admin/session").contextPath("/api").with(xsrf()).header("Accept-Language", "en")
                 .contentType(MediaType.APPLICATION_JSON).content("{\"login\":\"admin\"}"))
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.code").value("VALIDATION_FAILED"));
+            .andExpect(jsonPath("$.code").value("VALIDATION_FAILED"))
+            .andExpect(jsonPath("$.detail").value("Certaines valeurs de la requête sont invalides."))
+            .andExpect(jsonPath("$.errors[0].field").value("password"))
+            .andExpect(jsonPath("$.errors[0].message").value("ne doit pas être vide"));
     }
 
     /**

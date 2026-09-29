@@ -145,7 +145,7 @@ class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         HttpStatusCode status,
         WebRequest request) {
 
-        ProblemDetail body = ex.getBody();
+        ProblemDetail body = ex.updateAndGetBody(getMessageSource(), LocaleContextHolder.getLocale());
         body.setProperty(CODE_PROPERTY, ErrorCode.VALIDATION_FAILED.name());
         body.setProperty("errors", ex.getBindingResult().getFieldErrors().stream()
             .map(error -> Map.of(
@@ -184,7 +184,7 @@ class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         HttpStatusCode status,
         WebRequest request) {
 
-        ProblemDetail body = ex.getBody();
+        ProblemDetail body = ex.updateAndGetBody(getMessageSource(), LocaleContextHolder.getLocale());
         body.setProperty(CODE_PROPERTY, ErrorCode.VALIDATION_FAILED.name());
         body.setProperty("errors", ex.getParameterValidationResults().stream()
             .flatMap(result -> result.getResolvableErrors().stream()
