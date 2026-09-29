@@ -61,18 +61,18 @@ server:
 
 portfolio:
   media:
-    # Racine du stockage local des médias (D-BO) : relative au répertoire de travail en développement,
-    # volume persistant en production (étape 52).
-    storage-root: ${MEDIA_STORAGE_ROOT:uploads}
+    # Racine du stockage local des médias (D-BO) : volume persistant en production, obligatoire hors dev (D-DD) ;
+    # un défaut relatif perdrait les fichiers au redéploiement d'un conteneur. Développement : application-dev.yaml.
+    storage-root: ${MEDIA_STORAGE_ROOT:}
   admin:
     # Compte administrateur unique (D18, D-CN) : la configuration fait foi à chaque démarrage. Vides : non initialisé.
     username: ${ADMIN_USERNAME:}
     password: ${ADMIN_PASSWORD:}
   contact:
     notification:
-      # Expéditeur et destinataire (l'administrateur) des notifications de contact (D-CI).
-      from: ${MAIL_FROM:portfolio@localhost}
-      to: ${MAIL_TO:admin@localhost}
+      # Expéditeur et destinataire (l'administrateur) des notifications de contact (D-CI), obligatoires hors dev.
+      from: ${MAIL_FROM:}
+      to: ${MAIL_TO:}
 
 # Documentation OpenAPI et Swagger UI : profil dev seulement (KI-19, D-CK).
 springdoc:

@@ -27,9 +27,10 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Ce que seul un vrai serveur montre (D-CR, D-CT) : attributs des cookies posés par Tomcat, traitement d'un séparateur
- * encodé par Tomcat (KI-33), limite d'une requête multipart. MockMvc ne passe ni par Tomcat ni par sa configuration de session. Contexte distinct de
- * {@code AbstractIntegrationTest} (serveur sur un port aléatoire).
+ * Ce que seul un vrai serveur montre (D-CR, D-CT, D-DC) : attributs des cookies posés par Tomcat, traitement d'un
+ * séparateur encodé par Tomcat (KI-33), limite d'une requête multipart, en-têtes du mandataire inverse. MockMvc ne passe
+ * ni par Tomcat ni par sa configuration. Contexte distinct de {@code AbstractIntegrationTest} (serveur sur un port
+ * aléatoire). Le client de test est en 127.0.0.1, réseau de confiance comme le mandataire en production.
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -37,6 +38,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 class HttpServerSecurityIT {
 
     private static final String PASSWORD = "correct-horse-battery-staple";
+    // Adresses de documentation (RFC 5737), jamais routées.
+    private static final String FIRST_CLIENT = "203.0.113.7";
+    private static final String SECOND_CLIENT = "203.0.113.8";
 
     @LocalServerPort
     int port;
@@ -113,6 +117,49 @@ class HttpServerSecurityIT {
 
         assertThat(response.statusCode()).isEqualTo(413);
         assertThat(response.body()).contains("\"code\":\"MEDIA_TOO_LARGE\"");
+    }
+
+    /**
+     * D-DC : derrière le mandataire inverse, la limite des essais porte sur l'adresse du client transmise par
+     * {@code X-Forwarded-For}, et non sur celle du mandataire. Sinon cinq échecs d'un inconnu bloqueraient tout le monde.
+     */
+    @Test
+    void limits_login_attempts_per_client_behind_the_reverse_proxy() throws Exception {
+        String token = value(cookie(send(HttpRequest.newBuilder(uri("/api/admin/session"))), "XSRF-TOKEN")
+            .orElseThrow());
+        try {
+            for (int attempt = 0; attempt < 5; attempt++) {
+                assertThat(wrongLoginFrom(FIRST_CLIENT, token).statusCode()).isEqualTo(401);
+            }
+            assertThat(wrongLoginFrom(FIRST_CLIENT, token).statusCode()).isEqualTo(429);
+            assertThat(wrongLoginFrom(SECOND_CLIENT, token).statusCode()).isEqualTo(401);
+        } finally {
+            loginAttempts.reset(FIRST_CLIENT);
+            loginAttempts.reset(SECOND_CLIENT);
+        }
+    }
+
+    /**
+     * D-DC : TLS est terminé par le mandataire ; {@code X-Forwarded-Proto: https} fait reconnaître la requête comme
+     * sécurisée, d'où l'en-tête HSTS, jamais envoyé sur du HTTP.
+     */
+    @Test
+    void recognizes_https_terminated_by_the_reverse_proxy() throws Exception {
+        HttpResponse<String> plain = send(HttpRequest.newBuilder(uri("/api/public/projects")));
+        HttpResponse<String> forwarded = send(HttpRequest.newBuilder(uri("/api/public/projects"))
+            .header("X-Forwarded-Proto", "https"));
+
+        assertThat(plain.headers().firstValue("Strict-Transport-Security")).isEmpty();
+        assertThat(forwarded.headers().firstValue("Strict-Transport-Security")).isPresent();
+    }
+
+    private HttpResponse<String> wrongLoginFrom(String client, String csrfToken) throws IOException, InterruptedException {
+        return send(HttpRequest.newBuilder(uri("/api/admin/session"))
+            .header("Content-Type", "application/json")
+            .header("X-Forwarded-For", client)
+            .header("Cookie", "XSRF-TOKEN=" + csrfToken)
+            .header("X-XSRF-TOKEN", csrfToken)
+            .POST(HttpRequest.BodyPublishers.ofString("{\"login\":\"admin\",\"password\":\"mauvais mot de passe\"}")));
     }
 
     private HttpResponse<String> login(String csrfToken) throws IOException, InterruptedException {

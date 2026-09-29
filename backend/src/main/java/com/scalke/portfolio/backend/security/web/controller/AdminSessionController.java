@@ -39,8 +39,8 @@ public class AdminSessionController {
 
     /**
      * Connexion : identifiant de session et jeton CSRF renouvelés (fixation de session), puis authentification
-     * enregistrée dans la session. Tentatives limitées par adresse du client (D-CQ) ; derrière le mandataire inverse
-     * de production, l'adresse réelle viendra des en-têtes de transfert (étape 52).
+     * enregistrée dans la session. Tentatives limitées par adresse du client (D-CQ) ; derrière le mandataire inverse,
+     * {@code getRemoteAddr()} rend l'adresse transmise par {@code X-Forwarded-For} depuis un réseau de confiance (D-DC).
      */
     @PostMapping
     AdminSessionResponse open(@Valid @RequestBody OpenAdminSessionRequest body, HttpServletRequest request,
