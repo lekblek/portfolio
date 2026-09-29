@@ -2,25 +2,35 @@
 
 Ce fichier est la **seule** source de vérité sur l'avancement. Il ne répète pas le contenu des autres documents : il pointe vers eux.
 
-Dernière mise à jour : 2026-09-29 (étape 34 poussée, CI verte ; étape 35 terminée et vérifiée, commits à faire)
+Dernière mise à jour : 2026-09-29 (étape 35 poussée, CI verte ; étape 36.1 terminée et vérifiée, commits à faire)
 
 ---
 
 ## 1. État courant
 
 ```text
-Dernière étape terminée   : 35 — Durcissement HTTP (vérifiée, commits à faire) ; 34 poussée, CI verte (run 36595141519)
-Étape en cours            : aucune
-Prochaine étape prévue    : 36 — Construire les API CRUD administrateur
-État                      : PRÊT après commit et push de l'étape 35
+Dernière étape terminée   : 35 — Durcissement HTTP, poussée, CI verte (run 36596138213)
+Étape en cours            : 36 — API d'administration (36.1 taxonomie vérifiée, commits à faire ; 36.2 à 36.7 à faire)
+Prochaine étape prévue    : 36.2 — Administration des médias
+État                      : PRÊT après commit et push de 36.1
 Branche                   : develop
-Vérification              : ./mvnw clean verify → 599 tests verts (300 *Test, 299 *IT) à la fin de l'étape 35
+Vérification              : ./mvnw clean verify → 618 tests verts (303 *Test, 315 *IT) à la fin de 36.1
 ```
 
 ## 2. Prochaine action
 
-1. Committer et pousser l'étape 35 (deux commits), vérifier la CI, puis remplacer le 🟡 par ✅.
-2. Étape 36 : API d'administration derrière la session (profil, projets, publications, séries, taxonomie, médias, messages de contact), en reprenant les écritures reportées (§6 : statut des publications, envoi et suppression de médias, séries, slugs libres, stabilité du slug des projets) ; à découper en sous-étapes par module.
+1. Committer et pousser 36.1 (deux commits), vérifier la CI, puis remplacer le 🟡 par ✅.
+2. Suite de l'étape 36, dans l'ordre des dépendances (les termes et médias avant les contenus qui les référencent) :
+
+   ```text
+   36.1  Taxonomie : catégories et tags                                    ✔ vérifiée
+   36.2  Médias : envoi (multipart 10 Mio), liste, texte alternatif, suppression contrôlée
+   36.3  Publications : liste tous statuts, création, modification (SLUG_LOCKED), statut, termes, couverture
+   36.4  Séries : création, chapitres (NEWS_CANNOT_JOIN_SERIES, SERIES_POSITION_ALREADY_USED)
+   36.5  Projets : technologies, projets, couverture et captures, stabilité du slug
+   36.6  Profil : profil et collections, avatar et CV
+   36.7  Messages de contact : liste, détail, changement de statut
+   ```
 3. Confirmer ou infirmer D-T (cohérence `stage` ⇔ `endDate`) : `docs/decisions/registre-implementation.md`.
 
 ---
@@ -93,8 +103,10 @@ Légende : ✅ terminée et poussée · 🟡 terminée et vérifiée, commits à
 | 33 | Compte administrateur unique (`V021`), initialisé depuis la configuration, empreinte bcrypt seule | ✅ | `5786680`, `a9f3e80` (CI : run 36580781605) |
 | 34.1 | Connexion par session (`/api/admin/session`), CSRF d'application monopage, date de dernière connexion | ✅ | `72fda46`, `dbcbafa` (CI : run 36595141519) |
 | 34.2 | Limite des essais de connexion (5 échecs par adresse en 15 minutes, 429) | ✅ | `72fda46` (commit commun avec 34.1) |
-| 35 | Durcissement HTTP : attributs des cookies, en-têtes de sécurité, séparateur encodé (KI-33) | 🟡 | à committer |
-| 36 → 52 | Voir `docs/steps/liste_complete_etapes.md` | ⏳ | — |
+| 35 | Durcissement HTTP : attributs des cookies, en-têtes de sécurité, séparateur encodé (KI-33) | ✅ | `7e58f5e`, `4f41b01` (CI : run 36596138213) |
+| 36.1 | Administration de la taxonomie (catégories, tags) | 🟡 | à committer |
+| 36.2 → 36.7 | Administration des médias, publications, séries, projets, profil, messages | ⏳ | — |
+| 37 → 52 | Voir `docs/steps/liste_complete_etapes.md` | ⏳ | — |
 
 Après le push, remplacer les 🟡 par ✅ et noter les hashes.
 
@@ -130,6 +142,7 @@ Index : [`decisions/README.md`](decisions/README.md).
 | D-CC, D-CD | Recherche classée derrière les façades, règle de visibilité non réécrite ; module `search` sans table, classement commun et pagination | Actives (28.2) |
 | D-CE, D-CF | Route et contrat de la recherche publique ; `q` obligatoire, vide → page vide, 200 caractères au plus (`VALIDATION_FAILED`) ; code ajouté aux erreurs de Spring sans corps | Actives (29) |
 | D-CG, D-CH | Module `contact` sans route (envoi public à l'étape 48, administration à l'étape 36) ; règles du message doublées en SQL ; cycle en avant seulement (invariant 29, `INVALID_CONTACT_MESSAGE_TRANSITION`) | Actives (30) |
+| D-CS | Administration de la taxonomie : conventions des routes d'administration, slug généré, conservé ou suffixé dans la longueur de sa colonne, `NAME_ALREADY_USED`, `TERM_STILL_USED`, contraintes traduites | Active (36.1) |
 | D-CR | Cookies `Secure` et `SameSite=Strict`, session de 30 minutes ; `frame-ancestors 'none'` et `Referrer-Policy: no-referrer` en plus des en-têtes par défaut ; `%2F` confié au pare-feu de Spring Security | Active (35) |
 | D-CO … D-CQ | Connexion par session, refus uniforme, identifiant de session renouvelé, garde des 72 octets de bcrypt ; CSRF par cookie réservé à l'administration (avancé de l'étape 35) ; 5 échecs par adresse en 15 minutes, sans verrouillage du compte | Actives (34) |
 | D-CM, D-CN | Compte administrateur unique (invariant 30), empreinte bcrypt seule en SQL (invariant 15) ; configuration qui fait foi à chaque démarrage, mot de passe de 15 caractères à 72 octets | Actives (33) |
@@ -232,7 +245,7 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | Verrouillage optimiste des publications (`@Version`) | si plusieurs administrateurs | D-AX : un seul administrateur en V1 |
 | Routes publiques `/api/public/categories` et `/api/public/tags` | Étape 43 | D-AT : les termes sont exposés par publication |
 | Stabilité du slug d'un projet après sa première publication (D11) | Étape 36 | D-BC : pas encore de mémoire de publication des projets ni de modification |
-| Création et modification avec slug libre (`firstAvailable`), `SLUG_ALREADY_USED` sur conflit `UNIQUE` | Étape 36 | D-BD : aucun appelant avant l'administration |
+| Création et modification avec slug libre (`firstAvailable`), `SLUG_ALREADY_USED` sur conflit `UNIQUE` | Étapes 36.3 à 36.5 (publications, séries, projets) | D-BD : fait pour les termes en 36.1 (D-CS) |
 | Écriture des séries (création, chapitres, `NEWS_CANNOT_JOIN_SERIES`, `SERIES_POSITION_ALREADY_USED`) et stabilité de leur slug | Étape 36 | D-BE, D-BK : aucune route d'administration sans authentification |
 | Séries mises en avant sur l'accueil | si le modèle l'adopte | D-BI : absent de `02` §19 |
 | Route d'envoi et limite multipart à 10 Mio | Étape 36 | D-BR, D-BS : aucune route d'administration sans authentification |

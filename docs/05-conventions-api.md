@@ -1602,6 +1602,29 @@ Règles propres à ce contrat (D-CO, D-CP, D-CQ) :
 * `lastLoginAt` : instant ISO-8601 UTC de la connexion en cours ;
 * contrat vérifié par `AdminSessionIT`.
 
+### Catégories et tags (étape 36.1)
+
+```text
+GET    /api/admin/categories        200 AdminCategoryResponse[] { id, name, slug, description | null }, par nom
+POST   /api/admin/categories        { name, slug?, description? } → 201 + Location, AdminCategoryResponse
+PUT    /api/admin/categories/{id}   { name, slug?, description? } → 200 AdminCategoryResponse
+DELETE /api/admin/categories/{id}   204
+GET    /api/admin/tags              200 AdminTagResponse[] { id, name, slug }, par nom
+POST   /api/admin/tags              { name, slug? } → 201 + Location, AdminTagResponse
+PUT    /api/admin/tags/{id}         { name, slug? } → 200 AdminTagResponse
+DELETE /api/admin/tags/{id}         204
+400 VALIDATION_FAILED   nom blanc ou sans lettre ni chiffre, trop long ; slug mal formé ou trop long
+404 RESOURCE_NOT_FOUND  identifiant inconnu
+409 NAME_ALREADY_USED   nom déjà pris, casse ignorée ; 409 TERM_STILL_USED à la suppression d'un terme utilisé
+```
+
+Règles propres à ces contrats (D-CS) :
+
+* session de l’administrateur et jeton CSRF obligatoires (401 et 403 sinon) ;
+* `slug` facultatif : généré depuis le nom à la création, conservé à la modification ; s’il est déjà pris, le premier suffixe libre est ajouté (`backend-2`) ;
+* bornes : catégorie `name` 80, `slug` 80, `description` 500 ; tag `name` 60, `slug` 60 ;
+* contrats vérifiés par `AdminCategoryIT` et `AdminTagIT`.
+
 # 31. Ressources administratives prévues
 
 Les principales ressources administratives sont conceptuellement :
@@ -1842,6 +1865,8 @@ Elles sont simplement inutiles pour le périmètre actuel.
 | `MALFORMED_REQUEST`              |  400 | Requête HTTP ou JSON invalide                 |
 | `INTERNAL_ERROR`                 |  500 | Erreur serveur inattendue                     |
 | `SLUG_ALREADY_USED`              |  409 | Slug déjà utilisé                             |
+| `NAME_ALREADY_USED`              |  409 | Nom de terme déjà pris, casse ignorée (D-CS)  |
+| `TERM_STILL_USED`                |  409 | Terme encore utilisé par une publication (D-CS) |
 | `SLUG_LOCKED`                    |  409 | Slug d’un contenu déjà publié (D11)           |
 | `INVALID_PUBLICATION_TRANSITION` |  409 | Transition d’état de publication interdite    |
 | `SERIES_POSITION_ALREADY_USED`   |  409 | Position déjà occupée dans une série          |

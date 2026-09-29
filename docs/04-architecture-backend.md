@@ -271,6 +271,8 @@ taxonomy → shared
 
 La taxonomie éditoriale est indépendante des technologies utilisées dans les projets.
 
+État d’implémentation : lecture par la façade `TaxonomyQueryService` depuis l’étape 20 ; administration (`/api/admin/categories`, `/api/admin/tags`) depuis l’étape 36.1 (D-CS).
+
 ---
 
 ### 3.8 `media`
