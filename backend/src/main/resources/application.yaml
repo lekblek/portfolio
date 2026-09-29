@@ -14,6 +14,18 @@ spring:
         # Taille de page maximale pour toute l'API (ApiPaging.MAX_PAGE_SIZE, 05-conventions-api.md §13) :
         # une valeur supérieure est ramenée à ce plafond. La taille par défaut se déclare par contrôleur.
         max-page-size: 100
+  mail:
+    # Notification des messages de contact (D-CI). Par défaut : Mailpit de deploy/compose.dev.yaml.
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:1025}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    default-encoding: UTF-8
+    properties:
+      # Un serveur SMTP lent ne doit pas bloquer indéfiniment la requête qui a enregistré le message.
+      mail.smtp.connectiontimeout: 5000
+      mail.smtp.timeout: 5000
+      mail.smtp.writetimeout: 5000
 
 server:
   servlet:
@@ -24,8 +36,17 @@ portfolio:
     # Racine du stockage local des médias (D-BO) : relative au répertoire de travail en développement,
     # volume persistant en production (étape 52).
     storage-root: ${MEDIA_STORAGE_ROOT:uploads}
+  contact:
+    notification:
+      # Expéditeur et destinataire (l'administrateur) des notifications de contact (D-CI).
+      from: ${MAIL_FROM:portfolio@localhost}
+      to: ${MAIL_TO:admin@localhost}
 
 management:
+  health:
+    mail:
+      # Une panne SMTP ne rend pas l'application indisponible : la notification est accessoire (D14, D-CJ).
+      enabled: false
   endpoints:
     web:
       exposure:

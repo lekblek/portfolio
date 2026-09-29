@@ -21,4 +21,14 @@ class ActuatorHealthIT extends AbstractIntegrationTest {
             .andExpect(jsonPath("$.status").value("UP"))
             .andExpect(jsonPath("$.components.db.status").value("UP"));
     }
+
+    /**
+     * D-CJ : le serveur SMTP n'entre pas dans l'état de santé ; sa panne ne rend pas l'application indisponible.
+     */
+    @Test
+    void healthEndpointIgnoresTheMailServer() throws Exception {
+        mockMvc.perform(get("/actuator/health"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.components.mail").doesNotExist());
+    }
 }
