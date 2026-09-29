@@ -7,6 +7,7 @@ import com.scalke.portfolio.backend.shared.error.ResourceNotFoundException;
 import com.scalke.portfolio.backend.shared.error.UnsupportedContentException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -42,6 +43,14 @@ public class ErrorHandlingTestController {
 
     @PostMapping("/validate")
     void validate(@Valid @RequestBody SampleRequest request) {
+    }
+
+    @GetMapping("/required-param")
+    void requiredParam(@RequestParam String value) {
+    }
+
+    @GetMapping("/validate-param")
+    void validateParam(@RequestParam @Size(max = 3, message = "au plus {max} caractères") String value) {
     }
 
     @GetMapping("/boom")

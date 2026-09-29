@@ -62,6 +62,31 @@ public class GlobalExceptionHandlerTest {
             .andExpect(jsonPath("$.errors[0].field").value("title"));
     }
 
+    /**
+     * D-CF : une exception de Spring arrivée sans corps (paramètre obligatoire absent) reçoit elle aussi son code.
+     */
+    @Test
+    void gives_a_code_to_a_missing_required_parameter() throws Exception {
+        mockMvc.perform(get("/test-errors/required-param"))
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+            .andExpect(jsonPath("$.code").value("MALFORMED_REQUEST"))
+            .andExpect(jsonPath("$.detail").value("Required parameter 'value' is not present."));
+    }
+
+    /**
+     * D-CF : une contrainte sur un paramètre de requête a la même forme qu'un échec de validation d'un corps.
+     */
+    @Test
+    void renders_request_parameter_constraint_failures_with_field_details() throws Exception {
+        mockMvc.perform(get("/test-errors/validate-param").param("value", "trop long"))
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+            .andExpect(jsonPath("$.code").value("VALIDATION_FAILED"))
+            .andExpect(jsonPath("$.errors[0].field").value("value"))
+            .andExpect(jsonPath("$.errors[0].message").value("au plus 3 caractères"));
+    }
+
     @Test
     void never_leaks_internal_details_on_unexpected_errors() throws Exception {
         mockMvc.perform(get("/test-errors/boom"))

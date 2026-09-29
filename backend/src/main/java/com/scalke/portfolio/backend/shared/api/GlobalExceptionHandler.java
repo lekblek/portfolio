@@ -6,11 +6,14 @@ import com.scalke.portfolio.backend.shared.error.ErrorCode;
 import com.scalke.portfolio.backend.shared.error.ResourceNotFoundException;
 import com.scalke.portfolio.backend.shared.error.UnsupportedContentException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.*;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.Map;
@@ -78,6 +81,31 @@ class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, body, headers, status, request);
     }
 
+    /**
+     * Contrainte Jakarta Validation posée sur un paramètre de requête (ex. longueur de {@code q}, D-CF) : même
+     * forme que l'échec de validation d'un corps JSON ; {@code field} est le nom du paramètre.
+     */
+    @Override
+    protected ResponseEntity<Object> handleHandlerMethodValidationException(
+        HandlerMethodValidationException ex,
+        HttpHeaders headers,
+        HttpStatusCode status,
+        WebRequest request) {
+
+        ProblemDetail body = ex.getBody();
+        body.setProperty(CODE_PROPERTY, ErrorCode.VALIDATION_FAILED.name());
+        body.setProperty("errors", ex.getParameterValidationResults().stream()
+            .flatMap(result -> result.getResolvableErrors().stream()
+                .map(error -> Map.of(
+                    "field", Objects.requireNonNullElse(
+                        result.getMethodParameter().getParameterName(), "paramètre"),
+                    "message", Objects.requireNonNullElse(
+                        error.getDefaultMessage(), "valeur invalide"))))
+            .toList());
+
+        return handleExceptionInternal(ex, body, headers, status, request);
+    }
+
     @Override
     protected ResponseEntity<Object> handleExceptionInternal(
         Exception ex,
@@ -86,6 +114,11 @@ class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         HttpStatusCode statusCode,
         WebRequest request) {
 
+        // Certaines exceptions de Spring (paramètre obligatoire absent, par exemple) arrivent sans corps : la
+        // classe mère le construirait après ce contrôle, sans code. Il est donc construit ici, de la même façon.
+        if (body == null && ex instanceof ErrorResponse errorResponse) {
+            body = errorResponse.updateAndGetBody(getMessageSource(), LocaleContextHolder.getLocale());
+        }
         if (body instanceof ProblemDetail problemDetail) {
             Map<String, Object> properties = problemDetail.getProperties();
             if (properties == null || !properties.containsKey(CODE_PROPERTY)) {
