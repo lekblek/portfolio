@@ -2,12 +2,14 @@ package com.scalke.portfolio.backend.security.infrastructure;
 
 import jakarta.servlet.DispatcherType;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
@@ -29,7 +31,8 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
  * </ul>
  * Refus rendus par {@code GlobalExceptionHandler} ({@code ProblemDetail} et {@code code}, D-CL). Aucune requête
  * refusée n'est mémorisée en session : un visiteur anonyme ne reçoit jamais de session. CSRF pour une application
- * monopage (D-CP) : jeton dans le cookie {@code XSRF-TOKEN}, renvoyé dans l'en-tête {@code X-XSRF-TOKEN}.
+ * monopage (D-CP) : jeton dans le cookie {@code XSRF-TOKEN}, renvoyé dans l'en-tête {@code X-XSRF-TOKEN}. En-têtes et
+ * attributs des cookies : D-CR.
  */
 @Configuration
 public class SecurityConfiguration {
@@ -60,6 +63,11 @@ public class SecurityConfiguration {
                 .logoutRequestMatcher(PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.DELETE, SESSION))
                 .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT))
                 .deleteCookies("JSESSIONID"))
+            // En plus des en-têtes par défaut (nosniff, X-Frame-Options DENY, Cache-Control no-store, HSTS en HTTPS) :
+            // aucune réponse ne s'affiche dans un cadre, aucune adresse n'est transmise en référent (D-CR).
+            .headers(headers -> headers
+                .contentSecurityPolicy(csp -> csp.policyDirectives("frame-ancestors 'none'"))
+                .referrerPolicy(referrer -> referrer.policy(ReferrerPolicy.NO_REFERRER)))
             .exceptionHandling(exceptions -> exceptions
                 .authenticationEntryPoint((request, response, exception) ->
                     exceptionResolver.resolveException(request, response, null, exception))
@@ -69,11 +77,16 @@ public class SecurityConfiguration {
     }
 
     /**
-     * Jeton CSRF en cookie lisible par l'application Angular (D-CP) ; attributs du cookie : étape 35.
+     * Jeton CSRF en cookie lisible par l'application Angular (D-CP), avec les mêmes attributs que le cookie de session
+     * ({@code server.servlet.session.cookie.*}, D-CR) : {@code Secure} et {@code SameSite=Strict}.
      */
     @Bean
-    CookieCsrfTokenRepository csrfTokenRepository() {
-        return CookieCsrfTokenRepository.withHttpOnlyFalse();
+    CookieCsrfTokenRepository csrfTokenRepository(
+        @Value("${server.servlet.session.cookie.secure}") boolean secure,
+        @Value("${server.servlet.session.cookie.same-site}") String sameSite) {
+        CookieCsrfTokenRepository repository = CookieCsrfTokenRepository.withHttpOnlyFalse();
+        repository.setCookieCustomizer(cookie -> cookie.secure(secure).sameSite(sameSite));
+        return repository;
     }
 
     /**

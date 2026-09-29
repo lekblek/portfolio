@@ -34,6 +34,15 @@ spring:
 server:
   servlet:
     context-path: /api
+    session:
+      # Session de l'administrateur (D-CR) : 30 minutes d'inactivité. Cookie jamais lisible par JavaScript, envoyé
+      # seulement en HTTPS (les navigateurs acceptent aussi http://localhost) et seulement depuis le site lui-même ;
+      # le cookie XSRF-TOKEN reprend secure et same-site (SecurityConfiguration).
+      timeout: 30m
+      cookie:
+        http-only: true
+        secure: true
+        same-site: strict
 
 portfolio:
   media:

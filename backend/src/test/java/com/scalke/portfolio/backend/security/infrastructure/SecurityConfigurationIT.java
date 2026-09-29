@@ -9,10 +9,12 @@ import org.springframework.test.web.servlet.ResultMatcher;
 
 import static com.scalke.portfolio.backend.testsupport.CsrfTestSupport.xsrf;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -32,6 +34,20 @@ class SecurityConfigurationIT extends AbstractIntegrationTest {
         mockMvc.perform(get("/api/public/projects").contextPath("/api"))
             .andExpect(status().isOk())
             .andExpect(noSessionCreated());
+    }
+
+    /**
+     * D-CR : en-têtes de sécurité d'une API (recommandations de l'OWASP), sur toute réponse.
+     */
+    @Test
+    void sends_the_security_headers_of_an_api() throws Exception {
+        mockMvc.perform(get("/api/public/projects").contextPath("/api"))
+            .andExpect(status().isOk())
+            .andExpect(header().string("X-Content-Type-Options", "nosniff"))
+            .andExpect(header().string("X-Frame-Options", "DENY"))
+            .andExpect(header().string("Content-Security-Policy", "frame-ancestors 'none'"))
+            .andExpect(header().string("Referrer-Policy", "no-referrer"))
+            .andExpect(header().string("Cache-Control", containsString("no-store")));
     }
 
     @Test
