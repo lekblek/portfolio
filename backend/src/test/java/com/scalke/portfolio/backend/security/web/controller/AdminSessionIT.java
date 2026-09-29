@@ -8,7 +8,10 @@ import jakarta.persistence.EntityManager;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.mock.web.MockHttpSession;
@@ -35,6 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * monopage, fixation de session, déconnexion.
  */
 @Transactional
+@ExtendWith(OutputCaptureExtension.class)
 class AdminSessionIT extends AbstractIntegrationTest {
 
     private static final String PASSWORD = "correct-horse-battery-staple";
@@ -212,6 +216,32 @@ class AdminSessionIT extends AbstractIntegrationTest {
         mockMvc.perform(get("/api/admin/session").contextPath("/api").session(session))
             .andExpect(status().isUnauthorized())
             .andExpect(jsonPath("$.code").value("AUTHENTICATION_REQUIRED"));
+    }
+
+    /**
+     * D-DF : chaque événement de la session laisse une ligne avec sa source, sans l'identifiant ni le mot de passe
+     * saisis.
+     */
+    @Test
+    void logs_the_security_events_of_the_session(CapturedOutput output) throws Exception {
+        for (int attempt = 0; attempt < 5; attempt++) {
+            mockMvc.perform(login("admin-ou-mot-de-passe", "mauvais-mot-de-passe").with(xsrf()));
+        }
+        mockMvc.perform(login("admin", PASSWORD).with(xsrf())).andExpect(status().isTooManyRequests());
+        loginAttempts.reset(CLIENT);
+        MockHttpSession session = session(mockMvc.perform(login("admin", PASSWORD).with(xsrf())).andReturn());
+        mockMvc.perform(delete("/api/admin/session").contextPath("/api").session(session).with(xsrf()))
+            .andExpect(status().isNoContent());
+
+        assertThat(output.getOut().lines().filter(line -> line.contains("Connexion refusée depuis 127.0.0.1")))
+            .hasSize(5);
+        assertThat(output)
+            .contains("Connexion bloquée depuis 127.0.0.1 : trop d'échecs, nouvel essai dans 900 s")
+            .contains("Connexion de l'administrateur admin depuis 127.0.0.1")
+            .contains("Déconnexion de l'administrateur admin")
+            .doesNotContain("admin-ou-mot-de-passe")
+            .doesNotContain("mauvais-mot-de-passe")
+            .doesNotContain(PASSWORD);
     }
 
     private static MockHttpServletRequestBuilder login(String login, String password) {

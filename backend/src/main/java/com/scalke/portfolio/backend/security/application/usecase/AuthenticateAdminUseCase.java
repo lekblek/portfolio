@@ -6,6 +6,7 @@ import com.scalke.portfolio.backend.security.domain.port.AdminAccountRepository;
 import com.scalke.portfolio.backend.shared.error.ErrorCode;
 import com.scalke.portfolio.backend.shared.error.TooManyRequestsException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,9 +27,13 @@ import java.util.Optional;
  * lève une {@code AuthenticationException} (401 {@code INVALID_CREDENTIALS}), identique quelle qu'en soit la cause.
  * Trop d'échecs depuis la même source : 429 {@code TOO_MANY_LOGIN_ATTEMPTS}, sans même vérifier le mot de passe
  * (D-CQ). L'ouverture de la session HTTP revient au contrôleur.
+ * <p>
+ * Chaque issue est journalisée avec sa source (D-DF), sans l'identifiant saisi lors d'un échec : il peut contenir le
+ * mot de passe tapé dans le mauvais champ.
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthenticateAdminUseCase {
 
     private final AuthenticationManager authenticationManager;
@@ -45,6 +50,8 @@ public class AuthenticateAdminUseCase {
         Instant now = clock.instant().truncatedTo(ChronoUnit.MICROS);
         Optional<Duration> retryAfter = loginAttempts.retryAfter(source, now);
         if (retryAfter.isPresent()) {
+            log.warn("Connexion bloquée depuis {} : trop d'échecs, nouvel essai dans {} s", source,
+                retryAfter.get().toSeconds());
             throw new TooManyRequestsException(ErrorCode.TOO_MANY_LOGIN_ATTEMPTS,
                 "Trop de tentatives de connexion : réessayer plus tard.", retryAfter.get());
         }
@@ -53,9 +60,11 @@ public class AuthenticateAdminUseCase {
             authentication = authenticate(login, password);
         } catch (AuthenticationException failure) {
             loginAttempts.recordFailure(source, now);
+            log.warn("Connexion refusée depuis {} : identifiant ou mot de passe incorrect", source);
             throw failure;
         }
         loginAttempts.reset(source);
+        log.info("Connexion de l'administrateur {} depuis {}", authentication.getName(), source);
         AdminAccount account = adminAccountRepository.find().orElseThrow();
         return new AuthenticatedAdmin(authentication, adminAccountRepository.recordLogin(account.loggedInAt(now)));
     }

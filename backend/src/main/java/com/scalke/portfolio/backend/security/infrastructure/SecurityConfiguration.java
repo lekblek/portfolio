@@ -1,6 +1,7 @@
 package com.scalke.portfolio.backend.security.infrastructure;
 
 import jakarta.servlet.DispatcherType;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -35,6 +36,7 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
  * attributs des cookies : D-CR.
  */
 @Configuration
+@Slf4j
 public class SecurityConfiguration {
 
     private static final String SESSION = "/admin/session";
@@ -61,6 +63,12 @@ public class SecurityConfiguration {
                 .csrfTokenRequestHandler(new AdminCsrfTokenRequestHandler()))
             .logout(logout -> logout
                 .logoutRequestMatcher(PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.DELETE, SESSION))
+                // Journal des événements de sécurité (D-DF) ; sans session, la déconnexion ne ferme rien.
+                .addLogoutHandler((request, response, authentication) -> {
+                    if (authentication != null) {
+                        log.info("Déconnexion de l'administrateur {}", authentication.getName());
+                    }
+                })
                 .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT))
                 .deleteCookies("JSESSIONID"))
             // En plus des en-têtes par défaut (nosniff, X-Frame-Options DENY, Cache-Control no-store, HSTS en HTTPS) :

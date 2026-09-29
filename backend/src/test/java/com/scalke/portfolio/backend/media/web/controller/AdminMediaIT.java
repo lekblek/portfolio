@@ -8,7 +8,10 @@ import com.scalke.portfolio.backend.project.domain.port.ProjectRepository;
 import com.scalke.portfolio.backend.testsupport.AbstractIntegrationTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.mock.web.MockMultipartFile;
@@ -49,6 +52,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * (comme {@code DeleteMediaUseCaseIT}) ; les entrées et les fichiers créés sont supprimés après chaque test. La limite
  * de la requête multipart, appliquée par Tomcat, se vérifie sur un vrai serveur ({@code HttpServerSecurityIT}).
  */
+@ExtendWith(OutputCaptureExtension.class)
 class AdminMediaIT extends AbstractIntegrationTest {
 
     @Autowired
@@ -215,10 +219,10 @@ class AdminMediaIT extends AbstractIntegrationTest {
     }
 
     /**
-     * Invariant 13 : un média utilisé par un contenu n'est pas supprimé.
+     * Invariant 13 : un média utilisé par un contenu n'est pas supprimé. L'écriture refusée est tracée (D-DF).
      */
     @Test
-    void refuses_to_delete_a_media_in_use() throws Exception {
+    void refuses_to_delete_a_media_in_use(CapturedOutput output) throws Exception {
         Media cover = mediaRepository.create(MediaFixtures.image("Couverture"));
         projectRepository.create(withImages(published("avec-couverture", LocalDate.of(2026, 1, 1), 0), cover.id()));
 
@@ -226,6 +230,7 @@ class AdminMediaIT extends AbstractIntegrationTest {
             .andExpect(status().isConflict())
             .andExpect(jsonPath("$.code").value("MEDIA_STILL_REFERENCED"));
         assertThat(mediaRepository.findById(cover.id())).isPresent();
+        assertThat(output).contains("Administration : DELETE /api/admin/media/" + cover.id() + " → 409 (admin)");
     }
 
     private ResultActions upload(MockMultipartFile file, String altText) throws Exception {
