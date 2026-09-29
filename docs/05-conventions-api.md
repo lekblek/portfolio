@@ -1578,6 +1578,8 @@ Règles propres à ce contrat :
 * ni identifiant ni pertinence exposés (D-CE) ;
 * contrat vérifié par `PublicSearchControllerTest` et `PublicSearchIT`.
 
+En-têtes de sécurité de toute réponse (D-CR) : `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Content-Security-Policy: frame-ancestors 'none'`, `Referrer-Policy: no-referrer`, `Cache-Control: no-store` sauf quand la réponse fixe son propre cache (médias) ; HSTS sur HTTPS.
+
 Chaque module introduit ses routes lors de son étape d’implémentation.
 
 ---
@@ -1595,7 +1597,7 @@ DELETE /api/admin/session     204, session invalidée (jeton CSRF requis)
 
 Règles propres à ce contrat (D-CO, D-CP, D-CQ) :
 
-* session serveur, cookie `JSESSIONID` `HttpOnly` ; aucune session pour un visiteur anonyme ; identifiant de session renouvelé à la connexion ;
+* session serveur, cookie `JSESSIONID` `HttpOnly`, `Secure`, `SameSite=Strict`, 30 minutes d’inactivité (D-CR) ; aucune session pour un visiteur anonyme ; identifiant de session renouvelé à la connexion ;
 * CSRF : toute écriture envoie l’en-tête `X-XSRF-TOKEN` avec la valeur du cookie `XSRF-TOKEN`, déposé par les réponses de `/api/admin/**` et renouvelé à la connexion (comportement par défaut du `HttpClient` d’Angular) ;
 * `lastLoginAt` : instant ISO-8601 UTC de la connexion en cours ;
 * contrat vérifié par `AdminSessionIT`.

@@ -130,7 +130,7 @@ Les autres modules métier ne doivent pas dépendre directement de `security`.
 
 La sécurité protège principalement les points d’entrée HTTP et l’accès aux fonctionnalités administratives.
 
-État d’implémentation (étape 32) : `security.infrastructure.SecurityConfiguration` sépare routes publiques, d’administration et refusées ; les refus passent par `GlobalExceptionHandler` (D-CK, D-CL). Aucun module métier ne dépend de `security`. Depuis l’étape 33 : compte administrateur unique (`admin_account`), créé ou aligné au démarrage depuis la configuration (D-CM, D-CN). Depuis l’étape 34 : connexion par session (`/api/admin/session`), CSRF d’application monopage, limite des essais (D-CO à D-CQ) ; `SecurityConfiguration` (chaîne de filtres) et `AdminAuthenticationConfiguration` (authentification) sont séparées pour que les tests de tranche web n’importent que la première. Attributs du cookie et en-têtes HTTP : étape 35.
+État d’implémentation (étape 32) : `security.infrastructure.SecurityConfiguration` sépare routes publiques, d’administration et refusées ; les refus passent par `GlobalExceptionHandler` (D-CK, D-CL). Aucun module métier ne dépend de `security`. Depuis l’étape 33 : compte administrateur unique (`admin_account`), créé ou aligné au démarrage depuis la configuration (D-CM, D-CN). Depuis l’étape 34 : connexion par session (`/api/admin/session`), CSRF d’application monopage, limite des essais (D-CO à D-CQ) ; `SecurityConfiguration` (chaîne de filtres) et `AdminAuthenticationConfiguration` (authentification) sont séparées pour que les tests de tranche web n’importent que la première. Depuis l’étape 35 : attributs des cookies, en-têtes de sécurité, `HttpServerConfiguration` (séparateur encodé confié au pare-feu de Spring Security, D-CR).
 
 ---
 

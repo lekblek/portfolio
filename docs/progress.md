@@ -2,25 +2,25 @@
 
 Ce fichier est la **seule** source de vérité sur l'avancement. Il ne répète pas le contenu des autres documents : il pointe vers eux.
 
-Dernière mise à jour : 2026-09-29 (étape 33 poussée, CI verte ; étape 34 terminée et vérifiée, commits à faire)
+Dernière mise à jour : 2026-09-29 (étape 34 poussée, CI verte ; étape 35 terminée et vérifiée, commits à faire)
 
 ---
 
 ## 1. État courant
 
 ```text
-Dernière étape terminée   : 34 — Authentification par session (34.1 et 34.2 vérifiées, commits à faire) ; 33 poussée, CI verte (run 36580781605)
+Dernière étape terminée   : 35 — Durcissement HTTP (vérifiée, commits à faire) ; 34 poussée, CI verte (run 36595141519)
 Étape en cours            : aucune
-Prochaine étape prévue    : 35 — Protection CSRF et durcissement HTTP (CSRF fait en 34 : reste cookies, en-têtes, KI-33)
-État                      : PRÊT après commit et push de l'étape 34
+Prochaine étape prévue    : 36 — Construire les API CRUD administrateur
+État                      : PRÊT après commit et push de l'étape 35
 Branche                   : develop
-Vérification              : ./mvnw clean verify → 596 tests verts (300 *Test, 296 *IT) à la fin de l'étape 34
+Vérification              : ./mvnw clean verify → 599 tests verts (300 *Test, 299 *IT) à la fin de l'étape 35
 ```
 
 ## 2. Prochaine action
 
-1. Committer et pousser l'étape 34 (deux commits : 34.1 et 34.2 modifient les mêmes fichiers), vérifier la CI, puis remplacer les 🟡 par ✅.
-2. Étape 35 : attributs des cookies de session et CSRF (`Secure`, `SameSite`, durée de session), en-têtes de sécurité HTTP (CSP, `Referrer-Policy`, `Permissions-Policy`, HSTS), KI-33 (rejet HTML de `%2F` par Tomcat) ; le CSRF lui-même est fait (D-CP).
+1. Committer et pousser l'étape 35 (deux commits), vérifier la CI, puis remplacer le 🟡 par ✅.
+2. Étape 36 : API d'administration derrière la session (profil, projets, publications, séries, taxonomie, médias, messages de contact), en reprenant les écritures reportées (§6 : statut des publications, envoi et suppression de médias, séries, slugs libres, stabilité du slug des projets) ; à découper en sous-étapes par module.
 3. Confirmer ou infirmer D-T (cohérence `stage` ⇔ `endDate`) : `docs/decisions/registre-implementation.md`.
 
 ---
@@ -91,9 +91,10 @@ Légende : ✅ terminée et poussée · 🟡 terminée et vérifiée, commits à
 | 31 | Notification de l'administrateur après enregistrement d'un message (SMTP, après validation), Mailpit en développement | ✅ | `a21346b`, `51d4ce7` (CI : run 36565149687) |
 | 32 | Spring Security : routes publiques, d'administration et refusées ; refus codés (401, 403, 400) ; springdoc en `dev` seulement | ✅ | `ae5bd94`, `fa8ebd8` (CI : run 36578007365) |
 | 33 | Compte administrateur unique (`V021`), initialisé depuis la configuration, empreinte bcrypt seule | ✅ | `5786680`, `a9f3e80` (CI : run 36580781605) |
-| 34.1 | Connexion par session (`/api/admin/session`), CSRF d'application monopage, date de dernière connexion | 🟡 | à committer |
-| 34.2 | Limite des essais de connexion (5 échecs par adresse en 15 minutes, 429) | 🟡 | à committer |
-| 35 → 52 | Voir `docs/steps/liste_complete_etapes.md` | ⏳ | — |
+| 34.1 | Connexion par session (`/api/admin/session`), CSRF d'application monopage, date de dernière connexion | ✅ | `72fda46`, `dbcbafa` (CI : run 36595141519) |
+| 34.2 | Limite des essais de connexion (5 échecs par adresse en 15 minutes, 429) | ✅ | `72fda46` (commit commun avec 34.1) |
+| 35 | Durcissement HTTP : attributs des cookies, en-têtes de sécurité, séparateur encodé (KI-33) | 🟡 | à committer |
+| 36 → 52 | Voir `docs/steps/liste_complete_etapes.md` | ⏳ | — |
 
 Après le push, remplacer les 🟡 par ✅ et noter les hashes.
 
@@ -129,6 +130,7 @@ Index : [`decisions/README.md`](decisions/README.md).
 | D-CC, D-CD | Recherche classée derrière les façades, règle de visibilité non réécrite ; module `search` sans table, classement commun et pagination | Actives (28.2) |
 | D-CE, D-CF | Route et contrat de la recherche publique ; `q` obligatoire, vide → page vide, 200 caractères au plus (`VALIDATION_FAILED`) ; code ajouté aux erreurs de Spring sans corps | Actives (29) |
 | D-CG, D-CH | Module `contact` sans route (envoi public à l'étape 48, administration à l'étape 36) ; règles du message doublées en SQL ; cycle en avant seulement (invariant 29, `INVALID_CONTACT_MESSAGE_TRANSITION`) | Actives (30) |
+| D-CR | Cookies `Secure` et `SameSite=Strict`, session de 30 minutes ; `frame-ancestors 'none'` et `Referrer-Policy: no-referrer` en plus des en-têtes par défaut ; `%2F` confié au pare-feu de Spring Security | Active (35) |
 | D-CO … D-CQ | Connexion par session, refus uniforme, identifiant de session renouvelé, garde des 72 octets de bcrypt ; CSRF par cookie réservé à l'administration (avancé de l'étape 35) ; 5 échecs par adresse en 15 minutes, sans verrouillage du compte | Actives (34) |
 | D-CM, D-CN | Compte administrateur unique (invariant 30), empreinte bcrypt seule en SQL (invariant 15) ; configuration qui fait foi à chaque démarrage, mot de passe de 15 caractères à 72 octets | Actives (33) |
 | D-CK, D-CL | Séparation des routes (public, administration authentifiée, reste refusé), aucun utilisateur généré, aucune session anonyme, springdoc en `dev` ; refus de sécurité rendus par `GlobalExceptionHandler` (`AUTHENTICATION_REQUIRED`, `ACCESS_DENIED`, `MALFORMED_REQUEST`) | Actives (32) |
@@ -149,8 +151,13 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | KI-16 | OPTIONNEL | `V001` : virgule manquante avant `CONSTRAINT profile_single_row` (comportement identique) ; migration appliquée, non modifiable | aucun |
 | KI-29 | OPTIONNEL | Surface sans appelant : `ProfileEntity.removeLink` / `removeSkill`, `App.title` (frontend) ; codes d'erreur des séries et médias déclarés d'avance | au plus tard avec l'administration du profil (étape 36) et le frontend (37) |
 | KI-30 | OPTIONNEL | Les `*IT` transactionnels (écriture de statut, lectures publiques) ne prouvent pas le comportement après commit | à reprendre si un défaut de transaction apparaît |
-| KI-33 | AMÉLIORATION | Un séparateur encodé (`%2F`) dans le chemin est rejeté par Tomcat avant Spring : 400 en page HTML (sans version du serveur), et non `ProblemDetail` codé (D-CL) | étape 35 (durcissement HTTP) |
 | KI-31 | OPTIONNEL | Un `tsvector` est limité à 1 Mio (positions plafonnées à 16 383) : un contenu Markdown démesuré serait refusé par PostgreSQL à l'écriture (500), faute de longueur maximale du contenu en V1 | étape 36 : borner la longueur du contenu à l'écriture (administration) |
+
+### Résolus le 2026-09-29 (étape 35)
+
+| ID | Problème | Résolution |
+|---|---|---|
+| KI-33 | Un `%2F` était rejeté par Tomcat en page HTML, pas en `ProblemDetail` codé | transmis au pare-feu de Spring Security, 400 `MALFORMED_REQUEST` (D-CR), `HttpServerSecurityIT` |
 
 ### Résolus le 2026-09-29 (étape 32)
 
@@ -238,7 +245,8 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | Restaurer un message archivé, remettre un message « non lu » | si l'administration le demande | D-CH : cycle en avant seulement |
 | Notification asynchrone (hors du fil de la requête) | Étape 48, si la latence de la route publique le justifie | D-CJ : envoi synchrone borné à 5 s par délai SMTP |
 | Argon2id au lieu de bcrypt | si une dépendance BouncyCastle devient acceptable | D-CN : l'encodeur délégué permet la migration (empreintes préfixées, `upgradeEncoding`) |
-| Attributs des cookies (`Secure`, `SameSite`), durée de session, en-têtes de sécurité | Étape 35 | D-CO, D-CP |
+| Politique de sécurité du contenu (CSP complète) du site | Étapes 37 et 52 | D-CR : l'API n'envoie que `frame-ancestors 'none'` |
+| HSTS derrière le mandataire inverse (requête vue en HTTP par Tomcat) | Étape 52 | D-CR : Spring ne l'envoie qu'en HTTPS ; Caddy ou les en-têtes de transfert |
 | Adresse réelle du client derrière le mandataire inverse (en-têtes de transfert) pour la limite des essais | Étape 52 | D-CQ : `getRemoteAddr()` vaut l'adresse du mandataire en production |
 | Limite des essais partagée entre plusieurs instances | si l'application passe à plusieurs instances | D-CQ : compteur en mémoire |
 | Désactiver le compte (`enabled`) | si l'administration le demande | D-CM : colonne présente (`02` §26), toujours vraie |
