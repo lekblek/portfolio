@@ -2,16 +2,19 @@ package com.scalke.portfolio.backend.series.infrastructure.persistence.jpa.repos
 
 import com.scalke.portfolio.backend.series.domain.model.Series;
 import com.scalke.portfolio.backend.series.domain.port.SeriesRepository;
+import com.scalke.portfolio.backend.series.infrastructure.persistence.jpa.entity.SeriesEntity;
 import com.scalke.portfolio.backend.series.infrastructure.persistence.jpa.mapper.SeriesPersistenceMapper;
 import com.scalke.portfolio.backend.shared.domain.model.PageQuery;
 import com.scalke.portfolio.backend.shared.domain.model.PageResult;
 import com.scalke.portfolio.backend.shared.domain.model.Slug;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 
@@ -65,11 +68,60 @@ public class SeriesRepositoryAdapter implements SeriesRepository {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public PageResult<Series> findPage(PageQuery query) {
+        Page<Series> page = repository
+            .findAllByTitle(PageRequest.of(query.page(), query.size()))
+            .map(SeriesPersistenceMapper::toDomain);
+        return new PageResult<>(page.getContent(), page.getNumber(), page.getSize(), page.getTotalElements());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Series> findById(Long id) {
+        return repository.findById(id).map(SeriesPersistenceMapper::toDomain);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean existsBySlug(Slug slug, Long excludedId) {
+        return repository.existsBySlug(slug.value(), excludedId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Set<Long> findPublicationIdsInOtherSeries(Collection<Long> publicationIds, Long seriesId) {
+        if (publicationIds.isEmpty()) {
+            return Set.of();
+        }
+        return Set.copyOf(repository.findPublicationIdsInOtherSeries(publicationIds, seriesId));
+    }
+
+    @Override
     @Transactional
     public Series create(Series series) {
         if (series.id() != null) {
             throw new IllegalArgumentException("create expects a new series, got id " + series.id());
         }
-        return SeriesPersistenceMapper.toDomain(repository.save(SeriesPersistenceMapper.toNewEntity(series)));
+        try {
+            return SeriesPersistenceMapper.toDomain(repository.saveAndFlush(SeriesPersistenceMapper.toNewEntity(series)));
+        } catch (DataIntegrityViolationException e) {
+            throw SeriesConstraints.translate(e);
+        }
+    }
+
+    @Override
+    @Transactional
+    public Series update(Series series) {
+        SeriesEntity entity = repository.findById(series.id())
+            .orElseThrow(() -> new IllegalStateException("series " + series.id() + " does not exist"));
+        entity.revise(series.title(), series.slug().value(), series.descriptionMarkdown(),
+            SeriesPersistenceMapper.items(series), series.coverMediaId());
+        try {
+            repository.flush();
+        } catch (DataIntegrityViolationException e) {
+            throw SeriesConstraints.translate(e);
+        }
+        return SeriesPersistenceMapper.toDomain(entity);
     }
 }

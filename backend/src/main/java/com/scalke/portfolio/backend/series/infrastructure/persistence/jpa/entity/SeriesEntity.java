@@ -58,4 +58,20 @@ public class SeriesEntity {
         this.items = new ArrayList<>(items);
         this.coverMediaId = coverMediaId;
     }
+
+    /**
+     * Écriture de l'administration (D-CV), déjà validée par le domaine ({@code Series.edit},
+     * {@code Series.withChapters}). Les chapitres sont remplacés d'un bloc : Hibernate supprime les lignes de
+     * {@code series_item} avant d'insérer les nouvelles, si bien qu'une position réattribuée ne se heurte pas à
+     * l'ancienne.
+     */
+    public void revise(String title, String slug, String descriptionMarkdown, List<SeriesItemEmbeddable> items,
+                       Long coverMediaId) {
+        this.title = title;
+        this.slug = slug;
+        this.descriptionMarkdown = descriptionMarkdown;
+        this.items.clear();
+        this.items.addAll(items);
+        this.coverMediaId = coverMediaId;
+    }
 }

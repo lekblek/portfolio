@@ -22,8 +22,8 @@ public enum ErrorCode {
     SLUG_LOCKED,
 
     // series
-    SERIES_POSITION_ALREADY_USED,
     NEWS_CANNOT_JOIN_SERIES,
+    ARTICLE_ALREADY_IN_SERIES,
 
     // media
     MEDIA_STILL_REFERENCED,

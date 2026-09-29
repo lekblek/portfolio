@@ -49,5 +49,22 @@ public interface SeriesJpaRepository extends Repository<SeriesEntity, Long> {
 
     long count();
 
-    SeriesEntity save(SeriesEntity entity);
+    @Query(value = "select series from SeriesEntity series order by lower(series.title), series.id",
+        countQuery = "select count(series) from SeriesEntity series")
+    Page<SeriesEntity> findAllByTitle(Pageable pageable);
+
+    Optional<SeriesEntity> findById(Long id);
+
+    @Query("select count(s) > 0 from SeriesEntity s where s.slug = :slug and (:excludedId is null or s.id <> :excludedId)")
+    boolean existsBySlug(String slug, Long excludedId);
+
+    @Query("""
+        select item.publicationId from SeriesEntity series join series.items item
+        where item.publicationId in :publicationIds and (:seriesId is null or series.id <> :seriesId)
+        """)
+    List<Long> findPublicationIdsInOtherSeries(Collection<Long> publicationIds, Long seriesId);
+
+    SeriesEntity saveAndFlush(SeriesEntity entity);
+
+    void flush();
 }

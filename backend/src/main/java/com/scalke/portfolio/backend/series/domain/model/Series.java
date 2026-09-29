@@ -1,7 +1,10 @@
 package com.scalke.portfolio.backend.series.domain.model;
 
 import com.scalke.portfolio.backend.shared.domain.model.Slug;
+import com.scalke.portfolio.backend.shared.error.BusinessRuleViolationException;
+import com.scalke.portfolio.backend.shared.error.ErrorCode;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -16,8 +19,11 @@ import java.util.Set;
  * <p>
  * Invariants : une position au plus une fois (invariant 3), positions strictement positives, un article au
  * plus une fois. Doublés par PostgreSQL, qui garantit aussi qu'un article n'appartient qu'à une série et
- * qu'une {@code NEWS} n'y entre jamais (invariants 1 et 2, D-BF). Le slug est un {@link Slug} (D-BA) ; sa
- * stabilité après publication (D11) s'appliquera à sa modification (étape 36, D-BK).
+ * qu'une {@code NEWS} n'y entre jamais (invariants 1 et 2, D-BF). Le slug est un {@link Slug} (D-BA) ; il ne change
+ * plus dès qu'un de ses articles a été public (D11, D-BK, {@link #edit}).
+ * <p>
+ * Bornes (D-CV) : titre non vide de 160 caractères au plus (colonne de {@code V011}), description de
+ * {@value #DESCRIPTION_MAX_LENGTH} caractères au plus (vide permise).
  */
 public record Series(
     Long id,
@@ -28,10 +34,19 @@ public record Series(
     Long coverMediaId
 ) {
 
+    public static final int TITLE_MAX_LENGTH = 160;
+    public static final int DESCRIPTION_MAX_LENGTH = 10_000;
+
     public Series {
         Objects.requireNonNull(title, "title");
         Objects.requireNonNull(slug, "slug");
         Objects.requireNonNull(descriptionMarkdown, "descriptionMarkdown");
+        if (title.isBlank() || title.length() > TITLE_MAX_LENGTH) {
+            throw new IllegalArgumentException("title must be 1 to 160 characters");
+        }
+        if (descriptionMarkdown.length() > DESCRIPTION_MAX_LENGTH) {
+            throw new IllegalArgumentException("description must be at most " + DESCRIPTION_MAX_LENGTH + " characters");
+        }
         items = Objects.requireNonNull(items, "items").stream()
             .sorted(SeriesItem.BY_POSITION)
             .toList();
@@ -45,6 +60,41 @@ public record Series(
                 throw new IllegalArgumentException("publication " + item.publicationId() + " appears twice");
             }
         }
+    }
+
+    /**
+     * Nouvelle série, sans chapitre (D-CV) : les articles sont rangés ensuite ({@link #withChapters}).
+     */
+    public static Series newSeries(Slug slug, SeriesContent content) {
+        Objects.requireNonNull(content, "content");
+        return new Series(null, content.title(), slug, content.descriptionMarkdown(), List.of(), content.coverMediaId());
+    }
+
+    /**
+     * Remplace la saisie de l'administrateur (D-CV) ; les chapitres ne changent pas. Un slug différent est refusé
+     * si la série a déjà été publique ({@code slugLocked} : un de ses articles l'a été, D-BK), avec
+     * {@link ErrorCode#SLUG_LOCKED} (409).
+     */
+    public Series edit(Slug newSlug, SeriesContent content, boolean slugLocked) {
+        Objects.requireNonNull(newSlug, "newSlug");
+        Objects.requireNonNull(content, "content");
+        if (slugLocked && !newSlug.equals(slug)) {
+            throw new BusinessRuleViolationException(ErrorCode.SLUG_LOCKED,
+                "Le slug d'une série déjà publiée ne peut plus changer.");
+        }
+        return new Series(id, content.title(), newSlug, content.descriptionMarkdown(), items, content.coverMediaId());
+    }
+
+    /**
+     * Même série avec ces articles, dans cet ordre, aux positions 1, 2, … (D-CV) : une liste de chapitres est
+     * remplacée d'un bloc, si bien qu'aucune position ne peut être occupée deux fois.
+     */
+    public Series withChapters(List<Long> publicationIds) {
+        List<SeriesItem> chapters = new ArrayList<>();
+        for (Long publicationId : publicationIds) {
+            chapters.add(new SeriesItem(publicationId, chapters.size() + 1));
+        }
+        return new Series(id, title, slug, descriptionMarkdown, chapters, coverMediaId);
     }
 
     /**

@@ -71,6 +71,19 @@ public class PublicationQueryService {
     }
 
     /**
+     * Publications parmi {@code ids}, quel que soit leur statut, indexées par identifiant ; les inconnues sont
+     * absentes. Pour l'administration d'un autre module (chapitres d'une série, D-CV), jamais pour une lecture
+     * publique. Une requête ; aucune si la collection est vide.
+     */
+    public Map<Long, Publication> byId(Collection<Long> ids) {
+        if (ids.isEmpty()) {
+            return Map.of();
+        }
+        return publicationRepository.findAllById(ids).stream()
+            .collect(Collectors.toUnmodifiableMap(Publication::id, Function.identity()));
+    }
+
+    /**
      * Toute publication portant ce slug, quel que soit son statut : pour le seed de développement (et
      * l'administration), jamais pour une lecture publique.
      */

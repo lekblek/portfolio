@@ -161,6 +161,12 @@ public class PublicationRepositoryAdapter implements PublicationRepository {
         return repository.findById(id).map(PublicationPersistenceMapper::toDomain);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<Publication> findAllById(Collection<Long> ids) {
+        return repository.findAll(hasIdIn(ids)).stream().map(PublicationPersistenceMapper::toDomain).toList();
+    }
+
     /**
      * Modifie l'entité gérée ; l'écriture a lieu à la validation de la transaction (dirty checking).
      */

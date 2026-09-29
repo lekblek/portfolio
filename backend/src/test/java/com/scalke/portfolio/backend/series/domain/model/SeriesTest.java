@@ -1,6 +1,8 @@
 package com.scalke.portfolio.backend.series.domain.model;
 
 import com.scalke.portfolio.backend.shared.domain.model.Slug;
+import com.scalke.portfolio.backend.shared.error.BusinessRuleViolationException;
+import com.scalke.portfolio.backend.shared.error.ErrorCode;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -100,6 +102,59 @@ class SeriesTest {
     void requires_a_slug() {
         assertThatThrownBy(() -> new Series(null, "Titre", null, "Description", List.of(), null))
             .isInstanceOf(NullPointerException.class);
+    }
+
+    /**
+     * D-CV : bornes de la saisie.
+     */
+    @Test
+    void bounds_the_title_and_the_description() {
+        assertThatThrownBy(() -> new Series(null, " ", Slug.of("s"), "", List.of(), null))
+            .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new Series(null, "t".repeat(161), Slug.of("s"), "", List.of(), null))
+            .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new Series(null, "Titre", Slug.of("s"), "d".repeat(10_001), List.of(), null))
+            .isInstanceOf(IllegalArgumentException.class);
+        assertThat(new Series(null, "t".repeat(160), Slug.of("s"), "d".repeat(10_000), List.of(), null)).isNotNull();
+    }
+
+    @Test
+    void a_new_series_has_no_chapter() {
+        Series series = Series.newSeries(Slug.of("angular"), new SeriesContent(" Angular ", "Description", 4L));
+
+        assertThat(series.title()).isEqualTo("Angular");
+        assertThat(series.items()).isEmpty();
+        assertThat(series.coverMediaId()).isEqualTo(4L);
+    }
+
+    /**
+     * D-CV : une liste de chapitres est rangée aux positions 1, 2, … dans l'ordre donné.
+     */
+    @Test
+    void chapters_are_numbered_in_the_given_order() {
+        Series series = series(new SeriesItem(10L, 3), new SeriesItem(20L, 7)).withChapters(List.of(20L, 30L, 10L));
+
+        assertThat(series.items()).containsExactly(
+            new SeriesItem(20L, 1), new SeriesItem(30L, 2), new SeriesItem(10L, 3));
+        assertThat(series.title()).isEqualTo("Spring Boot");
+    }
+
+    /**
+     * D-BK : le slug ne change plus quand la série a déjà été publique ; le reste de la saisie, si.
+     */
+    @Test
+    void editing_keeps_the_chapters_and_respects_the_slug_lock() {
+        Series series = series(new SeriesItem(10L, 1));
+        SeriesContent content = new SeriesContent("Spring Boot 4", "Nouvelle description", null);
+
+        Series edited = series.edit(Slug.of("spring-boot"), content, true);
+        assertThat(edited.title()).isEqualTo("Spring Boot 4");
+        assertThat(edited.items()).containsExactly(new SeriesItem(10L, 1));
+
+        assertThatThrownBy(() -> series.edit(Slug.of("spring"), content, true))
+            .isInstanceOfSatisfying(BusinessRuleViolationException.class, exception ->
+                assertThat(exception.errorCode()).isEqualTo(ErrorCode.SLUG_LOCKED));
+        assertThat(series.edit(Slug.of("spring"), content, false).slug()).isEqualTo(Slug.of("spring"));
     }
 
     private static Series series(SeriesItem... items) {

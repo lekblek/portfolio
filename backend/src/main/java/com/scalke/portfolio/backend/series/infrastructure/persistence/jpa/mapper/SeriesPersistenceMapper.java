@@ -6,6 +6,8 @@ import com.scalke.portfolio.backend.series.infrastructure.persistence.jpa.entity
 import com.scalke.portfolio.backend.series.infrastructure.persistence.jpa.entity.SeriesItemEmbeddable;
 import com.scalke.portfolio.backend.shared.domain.model.Slug;
 
+import java.util.List;
+
 public final class SeriesPersistenceMapper {
 
     private SeriesPersistenceMapper() {
@@ -31,10 +33,14 @@ public final class SeriesPersistenceMapper {
             .title(series.title())
             .slug(series.slug().value())
             .descriptionMarkdown(series.descriptionMarkdown())
-            .items(series.items().stream()
-                .map(item -> new SeriesItemEmbeddable(item.publicationId(), item.position()))
-                .toList())
+            .items(items(series))
             .coverMediaId(series.coverMediaId())
             .build();
+    }
+
+    public static List<SeriesItemEmbeddable> items(Series series) {
+        return series.items().stream()
+            .map(item -> new SeriesItemEmbeddable(item.publicationId(), item.position()))
+            .toList();
     }
 }
