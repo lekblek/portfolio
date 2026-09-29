@@ -13,6 +13,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -49,6 +50,13 @@ public class PublicationRepositoryAdapter implements PublicationRepository {
      */
     private static final Sort PUBLIC_ORDER = Sort.by(
         Sort.Order.desc("publishedAt"),
+        Sort.Order.desc("id"));
+
+    /**
+     * Administration : les dernières modifiées d'abord, tri total (D-CU).
+     */
+    private static final Sort ADMIN_ORDER = Sort.by(
+        Sort.Order.desc("updatedAt"),
         Sort.Order.desc("id"));
 
     private final PublicationJpaRepository repository;
@@ -119,13 +127,32 @@ public class PublicationRepositoryAdapter implements PublicationRepository {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public PageResult<Publication> findPage(PageQuery query) {
+        Page<Publication> page = repository
+            .findAll(PageRequest.of(query.page(), query.size(), ADMIN_ORDER))
+            .map(PublicationPersistenceMapper::toDomain);
+        return new PageResult<>(page.getContent(), page.getNumber(), page.getSize(), page.getTotalElements());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean existsBySlug(Slug slug, Long excludedId) {
+        return repository.existsBySlug(slug.value(), excludedId);
+    }
+
+    @Override
     @Transactional
     public Publication create(Publication publication) {
         if (publication.id() != null) {
             throw new IllegalArgumentException("create expects a new publication, got id " + publication.id());
         }
-        return PublicationPersistenceMapper.toDomain(
-            repository.save(PublicationPersistenceMapper.toNewEntity(publication)));
+        try {
+            return PublicationPersistenceMapper.toDomain(
+                repository.saveAndFlush(PublicationPersistenceMapper.toNewEntity(publication)));
+        } catch (DataIntegrityViolationException e) {
+            throw PublicationConstraints.translate(e);
+        }
     }
 
     @Override
@@ -144,6 +171,22 @@ public class PublicationRepositoryAdapter implements PublicationRepository {
             .orElseThrow(() -> new IllegalStateException("publication " + publication.id() + " does not exist"));
         entity.changeStatus(publication.status(), publication.publishedAt(), publication.firstPublishedAt(),
             publication.updatedAt());
+        return PublicationPersistenceMapper.toDomain(entity);
+    }
+
+    @Override
+    @Transactional
+    public Publication update(Publication publication) {
+        PublicationEntity entity = repository.findById(publication.id())
+            .orElseThrow(() -> new IllegalStateException("publication " + publication.id() + " does not exist"));
+        entity.revise(publication.title(), publication.slug().value(), publication.summary(),
+            publication.contentMarkdown(), publication.featured(), publication.categoryId(), publication.tagIds(),
+            publication.seoTitle(), publication.seoDescription(), publication.coverMediaId(), publication.updatedAt());
+        try {
+            repository.flush();
+        } catch (DataIntegrityViolationException e) {
+            throw PublicationConstraints.translate(e);
+        }
         return PublicationPersistenceMapper.toDomain(entity);
     }
 }

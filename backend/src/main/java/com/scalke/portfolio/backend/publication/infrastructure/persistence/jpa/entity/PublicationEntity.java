@@ -120,14 +120,36 @@ public class PublicationEntity {
     }
 
     /**
-     * Seule écriture après création (D-AX) : les valeurs viennent d'une transition déjà validée par le
-     * domaine ({@code Publication.transitionTo}).
+     * Écriture du cycle éditorial (D-AX) : les valeurs viennent d'une transition déjà validée par le domaine
+     * ({@code Publication.transitionTo}).
      */
     public void changeStatus(PublicationStatus status, Instant publishedAt, Instant firstPublishedAt,
                              Instant updatedAt) {
         this.status = status;
         this.publishedAt = publishedAt;
         this.firstPublishedAt = firstPublishedAt;
+        this.updatedAt = updatedAt;
+    }
+
+    /**
+     * Écriture de la saisie de l'administrateur (D-CU), déjà validée par le domaine ({@code Publication.edit}) ; le
+     * type, le statut et ses dates ne changent pas ici. Les tags retirés ou ajoutés seulement : les autres lignes de
+     * {@code publication_tag} restent en place.
+     */
+    public void revise(String title, String slug, String summary, String contentMarkdown, boolean featured,
+                       Long categoryId, Set<Long> tagIds, String seoTitle, String seoDescription, Long coverMediaId,
+                       Instant updatedAt) {
+        this.title = title;
+        this.slug = slug;
+        this.summary = summary;
+        this.contentMarkdown = contentMarkdown;
+        this.featured = featured;
+        this.categoryId = categoryId;
+        this.tagIds.retainAll(tagIds);
+        this.tagIds.addAll(tagIds);
+        this.seoTitle = seoTitle;
+        this.seoDescription = seoDescription;
+        this.coverMediaId = coverMediaId;
         this.updatedAt = updatedAt;
     }
 }

@@ -3,6 +3,7 @@ package com.scalke.portfolio.backend.shared.api;
 import com.scalke.portfolio.backend.shared.error.BusinessRuleViolationException;
 import com.scalke.portfolio.backend.shared.error.ContentTooLargeException;
 import com.scalke.portfolio.backend.shared.error.ErrorCode;
+import com.scalke.portfolio.backend.shared.error.InvalidInputException;
 import com.scalke.portfolio.backend.shared.error.ResourceNotFoundException;
 import com.scalke.portfolio.backend.shared.error.TooManyRequestsException;
 import com.scalke.portfolio.backend.shared.error.UnsupportedContentException;
@@ -23,6 +24,7 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -104,6 +106,16 @@ class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(BusinessRuleViolationException.class)
     ProblemDetail handleBusinessRuleViolation(BusinessRuleViolationException ex) {
         return problem(HttpStatus.CONFLICT, ex.getMessage(), ex.errorCode());
+    }
+
+    /**
+     * Valeur refusée par un cas d'usage (référence inconnue, D-CU) : même forme qu'un échec de validation du corps.
+     */
+    @ExceptionHandler(InvalidInputException.class)
+    ProblemDetail handleInvalidInput(InvalidInputException ex) {
+        ProblemDetail body = problem(HttpStatus.BAD_REQUEST, ex.getMessage(), ex.errorCode());
+        body.setProperty("errors", List.of(Map.of("field", ex.field(), "message", ex.getMessage())));
+        return body;
     }
 
     @ExceptionHandler(UnsupportedContentException.class)

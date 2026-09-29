@@ -21,7 +21,8 @@ import java.util.Set;
  * {@code existsAny} et {@code create} par le seed de développement, {@code findById} et {@code updateStatus}
  * par {@code ChangePublicationStatusUseCase}, {@code findVisibleIds}, {@code findVisibleByIds},
  * {@code findBySlug} et {@code searchVisible} par la façade {@code PublicationQueryService} (autres modules,
- * ADR 0002), qui utilise aussi {@code findVisibleBySlug}.
+ * ADR 0002), qui utilise aussi {@code findVisibleBySlug} ; {@code findPage}, {@code existsBySlug}, {@code create},
+ * {@code findById} et {@code update} par l'administration (D-CU).
  * <p>
  * « Visible à {@code now} » (D-AH) : {@code PUBLISHED}, ou {@code SCHEDULED} avec {@code publishedAt <= now}.
  * {@code now} est fourni par l'appelant, qui le lit dans l'horloge applicative.
@@ -65,6 +66,23 @@ public interface PublicationRepository {
 
     boolean existsAny();
 
+    /**
+     * Toutes les publications, quel que soit leur statut (administration, D-CU) : les dernières modifiées d'abord
+     * ({@code updatedAt} décroissant, puis identifiant décroissant : tri total).
+     */
+    PageResult<Publication> findPage(PageQuery query);
+
+    /**
+     * Vrai si une autre publication que {@code excludedId} ({@code null} : aucune) porte ce slug.
+     */
+    boolean existsBySlug(Slug slug, Long excludedId);
+
+    /**
+     * Insertion exécutée immédiatement.
+     *
+     * @throws com.scalke.portfolio.backend.shared.error.BusinessRuleViolationException slug pris entre-temps
+     * @throws com.scalke.portfolio.backend.shared.error.InvalidInputException terme ou média supprimé entre-temps
+     */
     Publication create(Publication publication);
 
     /**
@@ -78,4 +96,14 @@ public interface PublicationRepository {
      * {@code updatedAt} sont écrits. La modification du contenu est une autre opération (étape 36).
      */
     Publication updateStatus(Publication publication);
+
+    /**
+     * Enregistre la saisie de l'administrateur (D-CU) : titre, slug, résumé, contenu, mise en avant, termes,
+     * couverture et SEO, avec {@code updatedAt}. Ni le type, ni le statut, ni ses dates. Écriture exécutée
+     * immédiatement.
+     *
+     * @throws com.scalke.portfolio.backend.shared.error.BusinessRuleViolationException slug pris entre-temps
+     * @throws com.scalke.portfolio.backend.shared.error.InvalidInputException terme ou média supprimé entre-temps
+     */
+    Publication update(Publication publication);
 }

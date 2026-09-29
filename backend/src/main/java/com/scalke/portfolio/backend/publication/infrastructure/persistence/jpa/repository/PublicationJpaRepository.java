@@ -1,6 +1,8 @@
 package com.scalke.portfolio.backend.publication.infrastructure.persistence.jpa.repository;
 
 import com.scalke.portfolio.backend.publication.infrastructure.persistence.jpa.entity.PublicationEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
@@ -31,7 +33,14 @@ public interface PublicationJpaRepository
 
     Optional<PublicationEntity> findById(Long id);
 
-    PublicationEntity save(PublicationEntity entity);
+    Page<PublicationEntity> findAll(Pageable pageable);
+
+    @Query("select count(p) > 0 from PublicationEntity p where p.slug = :slug and (:excludedId is null or p.id <> :excludedId)")
+    boolean existsBySlug(String slug, Long excludedId);
+
+    PublicationEntity saveAndFlush(PublicationEntity entity);
+
+    void flush();
 
     /**
      * Ligne de {@link #search} : {@code ts_rank} renvoie un {@code real}.

@@ -15,9 +15,8 @@ import java.time.Instant;
 /**
  * Change le statut éditorial d'une publication ({@code docs/05-conventions-api.md} §17).
  * <p>
- * Opération d'administration : elle sera exposée par {@code POST /api/admin/publications/{id}/status}
- * à l'étape 36, derrière l'authentification (étapes 32 à 35), jamais avant (D-AU). Les règles de
- * transition vivent dans le domaine ({@link Publication#transitionTo}) ; une transition refusée donne
+ * Opération d'administration, exposée par {@code POST /api/admin/publications/{id}/status} (D-AU, D-CU). Les
+ * règles de transition vivent dans le domaine ({@link Publication#transitionTo}) ; une transition refusée donne
  * 409 {@code INVALID_PUBLICATION_TRANSITION}.
  */
 @Service
@@ -31,10 +30,12 @@ public class ChangePublicationStatusUseCase {
      * @param scheduledAt date de publication pour une planification ({@code SCHEDULED}) ; {@code null} sinon
      */
     @Transactional
-    public Publication execute(Long publicationId, PublicationStatus target, Instant scheduledAt) {
+    public AdminPublication execute(Long publicationId, PublicationStatus target, Instant scheduledAt) {
         Publication publication = publicationRepository.findById(publicationId)
             .orElseThrow(() -> new ResourceNotFoundException(
                 ErrorCode.RESOURCE_NOT_FOUND, "Publication introuvable."));
-        return publicationRepository.updateStatus(publication.transitionTo(target, scheduledAt, clock.instant()));
+        Instant now = clock.instant();
+        Publication changed = publicationRepository.updateStatus(publication.transitionTo(target, scheduledAt, now));
+        return AdminPublication.at(changed, now);
     }
 }

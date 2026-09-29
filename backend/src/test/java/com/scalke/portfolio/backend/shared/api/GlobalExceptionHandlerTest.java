@@ -67,6 +67,19 @@ public class GlobalExceptionHandlerTest {
     }
 
     /**
+     * D-CU : une valeur refusée par un cas d'usage a la forme d'un échec de validation du corps.
+     */
+    @Test
+    void renders_an_invalid_input_like_a_validation_failure() throws Exception {
+        mockMvc.perform(get("/test-errors/invalid-input"))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.code").value("VALIDATION_FAILED"))
+            .andExpect(jsonPath("$.detail").value("Catégorie inconnue."))
+            .andExpect(jsonPath("$.errors[0].field").value("categoryId"))
+            .andExpect(jsonPath("$.errors[0].message").value("Catégorie inconnue."));
+    }
+
+    /**
      * D-CF : une exception de Spring arrivée sans corps (paramètre obligatoire absent) reçoit elle aussi son code.
      */
     @Test

@@ -3,6 +3,7 @@ package com.scalke.portfolio.backend.shared.api;
 import com.scalke.portfolio.backend.shared.error.BusinessRuleViolationException;
 import com.scalke.portfolio.backend.shared.error.ContentTooLargeException;
 import com.scalke.portfolio.backend.shared.error.ErrorCode;
+import com.scalke.portfolio.backend.shared.error.InvalidInputException;
 import com.scalke.portfolio.backend.shared.error.ResourceNotFoundException;
 import com.scalke.portfolio.backend.shared.error.TooManyRequestsException;
 import com.scalke.portfolio.backend.shared.error.UnsupportedContentException;
@@ -48,6 +49,11 @@ public class ErrorHandlingTestController {
 
     @PostMapping("/validate")
     void validate(@Valid @RequestBody SampleRequest request) {
+    }
+
+    @GetMapping("/invalid-input")
+    void invalidInput() {
+        throw new InvalidInputException("categoryId", "Catégorie inconnue.");
     }
 
     @GetMapping("/required-param")

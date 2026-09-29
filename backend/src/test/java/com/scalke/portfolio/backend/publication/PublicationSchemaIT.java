@@ -16,8 +16,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
- * Contraintes de {@code V006__create_publication.sql}, {@code V009} (date des archives) et {@code V010}
- * (première publication, D-AZ), vérifiées sans JPA.
+ * Contraintes de {@code V006__create_publication.sql}, {@code V009} (date des archives), {@code V010}
+ * (première publication, D-AZ) et {@code V022} (longueur du contenu, D-CU), vérifiées sans JPA.
  */
 @Transactional
 class PublicationSchemaIT extends AbstractIntegrationTest {
@@ -116,6 +116,21 @@ class PublicationSchemaIT extends AbstractIntegrationTest {
         assertThatThrownBy(() -> jdbcClient.sql("DELETE FROM media WHERE id = :media").param("media", media).update())
             .isInstanceOf(DataIntegrityViolationException.class)
             .hasMessageContaining("publication_cover_media_fk");
+    }
+
+    /**
+     * D-CU, KI-31 : le contenu est borné à 100 000 caractères (et non octets).
+     */
+    @Test
+    void bounds_the_content_length() {
+        insert("article", "ARTICLE", "DRAFT", null);
+
+        jdbcClient.sql("UPDATE publication SET content_markdown = :content").param("content", "é".repeat(100_000))
+            .update();
+        assertThatThrownBy(() -> jdbcClient.sql("UPDATE publication SET content_markdown = :content")
+                .param("content", "é".repeat(100_001)).update())
+            .isInstanceOf(DataIntegrityViolationException.class)
+            .hasMessageContaining("publication_content_length_check");
     }
 
     private void insert(String slug, String type, String status, OffsetDateTime publishedAt) {

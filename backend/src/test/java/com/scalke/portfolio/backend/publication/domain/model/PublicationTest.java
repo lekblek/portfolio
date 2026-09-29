@@ -1,6 +1,8 @@
 package com.scalke.portfolio.backend.publication.domain.model;
 
 import com.scalke.portfolio.backend.shared.domain.model.Slug;
+import com.scalke.portfolio.backend.shared.error.BusinessRuleViolationException;
+import com.scalke.portfolio.backend.shared.error.ErrorCode;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -66,6 +68,102 @@ class PublicationTest {
 
         assertThat(publication.tagIds()).containsExactlyInAnyOrder(1L, 2L);
         assertThatThrownBy(() -> publication.tagIds().add(4L)).isInstanceOf(UnsupportedOperationException.class);
+    }
+
+    /**
+     * D-CU : bornes de la saisie, doublées par PostgreSQL.
+     */
+    @Test
+    void bounds_the_text_fields() {
+        assertThatThrownBy(() -> withText(" ", "Résumé", "Contenu", null, null))
+            .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> withText("t".repeat(161), "Résumé", "Contenu", null, null))
+            .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> withText("Titre", "r".repeat(501), "Contenu", null, null))
+            .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> withText("Titre", "Résumé", "c".repeat(100_001), null, null))
+            .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> withText("Titre", "Résumé", "Contenu", "s".repeat(121), null))
+            .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> withText("Titre", "Résumé", "Contenu", null, "d".repeat(301)))
+            .isInstanceOf(IllegalArgumentException.class);
+
+        assertThat(withText("t".repeat(160), "r".repeat(500), "c".repeat(100_000), "s".repeat(120), "d".repeat(300)))
+            .isNotNull();
+    }
+
+    @Test
+    void a_new_draft_has_no_publication_date() {
+        PublicationContent content = content(" Mon article ", Set.of(3L));
+
+        Publication draft = Publication.newDraft(PublicationType.NEWS, Slug.of("mon-article"), content, AT);
+
+        assertThat(draft.status()).isEqualTo(PublicationStatus.DRAFT);
+        assertThat(draft.type()).isEqualTo(PublicationType.NEWS);
+        assertThat(draft.title()).isEqualTo("Mon article");
+        assertThat(draft.publishedAt()).isNull();
+        assertThat(draft.firstPublishedAt()).isNull();
+        assertThat(draft.tagIds()).containsExactly(3L);
+        assertThat(draft.createdAt()).isEqualTo(AT);
+        assertThat(draft.updatedAt()).isEqualTo(AT);
+    }
+
+    /**
+     * D-CU : la modification remplace la saisie, jamais le type, le statut ni ses dates.
+     */
+    @Test
+    void editing_keeps_the_type_the_status_and_its_dates() {
+        Instant later = AT.plusSeconds(3_600);
+        Publication published = publication(PublicationStatus.PUBLISHED, AT, "Contenu");
+
+        Publication edited = published.edit(published.slug(), content("Nouveau titre", Set.of(5L)), later);
+
+        assertThat(edited.title()).isEqualTo("Nouveau titre");
+        assertThat(edited.tagIds()).containsExactly(5L);
+        assertThat(edited.coverMediaId()).isEqualTo(9L);
+        assertThat(edited.seoTitle()).isNull();
+        assertThat(edited.type()).isEqualTo(published.type());
+        assertThat(edited.status()).isEqualTo(PublicationStatus.PUBLISHED);
+        assertThat(edited.publishedAt()).isEqualTo(AT);
+        assertThat(edited.firstPublishedAt()).isEqualTo(AT);
+        assertThat(edited.createdAt()).isEqualTo(AT);
+        assertThat(edited.updatedAt()).isEqualTo(later);
+    }
+
+    /**
+     * D-BC : la modification passe par la règle du slug.
+     */
+    @Test
+    void editing_cannot_change_the_slug_of_a_publication_already_public() {
+        Publication published = publication(PublicationStatus.PUBLISHED, AT, "Contenu");
+
+        assertThatThrownBy(() -> published.edit(Slug.of("autre"), content("Titre", Set.of()), AT.plusSeconds(1)))
+            .isInstanceOfSatisfying(BusinessRuleViolationException.class, exception ->
+                assertThat(exception.errorCode()).isEqualTo(ErrorCode.SLUG_LOCKED));
+        assertThat(publication(PublicationStatus.DRAFT, null, "Contenu")
+            .edit(Slug.of("autre"), content("Titre", Set.of()), AT).slug()).isEqualTo(Slug.of("autre"));
+    }
+
+    @Test
+    void the_content_is_normalized() {
+        PublicationContent content = new PublicationContent(" Titre ", " Résumé ", "Contenu", false, null, null, null,
+            "  ", " Description ");
+
+        assertThat(content.title()).isEqualTo("Titre");
+        assertThat(content.summary()).isEqualTo("Résumé");
+        assertThat(content.tagIds()).isEmpty();
+        assertThat(content.seoTitle()).isNull();
+        assertThat(content.seoDescription()).isEqualTo("Description");
+    }
+
+    private static PublicationContent content(String title, Set<Long> tagIds) {
+        return new PublicationContent(title, "Résumé", "Contenu", true, null, tagIds, 9L, " ", null);
+    }
+
+    private static Publication withText(String title, String summary, String content, String seoTitle,
+                                        String seoDescription) {
+        return new Publication(null, PublicationType.ARTICLE, title, Slug.of("titre"), summary, content,
+            PublicationStatus.DRAFT, null, null, false, null, Set.of(), seoTitle, seoDescription, AT, AT, null);
     }
 
     private static Publication publication(PublicationStatus status, Instant publishedAt, String content) {

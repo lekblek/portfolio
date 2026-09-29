@@ -29,6 +29,10 @@ import java.util.regex.Pattern;
  * ensemble : chaque tag au plus une fois). Les termes appartiennent au module {@code taxonomy} : la
  * publication n'en connaît que les identifiants. Couverture ({@code coverMediaId}, facultative) : référence
  * vers une image du catalogue {@code media}, par identifiant (ADR 0002, D-BY).
+ * <p>
+ * Bornes (D-CU) : titre non vide de 160 caractères au plus, résumé de 500, contenu de {@value #CONTENT_MAX_LENGTH}
+ * (KI-31 : le document de recherche reste loin de la limite d'un {@code tsvector}), titre SEO de 120, description
+ * SEO de 300. Les longueurs sont doublées par PostgreSQL (colonnes de {@code V006}, contrainte de {@code V022}).
  */
 public record Publication(
     Long id,
@@ -55,6 +59,12 @@ public record Publication(
      */
     static final int WORDS_PER_MINUTE = 200;
 
+    public static final int TITLE_MAX_LENGTH = 160;
+    public static final int SUMMARY_MAX_LENGTH = 500;
+    public static final int CONTENT_MAX_LENGTH = 100_000;
+    public static final int SEO_TITLE_MAX_LENGTH = 120;
+    public static final int SEO_DESCRIPTION_MAX_LENGTH = 300;
+
     /**
      * Un mot : lettres ou chiffres, éventuellement liés par une apostrophe ou un tiret (« l'API »,
      * « full-stack »). Les symboles Markdown ({@code #}, {@code *}, {@code -}) ne comptent pas.
@@ -65,16 +75,55 @@ public record Publication(
         Objects.requireNonNull(type, "type");
         Objects.requireNonNull(slug, "slug");
         Objects.requireNonNull(status, "status");
+        Objects.requireNonNull(title, "title");
+        Objects.requireNonNull(summary, "summary");
         Objects.requireNonNull(contentMarkdown, "contentMarkdown");
         Objects.requireNonNull(createdAt, "createdAt");
         Objects.requireNonNull(updatedAt, "updatedAt");
         tagIds = Set.copyOf(Objects.requireNonNull(tagIds, "tagIds"));
+        if (title.isBlank() || title.length() > TITLE_MAX_LENGTH) {
+            throw new IllegalArgumentException("title must be 1 to 160 characters");
+        }
+        if (summary.length() > SUMMARY_MAX_LENGTH) {
+            throw new IllegalArgumentException("summary must be at most 500 characters");
+        }
+        if (contentMarkdown.length() > CONTENT_MAX_LENGTH) {
+            throw new IllegalArgumentException("content must be at most " + CONTENT_MAX_LENGTH + " characters");
+        }
+        if (seoTitle != null && seoTitle.length() > SEO_TITLE_MAX_LENGTH) {
+            throw new IllegalArgumentException("SEO title must be at most 120 characters");
+        }
+        if (seoDescription != null && seoDescription.length() > SEO_DESCRIPTION_MAX_LENGTH) {
+            throw new IllegalArgumentException("SEO description must be at most 300 characters");
+        }
         if (status.requiresPublicationDate() && (publishedAt == null || firstPublishedAt == null)) {
             throw new IllegalArgumentException("a " + status + " publication requires publishedAt and firstPublishedAt");
         }
         if (firstPublishedAt != null && publishedAt != null && firstPublishedAt.isAfter(publishedAt)) {
             throw new IllegalArgumentException("firstPublishedAt must not be after publishedAt");
         }
+    }
+
+    /**
+     * Nouveau brouillon (D-CU) : ni date de publication ni première publication ; créé et modifié à {@code now}.
+     */
+    public static Publication newDraft(PublicationType type, Slug slug, PublicationContent content, Instant now) {
+        Objects.requireNonNull(content, "content");
+        return new Publication(null, type, content.title(), slug, content.summary(), content.contentMarkdown(),
+            PublicationStatus.DRAFT, null, null, content.featured(), content.categoryId(), content.tagIds(),
+            content.seoTitle(), content.seoDescription(), now, now, content.coverMediaId());
+    }
+
+    /**
+     * Remplace la saisie de l'administrateur (D-CU) ; le type, le statut et les dates du cycle éditorial ne changent
+     * pas. Un nouveau slug suit la règle de {@link #changeSlug} ({@code SLUG_LOCKED} après la première publication).
+     */
+    public Publication edit(Slug newSlug, PublicationContent content, Instant now) {
+        Objects.requireNonNull(content, "content");
+        Publication renamed = changeSlug(newSlug, now);
+        return new Publication(id, type, content.title(), renamed.slug(), content.summary(), content.contentMarkdown(),
+            status, publishedAt, firstPublishedAt, content.featured(), content.categoryId(), content.tagIds(),
+            content.seoTitle(), content.seoDescription(), createdAt, now, content.coverMediaId());
     }
 
     /**
@@ -163,7 +212,7 @@ public record Publication(
      * avec {@link ErrorCode#SLUG_LOCKED} (409), pour que les liens publiés restent valides. Sans effet si le
      * slug est identique. L'unicité est vérifiée par l'appelant ({@link Slug#firstAvailable}) et par la base.
      * <p>
-     * Appelé par la modification d'une publication (administration, étape 36).
+     * Appelé par la modification d'une publication ({@link #edit}, D-CU).
      */
     public Publication changeSlug(Slug newSlug, Instant now) {
         Objects.requireNonNull(newSlug, "newSlug");

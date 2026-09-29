@@ -1,5 +1,6 @@
 package com.scalke.portfolio.backend.taxonomy.web.dto;
 
+import com.scalke.portfolio.backend.shared.api.InputPatterns;
 import com.scalke.portfolio.backend.taxonomy.application.usecase.TermDraft;
 import com.scalke.portfolio.backend.taxonomy.domain.model.Tag;
 import jakarta.validation.constraints.NotBlank;
@@ -12,9 +13,9 @@ import jakarta.validation.constraints.Size;
  */
 public record SaveTagRequest(
     @NotBlank @Size(max = Tag.NAME_MAX_LENGTH)
-    @Pattern(regexp = TermRequests.HAS_LETTER_OR_DIGIT, message = TermRequests.HAS_LETTER_OR_DIGIT_MESSAGE)
+    @Pattern(regexp = InputPatterns.HAS_LETTER_OR_DIGIT, message = InputPatterns.HAS_LETTER_OR_DIGIT_MESSAGE)
     String name,
-    @Size(max = Tag.SLUG_MAX_LENGTH) @Pattern(regexp = TermRequests.SLUG, message = TermRequests.SLUG_MESSAGE)
+    @Size(max = Tag.SLUG_MAX_LENGTH) @Pattern(regexp = InputPatterns.SLUG, message = InputPatterns.SLUG_MESSAGE)
     String slug
 ) {
 
