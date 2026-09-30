@@ -1,0 +1,323 @@
+<main class="page-container pb-section">
+  <header class="border-b border-rule py-section">
+    <h1 class="text-3xl leading-tight tracking-title">Catalogue de l’interface</h1>
+    <p class="mt-3 max-w-prose font-text text-lg text-ink-muted">
+      Tokens du système de design tels qu’ils sont appliqués. Page de développement, absente du
+      build de production.
+    </p>
+  </header>
+
+  <section class="border-b border-rule py-block" aria-labelledby="ui-typographie">
+    <h2 id="ui-typographie" class="text-2xl tracking-heading">Typographie</h2>
+    <dl class="mt-6 grid gap-6">
+      @for (step of typeScale; track step.token) {
+        <div class="grid gap-1 md:grid-cols-12 md:gap-8">
+          <dt class="text-sm text-ink-muted md:col-span-3">
+            <code translate="no">{{ step.token }}</code> · {{ step.use }}
+          </dt>
+          <dd [class]="'font-semibold md:col-span-9 ' + step.classes">
+            Construire une API REST avec Spring Boot
+          </dd>
+        </div>
+      }
+    </dl>
+    <div class="mt-block grid gap-6 md:grid-cols-12 md:gap-8">
+      <p class="text-sm text-ink-muted md:col-span-3">
+        <code translate="no">font-text</code> · <code translate="no">text-lg</code> ·
+        <code translate="no">leading-prose</code>
+      </p>
+      <div class="max-w-prose font-text text-lg leading-prose md:col-span-9" lang="fr">
+        <p>
+          Une API se juge d’abord à ses erreurs : c’est là qu’un client passe le plus de temps, et
+          c’est ce que la documentation oublie le plus souvent. <em>Problem Details</em> décrit
+          chaque réponse ; le code <code translate="no">RESOURCE_NOT_FOUND</code> reste stable.
+        </p>
+        <p class="mt-flow">
+          Chiffres tabulaires : <span class="tabular-nums">25 août 2026 · 17 sept. 2026</span>.
+        </p>
+      </div>
+    </div>
+    <pre
+      translate="no"
+      class="mt-block overflow-x-auto rounded-media border border-rule bg-paper-sunken p-4 leading-ui"
+      tabindex="0"
+      aria-label="Exemple de code"
+    ><code translate="no"><span class="text-code-annotation">&#64;ExceptionHandler</span>(ResourceNotFoundException.<span class="text-code-keyword">class</span>)
+ProblemDetail handleResourceNotFound(ResourceNotFoundException ex) &#123;
+    <span class="text-code-keyword">return</span> problem(HttpStatus.NOT_FOUND, <span class="text-code-string">"Publication introuvable."</span>, ex.errorCode());
+&#125;</code></pre>
+  </section>
+
+  <section class="border-b border-rule py-block" aria-labelledby="ui-couleurs">
+    <h2 id="ui-couleurs" class="text-2xl tracking-heading">Couleurs</h2>
+    <ul class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      @for (color of colors; track color.name) {
+        <li class="flex items-center gap-3">
+          <span
+            [class]="'size-10 shrink-0 rounded-control border border-rule ' + color.swatch"
+          ></span>
+          <span class="text-sm">
+            <code translate="no">{{ color.name }}</code>
+            <span class="block text-ink-muted">{{ values()[color.name] }} · {{ color.use }}</span>
+          </span>
+        </li>
+      }
+    </ul>
+
+    <div
+      class="mt-block overflow-x-auto"
+      tabindex="0"
+      role="region"
+      aria-label="Contrastes des paires de couleurs"
+    >
+      <table class="w-full border-collapse text-sm">
+        <caption class="pb-3 text-left text-ink-muted">
+          Contraste de chaque paire de texte (seuils : 4,5:1 AA, 7:1 AAA)
+        </caption>
+        <thead>
+          <tr class="border-b border-ink text-left">
+            <th scope="col" class="py-2 pr-4 font-semibold">Texte</th>
+            <th scope="col" class="py-2 pr-4 font-semibold">Fond</th>
+            <th scope="col" class="py-2 pr-4 font-semibold">Aperçu</th>
+            <th scope="col" class="py-2 pr-4 font-semibold">Rapport</th>
+            <th scope="col" class="py-2 font-semibold">Niveau</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of measuredPairs(); track item.foreground + item.background) {
+            <tr class="border-b border-rule">
+              <td class="py-2 pr-4">
+                <code translate="no">{{ item.foreground }}</code>
+              </td>
+              <td class="py-2 pr-4">
+                <code translate="no">{{ item.background }}</code>
+              </td>
+              <td class="py-2 pr-4">
+                <span
+                  [class]="
+                    'inline-block whitespace-nowrap px-2 py-1 ' +
+                    item.textClass +
+                    ' ' +
+                    item.backgroundClass
+                  "
+                  >Texte d’exemple</span
+                >
+              </td>
+              <td class="py-2 pr-4 tabular-nums">{{ item.ratio }}</td>
+              <td class="py-2">{{ item.level }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="border-b border-rule py-block" aria-labelledby="ui-espacement">
+    <h2 id="ui-espacement" class="text-2xl tracking-heading">Espacement</h2>
+    <p class="mt-3 text-sm text-ink-muted">
+      Base de 4 px ; <code translate="no">flow</code>, <code translate="no">block</code>,
+      <code translate="no">section</code> et <code translate="no">gutter</code> varient avec la
+      largeur de l’écran.
+    </p>
+    <ul class="mt-6 grid gap-2">
+      @for (step of spacing; track step.token) {
+        <li class="flex items-center gap-4 text-sm">
+          <code class="w-16 shrink-0">{{ step.token }}</code>
+          <span [class]="'h-3 bg-accent ' + step.bar"></span>
+        </li>
+      }
+    </ul>
+  </section>
+
+  <section class="border-b border-rule py-block" aria-labelledby="ui-formes">
+    <h2 id="ui-formes" class="text-2xl tracking-heading">Rayons, traits, ombre</h2>
+    <ul class="mt-6 flex flex-wrap gap-8 text-sm">
+      <li class="grid justify-items-start gap-2">
+        <span class="size-16 rounded-control border border-ink"></span
+        ><code translate="no">rounded-control</code>
+      </li>
+      <li class="grid justify-items-start gap-2">
+        <span class="size-16 rounded-media bg-paper-sunken border border-rule"></span
+        ><code translate="no">rounded-media</code>
+      </li>
+      <li class="grid justify-items-start gap-2">
+        <span class="size-16 rounded-full bg-paper-sunken border border-rule"></span
+        ><code translate="no">rounded-full</code>
+      </li>
+      <li class="grid justify-items-start gap-2">
+        <span class="catalogue-strong size-16"></span><code translate="no">trait fort</code>
+      </li>
+      <li class="grid justify-items-start gap-2">
+        <span class="size-16 bg-paper shadow-overlay"></span
+        ><code translate="no">shadow-overlay</code>
+      </li>
+    </ul>
+  </section>
+
+  <section class="border-b border-rule py-block" aria-labelledby="ui-composition">
+    <h2 id="ui-composition" class="text-2xl tracking-heading">Composition</h2>
+    <p class="mt-3 max-w-prose text-ink-muted">
+      <code translate="no">page-container</code> limite cette page à
+      <code translate="no">max-w-content</code> et pose la gouttière. Les exemples suivants gardent
+      l’ordre du document : aucune inversion par CSS.
+    </p>
+
+    <div class="mt-block grid gap-8 lg:grid-cols-3">
+      @for (variant of stacks; track variant.name) {
+        <div>
+          <h3 class="text-sm text-ink-muted">
+            <code translate="no">{{ variant.name }}</code> · {{ variant.use }}
+          </h3>
+          <div [class]="'mt-3 border-l border-rule pl-4 ' + variant.name">
+            <p class="bg-paper-sunken px-3 py-2">Premier élément</p>
+            <p class="bg-paper-sunken px-3 py-2">Deuxième élément</p>
+            <p class="bg-paper-sunken px-3 py-2">Troisième élément</p>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="mt-block">
+      <h3 class="text-sm text-ink-muted">
+        <code translate="no">cluster-3</code> · éléments en ligne qui passent à la ligne ensemble
+      </h3>
+      <ul class="mt-3 cluster-3 max-w-prose" aria-label="Technologies d’exemple">
+        @for (term of terms; track term) {
+          <li translate="no">
+            <a href="#ui-composition">{{ term }}</a>
+          </li>
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="border-b border-rule py-block" aria-labelledby="ui-actions">
+    <h2 id="ui-actions" class="text-2xl tracking-heading">Actions</h2>
+    <p class="mt-3 max-w-prose text-ink-muted">
+      <code translate="no">button[appButton]</code> et <code translate="no">a[appButton]</code>.
+      Survol, focus clavier et pression se vérifient ici ; la pression réduit le bouton à 97 %
+      pendant 100 ms.
+    </p>
+
+    <div
+      class="mt-block overflow-x-auto"
+      tabindex="0"
+      role="region"
+      aria-label="Variantes et états des boutons"
+    >
+      <table class="border-collapse text-sm">
+        <thead>
+          <tr class="border-b border-ink text-left">
+            <th scope="col" class="py-2 pr-6 font-semibold">Variante</th>
+            <th scope="col" class="py-2 pr-6 font-semibold">Repos</th>
+            <th scope="col" class="py-2 pr-6 font-semibold">Avec icône</th>
+            <th scope="col" class="py-2 pr-6 font-semibold"><code translate="no">sm</code></th>
+            <th scope="col" class="py-2 pr-6 font-semibold">
+              <code translate="no">disabled</code>
+            </th>
+            <th scope="col" class="py-2 pr-6 font-semibold">
+              <code translate="no">aria-disabled</code>
+            </th>
+            <th scope="col" class="py-2 font-semibold">Chargement</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (variant of buttonVariants; track variant) {
+            <tr class="border-b border-rule">
+              <th scope="row" class="py-3 pr-6 text-left align-middle font-normal">
+                <code translate="no">{{ variant }}</code>
+              </th>
+              <td class="py-3 pr-6 align-middle">
+                <button appButton type="button" [variant]="variant">Publier</button>
+              </td>
+              <td class="py-3 pr-6 align-middle">
+                <button appButton type="button" [variant]="variant">
+                  <app-icon name="menu" />
+                  Menu
+                </button>
+              </td>
+              <td class="py-3 pr-6 align-middle">
+                <button appButton type="button" size="sm" [variant]="variant">Publier</button>
+              </td>
+              <td class="py-3 pr-6 align-middle">
+                <button appButton type="button" disabled [variant]="variant">Publier</button>
+              </td>
+              <td class="py-3 pr-6 align-middle">
+                <button appButton type="button" aria-disabled="true" [variant]="variant">
+                  Publier
+                </button>
+              </td>
+              <td class="py-3 align-middle">
+                <button appButton type="button" loading [variant]="variant">Enregistrement…</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mt-block stack-flow">
+      <div class="cluster-4">
+        <a appButton href="#ui-actions">Lien avec l’apparence d’un bouton</a>
+        <a appButton variant="secondary" href="#ui-actions">Voir tous les projets</a>
+        <button appButton type="button" variant="quiet" aria-label="Fermer le panneau">
+          <app-icon name="close" />
+        </button>
+      </div>
+      <div class="max-w-64">
+        <button appButton type="button" variant="secondary">
+          Un libellé long passe à la ligne sans être tronqué ni déborder
+        </button>
+      </div>
+    </div>
+
+    <p class="mt-block max-w-prose font-text text-lg leading-prose">
+      Un lien dans le texte courant :
+      <a href="#ui-actions">lire l’article sur les erreurs de l’API</a>, souligné au repos, plus
+      épais au survol.
+    </p>
+  </section>
+
+  <section class="border-b border-rule py-block" aria-labelledby="ui-focus">
+    <h2 id="ui-focus" class="text-2xl tracking-heading">Focus</h2>
+    <p class="mt-3 max-w-prose">
+      Parcourir au clavier : <a href="#ui-focus">un lien</a>, puis
+      <button appButton type="button" variant="secondary" size="sm">un bouton</button>. Le contour
+      est le même partout.
+    </p>
+  </section>
+
+  <section class="py-block" aria-labelledby="ui-mouvement">
+    <h2 id="ui-mouvement" class="text-2xl tracking-heading">Mouvement</h2>
+    <p class="mt-3 max-w-prose text-ink-muted">
+      Déplacement de démonstration pour chaque durée. Avec « réduire les animations », il est
+      instantané.
+    </p>
+    <button
+      appButton
+      type="button"
+      variant="secondary"
+      size="sm"
+      class="mt-4"
+      [attr.aria-pressed]="moved()"
+      (click)="moved.set(!moved())"
+    >
+      Déplacer les repères
+    </button>
+    <ul class="mt-6 grid gap-3">
+      @for (row of motion; track row.token) {
+        <li class="grid gap-1 text-sm">
+          <code translate="no">{{ row.token }}</code>
+          <span class="catalogue-track">
+            <span
+              class="catalogue-mark"
+              [class.catalogue-mark-moved]="moved()"
+              [style.transition-duration]="row.duration"
+              [style.transition-timing-function]="row.ease"
+            ></span>
+          </span>
+        </li>
+      }
+    </ul>
+  </section>
+</main>

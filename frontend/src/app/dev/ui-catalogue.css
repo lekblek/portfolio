@@ -1,0 +1,22 @@
+.catalogue-strong {
+  border: var(--border-strong) solid var(--color-ink);
+}
+
+.catalogue-track {
+  display: block;
+  container-type: inline-size;
+  max-width: 20rem;
+  border-bottom: var(--border-rule) solid var(--color-rule);
+}
+
+.catalogue-mark {
+  display: block;
+  width: 1rem;
+  height: 1rem;
+  background: var(--color-accent);
+  transition-property: transform;
+}
+
+.catalogue-mark-moved {
+  transform: translateX(calc(100cqi - 1rem));
+}
