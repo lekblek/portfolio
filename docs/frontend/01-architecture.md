@@ -182,7 +182,7 @@ features/projects/
 | `/search` | `search` | Server | `?q=`, `?page=` ; résultat partageable par URL |
 | `/contact` | `contact` | Server | formulaire hydraté |
 | `/admin/login`, `/admin/**` | `admin` | **Client** | pas de SEO, cookie de session `SameSite=Strict`, aucune requête d'administration depuis le serveur Node |
-| `/_ui` | `dev` | Client | catalogue, `canMatch: () => isDevMode()` |
+| `/_ui` | `dev` | Server | catalogue du système de design, `canMatch: () => isDevMode()` : en production, la route ne correspond pas et l'adresse répond 404 (le mode `Client` servirait une coquille en 200) |
 | `**` | `not-found` | Server | statut HTTP **404** posé côté serveur |
 | `/sitemap.xml`, `/robots.txt` | — | — | décidés en F33 (route Express de `server.ts` ou point d'API) |
 

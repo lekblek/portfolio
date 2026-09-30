@@ -11,6 +11,7 @@ Documentation générale, prérequis et démarrage : [README principal](../READM
 | `npm ci` | installe les dépendances exactes du `package-lock.json` |
 | `npm start` | serveur de développement sur `http://localhost:4200` (rendu serveur, proxy `/api`) |
 | `npm run lint` | ESLint : règles Angular, accessibilité des gabarits, frontières entre dossiers |
+| `npm run lint:styles` | refuse valeurs arbitraires de Tailwind, couleurs littérales et `!important` hors de `src/styles/tokens.css` |
 | `npm run format` / `npm run format:check` | Prettier : corrige / vérifie le formatage |
 | `npm test -- --watch=false` | tests unitaires, une exécution |
 | `npm run api:types` | régénère `src/app/core/api/openapi.d.ts` depuis `docs/api/openapi.json` |
@@ -41,6 +42,14 @@ NG_ALLOWED_HOSTS=localhost npm run serve:ssr:frontend
 
 PowerShell : `$env:NG_ALLOWED_HOSTS='localhost'; npm run serve:ssr:frontend`.
 
+## Système de design
+
+- `src/styles/tokens.css` : tokens (`@theme` de Tailwind 4, thème par défaut retiré) ; seule source des valeurs. `base.css` : éléments HTML nus, focus, mouvement réduit. `utilities.css` : `page-container`, `stack-*`, `cluster-*`.
+- Polices auto-hébergées par `@fontsource-variable` : Schibsted Grotesk, Literata, JetBrains Mono.
+- Primitives : `src/app/shared/ui` (`button[appButton]`, `a[appButton]`, `app-icon`).
+- Catalogue `http://localhost:4200/_ui` : tokens appliqués, contrastes calculés, composition, primitives et leurs états. Développement seulement : en production, l'adresse répond 404.
+- Documentation : [`docs/frontend/02-design-system.md`](../docs/frontend/02-design-system.md). Notices des polices et des icônes : [`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md).
+
 ## Tests de bout en bout
 
 Prérequis, une fois par poste : `npx playwright install chromium` (version fixée par `@playwright/test`).
@@ -52,6 +61,6 @@ Prérequis, une fois par poste : `npx playwright install chromium` (version fix�
 
 ## État
 
-Angular 22.2 (versions : [`docs/03-versions-cibles.md`](../docs/03-versions-cibles.md) §11.2). Socle en place : HTTP, routeur, titre des pages, mode de rendu par route (`app.routes.server.ts`), page introuvable avec statut 404 réel, types de l'API générés. Aucune page métier, aucun style du système de design.
+Angular 22.2 (versions : [`docs/03-versions-cibles.md`](../docs/03-versions-cibles.md) §11.2). Socle en place : HTTP, routeur, titre des pages, mode de rendu par route (`app.routes.server.ts`), page introuvable avec statut 404 réel, types de l'API générés. Système de design exécutable : tokens, polices, styles de base, utilitaires de composition, primitives d'action. Aucune page métier ni shell public.
 
 Lot initial du navigateur (build de production, 2026-09-30) : 234,16 kB bruts / 65,43 kB transférés pour le squelette nettoyé ; voir `docs/progress.md` pour le relevé après le socle.

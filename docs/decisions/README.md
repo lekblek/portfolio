@@ -21,7 +21,7 @@ Une décision n'est **jamais** enregistrée uniquement dans `docs/steps/` : ce d
 | V01 … V06 | Versions (étape 04) | intégrées à [`../03-versions-cibles.md`](../03-versions-cibles.md) |
 | A01 … A13 | Architecture backend | [`../04-architecture-backend.md` §16](../04-architecture-backend.md) |
 | C01 … C11 | Conventions API | [`../05-conventions-api.md` §37](../05-conventions-api.md) |
-| D-A … D-DQ | Décisions d'implémentation des étapes 14 à 36, de la professionnalisation du backend (P-B) et du socle frontend (F00 à F04) | [`registre-implementation.md`](registre-implementation.md) |
+| D-A … D-DU | Décisions d'implémentation des étapes 14 à 36, de la professionnalisation du backend (P-B) et du frontend (F00 à F08) | [`registre-implementation.md`](registre-implementation.md) |
 | R-1 … R-8 | Organisation du dépôt et de l'outillage | [`registre-implementation.md`](registre-implementation.md) |
 | FA01 … FA12 | Architecture frontend | [`../frontend/01-architecture.md` §18](../frontend/01-architecture.md) |
 | DS01 … DS08 | Système de design | [`../frontend/02-design-system.md` §21](../frontend/02-design-system.md) |

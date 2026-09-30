@@ -688,6 +688,7 @@ Lorsque le frontend est concerné, la vérification de référence avant un comm
 ```bash
 cd frontend
 npm run lint
+npm run lint:styles
 npm run format:check
 npm test -- --watch=false
 npm run api:types
@@ -695,7 +696,7 @@ npm run build
 npm run e2e:no-api
 ```
 
-`npm run lint` échoue sur une règle Angular, une règle d’accessibilité des gabarits ou un import qui franchit une frontière de dossier (`docs/frontend/01-architecture.md` §5). `npm run format` corrige le formatage.
+`npm run lint` échoue sur une règle Angular, une règle d’accessibilité des gabarits ou un import qui franchit une frontière de dossier (`docs/frontend/01-architecture.md` §5). `npm run lint:styles` échoue sur une valeur arbitraire de Tailwind, une couleur littérale ou un `!important` hors des tokens (`docs/frontend/02-design-system.md` §17). `npm run format` corrige le formatage.
 
 `npm run api:types` régénère `src/app/core/api/openapi.d.ts` depuis `docs/api/openapi.json` : un changement du contrat de l’API (backend) est committé **avec** les types régénérés, dans le même lot ; la CI échoue si le fichier généré diffère du contrat.
 
