@@ -41,6 +41,13 @@ npm-debug.log*
 yarn-error.log*
 coverage/
 
+# ---------- Playwright (tests de bout en bout) ----------
+frontend/test-results/
+frontend/playwright-report/
+frontend/blob-report/
+frontend/.playwright/
+frontend/.playwright-cli/
+
 # ---------- IDE ----------
 .idea/
 *.iml

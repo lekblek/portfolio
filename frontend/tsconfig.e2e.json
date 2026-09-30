@@ -1,0 +1,9 @@
+/* Tests de bout en bout (Playwright) : vérifiés par `tsc` avant chaque exécution (scripts e2e). */
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "types": ["node"]
+  },
+  "include": ["e2e/**/*.ts", "playwright.config.ts"]
+}
