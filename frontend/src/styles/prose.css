@@ -1,0 +1,179 @@
+/*
+ * Rendu du Markdown (docs/frontend/02-design-system.md §4.4, §17) : le HTML produit ne porte pas
+ * de classes utilitaires, ces règles le mettent en forme sous l'élément `.prose`.
+ */
+
+.prose {
+  display: block;
+  max-width: var(--container-prose);
+  font-family: var(--font-text);
+  font-size: var(--text-lg);
+  line-height: var(--leading-prose);
+  overflow-wrap: break-word;
+
+  & > * + * {
+    margin-block-start: var(--spacing-flow);
+  }
+
+  & :where(p, li, blockquote) {
+    hyphens: auto;
+  }
+
+  & :where(h2, h3, h4, h5, h6) {
+    font-family: var(--font-display);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--leading-snug);
+    letter-spacing: var(--tracking-heading);
+    scroll-margin-top: calc(var(--spacing) * 6);
+  }
+
+  & h2 {
+    margin-block-start: calc(var(--spacing) * 12);
+    font-size: var(--text-2xl);
+  }
+
+  & h3 {
+    margin-block-start: calc(var(--spacing) * 10);
+    font-size: var(--text-xl);
+  }
+
+  & :where(h4, h5, h6) {
+    margin-block-start: calc(var(--spacing) * 8);
+    font-size: var(--text-lg);
+  }
+
+  & :where(h2, h3, h4, h5, h6) + * {
+    margin-block-start: calc(var(--spacing) * 3);
+  }
+
+  & :where(ul, ol) {
+    padding-inline-start: calc(var(--spacing) * 6);
+  }
+
+  & ul {
+    list-style: disc;
+  }
+
+  & ol {
+    list-style: decimal;
+  }
+
+  & li + li {
+    margin-block-start: calc(var(--spacing) * 2);
+  }
+
+  & li::marker {
+    color: var(--color-ink-muted);
+  }
+
+  & .task-list-item {
+    list-style: none;
+  }
+
+  & .task-state {
+    display: inline-block;
+    width: 1.5em;
+    margin-inline-start: -1.5em;
+    color: var(--color-ink-muted);
+  }
+
+  & blockquote {
+    padding-inline-start: calc(var(--spacing) * 4);
+    border-inline-start: 2px solid var(--color-rule);
+    color: var(--color-ink-muted);
+    font-style: italic;
+  }
+
+  & hr {
+    margin-block: calc(var(--spacing) * 10);
+  }
+
+  & a.external::after {
+    content: '\2197' / '';
+    margin-inline-start: 0.15em;
+    font-size: 0.85em;
+  }
+
+  & img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--radius-media);
+  }
+
+  /* Code dans le texte */
+  & :not(pre) > code {
+    padding: 0.05em 0.15em;
+    border-radius: var(--radius-media);
+    background: var(--color-paper-sunken);
+    font-size: 0.85em;
+  }
+
+  /* Blocs de code : défilement dans le bloc, jamais dans la page */
+  & pre.code {
+    overflow-x: auto;
+    padding: calc(var(--spacing) * 4) calc(var(--spacing) * 5);
+    border: var(--border-rule) solid var(--color-rule);
+    border-radius: var(--radius-media);
+    background: var(--color-paper-sunken);
+    font-size: var(--text-xs);
+    line-height: var(--leading-ui);
+    hyphens: none;
+    overflow-wrap: normal;
+    tab-size: 4;
+  }
+
+  & pre.code code {
+    font-size: inherit;
+  }
+
+  /* Coloration syntaxique (highlight.js) : couleurs des tokens, contrastes vérifiés (§4.1) */
+  & :where(.hljs-keyword, .hljs-built_in, .hljs-type, .hljs-selector-tag, .hljs-doctag) {
+    color: var(--color-code-keyword);
+  }
+
+  & :where(.hljs-string, .hljs-regexp, .hljs-attr, .hljs-template-string, .hljs-addition) {
+    color: var(--color-code-string);
+  }
+
+  & :where(.hljs-meta, .hljs-number, .hljs-literal, .hljs-symbol, .hljs-variable, .hljs-deletion) {
+    color: var(--color-code-annotation);
+  }
+
+  & :where(.hljs-comment, .hljs-quote) {
+    color: var(--color-ink-muted);
+    font-style: italic;
+  }
+
+  & :where(.hljs-title, .hljs-section, .hljs-name) {
+    font-weight: var(--font-weight-semibold);
+  }
+
+  /* Tableaux : défilement dans leur conteneur */
+  & .table-scroll {
+    overflow-x: auto;
+  }
+
+  & table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-display);
+    font-size: var(--text-sm);
+    line-height: var(--leading-ui);
+    font-variant-numeric: tabular-nums;
+  }
+
+  & th {
+    border-block-end: var(--border-strong) solid var(--color-ink);
+    font-weight: var(--font-weight-semibold);
+    text-align: start;
+  }
+
+  & :where(th, td) {
+    padding: calc(var(--spacing) * 2) calc(var(--spacing) * 4) calc(var(--spacing) * 2) 0;
+    vertical-align: top;
+  }
+
+  & td {
+    border-block-end: var(--border-rule) solid var(--color-rule);
+  }
+}
