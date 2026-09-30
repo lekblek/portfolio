@@ -6,6 +6,9 @@ AGENTS.md
 .codex/
 docs/codex/
 graphify-out/
+docs/frontend/00-roadmap-frontend.md
+docs/frontend/03-tooling-and-agent-skills.md
+docs/frontend/prototypes/
 
 
 # ---------- Secrets et environnement ----------
@@ -64,3 +67,4 @@ uploads/
 docs/prompts/
 docs/steps/
 docs/prompt.txt
+docs/project/

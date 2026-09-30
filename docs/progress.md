@@ -2,7 +2,7 @@
 
 Ce fichier est la **seule** source de vérité sur l'avancement. Il ne répète pas le contenu des autres documents : il pointe vers eux.
 
-Dernière mise à jour : 2026-09-29 (étape 36 close, CI verte ; professionnalisation du backend : P-B01 à P-B09 commités, P-B10, P-B11 et P-B14 vérifiés, commits à faire)
+Dernière mise à jour : 2026-09-30 (conception du frontend : architecture, système de design et feuille de route F00 à F37, R-8 ; professionnalisation du backend : P-B01 à P-B09 commités, P-B10, P-B11 et P-B14 vérifiés, commits à faire)
 
 ---
 
@@ -11,7 +11,7 @@ Dernière mise à jour : 2026-09-29 (étape 36 close, CI verte ; professionnalis
 ```text
 Dernière étape terminée   : 36 — API CRUD d'administration, poussée, CI verte (run 36608187827)
 Étape en cours            : professionnalisation du backend : P-B01 à P-B09 commités (à pousser), P-B10, P-B11, P-B14 vérifiés (commits à faire)
-Prochaine étape prévue    : 37 — Structurer Angular par fonctionnalités
+Prochaine étape prévue    : F00 — Remise à niveau du socle Angular (feuille de route frontend, R-8)
 État                      : PRÊT après commit et push des lots
 Branche                   : develop
 Vérification              : ./mvnw clean verify → 734 tests verts (335 *Test, 399 *IT) à la fin de P-B11
@@ -20,7 +20,7 @@ Vérification              : ./mvnw clean verify → 734 tests verts (335 *Test,
 ## 2. Prochaine action
 
 1. Committer P-B10, P-B11, P-B14 et la documentation, pousser, vérifier la CI, remplacer les 🟡 par ✅. Décisions : D-DA à D-DL.
-2. Étape 37 : structurer Angular par fonctionnalités (premier écran du frontend).
+2. Committer la conception du frontend (`docs/frontend/01-architecture.md`, `02-design-system.md`, R-8), puis F00 → F37 selon `docs/frontend/00-roadmap-frontend.md` (non versionnée, remplace les étapes 37 à 51 et les parties frontend de l'étape 52). Décisions attendues du propriétaire, avant l'étape concernée : direction visuelle (F05, DS01), nom et description du site (F09, F10), page de mentions légales (F09), exposition de `publicEmail` (14.4, avant F12), contenu de `/admin/settings` (avant F23).
 3. Étape 36, close (rappel du découpage) :
 
    ```text
@@ -114,7 +114,9 @@ Légende : ✅ terminée et poussée · 🟡 terminée et vérifiée, commits à
 | 36.7 | Administration des messages de contact | ✅ | `77ff96b`, `23aa08b` (CI : run 36608187827) |
 | P-B01 → P-B09 | Professionnalisation du backend : construction reproductible, diagnostic sûr, mandataire inverse, configuration de production explicite, cohérence des fichiers médias, journal de sécurité, contrat OpenAPI versionné, contraintes par nom structuré, Dependabot | 🟡 | `aa5ed7f` … `bec418a`, à pousser |
 | P-B10, P-B11, P-B14 | Textes de l'API en français quel que soit le client ; bcrypt de coût 12 avec mise à niveau au démarrage ; actions GitHub épinglées par empreinte | 🟡 | à committer |
-| 37 → 52 | Voir `docs/steps/liste_complete_etapes.md` | ⏳ | — |
+| — | Conception du frontend : architecture (FA01 à FA12), système de design (DS01 à DS08), organisation de la documentation (R-8) | 🟡 | à committer |
+| F00 → F37 | Frontend : voir `docs/frontend/00-roadmap-frontend.md` (remplace les étapes 37 à 51 et les parties frontend de 52) | ⏳ | — |
+| 52 | Déploiement : voir `docs/steps/liste_complete_etapes.md` (52.7 à 52.21) | ⏳ | — |
 
 Après le push, remplacer les 🟡 par ✅ et noter les hashes.
 
@@ -128,7 +130,9 @@ Index : [`decisions/README.md`](decisions/README.md).
 |---|---|---|
 | ADR 0001 | Architecture interne des modules (ports et adaptateurs légers) | Acceptée (2026-09-24) ; travail induit n° 6 (`shared.domain.model`) fait à l'étape 17 |
 | ADR 0002 | Communication entre modules : identifiants et façades de lecture | Acceptée (2026-09-24, étape 20) |
-| R-1 … R-7 | Organisation du dépôt et outillage (docs non versionnées, profils Spring, OSIV, CI, TypeScript strict, compose, outillage local hors dépôt) | Actives |
+| R-1 … R-8 | Organisation du dépôt et outillage (docs non versionnées, profils Spring, OSIV, CI, TypeScript strict, compose, outillage local hors dépôt, documentation du frontend) | Actives |
+| FA01 … FA12 | Architecture frontend : fonctionnalités, frontières ESLint, `httpResource`, types générés, origine de l'API en SSR, rendu par route, Signal Forms, pas de Material ni de Storybook, Playwright et axe, état dans l'URL, Markdown partagé | Acceptées (2026-09-30), mises en œuvre de F01 à F11 |
+| DS01 … DS08 | Système de design : direction (**proposée**, validée en F05), tokens Tailwind 4, polices auto-hébergées, stratégie de style, primitives à la demande, mouvement, thème clair, typographie française | DS01 proposée, autres acceptées (2026-09-30) |
 | D-O, D-Q | Lecture en 1 + 5 requêtes constantes ; invariants de dates au domaine | Actives (16.3.1) |
 | D-P, D-R | Aplatissement de `DateRange` dans le JSON ; contrat public sans `id`/`displayOrder` | Actives (16.3.2) |
 | D-S, D-U, D-V, D-W, D-X, D-Y | `DateRange` partagé ; visibilité publique ; pagination sans type Spring dans les ports ; représentations publiques des projets ; slug ; périmètre de `V004` | Actives (17) |
@@ -175,10 +179,10 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | ID | Priorité | Problème | Traitement prévu |
 |---|---|---|---|
 | KI-18 | AMÉLIORATION | `LICENSE` : titulaire et année non renseignés (`[year] [fullname]`) | à décider par le propriétaire du dépôt |
-| KI-21 | AMÉLIORATION | `@types/node ^20` alors que Node 24 est la cible | étape 37 |
-| KI-22 | AMÉLIORATION | SSR : `security.allowedHosts` vide | étape 52 (déploiement) |
+| KI-21 | AMÉLIORATION | `@types/node ^20` alors que Node 24 est la cible | F00 |
+| KI-22 | AMÉLIORATION | SSR : `security.allowedHosts` vide | F35 |
 | KI-16 | OPTIONNEL | `V001` : virgule manquante avant `CONSTRAINT profile_single_row` (comportement identique) ; migration appliquée, non modifiable | aucun |
-| KI-29 | OPTIONNEL | Surface sans appelant : `App.title` (frontend). Côté backend, résolu : codes des séries et des médias tous émis (`SERIES_POSITION_ALREADY_USED` retiré, D-CV), `ProfileEntity.removeLink` / `removeSkill` retirées (D-CY) | frontend (étape 37) |
+| KI-29 | OPTIONNEL | Surface sans appelant : `App.title` (frontend). Côté backend, résolu : codes des séries et des médias tous émis (`SERIES_POSITION_ALREADY_USED` retiré, D-CV), `ProfileEntity.removeLink` / `removeSkill` retirées (D-CY) | F00 |
 | KI-30 | OPTIONNEL | Les `*IT` transactionnels (écriture de statut, lectures publiques) ne prouvent pas le comportement après commit | à reprendre si un défaut de transaction apparaît |
 
 ### Résolus le 2026-09-29 (étape 36.3)

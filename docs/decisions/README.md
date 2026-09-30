@@ -22,7 +22,9 @@ Une décision n'est **jamais** enregistrée uniquement dans `docs/steps/` : ce d
 | A01 … A13 | Architecture backend | [`../04-architecture-backend.md` §16](../04-architecture-backend.md) |
 | C01 … C11 | Conventions API | [`../05-conventions-api.md` §37](../05-conventions-api.md) |
 | D-A … D-CZ | Décisions d'implémentation des étapes 14 à 36 | [`registre-implementation.md`](registre-implementation.md) |
-| R-1 … R-7 | Organisation du dépôt et de l'outillage | [`registre-implementation.md`](registre-implementation.md) |
+| R-1 … R-8 | Organisation du dépôt et de l'outillage | [`registre-implementation.md`](registre-implementation.md) |
+| FA01 … FA12 | Architecture frontend | [`../frontend/01-architecture.md` §18](../frontend/01-architecture.md) |
+| DS01 … DS08 | Système de design | [`../frontend/02-design-system.md` §21](../frontend/02-design-system.md) |
 
 ## ADR
 
