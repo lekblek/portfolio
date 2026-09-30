@@ -11,7 +11,7 @@ En construction — V1. Avancement détaillé, étape courante et problèmes con
 | Couche | Technologies |
 |---|---|
 | Backend | Java 25, Spring Boot 4.1 (Web MVC, Data JPA, Validation, Actuator), Flyway, PostgreSQL 18 |
-| Frontend | Angular 22 (SSR / rendu hybride), Tailwind CSS 4, Vitest |
+| Frontend | Angular 22 (SSR / rendu hybride), Tailwind CSS 4, Vitest, Playwright et axe (bout en bout, accessibilité), ESLint |
 | Tests backend | JUnit 6, AssertJ, MockMvc, Testcontainers 2 (PostgreSQL réel), ArchUnit |
 | Infrastructure | Docker Compose ; en production : Caddy, HTTPS, VPS (à venir) |
 
@@ -89,8 +89,10 @@ Dans IntelliJ : configuration d'exécution `Application` → *Active profiles* :
 ```bash
 cd frontend
 npm ci
-npm start                       # http://localhost:4200
+npm start                       # http://localhost:4200, appels /api transmis au backend 8080
 ```
+
+Un autre backend : `API_ORIGIN=http://localhost:8081 npm start`. Détails (proxy, build SSR, tests de bout en bout) : [frontend/README.md](frontend/README.md).
 
 ## Tests
 
@@ -100,15 +102,17 @@ cd backend
 ./mvnw verify    # + tests d'intégration (*IT) sur PostgreSQL Testcontainers — référence avant commit
 
 cd frontend
+npm run lint
 npm test -- --watch=false
 npm run build
+npm run e2e:no-api   # bout en bout sans backend (Chromium : npx playwright install chromium)
 ```
 
 Stratégie complète : [docs/06-strategie-tests.md](docs/06-strategie-tests.md).
 
 ## Intégration continue
 
-`.github/workflows/ci.yml` exécute `./mvnw verify` (JDK 25, Testcontainers) et `npm ci`, `npm test`, `npm run build` (Node 24) à chaque push ou pull request sur `develop` et `main`.
+`.github/workflows/ci.yml` exécute `./mvnw verify` (JDK 25, Testcontainers) et, côté frontend (Node 24), `npm ci`, lint, formatage, contrôle des types de l'API contre `docs/api/openapi.json`, `npm test`, `npm run build`, puis les tests de bout en bout sans backend (Chromium) à chaque push ou pull request sur `develop` et `main`.
 
 ## Documentation
 

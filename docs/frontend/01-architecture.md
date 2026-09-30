@@ -143,7 +143,7 @@ Un dossier n'est créé qu'avec son premier fichier réel : la structure ci-dess
 
 Deux fonctionnalités qui ont besoin du même composant le déplacent dans `shared/` (s'il est générique) ou dupliquent un gabarit de quelques lignes (s'il ne l'est pas) : pas d'import croisé.
 
-Contrôle : règle ESLint `no-restricted-imports` par dossier (F01), exécutée en CI.
+Contrôle : règle ESLint locale `project/folder-boundaries` (`frontend/eslint/folder-boundaries.js`), exécutée par `npm run lint` et en CI. Elle résout chaque import relatif (statique, réexportation ou `import()` dynamique) vers sa zone (`core`, `shared`, `layout`, `dev`, `features/<x>`, `features/admin/<x>`) et applique ce tableau. `no-restricted-imports`, envisagé d'abord, ne compare que le texte de l'import : `../../b/x`, écrit depuis `features/a`, ne nomme pas le dossier visé et passait le contrôle (vérifié par mutation le 2026-09-30). Les fichiers de la racine (`app.ts`, `app.config*.ts`, `app.routes*.ts`) peuvent tout importer ; `features/admin/admin.routes.ts` assemble les sous-fonctionnalités d'administration.
 
 ---
 
@@ -188,7 +188,9 @@ features/projects/
 
 Configuration du routeur (F02) : `withComponentInputBinding()` (paramètres de route en `input()`), `withInMemoryScrolling({ scrollPositionRestoration: 'enabled', anchorScrolling: 'enabled' })`, chargement paresseux de chaque fonctionnalité, `TitleStrategy` du projet (« Titre de page — Nom du site »).
 
-Statut 404 : une page qui reçoit une 404 de l'API (slug inconnu, contenu non public) affiche la page introuvable et pose le statut 404 de la réponse SSR (`RESPONSE_INIT`), sans redirection.
+Statut 404 : une page qui reçoit une 404 de l'API (slug inconnu, contenu non public) affiche la page introuvable et pose le statut 404 de la réponse SSR (`RESPONSE_INIT`, par `core/platform/response-status.ts`), sans redirection.
+
+Mode de rendu : `app.routes.server.ts` s'applique aux routes que l'application déclare. Tant qu'aucune route `admin` n'existe, `/admin/x` est une adresse inconnue, rendue par le serveur avec le statut 404 ; une route `admin/...` déclarée est servie en rendu client (vérifié par une route d'essai le 2026-09-30).
 
 ---
 
@@ -199,11 +201,15 @@ Statut 404 : une page qui reçoit une 404 de l'API (slug inconnu, contenu non pu
 - `npm run api:types` génère `src/app/core/api/openapi.d.ts` depuis `../docs/api/openapi.json` (`openapi-typescript`, F03). Le fichier généré est versionné et jamais modifié à la main.
 - `core/api/api-types.ts` expose des alias lisibles : `export type ProjectSummary = Schemas['ProjectSummaryResponse']`.
 - La CI régénère les types et échoue si le fichier diffère (`git diff --exit-code`) : un changement du contrat backend impose la mise à jour du frontend dans le même lot.
+- `openapi-typescript` 7.13 déclare `typescript ^5` comme dépendance homologue ; le projet est en TypeScript 6. Un `overrides` de `package.json`, limité à ce paquet, lui fait utiliser le TypeScript du projet (génération vérifiée identique et déterministe). À retirer quand une version compatible paraîtra.
+- Les schémas de réponse du contrat ne déclarent pas de propriétés `required` (49 schémas sur 68, dont toutes les réponses) : toutes leurs propriétés sont donc optionnelles dans les types générés, et aucune n'est marquée `null`. Les types restent fidèles au contrat ; la correction se fait côté backend (KI-34), avant la première page qui lit l'API.
+- `core/api/api-error.ts` : `ApiProblem` (forme de `05-conventions-api.md` §10, absente du contrat), `ApiError` et `toApiError`. `core/api/page.ts` : `Page<T>` (métadonnées reprises du schéma `PageResponse…`), `PageRequest` et `toHttpParams`.
 
 ### 8.2 URL et origine
 
 - Le navigateur appelle toujours des URL relatives `/api/...` : même origine en production (Caddy), proxy `proxy.conf.mjs` en développement (cible `API_ORIGIN`, défaut `http://localhost:8080`).
-- Le serveur SSR n'a pas d'origine « courante » fiable : un intercepteur fourni **seulement** par `app.config.server.ts` préfixe les URL `/api/` par l'origine interne lue dans l'environnement (`API_ORIGIN`). L'origine n'est jamais déduite de la requête entrante (pas de SSRF par l'en-tête `Host`).
+- Le serveur SSR n'a pas d'origine « courante » fiable : l'intercepteur `core/api/server-api-origin.interceptor.ts` préfixe les URL `/api/` par l'origine interne lue dans l'environnement (`API_ORIGIN`, défaut `http://localhost:8080`). Le jeton `API_ORIGIN` est fourni **seulement** par `app.config.server.ts` ; dans le navigateur, faute de jeton, l'intercepteur laisse la requête relative (un seul `provideHttpClient`, commun aux deux configurations). L'origine n'est jamais déduite de la requête entrante (pas de SSRF par l'en-tête `Host`).
+- `withFetch()` n'est pas appelé : Fetch est le moteur par défaut de `HttpClient` en v22 (la fonction est dépréciée).
 - Cache de transfert : les GET faits pendant le rendu serveur sont transmis au navigateur (`HttpTransferCache`, actif par défaut). F02 vérifie qu'aucune requête API n'est rejouée par le navigateur au premier affichage ; si la réécriture d'URL empêche la correspondance des clés, `HTTP_TRANSFER_CACHE_ORIGIN_MAP` est fourni côté serveur.
 
 ### 8.3 Lectures
@@ -329,7 +335,8 @@ Cible WCAG 2.2 AA (D17). Règles d'architecture :
 | visuel | Playwright (captures) | `e2e/visual/*.spec.ts` | non-régression des primitives et des pages stabilisées (F36) |
 
 - Les tests `*.spec.ts` n'ont besoin ni du backend ni de Docker (même règle que les `*Test` du backend).
-- Les tests de bout en bout locaux utilisent le backend de développement (profil `dev`, données d'amorçage) ; leur exécution en CI est ajoutée en F36 avec l'environnement Compose.
+- Les tests de bout en bout locaux utilisent le backend de développement (profil `dev`, données d'amorçage) ; leur exécution en CI est ajoutée en F36 avec l'environnement Compose. Dès F04, la CI lance les spécifications marquées `@no-api` (sans backend).
+- Banc Playwright (`frontend/playwright.config.ts`) : projets `desktop` (1440 × 900) et `mobile` (390 × 844, tactile), serveur de développement démarré ou réutilisé (`webServer`). Toute spécification importe `test` et `expect` de `e2e/support/fixtures.ts` : la fixture automatique `guard` fait échouer le test sur une erreur ou un avertissement de console, une exception, une requête en échec ou une réponse HTTP ≥ 400 non déclarée (`guard.allowHttpError(…)`) ; `expectAccessible(page)` exige zéro violation axe (WCAG 2.0, 2.1, 2.2, A et AA). Captures et traces vont dans `frontend/test-results/` (ignoré).
 - Ce qui n'est pas testé : les détails de style (couverts par les captures et la revue visuelle), les composants triviaux sans logique.
 
 ---
@@ -339,15 +346,15 @@ Cible WCAG 2.2 AA (D17). Règles d'architecture :
 | Réf | Décision | Statut |
 |---|---|---|
 | FA01 | Organisation par fonctionnalité (`core`, `shared`, `layout`, `features`), sans reproduction de l'architecture hexagonale du backend | Acceptée |
-| FA02 | Frontières entre dossiers vérifiées par ESLint `no-restricted-imports` | Acceptée (mise en œuvre F01) |
+| FA02 | Frontières entre dossiers vérifiées par ESLint (règle locale qui résout les chemins, §5 ; `no-restricted-imports` ne détecte pas les imports relatifs) | Acceptée, mise en œuvre (F01) |
 | FA03 | Lectures par `httpResource`, écritures par `HttpClient`, pas de bibliothèque d'état | Acceptée |
-| FA04 | Types générés depuis `docs/api/openapi.json` par `openapi-typescript` (types seulement), contrôle de dérive en CI | Acceptée (F03) |
-| FA05 | URL relatives `/api` dans le navigateur ; origine interne `API_ORIGIN` pour le rendu serveur, jamais déduite de la requête | Acceptée (F02) |
-| FA06 | Site public en `RenderMode.Server` (D22), administration en `RenderMode.Client`, 404 réelle côté serveur | Acceptée (F02) |
+| FA04 | Types générés depuis `docs/api/openapi.json` par `openapi-typescript` (types seulement), contrôle de dérive en CI | Acceptée, mise en œuvre (F03) |
+| FA05 | URL relatives `/api` dans le navigateur ; origine interne `API_ORIGIN` pour le rendu serveur, jamais déduite de la requête | Acceptée, mise en œuvre (F02) |
+| FA06 | Site public en `RenderMode.Server` (D22), administration en `RenderMode.Client`, 404 réelle côté serveur | Acceptée, mise en œuvre (F02) |
 | FA07 | Signal Forms pour tout formulaire | Acceptée |
 | FA08 | Pas d'Angular Material ; plateforme web d'abord, Angular Aria et CDK à la demande | Acceptée |
 | FA09 | Pas de Storybook en V1 ; catalogue interne `/_ui` en développement seulement | Acceptée |
-| FA10 | Playwright Test et axe pour les tests de bout en bout et d'accessibilité | Acceptée (F04) |
+| FA10 | Playwright Test et axe pour les tests de bout en bout et d'accessibilité | Acceptée, mise en œuvre (F04) |
 | FA11 | Filtres, recherche et pagination dans l'URL | Acceptée |
 | FA12 | Rendu Markdown partagé, rendu serveur, HTML assaini ; bibliothèques choisies par ADR en F11 | Acceptée (choix des bibliothèques à venir) |
 

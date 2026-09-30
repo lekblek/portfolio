@@ -2,26 +2,27 @@
 
 Ce fichier est la **seule** source de vérité sur l'avancement. Il ne répète pas le contenu des autres documents : il pointe vers eux.
 
-Dernière mise à jour : 2026-09-30 (conception du frontend : architecture, système de design et feuille de route F00 à F37, R-8 ; professionnalisation du backend : P-B01 à P-B09 commités, P-B10, P-B11 et P-B14 vérifiés, commits à faire)
+Dernière mise à jour : 2026-09-30 (socle frontend F00 à F04 vérifié, commits à faire ; F05 direction visuelle : prototypes présentés, choix du propriétaire attendu)
 
 ---
 
 ## 1. État courant
 
 ```text
-Dernière étape terminée   : 36 — API CRUD d'administration, poussée, CI verte (run 36608187827)
-Étape en cours            : professionnalisation du backend : P-B01 à P-B09 commités (à pousser), P-B10, P-B11, P-B14 vérifiés (commits à faire)
-Prochaine étape prévue    : F00 — Remise à niveau du socle Angular (feuille de route frontend, R-8)
-État                      : PRÊT après commit et push des lots
+Dernière étape terminée   : F04 — Banc de QA navigateur (socle frontend F00 à F04 vérifié, commits à faire)
+Étape en cours            : F05 — Direction visuelle : trois directions prototypées hors dépôt, choix du propriétaire attendu (DS01)
+Prochaine étape prévue    : F06 — Tokens, polices, styles de base, catalogue /_ui (après le choix de F05)
+État                      : EN ATTENTE du choix de direction ; F00 à F04 à committer, lots précédents à pousser
 Branche                   : develop
-Vérification              : ./mvnw clean verify → 734 tests verts (335 *Test, 399 *IT) à la fin de P-B11
+Vérification              : frontend : lint, format, 19 tests unitaires, types de l'API sans dérive, build et SSR (404 réelle), 2 tests de bout en bout (bureau, mobile) verts ; backend : ./mvnw clean verify → 734 tests verts à la fin de P-B11
 ```
 
 ## 2. Prochaine action
 
-1. Committer P-B10, P-B11, P-B14 et la documentation, pousser, vérifier la CI, remplacer les 🟡 par ✅. Décisions : D-DA à D-DL.
-2. Committer la conception du frontend (`docs/frontend/01-architecture.md`, `02-design-system.md`, R-8), puis F00 → F37 selon `docs/frontend/00-roadmap-frontend.md` (non versionnée, remplace les étapes 37 à 51 et les parties frontend de l'étape 52). Décisions attendues du propriétaire, avant l'étape concernée : direction visuelle (F05, DS01), nom et description du site (F09, F10), page de mentions légales (F09), exposition de `publicEmail` (14.4, avant F12), contenu de `/admin/settings` (avant F23).
-3. Étape 36, close (rappel du découpage) :
+1. Committer F00 à F04 (commandes fournies à la fin de l'étape), pousser avec les lots déjà commités (P-B01 à P-B14, conception du frontend), vérifier la CI (trois jobs : backend, frontend, bout en bout sans API), remplacer les 🟡 par ✅.
+2. F05 : le propriétaire choisit la direction visuelle parmi les trois prototypes (DS01) ; puis une itération sur la direction retenue, `02-design-system.md` §4 réécrit, DS01 → « Acceptée ». Ensuite F06 selon `docs/frontend/00-roadmap-frontend.md` (non versionnée, remplace les étapes 37 à 51 et les parties frontend de l'étape 52). Décisions attendues du propriétaire, avant l'étape concernée : nom et description du site (F09, F10), page de mentions légales (F09), exposition de `publicEmail` (14.4, avant F12), contenu de `/admin/settings` (avant F23).
+3. Avant F12 (première page qui lit l'API) : KI-34, déclarer les propriétés obligatoires et nullables des réponses dans le contrat OpenAPI.
+4. Étape 36, close (rappel du découpage) :
 
    ```text
    36.1  Taxonomie : catégories et tags                                    ✔ poussée
@@ -32,7 +33,7 @@ Vérification              : ./mvnw clean verify → 734 tests verts (335 *Test,
    36.6  Profil : profil et collections, avatar et CV   ✔ poussée
    36.7  Messages de contact : liste, détail, changement de statut   ✔ poussée
    ```
-4. Confirmer ou infirmer D-T (cohérence `stage` ⇔ `endDate`) : `docs/decisions/registre-implementation.md`.
+5. Confirmer ou infirmer D-T (cohérence `stage` ⇔ `endDate`) : `docs/decisions/registre-implementation.md`.
 
 ---
 
@@ -113,9 +114,15 @@ Légende : ✅ terminée et poussée · 🟡 terminée et vérifiée, commits à
 | 36.6 | Administration du profil (remplacement complet, collections comprises) | ✅ | `3203055`, `c9b3297` (CI : run 36607262554) |
 | 36.7 | Administration des messages de contact | ✅ | `77ff96b`, `23aa08b` (CI : run 36608187827) |
 | P-B01 → P-B09 | Professionnalisation du backend : construction reproductible, diagnostic sûr, mandataire inverse, configuration de production explicite, cohérence des fichiers médias, journal de sécurité, contrat OpenAPI versionné, contraintes par nom structuré, Dependabot | 🟡 | `aa5ed7f` … `bec418a`, à pousser |
-| P-B10, P-B11, P-B14 | Textes de l'API en français quel que soit le client ; bcrypt de coût 12 avec mise à niveau au démarrage ; actions GitHub épinglées par empreinte | 🟡 | à committer |
-| — | Conception du frontend : architecture (FA01 à FA12), système de design (DS01 à DS08), organisation de la documentation (R-8) | 🟡 | à committer |
-| F00 → F37 | Frontend : voir `docs/frontend/00-roadmap-frontend.md` (remplace les étapes 37 à 51 et les parties frontend de 52) | ⏳ | — |
+| P-B10, P-B11, P-B14 | Textes de l'API en français quel que soit le client ; bcrypt de coût 12 avec mise à niveau au démarrage ; actions GitHub épinglées par empreinte | 🟡 | `04fba3c`, `77acf2a`, `1f1e55d`, `9e67629`, à pousser |
+| — | Conception du frontend : architecture (FA01 à FA12), système de design (DS01 à DS08), organisation de la documentation (R-8) | 🟡 | `ebdaefc`, `cefb019`, `4ead1d3`, à pousser |
+| F00 | Socle Angular : 22.2, `@types/node` 24, squelette nettoyé (KI-21, KI-29) ; lot initial 234,16 kB bruts / 65,43 kB transférés | 🟡 | à committer |
+| F01 | ESLint (Angular, accessibilité des gabarits, frontières par règle locale), Prettier, CI (D-DN) | 🟡 | à committer |
+| F02 | HTTP, routeur, titre, rendu par route, `API_ORIGIN` en SSR, proxy, 404 réelle (D-DO) ; lot initial 258,59 kB bruts / 73,10 kB transférés | 🟡 | à committer |
+| F03 | Types de l'API générés, `ApiError`, pagination, contrôle de dérive en CI (D-DP) | 🟡 | à committer |
+| F04 | Playwright, axe, garde console et réseau, E2E de la 404, job CI sans API, CLI Playwright (D-DQ) | 🟡 | à committer |
+| F05 | Direction visuelle : trois directions prototypées hors dépôt, captures 390 et 1440 | ⏳ | choix du propriétaire attendu |
+| F06 → F37 | Frontend : voir `docs/frontend/00-roadmap-frontend.md` (remplace les étapes 37 à 51 et les parties frontend de 52) | ⏳ | — |
 | 52 | Déploiement : voir `docs/steps/liste_complete_etapes.md` (52.7 à 52.21) | ⏳ | — |
 
 Après le push, remplacer les 🟡 par ✅ et noter les hashes.
@@ -131,7 +138,8 @@ Index : [`decisions/README.md`](decisions/README.md).
 | ADR 0001 | Architecture interne des modules (ports et adaptateurs légers) | Acceptée (2026-09-24) ; travail induit n° 6 (`shared.domain.model`) fait à l'étape 17 |
 | ADR 0002 | Communication entre modules : identifiants et façades de lecture | Acceptée (2026-09-24, étape 20) |
 | R-1 … R-8 | Organisation du dépôt et outillage (docs non versionnées, profils Spring, OSIV, CI, TypeScript strict, compose, outillage local hors dépôt, documentation du frontend) | Actives |
-| FA01 … FA12 | Architecture frontend : fonctionnalités, frontières ESLint, `httpResource`, types générés, origine de l'API en SSR, rendu par route, Signal Forms, pas de Material ni de Storybook, Playwright et axe, état dans l'URL, Markdown partagé | Acceptées (2026-09-30), mises en œuvre de F01 à F11 |
+| FA01 … FA12 | Architecture frontend : fonctionnalités, frontières ESLint, `httpResource`, types générés, origine de l'API en SSR, rendu par route, Signal Forms, pas de Material ni de Storybook, Playwright et axe, état dans l'URL, Markdown partagé | Acceptées (2026-09-30) ; FA02, FA04, FA05, FA06, FA10 mises en œuvre (F01 à F04) |
+| D-DM … D-DQ | Socle frontend : montée 22.2 et hôtes SSR en local ; frontières par règle ESLint qui résout les chemins ; intercepteur commun et jeton serveur ; types générés et `overrides` de TypeScript ; banc Playwright et garde console et réseau | Actives (F00 à F04) |
 | DS01 … DS08 | Système de design : direction (**proposée**, validée en F05), tokens Tailwind 4, polices auto-hébergées, stratégie de style, primitives à la demande, mouvement, thème clair, typographie française | DS01 proposée, autres acceptées (2026-09-30) |
 | D-O, D-Q | Lecture en 1 + 5 requêtes constantes ; invariants de dates au domaine | Actives (16.3.1) |
 | D-P, D-R | Aplatissement de `DateRange` dans le JSON ; contrat public sans `id`/`displayOrder` | Actives (16.3.2) |
@@ -179,11 +187,18 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | ID | Priorité | Problème | Traitement prévu |
 |---|---|---|---|
 | KI-18 | AMÉLIORATION | `LICENSE` : titulaire et année non renseignés (`[year] [fullname]`) | à décider par le propriétaire du dépôt |
-| KI-21 | AMÉLIORATION | `@types/node ^20` alors que Node 24 est la cible | F00 |
-| KI-22 | AMÉLIORATION | SSR : `security.allowedHosts` vide | F35 |
+| KI-22 | AMÉLIORATION | SSR : `security.allowedHosts` vide ; depuis Angular 22.2, le build SSR refuse alors **tout** hôte (400), `localhost` compris : obligatoire avant la mise en production ; en local, `NG_ALLOWED_HOSTS=localhost` (D-DM) | F35 |
 | KI-16 | OPTIONNEL | `V001` : virgule manquante avant `CONSTRAINT profile_single_row` (comportement identique) ; migration appliquée, non modifiable | aucun |
-| KI-29 | OPTIONNEL | Surface sans appelant : `App.title` (frontend). Côté backend, résolu : codes des séries et des médias tous émis (`SERIES_POSITION_ALREADY_USED` retiré, D-CV), `ProfileEntity.removeLink` / `removeSkill` retirées (D-CY) | F00 |
+| KI-34 | AMÉLIORATION | Contrat OpenAPI : les schémas de réponse (49 sur 68) ne déclarent ni propriétés obligatoires (`required`) ni valeurs `null` ; les types générés rendent donc toutes leurs propriétés optionnelles, et un champ réellement nullable (`endDate`) n'est pas distingué d'un champ toujours présent | backend (springdoc : propriétés non nulles des records obligatoires, nullables marquées), avant F12 |
+| KI-35 | OPTIONNEL | `npm ci` avertit que quatre paquets de la chaîne de build (`esbuild`, `lmdb`, `msgpackr-extract`, `@parcel/watcher`) ont des scripts d'installation non listés dans `allowScripts` (npm 11) ; sans effet sur l'installation | décider d'une liste `allowScripts` explicite, ou ignorer |
 | KI-30 | OPTIONNEL | Les `*IT` transactionnels (écriture de statut, lectures publiques) ne prouvent pas le comportement après commit | à reprendre si un défaut de transaction apparaît |
+
+### Résolus le 2026-09-30 (socle frontend)
+
+| ID | Problème | Résolution |
+|---|---|---|
+| KI-21 | `@types/node ^20` alors que Node 24 est la cible | F00 : `@types/node ^24` (24.19.0) |
+| KI-29 | `App.title` sans appelant (frontend) ; côté backend déjà résolu (D-CV, D-CY) | F00 : squelette réduit à `<router-outlet />` |
 
 ### Résolus le 2026-09-29 (étape 36.3)
 

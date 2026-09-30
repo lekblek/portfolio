@@ -683,20 +683,23 @@ avant un commit contenant des modifications backend.
 
 ## Frontend
 
-Lorsque le frontend est concerné :
+Lorsque le frontend est concerné, la vérification de référence avant un commit est :
 
 ```bash
 cd frontend
-npm test
-```
-
-et/ou :
-
-```bash
+npm run lint
+npm run format:check
+npm test -- --watch=false
+npm run api:types
 npm run build
+npm run e2e:no-api
 ```
 
-selon l’étape.
+`npm run lint` échoue sur une règle Angular, une règle d’accessibilité des gabarits ou un import qui franchit une frontière de dossier (`docs/frontend/01-architecture.md` §5). `npm run format` corrige le formatage.
+
+`npm run api:types` régénère `src/app/core/api/openapi.d.ts` depuis `docs/api/openapi.json` : un changement du contrat de l’API (backend) est committé **avec** les types régénérés, dans le même lot ; la CI échoue si le fichier généré diffère du contrat.
+
+`npm run e2e:no-api` lance les tests de bout en bout qui n’ont pas besoin du backend ; `npm run e2e` lance toute la suite (backend de développement requis).
 
 Un changement purement documentaire ne nécessite pas artificiellement de lancer l’intégralité de la suite applicative.
 

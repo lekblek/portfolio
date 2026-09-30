@@ -432,17 +432,22 @@ Dependabot propose chaque semaine les montées de ces dépendances, des paquets 
 
 ## 11.2 Frontend
 
+Relevé du 2026-09-30, après la montée 22.1 → 22.2 (étape F00).
+
 | Paquet | Version résolue (lockfile) |
 |---|---|
-| `@angular/core` | 22.1.7 |
-| `@angular/cli`, `@angular/build` | 22.1.8 |
-| `@angular/ssr` | 22.1.8 |
+| `@angular/*` (core, common, compiler, forms, router, platform-browser, platform-server) | 22.2.0 |
+| `@angular/cli`, `@angular/build`, `@angular/compiler-cli` | 22.2.0 |
+| `@angular/ssr` | 22.2.0 |
 | TypeScript | 6.0.3 |
 | Tailwind CSS (`@tailwindcss/postcss`) | 4.3.3 |
 | Vitest (via `@angular/build:unit-test`) | 4.1.11 |
 | Express (serveur SSR) | 5.2.1 |
+| `@types/node` | 24.19.0 (plage `^24`, alignée sur `.nvmrc`) |
 
-Le moteur Node requis par Angular 22.1 est `^22.22.3 || ^24.15.0 || >=26.0.0`. Le projet cible Node 24 (`.nvmrc`).
+Le moteur Node requis par Angular 22.2 est `^22.22.3 || ^24.15.0 || >=26.0.0`. Le projet cible Node 24 (`.nvmrc`).
+
+Tous les paquets `@angular/*` restent sur la même version mineure ; une montée se fait par `ng update @angular/core@22 @angular/cli@22`, jamais paquet par paquet.
 
 ---
 
