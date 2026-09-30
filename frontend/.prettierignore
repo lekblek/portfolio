@@ -1,0 +1,17 @@
+# Fichiers générés ou installés
+dist/
+.angular/
+coverage/
+node_modules/
+package-lock.json
+test-results/
+playwright-report/
+blob-report/
+.playwright/
+.playwright-cli/
+
+# Documentation : convention de tableaux Markdown commune à tout le dépôt
+*.md
+
+# Types générés depuis docs/api/openapi.json (npm run api:types)
+src/app/core/api/openapi.d.ts
