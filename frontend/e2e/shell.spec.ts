@@ -1,7 +1,6 @@
 import { expect, expectAccessible, test } from './support/fixtures';
 
-// Toute adresse inconnue est rendue dans le shell public : c'est la seule page publique pour
-// l'instant. Les pages suivantes ajouteront leurs liens à la navigation.
+// Toute adresse inconnue est rendue dans le shell public : page sans API, pour la CI sans backend.
 const PAGE = '/nimporte-quoi';
 
 test.describe('public shell', () => {
@@ -19,6 +18,28 @@ test.describe('public shell', () => {
       await expect(page.getByRole('contentinfo')).toContainText('Blek Ngossanga');
       await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
       await expectAccessible(page);
+    },
+  );
+
+  test(
+    'lists the available pages, none of them current on an unknown address',
+    { tag: '@no-api' },
+    async ({ page }) => {
+      const toggle = page.getByRole('button', { name: 'Menu' });
+      if (await toggle.isVisible()) {
+        await toggle.click();
+      }
+      const nav = page.getByRole('navigation', { name: 'Navigation principale' });
+
+      await expect(nav.getByRole('link')).toHaveText(['À propos']);
+      await expect(nav.getByRole('link', { name: 'À propos' })).toHaveAttribute('href', '/about');
+      await expect(nav.locator('[aria-current]')).toHaveCount(0);
+      await expect(
+        page.getByRole('banner').getByRole('link', { name: 'Blek Ngossanga' }),
+      ).toHaveCount(0);
+      await expect(
+        page.getByRole('contentinfo').getByRole('link', { name: 'À propos' }),
+      ).toBeVisible();
     },
   );
 
@@ -40,7 +61,6 @@ test.describe('public shell', () => {
     async ({ page }, info) => {
       test.skip(info.project.name !== 'mobile', 'navigation dépliable sous 64 rem seulement');
       const toggle = page.getByRole('button', { name: 'Menu' });
-      test.skip((await toggle.count()) === 0, 'aucune page publique à lister pour l’instant');
 
       await toggle.focus();
       await page.keyboard.press('Enter');

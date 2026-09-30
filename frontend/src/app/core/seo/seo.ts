@@ -16,9 +16,12 @@ export interface SeoData {
   image?: string | null;
   /** Page à ne pas indexer (introuvable, résultats de recherche). */
   noindex?: boolean;
+  /** Données structurées propres à la page (`ProfilePage`, `Article`…) ; absentes : retirées. */
+  jsonLd?: object | null;
 }
 
 const WEBSITE_JSON_LD_ID = 'json-ld-site';
+const PAGE_JSON_LD_ID = 'json-ld-page';
 
 /**
  * Métadonnées de la page courante : titre, description, lien canonique, Open Graph, robots.
@@ -61,6 +64,12 @@ export class Seo {
     } else {
       this.meta.removeTag("name='robots'");
     }
+
+    if (data.jsonLd) {
+      this.jsonLd(PAGE_JSON_LD_ID, data.jsonLd);
+    } else {
+      this.document.getElementById(PAGE_JSON_LD_ID)?.remove();
+    }
   }
 
   /** Données structurées `WebSite`, posées une fois par le shell public. */
@@ -75,7 +84,8 @@ export class Seo {
     });
   }
 
-  private absolute(path: string): string {
+  /** Adresse absolue d'un chemin du site (lien canonique, image, données structurées). */
+  absolute(path: string): string {
     return new URL(path, this.siteUrl).href;
   }
 

@@ -39,6 +39,14 @@
     color: var(--color-accent-strong);
   }
 
+  /* Lien vers un autre site : flèche ↗ sans texte de remplacement ; le lien porte aussi le texte
+     masqué « (site externe) » (Markdown, liens professionnels du profil) */
+  a.external::after {
+    content: '\2197' / '';
+    margin-inline-start: 0.15em;
+    font-size: 0.85em;
+  }
+
   @media (hover: hover) and (pointer: fine) {
     a:hover {
       color: var(--color-accent-strong);

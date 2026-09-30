@@ -24,6 +24,10 @@ export const routes: Routes = [
     component: PublicShell,
     children: [
       {
+        path: 'about',
+        loadChildren: () => import('./features/about/about.routes').then((m) => m.aboutRoutes),
+      },
+      {
         path: '**',
         title: 'Page introuvable',
         data: { noindex: true },

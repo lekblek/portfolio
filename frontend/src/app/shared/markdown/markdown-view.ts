@@ -15,6 +15,8 @@ import { renderMarkdown } from './markdown-renderer';
 })
 export class MarkdownView {
   readonly source = input.required<string>();
+  /** Niveau du plus haut titre du contenu (`RenderOptions.topLevel`). */
+  readonly headingLevel = input<2 | 3>(2);
 
   private readonly sanitizer = inject(DomSanitizer);
   private readonly path = inject(Router).url.split(/[?#]/)[0];
@@ -23,6 +25,8 @@ export class MarkdownView {
     // Seul contournement de l'assainisseur d'Angular (01-architecture §16) : il retire les `id`
     // des titres. Le HTML est sûr par construction : HTML brut échappé, liens filtrés, balises
     // produites par les seules règles de markdown-renderer.ts (ADR 0003, corpus des tests).
-    this.sanitizer.bypassSecurityTrustHtml(renderMarkdown(this.source(), { path: this.path }).html),
+    this.sanitizer.bypassSecurityTrustHtml(
+      renderMarkdown(this.source(), { path: this.path, topLevel: this.headingLevel() }).html,
+    ),
   );
 }

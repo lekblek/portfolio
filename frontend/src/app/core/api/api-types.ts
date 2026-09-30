@@ -6,3 +6,12 @@ import { components } from './openapi';
  * `export type ProjectSummary = Schemas['ProjectSummaryResponse'];`
  */
 export type Schemas = components['schemas'];
+
+export type Profile = Schemas['ProfileResponse'];
+export type ProfileExperience = Schemas['ExperienceResponse'];
+export type ProfileEducation = Schemas['EducationResponse'];
+export type ProfileCertification = Schemas['CertificationResponse'];
+export type SkillGroup = Schemas['SkillGroupResponse'];
+export type ProfessionalLink = Schemas['ProfessionalLinkResponse'];
+export type PublicImage = Schemas['PublicImage'];
+export type PublicDocument = Schemas['PublicDocument'];

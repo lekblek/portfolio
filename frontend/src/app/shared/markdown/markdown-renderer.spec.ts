@@ -85,6 +85,13 @@ describe('renderMarkdown', () => {
       expect(render('# Titre').html).toContain('<h2 id="titre">Titre</h2>');
     });
 
+    it('places the content under a section heading when asked', () => {
+      const { html } = renderMarkdown('# Parcours\n\n## Détail', { path: '/about', topLevel: 3 });
+
+      expect(html).toContain('<h3 id="parcours">Parcours</h3>');
+      expect(html).toContain('<h4 id="detail">Détail</h4>');
+    });
+
     it('gives stable ids without accents and keeps them unique', () => {
       const { headings } = render(
         '## Où vit le cœur ?\n\n## Où vit le cœur ?\n\n## `code` et texte',

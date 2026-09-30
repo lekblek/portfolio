@@ -102,4 +102,25 @@ describe('Seo', () => {
       inLanguage: 'fr',
     });
   });
+
+  it('gives the page its own structured data, removed by the next page', () => {
+    seo.setWebsiteJsonLd();
+    seo.set({ path: '/about', jsonLd: { '@type': 'ProfilePage', name: '</script>' } });
+
+    const page = document.getElementById('json-ld-page');
+    expect(JSON.parse(page?.textContent ?? '')).toEqual({
+      '@type': 'ProfilePage',
+      name: '</script>',
+    });
+    expect(page?.textContent).not.toContain('</script>');
+
+    seo.set({ path: '/projects' });
+
+    expect(document.getElementById('json-ld-page')).toBeNull();
+    expect(document.getElementById('json-ld-site')).not.toBeNull();
+  });
+
+  it('makes a path of the site absolute', () => {
+    expect(seo.absolute('/api/public/media/cle')).toBe('https://blek.example/api/public/media/cle');
+  });
 });

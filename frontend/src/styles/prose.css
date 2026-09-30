@@ -46,6 +46,11 @@
     margin-block-start: calc(var(--spacing) * 3);
   }
 
+  /* Le contenu commence au ras de son bloc : un titre en tête s'aligne sur le repère de sa zone */
+  & > :first-child {
+    margin-block-start: 0;
+  }
+
   & :where(ul, ol) {
     padding-inline-start: calc(var(--spacing) * 6);
   }
@@ -86,12 +91,6 @@
 
   & hr {
     margin-block: calc(var(--spacing) * 10);
-  }
-
-  & a.external::after {
-    content: '\2197' / '';
-    margin-inline-start: 0.15em;
-    font-size: 0.85em;
   }
 
   & img {

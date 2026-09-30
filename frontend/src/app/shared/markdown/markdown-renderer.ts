@@ -38,6 +38,11 @@ for (const [name, language] of Object.entries({
 export interface RenderOptions {
   /** Chemin de la page (`/articles/exemple`) : préfixe des liens internes `#…`. */
   path: string;
+  /**
+   * Niveau du plus haut titre du contenu : 2 (défaut) directement sous le `<h1>` de la page,
+   * 3 quand le contenu est placé sous un titre de section `<h2>`.
+   */
+  topLevel?: 2 | 3;
 }
 
 export interface RenderedMarkdown {
@@ -48,6 +53,7 @@ export interface RenderedMarkdown {
 
 interface RenderEnv extends Env {
   path: string;
+  topLevel: number;
   headings: TocEntry[];
   externalLinks: boolean[];
 }
@@ -72,14 +78,15 @@ markdown.validateLink = isSafeUrl;
 
 const escapeHtml = markdown.utils.escapeHtml;
 
-// Titres : le plus haut niveau du contenu devient h2 (le h1 est celui de la page), identifiants uniques
+// Titres : le plus haut niveau du contenu devient h2 (le h1 est celui de la page), ou h3 sous une
+// section ; identifiants uniques
 markdown.core.ruler.push('project_headings', (state) => {
   const env = renderEnv(state.env);
   const openings = state.tokens.filter((token) => token.type === 'heading_open');
   if (openings.length === 0) {
     return;
   }
-  const shift = 2 - Math.min(...openings.map((token) => Number(token.tag.slice(1))));
+  const shift = env.topLevel - Math.min(...openings.map((token) => Number(token.tag.slice(1))));
   const slug = uniqueSlugger();
   state.tokens.forEach((token, index) => {
     if (token.type !== 'heading_open' && token.type !== 'heading_close') {
@@ -182,6 +189,7 @@ markdown.renderer.rules['image'] = (tokens, index, options, env, self) => {
 export function renderMarkdown(source: string, options: RenderOptions): RenderedMarkdown {
   const env: RenderEnv = {
     path: options.path,
+    topLevel: options.topLevel ?? 2,
     headings: [],
     externalLinks: [],
   };
