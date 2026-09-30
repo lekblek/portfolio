@@ -2,26 +2,26 @@
 
 Ce fichier est la **seule** source de vérité sur l'avancement. Il ne répète pas le contenu des autres documents : il pointe vers eux.
 
-Dernière mise à jour : 2026-09-30 (F09 à F11 vérifiés, commits à faire ; arrêt avant F12 : KI-34 et décision `publicEmail` attendues)
+Dernière mise à jour : 2026-09-30 (KI-34 corrigé à la source, F12 — page À propos — vérifiée ; commits à faire ; arrêt avant F13)
 
 ---
 
 ## 1. État courant
 
 ```text
-Dernière étape terminée   : F11 — Rendu Markdown (F09 à F11 vérifiés, commits à faire ; F00 à F08 commités, à pousser)
-Étape en cours            : aucune — arrêt avant F12
-Prochaine étape prévue    : F12 — Page À propos, après la correction du contrat OpenAPI (KI-34) et la décision sur `publicEmail` (14.4)
-État                      : EN ATTENTE de KI-34 (backend) et de la décision `publicEmail` ; F09 à F11 à committer, 30 commits à pousser
+Dernière étape terminée   : F12 — Page À propos (avec KI-34 corrigé côté backend) ; commits à faire
+Étape en cours            : aucune — arrêt avant F13
+Prochaine étape prévue    : F13 — Projets : liste et détail
+État                      : KI-34 et F12 vérifiés, à committer ; 34 commits à pousser (dont F09 à F11)
 Branche                   : develop
-Vérification              : frontend : lint, lint:styles, format, 93 tests unitaires, types de l'API sans dérive, build et SSR (404 réelle, métadonnées dans le HTML initial, `SITE_URL` exigée au démarrage), 16 tests de bout en bout (bureau, mobile ; 2 ignorés tant que la navigation est vide), axe sans violation de 360 à 1920 px et au zoom 200 % ; backend : ./mvnw clean verify → 734 tests verts à la fin de P-B11
+Vérification              : backend : ./mvnw clean verify → 739 tests verts (340 unitaires, 399 d'intégration), contrat OpenAPI sans dérive ; frontend : lint, lint:styles, format, 115 tests unitaires, types de l'API sans dérive, build (lot initial 370,34 kB bruts / 101,80 kB transférés), 31 tests de bout en bout (1 ignoré : menu mobile sur le projet bureau), rendu serveur de production vérifié derrière un mandataire local (profil dans le HTML initial, aucun appel /api/public/profile rejoué), axe sans violation de 320 à 1920 px et à 640 / 720 px (zoom 200 %) sur six états du profil
 ```
 
 ## 2. Prochaine action
 
-1. Committer F09 à F11 (commandes fournies à la fin de la tranche), pousser les 30 commits en attente et ceux-ci, vérifier la CI (backend, frontend, bout en bout sans API), remplacer les 🟡 par ✅.
-2. Avant F12 (première page qui lit l'API) : corriger KI-34 côté backend (propriétés obligatoires et nullables des réponses dans le contrat OpenAPI, types régénérés) et décision du propriétaire sur l'exposition de `publicEmail` (14.4). Puis F12 selon `docs/frontend/00-roadmap-frontend.md` (non versionnée, remplace les étapes 37 à 51 et les parties frontend de l'étape 52). Décision attendue plus tard : contenu de `/admin/settings` (avant F23) ; page de mentions légales avant la mise en production (D-DW).
-3. Liens professionnels du pied de page (GitHub, CV) : lus dans le profil réel à partir de F12, seulement s'ils existent (D-DV).
+1. Committer KI-34 et F12 (commandes fournies à la fin de la tranche), pousser les 34 commits en attente et ceux-ci, vérifier la CI (backend, frontend, bout en bout sans API), remplacer les 🟡 par ✅.
+2. F13 selon `docs/frontend/00-roadmap-frontend.md` (non versionnée, remplace les étapes 37 à 51 et les parties frontend de l'étape 52). Décisions attendues plus tard : contenu de `/admin/settings` (avant F23) ; page de mentions légales avant la mise en production (D-DW).
+3. Liens professionnels du pied de page (GitHub, CV) lus dans le profil (D-DV) : **non faits en F12** ; ils demanderaient un appel au profil sur chaque page publique, 404 comprise. À décider par le propriétaire (voir §6).
 4. Étape 36, close (rappel du découpage) :
 
    ```text
@@ -125,10 +125,12 @@ Légende : ✅ terminée et poussée · 🟡 terminée et vérifiée, commits à
 | F06 | Tokens (`@theme`, thème par défaut retiré), polices auto-hébergées, styles de base, catalogue `/_ui`, `lint:styles` en CI (D-DS) ; CSS global 25,97 kB bruts / 5,02 kB transférés | 🟡 | `5a71e88`, `9210757`, `9d37575`, à pousser |
 | F07 | Utilitaires `page-container`, `stack-*`, `cluster-*` (D-DT) | 🟡 | `5a71e88`, à pousser |
 | F08 | Bouton (`button[appButton]`, `a[appButton]`), icônes (`menu`, `close`), styles de lien ; retour de pression seul mouvement (D-DU) ; lot initial 298,36 kB bruts / 82,22 kB transférés | 🟡 | `b4c0e5a`, à pousser |
-| F09 | Shell public : en-tête « Blek Ngossanga » et signature, navigation (vide tant qu'aucune page n'existe), pied de page, lien d'évitement, focus après navigation, états vide et erreur, 404 stylée (D-DV, D-DW) ; lot initial 333,30 kB bruts / 92,02 kB transférés | 🟡 | à committer |
-| F10 | Service SEO : titre, description, canonical absolu, Open Graph, robots, JSON-LD `WebSite` ; `SITE_URL` exigée au démarrage du serveur de production (D-DX) | 🟡 | à committer |
-| F11 | Rendu Markdown : ADR 0003 (`markdown-it`, `highlight.js`, sûreté par construction), moteur, affichage, styles `prose`, spécimen `/_ui/prose` (D-DY) ; moteur dans un lot paresseux (58,35 kB transférés), lot initial 350,77 kB bruts / 93,99 kB transférés | 🟡 | à committer |
-| F12 → F37 | Frontend : voir `docs/frontend/00-roadmap-frontend.md` (remplace les étapes 37 à 51 et les parties frontend de 52) | ⏳ | F12 attend KI-34 et la décision `publicEmail` |
+| F09 | Shell public : en-tête « Blek Ngossanga » et signature, navigation (vide tant qu'aucune page n'existe), pied de page, lien d'évitement, focus après navigation, états vide et erreur, 404 stylée (D-DV, D-DW) ; lot initial 333,30 kB bruts / 92,02 kB transférés | 🟡 | `9d9a518`, docs `77ab4bd`, à pousser |
+| F10 | Service SEO : titre, description, canonical absolu, Open Graph, robots, JSON-LD `WebSite` ; `SITE_URL` exigée au démarrage du serveur de production (D-DX) | 🟡 | `9d9a518`, à pousser |
+| F11 | Rendu Markdown : ADR 0003 (`markdown-it`, `highlight.js`, sûreté par construction), moteur, affichage, styles `prose`, spécimen `/_ui/prose` (D-DY) ; moteur dans un lot paresseux (58,35 kB transférés), lot initial 350,77 kB bruts / 93,99 kB transférés | 🟡 | `815c2aa`, `c99fe60`, à pousser |
+| KI-34 | Contrat OpenAPI des réponses dérivé du code : propriétés `required`, `null` seulement pour les composantes `@Nullable` (JSpecify) ; types frontend régénérés (D-DZ) | 🟡 | à committer |
+| F12 | Page À propos : profil rendu par le serveur, aucun appel rejoué par le navigateur (cache de transfert corrigé : `no-store` de Spring Security, clé relative, transport serveur `ServerApiBackend`), états (non publié 404, erreur 503 et « Réessayer », chargement), `ProfilePage` en JSON-LD, lien « À propos » ; `publicEmail` jamais affiché (D-EA, D-EB) ; lot initial 370,34 kB bruts / 101,80 kB transférés (+ `resource` / `httpResource` d'Angular), page dans un lot paresseux de 4,52 kB transférés | 🟡 | à committer |
+| F13 → F37 | Frontend : voir `docs/frontend/00-roadmap-frontend.md` (remplace les étapes 37 à 51 et les parties frontend de 52) | ⏳ | — |
 | 52 | Déploiement : voir `docs/steps/liste_complete_etapes.md` (52.7 à 52.21) | ⏳ | — |
 
 Après le push, remplacer les 🟡 par ✅ et noter les hashes.
@@ -145,7 +147,8 @@ Index : [`decisions/README.md`](decisions/README.md).
 | ADR 0002 | Communication entre modules : identifiants et façades de lecture | Acceptée (2026-09-24, étape 20) |
 | R-1 … R-8 | Organisation du dépôt et outillage (docs non versionnées, profils Spring, OSIV, CI, TypeScript strict, compose, outillage local hors dépôt, documentation du frontend) | Actives |
 | FA01 … FA12 | Architecture frontend : fonctionnalités, frontières ESLint, `httpResource`, types générés, origine de l'API en SSR, rendu par route, Signal Forms, pas de Material ni de Storybook, Playwright et axe, état dans l'URL, Markdown partagé | Acceptées (2026-09-30) ; FA02, FA04, FA05, FA06, FA10 mises en œuvre (F01 à F04) |
-| D-DM … D-DY | Frontend : montée 22.2 et hôtes SSR en local ; frontières par règle ESLint qui résout les chemins ; intercepteur commun et jeton serveur ; types générés et `overrides` de TypeScript ; banc Playwright ; direction visuelle ; tokens et `lint:styles` ; utilitaires ; primitives d'action ; shell public et identité ; mentions légales reportées ; SEO ; rendu Markdown | Actives (F00 à F11) |
+| D-DM … D-DY | Frontend : montée 22.2 et hôtes SSR en local ; frontières par règle ESLint qui résout les chemins ; intercepteur commun et jeton serveur ; types générés et `overrides` de TypeScript ; banc Playwright ; direction visuelle ; tokens et `lint:styles` ; utilitaires ; primitives d'action ; shell public et identité ; mentions légales reportées ; SEO ; rendu Markdown | Actives (F00 à F11) ; D-DO modifiée en F12 (D-EB) |
+| D-DZ … D-EB | Contrat des réponses dérivé du code (`required`, `@Nullable`) ; `publicEmail` jamais affiché (décision du propriétaire) ; page À propos, cache de transfert et transport serveur | Actives (KI-34, F12) |
 | ADR 0003 | Rendu du Markdown : `markdown-it`, `highlight.js`, sûreté par construction | Acceptée (2026-09-30, F11) |
 | DS01 … DS08 | Système de design : direction « Planche technique » (F05), tokens Tailwind 4, polices auto-hébergées, stratégie de style, primitives à la demande, mouvement, thème clair, typographie française | Acceptées (2026-09-30) ; DS01 choisie par le propriétaire en F05 |
 | D-O, D-Q | Lecture en 1 + 5 requêtes constantes ; invariants de dates au domaine | Actives (16.3.1) |
@@ -183,7 +186,7 @@ Index : [`decisions/README.md`](decisions/README.md).
 | D-CI, D-CJ | Port `ContactNotificationSender`, courriel SMTP à l'administrateur (`Reply-To` visiteur, sujet sur une ligne) ; envoi après validation, échec journalisé sans donnée personnelle ; santé SMTP hors de l'état de l'application ; GreenMail en test, Mailpit en développement | Actives (31) |
 | D-DJ … D-DL | Textes de l'API en français (locale fixe, `messages.properties`) ; bcrypt 12 ; actions épinglées par empreinte | Actives (P-B10, P-B11, P-B14) |
 | D-DA … D-DI | Professionnalisation du backend : Enforcer et agent Mockito ; `X-Request-Id` et journal d'erreur sans message ; en-têtes du mandataire depuis un réseau de confiance ; aucune valeur de développement hors `dev` ; fichiers médias alignés sur la transaction ; événements de sécurité et écritures d'administration journalisés, JSON ECS facultatif ; contrat OpenAPI versionné ; nom structuré des contraintes ; Dependabot | Actives (P-B01 à P-B09) |
-| 14.4 | Exposition publique de `publicEmail` | À confirmer |
+| 14.4 | Exposition publique de `publicEmail` | Tranchée le 2026-09-30 : champ gardé dans le contrat, jamais affiché ni lié en `mailto:` (D-EA) |
 
 ## 5. Problèmes connus
 
@@ -196,7 +199,8 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | KI-18 | AMÉLIORATION | `LICENSE` : titulaire et année non renseignés (`[year] [fullname]`) | à décider par le propriétaire du dépôt |
 | KI-22 | AMÉLIORATION | SSR : `security.allowedHosts` vide ; depuis Angular 22.2, le build SSR refuse alors **tout** hôte (400), `localhost` compris : obligatoire avant la mise en production ; en local, `NG_ALLOWED_HOSTS=localhost` (D-DM) | F35 |
 | KI-16 | OPTIONNEL | `V001` : virgule manquante avant `CONSTRAINT profile_single_row` (comportement identique) ; migration appliquée, non modifiable | aucun |
-| KI-34 | AMÉLIORATION | Contrat OpenAPI : les schémas de réponse (49 sur 68) ne déclarent ni propriétés obligatoires (`required`) ni valeurs `null` ; les types générés rendent donc toutes leurs propriétés optionnelles, et un champ réellement nullable (`endDate`) n'est pas distingué d'un champ toujours présent | backend (springdoc : propriétés non nulles des records obligatoires, nullables marquées), avant F12 |
+| KI-36 | AMÉLIORATION | Contrat OpenAPI : un schéma à la fois reçu en requête et renvoyé en réponse garde la sémantique de la requête (propriétés facultatives omissibles) : éléments du profil d'administration (`Link`, `Skill`, `Experience`, `Education`, `Certification`, partagés par `SaveProfileRequest` et `AdminProfileResponse`) et `Screenshot` (nom commun à la requête et à la réponse d'administration des projets, un seul schéma retenu) | avec l'administration (F26, F27) : records de réponse distincts ou noms distincts (D-DZ) |
+| KI-37 | AMÉLIORATION | `docs/api/openapi.json` contient les routes `/test-errors/**` et le schéma `SampleRequest` du contrôleur de test `ErrorHandlingTestController`, chargé dans le contexte de `OpenApiContractIT` : absents de l'application réelle, présents dans les types frontend | exclure ce contrôleur de la génération (par exemple `springdoc.paths-to-exclude` dans `OpenApiContractIT`), puis régénérer le contrat et les types |
 | KI-35 | OPTIONNEL | `npm ci` avertit que quatre paquets de la chaîne de build (`esbuild`, `lmdb`, `msgpackr-extract`, `@parcel/watcher`) ont des scripts d'installation non listés dans `allowScripts` (npm 11) ; sans effet sur l'installation | décider d'une liste `allowScripts` explicite, ou ignorer |
 | KI-30 | OPTIONNEL | Les `*IT` transactionnels (écriture de statut, lectures publiques) ne prouvent pas le comportement après commit | à reprendre si un défaut de transaction apparaît |
 
@@ -204,6 +208,7 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 
 | ID | Problème | Résolution |
 |---|---|---|
+| KI-34 | Schémas de réponse sans `required` ni `null` : types frontend tous optionnels, `endDate` nullable indistinct | corrigé à la source (D-DZ) : `ResponsePropertiesRequired` (propriétés des schémas atteints depuis une réponse), `NullableRecordComponents` (`@Nullable` de JSpecify → type `null` ajouté, ou `oneOf` avec `null` pour un objet), 21 records annotés ; contrat et types régénérés, `Required<>` retiré de `Page<T>` ; `NullableRecordComponentsTest`, `ResponsePropertiesRequiredTest`, `OpenApiContractIT` |
 | KI-21 | `@types/node ^20` alors que Node 24 est la cible | F00 : `@types/node ^24` (24.19.0) |
 | KI-29 | `App.title` sans appelant (frontend) ; côté backend déjà résolu (D-CV, D-CY) | F00 : squelette réduit à `<router-outlet />` |
 
@@ -304,6 +309,8 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | Notification asynchrone (hors du fil de la requête) | Étape 48, si la latence de la route publique le justifie | D-CJ : envoi synchrone borné à 5 s par délai SMTP |
 | Argon2id au lieu de bcrypt | si une dépendance BouncyCastle devient acceptable | D-CN : l'encodeur délégué permet la migration (empreintes préfixées, `upgradeEncoding`) |
 | Politique de sécurité du contenu (CSP complète) du site | Étapes 37 et 52 | D-CR : l'API n'envoie que `frame-ancestors 'none'` |
+| Liens professionnels (GitHub, CV) dans le pied de page, lus dans le profil | décision du propriétaire | D-DV les prévoyait « à partir de F12 » ; ils demandent un appel au profil sur chaque page publique (404 comprise) : à trancher, ou à reprendre avec l'accueil (F17), qui lit déjà le profil |
+| Politique de cache HTTP des réponses publiques de l'API (`Cache-Control` au lieu du `no-store` de Spring Security) | F34 / étape 52 | D-EB : le cache de transfert est ouvert explicitement aux GET de `/api/public/` |
 | Page de mentions légales (éditeur, hébergeur) | avant la mise en production publique, une fois l'hébergement connu | D-DW : décision du propriétaire (2026-09-30) ; aucun lien provisoire d'ici là |
 | HSTS derrière le mandataire inverse (requête vue en HTTP par Tomcat) | fait (P-B03) | D-DC : `X-Forwarded-Proto` accepté depuis un réseau de confiance |
 | Adresse réelle du client derrière le mandataire inverse (en-têtes de transfert) pour la limite des essais | fait (P-B03) | D-DC : `X-Forwarded-For` accepté depuis un réseau de confiance ; à vérifier avec le réseau Docker réel à l'étape 52 |

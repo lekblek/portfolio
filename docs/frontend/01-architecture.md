@@ -202,15 +202,15 @@ Mode de rendu : `app.routes.server.ts` s'applique aux routes que l'application d
 - `core/api/api-types.ts` expose des alias lisibles : `export type ProjectSummary = Schemas['ProjectSummaryResponse']`.
 - La CI régénère les types et échoue si le fichier diffère (`git diff --exit-code`) : un changement du contrat backend impose la mise à jour du frontend dans le même lot.
 - `openapi-typescript` 7.13 déclare `typescript ^5` comme dépendance homologue ; le projet est en TypeScript 6. Un `overrides` de `package.json`, limité à ce paquet, lui fait utiliser le TypeScript du projet (génération vérifiée identique et déterministe). À retirer quand une version compatible paraîtra.
-- Les schémas de réponse du contrat ne déclarent pas de propriétés `required` (49 schémas sur 68, dont toutes les réponses) : toutes leurs propriétés sont donc optionnelles dans les types générés, et aucune n'est marquée `null`. Les types restent fidèles au contrat ; la correction se fait côté backend (KI-34), avant la première page qui lit l'API.
+- Les schémas de réponse déclarent toutes leurs propriétés `required` (toujours présentes dans le JSON) et n'admettent `null` que pour les composantes `@Nullable` des records du backend (D-DZ, KI-34 corrigé à la source) : `endDate: string | null`, `avatar: PublicImage | null`, collections jamais absentes. Aucun `!`, cast ou `Required<>` côté frontend. Un schéma aussi reçu en corps de requête garde la sémantique de la requête (propriétés facultatives omissibles, KI-36).
 - `core/api/api-error.ts` : `ApiProblem` (forme de `05-conventions-api.md` §10, absente du contrat), `ApiError` et `toApiError`. `core/api/page.ts` : `Page<T>` (métadonnées reprises du schéma `PageResponse…`), `PageRequest` et `toHttpParams`.
 
 ### 8.2 URL et origine
 
 - Le navigateur appelle toujours des URL relatives `/api/...` : même origine en production (Caddy), proxy `proxy.conf.mjs` en développement (cible `API_ORIGIN`, défaut `http://localhost:8080`).
-- Le serveur SSR n'a pas d'origine « courante » fiable : l'intercepteur `core/api/server-api-origin.interceptor.ts` préfixe les URL `/api/` par l'origine interne lue dans l'environnement (`API_ORIGIN`, défaut `http://localhost:8080`). Le jeton `API_ORIGIN` est fourni **seulement** par `app.config.server.ts` ; dans le navigateur, faute de jeton, l'intercepteur laisse la requête relative (un seul `provideHttpClient`, commun aux deux configurations). L'origine n'est jamais déduite de la requête entrante (pas de SSRF par l'en-tête `Host`).
+- Le serveur SSR n'a pas d'origine « courante » fiable : l'intercepteur commun `core/api/api-request.ts` **marque** les requêtes `/api/` (`API_REQUEST`) sans changer leur URL ; au serveur seulement, le transport `core/api/server-api-backend.ts` (`ServerApiBackend`, sous-classe de `FetchBackend`, fourni par `app.config.server.ts` avec `API_ORIGIN`, défaut `http://localhost:8080`) envoie chaque requête marquée à l'origine interne en ne gardant que son chemin et sa requête. `@angular/platform-server` rend les URL relatives absolues sur l'origine de la page, tirée de l'en-tête `Host` : cette origine est remplacée, elle ne choisit jamais la destination (pas de SSRF). La réécriture au transport, après tous les intercepteurs, garde au cache de transfert une clé relative identique au serveur et dans le navigateur (D-EB).
 - `withFetch()` n'est pas appelé : Fetch est le moteur par défaut de `HttpClient` en v22 (la fonction est dépréciée).
-- Cache de transfert : les GET faits pendant le rendu serveur sont transmis au navigateur (`HttpTransferCache`, actif par défaut). F02 vérifie qu'aucune requête API n'est rejouée par le navigateur au premier affichage ; si la réécriture d'URL empêche la correspondance des clés, `HTTP_TRANSFER_CACHE_ORIGIN_MAP` est fourni côté serveur.
+- Cache de transfert : les GET de `/api/public/` faits pendant le rendu serveur sont transmis au navigateur (`withHttpTransferCacheOptions({ filter, includeNonCacheableRequests: true })` : Spring Security marque toute réponse `no-store`, que le cache de transfert refuse sinon). Vérifié en F12 sur le build de production : aucune requête API rejouée au premier affichage (`e2e/about.spec.ts`). Une réponse en erreur n'est pas transférée : le navigateur réessaie une fois (D-EB).
 
 ### 8.3 Lectures
 
@@ -313,7 +313,7 @@ Cible WCAG 2.2 AA (D17). Règles d'architecture :
 ## 15. Performance
 
 - Budgets de `angular.json` conservés ; budget par route suivi en F34.
-- Images : `NgOptimizedImage` avec `width` / `height` venant de l'API (aucun décalage de mise en page), `priority` pour l'image principale au-dessus de la ligne de flottaison seulement.
+- Images : `NgOptimizedImage` avec `width` / `height` venant de l'API (aucun décalage de mise en page), ou `fill` dans un emplacement de taille fixe recadré par `object-fit` (portrait du profil, D-EB) ; `priority` pour l'image principale au-dessus de la ligne de flottaison seulement.
 - Polices auto-hébergées, sous-ensemble latin, `font-display: swap`, préchargement de la seule police du texte courant.
 - `@defer` pour tout bloc lourd non essentiel au premier affichage.
 - Mesures : Core Web Vitals en laboratoire (Lighthouse, traces de performance Chrome) en F34 ; cibles : LCP < 2,5 s, INP < 200 ms, CLS < 0,1 sur mobile simulé.
