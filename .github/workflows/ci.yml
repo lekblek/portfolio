@@ -54,6 +54,8 @@ jobs:
       - run: npm ci
       # Règles Angular, accessibilité des gabarits, frontières entre dossiers (01-architecture §5)
       - run: npm run lint
+      # Valeurs arbitraires, couleurs littérales et !important hors des tokens (02-design-system §17)
+      - run: npm run lint:styles
       - run: npm run format:check
       # Les types de l'API sont régénérés depuis docs/api/openapi.json : toute dérive fait échouer la CI
       - name: Types de l'API conformes au contrat
