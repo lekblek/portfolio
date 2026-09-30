@@ -50,6 +50,14 @@ app.use((req, res, next) => {
  * The server listens on the port defined by the `PORT` environment variable, or defaults to 4000.
  */
 if (isMainModule(import.meta.url) || process.env['pm_id']) {
+  // Origine publique des adresses canoniques : obligatoire en production, jamais déduite de la requête
+  const siteUrl = process.env['SITE_URL'];
+  if (!siteUrl || !URL.canParse(siteUrl)) {
+    throw new Error(
+      'SITE_URL manquante ou invalide : origine publique du site (https://…), requise pour les adresses canoniques.',
+    );
+  }
+
   const port = process.env['PORT'] || 4000;
   app.listen(port, (error) => {
     if (error) {

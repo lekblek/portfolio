@@ -68,6 +68,11 @@
     outline: 2px solid var(--color-focus);
     outline-offset: 2px;
   }
+
+  /* Cibles de focus programmatique non interactives (<main>, titre après une navigation) */
+  :where([tabindex='-1']):focus-visible {
+    outline: none;
+  }
 }
 
 /* Mouvement réduit : les déplacements disparaissent, les fondus très courts restent possibles (§11) */

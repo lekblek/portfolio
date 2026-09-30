@@ -4,7 +4,7 @@ test.describe('ui catalogue', () => {
   test('shows the design tokens accessibly', { tag: '@no-api' }, async ({ page }) => {
     await page.goto('/_ui');
 
-    await expect(page).toHaveTitle('Catalogue de l’interface — Portfolio');
+    await expect(page).toHaveTitle('Catalogue de l’interface — Blek Ngossanga');
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Catalogue de l’interface');
     // Contrastes calculés dans le navigateur à partir des tokens appliqués
     await expect(page.getByRole('row', { name: /ink paper .* 15,90:1 AAA/ })).toBeVisible();
