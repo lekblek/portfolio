@@ -34,20 +34,30 @@ Pendant le rendu serveur, les appels `/api/...` sont préfixés par la même var
 
 ## Servir le build SSR en local
 
-Le serveur SSR refuse toute requête dont l'en-tête `Host` n'est pas autorisé (protection contre la falsification de requêtes côté serveur) ; la liste `security.allowedHosts` de `angular.json` est encore vide (KI-22). En local, autoriser `localhost` par la variable d'environnement prévue par Angular :
+Variables d'environnement du serveur SSR :
+
+| Variable | Rôle |
+|---|---|
+| `SITE_URL` | origine publique du site (`https://…`) pour les adresses canoniques et Open Graph ; **obligatoire** : le serveur refuse de démarrer sans elle |
+| `API_ORIGIN` | origine interne de l'API pour le rendu serveur (défaut `http://localhost:8080`) |
+| `NG_ALLOWED_HOSTS` | hôtes acceptés dans l'en-tête `Host` ; la liste `security.allowedHosts` d'`angular.json` est encore vide (KI-22), le serveur refuse donc tout autre hôte |
+| `PORT` | port d'écoute (défaut 4000) |
 
 ```bash
-NG_ALLOWED_HOSTS=localhost npm run serve:ssr:frontend
+NG_ALLOWED_HOSTS=localhost SITE_URL=http://localhost:4000 npm run serve:ssr:frontend
 ```
 
-PowerShell : `$env:NG_ALLOWED_HOSTS='localhost'; npm run serve:ssr:frontend`.
+PowerShell : `$env:NG_ALLOWED_HOSTS='localhost'; $env:SITE_URL='http://localhost:4000'; npm run serve:ssr:frontend`.
+
+Le serveur de développement (`npm start`) n'exige pas `SITE_URL` : il prend `http://localhost:4200`.
 
 ## Système de design
 
 - `src/styles/tokens.css` : tokens (`@theme` de Tailwind 4, thème par défaut retiré) ; seule source des valeurs. `base.css` : éléments HTML nus, focus, mouvement réduit. `utilities.css` : `page-container`, `stack-*`, `cluster-*`.
 - Polices auto-hébergées par `@fontsource-variable` : Schibsted Grotesk, Literata, JetBrains Mono.
 - Primitives : `src/app/shared/ui` (`button[appButton]`, `a[appButton]`, `app-icon`).
-- Catalogue `http://localhost:4200/_ui` : tokens appliqués, contrastes calculés, composition, primitives et leurs états. Développement seulement : en production, l'adresse répond 404.
+- Catalogue `http://localhost:4200/_ui` : tokens appliqués, contrastes calculés, composition, primitives, états d'écran. Spécimen du rendu Markdown : `http://localhost:4200/_ui/prose`. Développement seulement : en production, ces adresses répondent 404.
+- Rendu Markdown : `src/app/shared/markdown` (`markdown-it`, `highlight.js`, [ADR 0003](../docs/decisions/0003-rendu-markdown.md)) ; styles de lecture `src/styles/prose.css`.
 - Documentation : [`docs/frontend/02-design-system.md`](../docs/frontend/02-design-system.md). Notices des polices et des icônes : [`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md).
 
 ## Tests de bout en bout
@@ -61,6 +71,6 @@ Prérequis, une fois par poste : `npx playwright install chromium` (version fix�
 
 ## État
 
-Angular 22.2 (versions : [`docs/03-versions-cibles.md`](../docs/03-versions-cibles.md) §11.2). Socle en place : HTTP, routeur, titre des pages, mode de rendu par route (`app.routes.server.ts`), page introuvable avec statut 404 réel, types de l'API générés. Système de design exécutable : tokens, polices, styles de base, utilitaires de composition, primitives d'action. Aucune page métier ni shell public.
+Angular 22.2 (versions : [`docs/03-versions-cibles.md`](../docs/03-versions-cibles.md) §11.2). Socle en place : HTTP, routeur, titre des pages, mode de rendu par route (`app.routes.server.ts`), page introuvable avec statut 404 réel, types de l'API générés. Système de design exécutable : tokens, polices, styles de base, utilitaires de composition, primitives d'action. Shell public (en-tête, navigation, pied de page, lien d'évitement, focus après navigation), service SEO (titre, description, canonical, Open Graph, JSON-LD), rendu Markdown. Aucune page métier : la navigation reste vide tant qu'aucune page publique n'existe.
 
 Lot initial du navigateur (build de production, 2026-09-30) : 234,16 kB bruts / 65,43 kB transférés pour le squelette nettoyé ; voir `docs/progress.md` pour le relevé après le socle.

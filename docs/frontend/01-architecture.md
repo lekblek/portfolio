@@ -284,13 +284,17 @@ Le Markdown est la source canonique (`01-perimetre-v1.md` §9) et arrive brut de
 - GFM, titres ancrés (identifiants stables, `scroll-margin-top`), table des matières, coloration syntaxique, liens externes marqués ;
 - **assainissement obligatoire** du HTML produit avant insertion (le contenu vient de l'administrateur, mais une faille XSS stockée ne doit pas dépendre de cette confiance) ;
 - KaTeX et Mermaid chargés à la demande, seulement sur les pages qui en contiennent (F15) ;
-- choix des bibliothèques (analyseur, coloration, assainissement compatible SSR) arrêté en F11 par un ADR : c'est une décision transverse (site et éditeur), coûteuse à inverser, avec des alternatives crédibles.
+- bibliothèques et sûreté : [ADR 0003](../decisions/0003-rendu-markdown.md) — `markdown-it` (HTML brut échappé, liens limités à http(s), mailto et adresses relatives), `highlight.js` (noyau et langages choisis, couleurs par les tokens), sûreté par construction sans bibliothèque d'assainissement ; `shared/markdown/markdown-renderer.ts` (moteur, synchrone, identique au serveur et au navigateur), `markdown-view.ts` (affichage, seul contournement de l'assainisseur d'Angular, qui retire les `id` des titres), `toc.ts` (identifiants de titres) ; titres du contenu décalés sous le `<h1>` de la page, ancres préfixées par le chemin de la page ; le moteur vit dans un lot chargé à la demande (≈ 58 kB transférés), jamais dans le lot initial.
 
 ---
 
 ## 13. SEO
 
-`core/seo` fournit un service unique appelé par chaque page : titre, `meta description`, `link rel="canonical"`, Open Graph, données structurées JSON-LD (`Person`, `Article`, `BreadcrumbList` si pertinent). Les publications fournissent `seoTitle` et `seoDescription` (D-AJ). Sitemap et `robots.txt` : F33 (D15).
+`core/seo` fournit un service unique (`Seo.set({ title, description, path, type, image, noindex })`) : titre « Titre — Blek Ngossanga » (ou le titre de référence « Blek Ngossanga — Software Engineering, AI Vision & Research »), `meta description` (description par défaut du site à défaut), `link rel="canonical"` absolu sans requête ni ancre, Open Graph (`og:title`, `og:description`, `og:type`, `og:url`, `og:site_name`, `og:locale`, `og:image`), `twitter:card`, `robots: noindex`. Chaque appel remplace les valeurs de la page précédente. La stratégie de titre du routeur l'appelle à chaque navigation avec les valeurs de la route (`title`, `data: { noindex: true }`) ; une page qui charge son contenu l'appelle ensuite avec les siennes (les publications fournissent `seoTitle` et `seoDescription`, D-AJ).
+
+JSON-LD : `WebSite` posé par le shell public ; `Person`, `Article`, `BreadcrumbList` avec leurs pages. Sérialisation par `serializeJsonLd` (`<`, `>`, `&`, U+2028, U+2029 échappés : un titre saisi ne peut pas fermer la balise `<script>`).
+
+Origine publique des adresses absolues : `SITE_URL`, variable d'environnement du serveur SSR, **obligatoire en production** (le serveur refuse de démarrer sans elle), jamais déduite de l'en-tête `Host` ; dans le navigateur, l'origine de la page. Sitemap et `robots.txt` : F33 (D15).
 
 ---
 
@@ -356,7 +360,7 @@ Cible WCAG 2.2 AA (D17). Règles d'architecture :
 | FA09 | Pas de Storybook en V1 ; catalogue interne `/_ui` en développement seulement | Acceptée |
 | FA10 | Playwright Test et axe pour les tests de bout en bout et d'accessibilité | Acceptée, mise en œuvre (F04) |
 | FA11 | Filtres, recherche et pagination dans l'URL | Acceptée |
-| FA12 | Rendu Markdown partagé, rendu serveur, HTML assaini ; bibliothèques choisies par ADR en F11 | Acceptée (choix des bibliothèques à venir) |
+| FA12 | Rendu Markdown partagé, rendu serveur, HTML sûr par construction ; bibliothèques choisies par ADR (0003) | Acceptée, mise en œuvre (F11) ; KaTeX, Mermaid et notes à venir (F14, F15) |
 
 ## 19. Points ouverts
 

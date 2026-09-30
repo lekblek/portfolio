@@ -2,26 +2,26 @@
 
 Ce fichier est la **seule** source de vérité sur l'avancement. Il ne répète pas le contenu des autres documents : il pointe vers eux.
 
-Dernière mise à jour : 2026-09-30 (F05 : direction « Planche technique » choisie, DS01 acceptée ; F06 à F08 : système de design exécutable, vérifié, commits à faire ; arrêt avant F09, décisions du propriétaire attendues)
+Dernière mise à jour : 2026-09-30 (F09 à F11 vérifiés, commits à faire ; arrêt avant F12 : KI-34 et décision `publicEmail` attendues)
 
 ---
 
 ## 1. État courant
 
 ```text
-Dernière étape terminée   : F08 — Primitives d'action (F05 à F08 vérifiés, commits à faire ; F00 à F04 commités, à pousser)
-Étape en cours            : aucune — arrêt avant F09
-Prochaine étape prévue    : F09 — Shell public, après les décisions du propriétaire : nom du site, liens du pied de page, page de mentions légales
-État                      : EN ATTENTE des décisions du propriétaire pour F09 ; F05 à F08 à committer, 25 commits à pousser
+Dernière étape terminée   : F11 — Rendu Markdown (F09 à F11 vérifiés, commits à faire ; F00 à F08 commités, à pousser)
+Étape en cours            : aucune — arrêt avant F12
+Prochaine étape prévue    : F12 — Page À propos, après la correction du contrat OpenAPI (KI-34) et la décision sur `publicEmail` (14.4)
+État                      : EN ATTENTE de KI-34 (backend) et de la décision `publicEmail` ; F09 à F11 à committer, 30 commits à pousser
 Branche                   : develop
-Vérification              : frontend : lint, lint:styles, format, 34 tests unitaires, types de l'API sans dérive, build et SSR (404 réelle, /_ui en 404 en production), 8 tests de bout en bout (bureau, mobile), axe sans violation de 360 à 1920 px et au zoom 200 % ; backend : ./mvnw clean verify → 734 tests verts à la fin de P-B11
+Vérification              : frontend : lint, lint:styles, format, 93 tests unitaires, types de l'API sans dérive, build et SSR (404 réelle, métadonnées dans le HTML initial, `SITE_URL` exigée au démarrage), 16 tests de bout en bout (bureau, mobile ; 2 ignorés tant que la navigation est vide), axe sans violation de 360 à 1920 px et au zoom 200 % ; backend : ./mvnw clean verify → 734 tests verts à la fin de P-B11
 ```
 
 ## 2. Prochaine action
 
-1. Committer F05 à F08 (commandes fournies à la fin de la tranche), pousser les 25 commits en attente et ceux-ci, vérifier la CI (backend, frontend, bout en bout sans API), remplacer les 🟡 par ✅.
-2. F09 (shell public) selon `docs/frontend/00-roadmap-frontend.md` (non versionnée, remplace les étapes 37 à 51 et les parties frontend de l'étape 52), après les décisions du propriétaire : nom du site, liens du pied de page, page de mentions légales. Décisions attendues plus tard : description du site (F10), exposition de `publicEmail` (14.4, avant F12), contenu de `/admin/settings` (avant F23).
-3. Avant F12 (première page qui lit l'API) : KI-34, déclarer les propriétés obligatoires et nullables des réponses dans le contrat OpenAPI.
+1. Committer F09 à F11 (commandes fournies à la fin de la tranche), pousser les 30 commits en attente et ceux-ci, vérifier la CI (backend, frontend, bout en bout sans API), remplacer les 🟡 par ✅.
+2. Avant F12 (première page qui lit l'API) : corriger KI-34 côté backend (propriétés obligatoires et nullables des réponses dans le contrat OpenAPI, types régénérés) et décision du propriétaire sur l'exposition de `publicEmail` (14.4). Puis F12 selon `docs/frontend/00-roadmap-frontend.md` (non versionnée, remplace les étapes 37 à 51 et les parties frontend de l'étape 52). Décision attendue plus tard : contenu de `/admin/settings` (avant F23) ; page de mentions légales avant la mise en production (D-DW).
+3. Liens professionnels du pied de page (GitHub, CV) : lus dans le profil réel à partir de F12, seulement s'ils existent (D-DV).
 4. Étape 36, close (rappel du découpage) :
 
    ```text
@@ -121,11 +121,14 @@ Légende : ✅ terminée et poussée · 🟡 terminée et vérifiée, commits à
 | F02 | HTTP, routeur, titre, rendu par route, `API_ORIGIN` en SSR, proxy, 404 réelle (D-DO) ; lot initial 258,59 kB bruts / 73,10 kB transférés | 🟡 | `a243c20`, à pousser |
 | F03 | Types de l'API générés, `ApiError`, pagination, contrôle de dérive en CI (D-DP) | 🟡 | `3f29de6`, à pousser |
 | F04 | Playwright, axe, garde console et réseau, E2E de la 404, job CI sans API, CLI Playwright (D-DQ) | 🟡 | `429a01a`, `bf1e41e`, `e240f0f` (documentation F00 à F04), à pousser |
-| F05 | Direction visuelle : « Planche technique » choisie par le propriétaire parmi trois prototypes (hors dépôt, captures de 320 à 1920 px, zoom 200 %, axe sans violation) ; notes marginales de « Monographie » pour les articles ; DS01 acceptée (D-DR) | 🟡 | à committer |
-| F06 | Tokens (`@theme`, thème par défaut retiré), polices auto-hébergées, styles de base, catalogue `/_ui`, `lint:styles` en CI (D-DS) ; CSS global 25,97 kB bruts / 5,02 kB transférés | 🟡 | à committer |
-| F07 | Utilitaires `page-container`, `stack-*`, `cluster-*` (D-DT) | 🟡 | à committer |
-| F08 | Bouton (`button[appButton]`, `a[appButton]`), icônes (`menu`, `close`), styles de lien ; retour de pression seul mouvement (D-DU) ; lot initial 298,36 kB bruts / 82,22 kB transférés | 🟡 | à committer |
-| F09 → F37 | Frontend : voir `docs/frontend/00-roadmap-frontend.md` (remplace les étapes 37 à 51 et les parties frontend de 52) | ⏳ | F09 attend trois décisions du propriétaire |
+| F05 | Direction visuelle : « Planche technique » choisie par le propriétaire parmi trois prototypes (hors dépôt, captures de 320 à 1920 px, zoom 200 %, axe sans violation) ; notes marginales de « Monographie » pour les articles ; DS01 acceptée (D-DR) | 🟡 | `b5f2222` (documentation), à pousser |
+| F06 | Tokens (`@theme`, thème par défaut retiré), polices auto-hébergées, styles de base, catalogue `/_ui`, `lint:styles` en CI (D-DS) ; CSS global 25,97 kB bruts / 5,02 kB transférés | 🟡 | `5a71e88`, `9210757`, `9d37575`, à pousser |
+| F07 | Utilitaires `page-container`, `stack-*`, `cluster-*` (D-DT) | 🟡 | `5a71e88`, à pousser |
+| F08 | Bouton (`button[appButton]`, `a[appButton]`), icônes (`menu`, `close`), styles de lien ; retour de pression seul mouvement (D-DU) ; lot initial 298,36 kB bruts / 82,22 kB transférés | 🟡 | `b4c0e5a`, à pousser |
+| F09 | Shell public : en-tête « Blek Ngossanga » et signature, navigation (vide tant qu'aucune page n'existe), pied de page, lien d'évitement, focus après navigation, états vide et erreur, 404 stylée (D-DV, D-DW) ; lot initial 333,30 kB bruts / 92,02 kB transférés | 🟡 | à committer |
+| F10 | Service SEO : titre, description, canonical absolu, Open Graph, robots, JSON-LD `WebSite` ; `SITE_URL` exigée au démarrage du serveur de production (D-DX) | 🟡 | à committer |
+| F11 | Rendu Markdown : ADR 0003 (`markdown-it`, `highlight.js`, sûreté par construction), moteur, affichage, styles `prose`, spécimen `/_ui/prose` (D-DY) ; moteur dans un lot paresseux (58,35 kB transférés), lot initial 350,77 kB bruts / 93,99 kB transférés | 🟡 | à committer |
+| F12 → F37 | Frontend : voir `docs/frontend/00-roadmap-frontend.md` (remplace les étapes 37 à 51 et les parties frontend de 52) | ⏳ | F12 attend KI-34 et la décision `publicEmail` |
 | 52 | Déploiement : voir `docs/steps/liste_complete_etapes.md` (52.7 à 52.21) | ⏳ | — |
 
 Après le push, remplacer les 🟡 par ✅ et noter les hashes.
@@ -142,7 +145,8 @@ Index : [`decisions/README.md`](decisions/README.md).
 | ADR 0002 | Communication entre modules : identifiants et façades de lecture | Acceptée (2026-09-24, étape 20) |
 | R-1 … R-8 | Organisation du dépôt et outillage (docs non versionnées, profils Spring, OSIV, CI, TypeScript strict, compose, outillage local hors dépôt, documentation du frontend) | Actives |
 | FA01 … FA12 | Architecture frontend : fonctionnalités, frontières ESLint, `httpResource`, types générés, origine de l'API en SSR, rendu par route, Signal Forms, pas de Material ni de Storybook, Playwright et axe, état dans l'URL, Markdown partagé | Acceptées (2026-09-30) ; FA02, FA04, FA05, FA06, FA10 mises en œuvre (F01 à F04) |
-| D-DM … D-DU | Frontend : montée 22.2 et hôtes SSR en local ; frontières par règle ESLint qui résout les chemins ; intercepteur commun et jeton serveur ; types générés et `overrides` de TypeScript ; banc Playwright ; direction visuelle ; tokens et `lint:styles` ; utilitaires ; primitives d'action et retour de pression | Actives (F00 à F08) |
+| D-DM … D-DY | Frontend : montée 22.2 et hôtes SSR en local ; frontières par règle ESLint qui résout les chemins ; intercepteur commun et jeton serveur ; types générés et `overrides` de TypeScript ; banc Playwright ; direction visuelle ; tokens et `lint:styles` ; utilitaires ; primitives d'action ; shell public et identité ; mentions légales reportées ; SEO ; rendu Markdown | Actives (F00 à F11) |
+| ADR 0003 | Rendu du Markdown : `markdown-it`, `highlight.js`, sûreté par construction | Acceptée (2026-09-30, F11) |
 | DS01 … DS08 | Système de design : direction « Planche technique » (F05), tokens Tailwind 4, polices auto-hébergées, stratégie de style, primitives à la demande, mouvement, thème clair, typographie française | Acceptées (2026-09-30) ; DS01 choisie par le propriétaire en F05 |
 | D-O, D-Q | Lecture en 1 + 5 requêtes constantes ; invariants de dates au domaine | Actives (16.3.1) |
 | D-P, D-R | Aplatissement de `DateRange` dans le JSON ; contrat public sans `id`/`displayOrder` | Actives (16.3.2) |
@@ -300,6 +304,7 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | Notification asynchrone (hors du fil de la requête) | Étape 48, si la latence de la route publique le justifie | D-CJ : envoi synchrone borné à 5 s par délai SMTP |
 | Argon2id au lieu de bcrypt | si une dépendance BouncyCastle devient acceptable | D-CN : l'encodeur délégué permet la migration (empreintes préfixées, `upgradeEncoding`) |
 | Politique de sécurité du contenu (CSP complète) du site | Étapes 37 et 52 | D-CR : l'API n'envoie que `frame-ancestors 'none'` |
+| Page de mentions légales (éditeur, hébergeur) | avant la mise en production publique, une fois l'hébergement connu | D-DW : décision du propriétaire (2026-09-30) ; aucun lien provisoire d'ici là |
 | HSTS derrière le mandataire inverse (requête vue en HTTP par Tomcat) | fait (P-B03) | D-DC : `X-Forwarded-Proto` accepté depuis un réseau de confiance |
 | Adresse réelle du client derrière le mandataire inverse (en-têtes de transfert) pour la limite des essais | fait (P-B03) | D-DC : `X-Forwarded-For` accepté depuis un réseau de confiance ; à vérifier avec le réseau Docker réel à l'étape 52 |
 | Limite des essais partagée entre plusieurs instances | si l'application passe à plusieurs instances | D-CQ : compteur en mémoire |
