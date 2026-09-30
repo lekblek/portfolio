@@ -697,190 +697,190 @@ export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
         AdminCategoryResponse: {
-            description?: string;
+            description: string | null;
             /** Format: int64 */
-            id?: number;
-            name?: string;
-            slug?: string;
+            id: number;
+            name: string;
+            slug: string;
         };
         AdminContactMessageResponse: {
             /** Format: date-time */
-            createdAt?: string;
-            email?: string;
+            createdAt: string;
+            email: string;
             /** Format: int64 */
-            id?: number;
-            message?: string;
-            name?: string;
+            id: number;
+            message: string;
+            name: string;
             /** @enum {string} */
-            status?: "NEW" | "READ" | "PROCESSED" | "ARCHIVED";
-            subject?: string;
+            status: "NEW" | "READ" | "PROCESSED" | "ARCHIVED";
+            subject: string;
             /** Format: date-time */
-            updatedAt?: string;
+            updatedAt: string;
         };
         AdminContactMessageSummaryResponse: {
             /** Format: date-time */
-            createdAt?: string;
-            email?: string;
+            createdAt: string;
+            email: string;
             /** Format: int64 */
-            id?: number;
-            name?: string;
+            id: number;
+            name: string;
             /** @enum {string} */
-            status?: "NEW" | "READ" | "PROCESSED" | "ARCHIVED";
-            subject?: string;
+            status: "NEW" | "READ" | "PROCESSED" | "ARCHIVED";
+            subject: string;
         };
         AdminMediaResponse: {
-            altText?: string;
+            altText: string | null;
             /** Format: date-time */
-            createdAt?: string;
+            createdAt: string;
             /** @enum {string} */
-            format?: "PNG" | "JPEG" | "WEBP" | "PDF";
+            format: "PNG" | "JPEG" | "WEBP" | "PDF";
             /** Format: int32 */
-            height?: number;
+            height: number | null;
             /** Format: int64 */
-            id?: number;
-            mimeType?: string;
-            originalName?: string;
+            id: number;
+            mimeType: string;
+            originalName: string;
             /** Format: int64 */
-            sizeBytes?: number;
-            url?: string;
+            sizeBytes: number;
+            url: string;
             /** Format: int32 */
-            width?: number;
+            width: number | null;
         };
         AdminProfileResponse: {
-            aboutMarkdown?: string;
+            aboutMarkdown: string | null;
             /** Format: int64 */
-            avatarMediaId?: number;
-            certifications?: components["schemas"]["Certification"][];
+            avatarMediaId: number | null;
+            certifications: components["schemas"]["Certification"][];
             /** Format: int64 */
-            cvMediaId?: number;
-            displayName?: string;
-            educations?: components["schemas"]["Education"][];
-            experiences?: components["schemas"]["Experience"][];
-            links?: components["schemas"]["Link"][];
-            professionalTitle?: string;
-            publicEmail?: string;
-            publicLocation?: string;
-            shortBio?: string;
-            skills?: components["schemas"]["Skill"][];
+            cvMediaId: number | null;
+            displayName: string;
+            educations: components["schemas"]["Education"][];
+            experiences: components["schemas"]["Experience"][];
+            links: components["schemas"]["Link"][];
+            professionalTitle: string;
+            publicEmail: string | null;
+            publicLocation: string | null;
+            shortBio: string;
+            skills: components["schemas"]["Skill"][];
         };
         AdminProjectResponse: {
             /** Format: int64 */
-            coverMediaId?: number;
-            demoUrl?: string;
-            descriptionMarkdown?: string;
+            coverMediaId: number | null;
+            demoUrl: string | null;
+            descriptionMarkdown: string;
             /** Format: int32 */
-            displayOrder?: number;
+            displayOrder: number;
             /** Format: date */
-            endDate?: string;
-            featured?: boolean;
+            endDate: string | null;
+            featured: boolean;
             /** Format: int64 */
-            id?: number;
-            repositoryUrl?: string;
-            screenshots?: components["schemas"]["Screenshot"][];
-            shortDescription?: string;
-            slug?: string;
-            slugLocked?: boolean;
+            id: number;
+            repositoryUrl: string | null;
+            screenshots: components["schemas"]["Screenshot"][];
+            shortDescription: string;
+            slug: string;
+            slugLocked: boolean;
             /** @enum {string} */
-            stage?: "IN_PROGRESS" | "COMPLETED";
+            stage: "IN_PROGRESS" | "COMPLETED";
             /** Format: date */
-            startDate?: string;
-            technologyIds?: number[];
-            title?: string;
+            startDate: string;
+            technologyIds: number[];
+            title: string;
             /** @enum {string} */
-            visibility?: "DRAFT" | "PUBLISHED" | "ARCHIVED";
+            visibility: "DRAFT" | "PUBLISHED" | "ARCHIVED";
         };
         AdminProjectSummaryResponse: {
             /** Format: int32 */
-            displayOrder?: number;
-            featured?: boolean;
+            displayOrder: number;
+            featured: boolean;
             /** Format: int64 */
-            id?: number;
-            slug?: string;
+            id: number;
+            slug: string;
             /** @enum {string} */
-            stage?: "IN_PROGRESS" | "COMPLETED";
-            title?: string;
+            stage: "IN_PROGRESS" | "COMPLETED";
+            title: string;
             /** @enum {string} */
-            visibility?: "DRAFT" | "PUBLISHED" | "ARCHIVED";
+            visibility: "DRAFT" | "PUBLISHED" | "ARCHIVED";
         };
         AdminPublicationResponse: {
             /** Format: int64 */
-            categoryId?: number;
-            contentMarkdown?: string;
+            categoryId: number | null;
+            contentMarkdown: string;
             /** Format: int64 */
-            coverMediaId?: number;
+            coverMediaId: number | null;
             /** Format: date-time */
-            createdAt?: string;
-            featured?: boolean;
+            createdAt: string;
+            featured: boolean;
             /** Format: int64 */
-            id?: number;
+            id: number;
             /** Format: date-time */
-            publishedAt?: string;
-            seoDescription?: string;
-            seoTitle?: string;
-            slug?: string;
-            slugLocked?: boolean;
+            publishedAt: string | null;
+            seoDescription: string | null;
+            seoTitle: string | null;
+            slug: string;
+            slugLocked: boolean;
             /** @enum {string} */
-            status?: "DRAFT" | "IN_REVIEW" | "SCHEDULED" | "PUBLISHED" | "ARCHIVED";
-            summary?: string;
-            tagIds?: number[];
-            title?: string;
+            status: "DRAFT" | "IN_REVIEW" | "SCHEDULED" | "PUBLISHED" | "ARCHIVED";
+            summary: string;
+            tagIds: number[];
+            title: string;
             /** @enum {string} */
-            type?: "ARTICLE" | "NEWS";
+            type: "ARTICLE" | "NEWS";
             /** Format: date-time */
-            updatedAt?: string;
+            updatedAt: string;
         };
         AdminPublicationSummaryResponse: {
-            featured?: boolean;
+            featured: boolean;
             /** Format: int64 */
-            id?: number;
+            id: number;
             /** Format: date-time */
-            publishedAt?: string;
-            slug?: string;
+            publishedAt: string | null;
+            slug: string;
             /** @enum {string} */
-            status?: "DRAFT" | "IN_REVIEW" | "SCHEDULED" | "PUBLISHED" | "ARCHIVED";
-            title?: string;
+            status: "DRAFT" | "IN_REVIEW" | "SCHEDULED" | "PUBLISHED" | "ARCHIVED";
+            title: string;
             /** @enum {string} */
-            type?: "ARTICLE" | "NEWS";
+            type: "ARTICLE" | "NEWS";
             /** Format: date-time */
-            updatedAt?: string;
+            updatedAt: string;
         };
         AdminSeriesResponse: {
-            chapters?: components["schemas"]["Chapter"][];
+            chapters: components["schemas"]["Chapter"][];
             /** Format: int64 */
-            coverMediaId?: number;
-            descriptionMarkdown?: string;
+            coverMediaId: number | null;
+            descriptionMarkdown: string;
             /** Format: int64 */
-            id?: number;
-            slug?: string;
-            slugLocked?: boolean;
-            title?: string;
+            id: number;
+            slug: string;
+            slugLocked: boolean;
+            title: string;
         };
         AdminSeriesSummaryResponse: {
             /** Format: int32 */
-            chapterCount?: number;
+            chapterCount: number;
             /** Format: int64 */
-            id?: number;
-            slug?: string;
-            title?: string;
+            id: number;
+            slug: string;
+            title: string;
         };
         AdminSessionResponse: {
             /** Format: date-time */
-            lastLoginAt?: string;
-            login?: string;
+            lastLoginAt: string;
+            login: string;
         };
         AdminTagResponse: {
             /** Format: int64 */
-            id?: number;
-            name?: string;
-            slug?: string;
+            id: number;
+            name: string;
+            slug: string;
         };
         AdminTechnologyResponse: {
             /** Format: int32 */
-            displayOrder?: number;
+            displayOrder: number;
             /** Format: int64 */
-            id?: number;
-            name?: string;
-            slug?: string;
+            id: number;
+            name: string;
+            slug: string;
         };
         Certification: {
             credentialUrl?: string;
@@ -892,13 +892,13 @@ export interface components {
             name: string;
         };
         CertificationResponse: {
-            credentialUrl?: string;
+            credentialUrl: string | null;
             /** Format: date */
-            expiresAt?: string;
+            expiresAt: string | null;
             /** Format: date */
-            issuedAt?: string;
-            issuer?: string;
-            name?: string;
+            issuedAt: string;
+            issuer: string;
+            name: string;
         };
         ChangeContactMessageStatusRequest: {
             /** @enum {string} */
@@ -915,19 +915,19 @@ export interface components {
         };
         Chapter: {
             /** Format: int32 */
-            position?: number;
+            position: number;
             /** Format: int64 */
-            publicationId?: number;
-            slug?: string;
+            publicationId: number;
+            slug: string;
             /** @enum {string} */
-            status?: "DRAFT" | "IN_REVIEW" | "SCHEDULED" | "PUBLISHED" | "ARCHIVED";
-            title?: string;
+            status: "DRAFT" | "IN_REVIEW" | "SCHEDULED" | "PUBLISHED" | "ARCHIVED";
+            title: string;
         };
         ChapterLinkResponse: {
             /** Format: int32 */
-            position?: number;
-            slug?: string;
-            title?: string;
+            position: number;
+            slug: string;
+            title: string;
         };
         CreatePublicationRequest: {
             /** Format: int64 */
@@ -957,15 +957,15 @@ export interface components {
             startDate: string;
         };
         EducationResponse: {
-            degree?: string;
-            description?: string;
+            degree: string;
+            description: string;
             /** Format: date */
-            endDate?: string;
-            field?: string;
-            institution?: string;
-            location?: string;
+            endDate: string | null;
+            field: string;
+            institution: string;
+            location: string;
             /** Format: date */
-            startDate?: string;
+            startDate: string;
         };
         Experience: {
             description: string;
@@ -978,14 +978,14 @@ export interface components {
             title: string;
         };
         ExperienceResponse: {
-            description?: string;
+            description: string;
             /** Format: date */
-            endDate?: string;
-            location?: string;
-            organization?: string;
+            endDate: string | null;
+            location: string;
+            organization: string;
             /** Format: date */
-            startDate?: string;
-            title?: string;
+            startDate: string;
+            title: string;
         };
         Link: {
             label: string;
@@ -996,121 +996,121 @@ export interface components {
             password: string;
         };
         PageResponseAdminContactMessageSummaryResponse: {
-            content?: components["schemas"]["AdminContactMessageSummaryResponse"][];
-            first?: boolean;
-            last?: boolean;
+            content: components["schemas"]["AdminContactMessageSummaryResponse"][];
+            first: boolean;
+            last: boolean;
             /** Format: int32 */
-            page?: number;
+            page: number;
             /** Format: int32 */
-            size?: number;
+            size: number;
             /** Format: int64 */
-            totalElements?: number;
+            totalElements: number;
             /** Format: int32 */
-            totalPages?: number;
+            totalPages: number;
         };
         PageResponseAdminMediaResponse: {
-            content?: components["schemas"]["AdminMediaResponse"][];
-            first?: boolean;
-            last?: boolean;
+            content: components["schemas"]["AdminMediaResponse"][];
+            first: boolean;
+            last: boolean;
             /** Format: int32 */
-            page?: number;
+            page: number;
             /** Format: int32 */
-            size?: number;
+            size: number;
             /** Format: int64 */
-            totalElements?: number;
+            totalElements: number;
             /** Format: int32 */
-            totalPages?: number;
+            totalPages: number;
         };
         PageResponseAdminProjectSummaryResponse: {
-            content?: components["schemas"]["AdminProjectSummaryResponse"][];
-            first?: boolean;
-            last?: boolean;
+            content: components["schemas"]["AdminProjectSummaryResponse"][];
+            first: boolean;
+            last: boolean;
             /** Format: int32 */
-            page?: number;
+            page: number;
             /** Format: int32 */
-            size?: number;
+            size: number;
             /** Format: int64 */
-            totalElements?: number;
+            totalElements: number;
             /** Format: int32 */
-            totalPages?: number;
+            totalPages: number;
         };
         PageResponseAdminPublicationSummaryResponse: {
-            content?: components["schemas"]["AdminPublicationSummaryResponse"][];
-            first?: boolean;
-            last?: boolean;
+            content: components["schemas"]["AdminPublicationSummaryResponse"][];
+            first: boolean;
+            last: boolean;
             /** Format: int32 */
-            page?: number;
+            page: number;
             /** Format: int32 */
-            size?: number;
+            size: number;
             /** Format: int64 */
-            totalElements?: number;
+            totalElements: number;
             /** Format: int32 */
-            totalPages?: number;
+            totalPages: number;
         };
         PageResponseAdminSeriesSummaryResponse: {
-            content?: components["schemas"]["AdminSeriesSummaryResponse"][];
-            first?: boolean;
-            last?: boolean;
+            content: components["schemas"]["AdminSeriesSummaryResponse"][];
+            first: boolean;
+            last: boolean;
             /** Format: int32 */
-            page?: number;
+            page: number;
             /** Format: int32 */
-            size?: number;
+            size: number;
             /** Format: int64 */
-            totalElements?: number;
+            totalElements: number;
             /** Format: int32 */
-            totalPages?: number;
+            totalPages: number;
         };
         PageResponseProjectSummaryResponse: {
-            content?: components["schemas"]["ProjectSummaryResponse"][];
-            first?: boolean;
-            last?: boolean;
+            content: components["schemas"]["ProjectSummaryResponse"][];
+            first: boolean;
+            last: boolean;
             /** Format: int32 */
-            page?: number;
+            page: number;
             /** Format: int32 */
-            size?: number;
+            size: number;
             /** Format: int64 */
-            totalElements?: number;
+            totalElements: number;
             /** Format: int32 */
-            totalPages?: number;
+            totalPages: number;
         };
         PageResponsePublicationSummaryResponse: {
-            content?: components["schemas"]["PublicationSummaryResponse"][];
-            first?: boolean;
-            last?: boolean;
+            content: components["schemas"]["PublicationSummaryResponse"][];
+            first: boolean;
+            last: boolean;
             /** Format: int32 */
-            page?: number;
+            page: number;
             /** Format: int32 */
-            size?: number;
+            size: number;
             /** Format: int64 */
-            totalElements?: number;
+            totalElements: number;
             /** Format: int32 */
-            totalPages?: number;
+            totalPages: number;
         };
         PageResponseSearchResultResponse: {
-            content?: components["schemas"]["SearchResultResponse"][];
-            first?: boolean;
-            last?: boolean;
+            content: components["schemas"]["SearchResultResponse"][];
+            first: boolean;
+            last: boolean;
             /** Format: int32 */
-            page?: number;
+            page: number;
             /** Format: int32 */
-            size?: number;
+            size: number;
             /** Format: int64 */
-            totalElements?: number;
+            totalElements: number;
             /** Format: int32 */
-            totalPages?: number;
+            totalPages: number;
         };
         PageResponseSeriesSummaryResponse: {
-            content?: components["schemas"]["SeriesSummaryResponse"][];
-            first?: boolean;
-            last?: boolean;
+            content: components["schemas"]["SeriesSummaryResponse"][];
+            first: boolean;
+            last: boolean;
             /** Format: int32 */
-            page?: number;
+            page: number;
             /** Format: int32 */
-            size?: number;
+            size: number;
             /** Format: int64 */
-            totalElements?: number;
+            totalElements: number;
             /** Format: int32 */
-            totalPages?: number;
+            totalPages: number;
         };
         Pageable: {
             /** Format: int32 */
@@ -1120,105 +1120,105 @@ export interface components {
             sort?: string[];
         };
         ProfessionalLinkResponse: {
-            label?: string;
-            url?: string;
+            label: string;
+            url: string;
         };
         ProfileResponse: {
-            aboutMarkdown?: string;
-            avatar?: components["schemas"]["PublicImage"];
-            certifications?: components["schemas"]["CertificationResponse"][];
-            cv?: components["schemas"]["PublicDocument"];
-            displayName?: string;
-            educations?: components["schemas"]["EducationResponse"][];
-            experiences?: components["schemas"]["ExperienceResponse"][];
-            links?: components["schemas"]["ProfessionalLinkResponse"][];
-            professionalTitle?: string;
-            publicEmail?: string;
-            publicLocation?: string;
-            shortBio?: string;
-            skillGroups?: components["schemas"]["SkillGroupResponse"][];
+            aboutMarkdown: string | null;
+            avatar: components["schemas"]["PublicImage"] | null;
+            certifications: components["schemas"]["CertificationResponse"][];
+            cv: components["schemas"]["PublicDocument"] | null;
+            displayName: string;
+            educations: components["schemas"]["EducationResponse"][];
+            experiences: components["schemas"]["ExperienceResponse"][];
+            links: components["schemas"]["ProfessionalLinkResponse"][];
+            professionalTitle: string;
+            publicEmail: string | null;
+            publicLocation: string | null;
+            shortBio: string;
+            skillGroups: components["schemas"]["SkillGroupResponse"][];
         };
         ProjectResponse: {
-            cover?: components["schemas"]["PublicImage"];
-            demoUrl?: string;
-            descriptionMarkdown?: string;
+            cover: components["schemas"]["PublicImage"] | null;
+            demoUrl: string | null;
+            descriptionMarkdown: string;
             /** Format: date */
-            endDate?: string;
-            featured?: boolean;
-            repositoryUrl?: string;
-            screenshots?: components["schemas"]["ProjectScreenshotResponse"][];
-            shortDescription?: string;
-            slug?: string;
+            endDate: string | null;
+            featured: boolean;
+            repositoryUrl: string | null;
+            screenshots: components["schemas"]["ProjectScreenshotResponse"][];
+            shortDescription: string;
+            slug: string;
             /** @enum {string} */
-            stage?: "IN_PROGRESS" | "COMPLETED";
+            stage: "IN_PROGRESS" | "COMPLETED";
             /** Format: date */
-            startDate?: string;
-            technologies?: components["schemas"]["TechnologyResponse"][];
-            title?: string;
+            startDate: string;
+            technologies: components["schemas"]["TechnologyResponse"][];
+            title: string;
         };
         ProjectScreenshotResponse: {
-            caption?: string;
-            image?: components["schemas"]["PublicImage"];
+            caption: string | null;
+            image: components["schemas"]["PublicImage"];
         };
         ProjectSummaryResponse: {
-            cover?: components["schemas"]["PublicImage"];
+            cover: components["schemas"]["PublicImage"] | null;
             /** Format: date */
-            endDate?: string;
-            featured?: boolean;
-            shortDescription?: string;
-            slug?: string;
+            endDate: string | null;
+            featured: boolean;
+            shortDescription: string;
+            slug: string;
             /** @enum {string} */
-            stage?: "IN_PROGRESS" | "COMPLETED";
+            stage: "IN_PROGRESS" | "COMPLETED";
             /** Format: date */
-            startDate?: string;
-            technologies?: components["schemas"]["TechnologyResponse"][];
-            title?: string;
+            startDate: string;
+            technologies: components["schemas"]["TechnologyResponse"][];
+            title: string;
         };
         PublicDocument: {
             /** Format: int64 */
-            sizeBytes?: number;
-            url?: string;
+            sizeBytes: number;
+            url: string;
         };
         PublicImage: {
-            altText?: string;
+            altText: string | null;
             /** Format: int32 */
-            height?: number;
-            url?: string;
+            height: number;
+            url: string;
             /** Format: int32 */
-            width?: number;
+            width: number;
         };
         PublicationResponse: {
-            category?: components["schemas"]["TaxonomyTermResponse"];
-            contentMarkdown?: string;
-            cover?: components["schemas"]["PublicImage"];
-            featured?: boolean;
+            category: components["schemas"]["TaxonomyTermResponse"] | null;
+            contentMarkdown: string;
+            cover: components["schemas"]["PublicImage"] | null;
+            featured: boolean;
             /** Format: date-time */
-            publishedAt?: string;
+            publishedAt: string;
             /** Format: int32 */
-            readingTimeMinutes?: number;
-            seoDescription?: string;
-            seoTitle?: string;
-            slug?: string;
-            summary?: string;
-            tags?: components["schemas"]["TaxonomyTermResponse"][];
-            title?: string;
+            readingTimeMinutes: number;
+            seoDescription: string | null;
+            seoTitle: string | null;
+            slug: string;
+            summary: string;
+            tags: components["schemas"]["TaxonomyTermResponse"][];
+            title: string;
             /** @enum {string} */
-            type?: "ARTICLE" | "NEWS";
+            type: "ARTICLE" | "NEWS";
         };
         PublicationSummaryResponse: {
-            category?: components["schemas"]["TaxonomyTermResponse"];
-            cover?: components["schemas"]["PublicImage"];
-            featured?: boolean;
+            category: components["schemas"]["TaxonomyTermResponse"] | null;
+            cover: components["schemas"]["PublicImage"] | null;
+            featured: boolean;
             /** Format: date-time */
-            publishedAt?: string;
+            publishedAt: string;
             /** Format: int32 */
-            readingTimeMinutes?: number;
-            slug?: string;
-            summary?: string;
-            tags?: components["schemas"]["TaxonomyTermResponse"][];
-            title?: string;
+            readingTimeMinutes: number;
+            slug: string;
+            summary: string;
+            tags: components["schemas"]["TaxonomyTermResponse"][];
+            title: string;
             /** @enum {string} */
-            type?: "ARTICLE" | "NEWS";
+            type: "ARTICLE" | "NEWS";
         };
         SampleRequest: {
             title: string;
@@ -1293,70 +1293,70 @@ export interface components {
         };
         SearchResultResponse: {
             /** Format: date-time */
-            publishedAt?: string;
-            slug?: string;
-            summary?: string;
-            title?: string;
+            publishedAt: string | null;
+            slug: string;
+            summary: string;
+            title: string;
             /** @enum {string} */
-            type?: "ARTICLE" | "NEWS" | "PROJECT";
+            type: "ARTICLE" | "NEWS" | "PROJECT";
         };
         SeriesChapterResponse: {
             /** Format: int32 */
-            position?: number;
+            position: number;
             /** Format: date-time */
-            publishedAt?: string;
+            publishedAt: string;
             /** Format: int32 */
-            readingTimeMinutes?: number;
-            slug?: string;
-            summary?: string;
-            title?: string;
+            readingTimeMinutes: number;
+            slug: string;
+            summary: string;
+            title: string;
         };
         SeriesNavigationResponse: {
             /** Format: int32 */
-            chapterCount?: number;
-            next?: components["schemas"]["ChapterLinkResponse"];
+            chapterCount: number;
+            next: components["schemas"]["ChapterLinkResponse"] | null;
             /** Format: int32 */
-            position?: number;
-            previous?: components["schemas"]["ChapterLinkResponse"];
-            series?: components["schemas"]["SeriesReferenceResponse"];
+            position: number;
+            previous: components["schemas"]["ChapterLinkResponse"] | null;
+            series: components["schemas"]["SeriesReferenceResponse"];
         };
         SeriesReferenceResponse: {
-            slug?: string;
-            title?: string;
+            slug: string;
+            title: string;
         };
         SeriesResponse: {
-            chapters?: components["schemas"]["SeriesChapterResponse"][];
-            cover?: components["schemas"]["PublicImage"];
-            descriptionMarkdown?: string;
-            slug?: string;
-            title?: string;
+            chapters: components["schemas"]["SeriesChapterResponse"][];
+            cover: components["schemas"]["PublicImage"] | null;
+            descriptionMarkdown: string;
+            slug: string;
+            title: string;
         };
         SeriesSummaryResponse: {
             /** Format: int32 */
-            chapterCount?: number;
-            cover?: components["schemas"]["PublicImage"];
-            descriptionMarkdown?: string;
-            slug?: string;
-            title?: string;
+            chapterCount: number;
+            cover: components["schemas"]["PublicImage"] | null;
+            descriptionMarkdown: string;
+            slug: string;
+            title: string;
         };
         Skill: {
             category: string;
             name: string;
         };
         SkillGroupResponse: {
-            category?: string;
-            skills?: components["schemas"]["SkillResponse"][];
+            category: string;
+            skills: components["schemas"]["SkillResponse"][];
         };
         SkillResponse: {
-            name?: string;
+            name: string;
         };
         TaxonomyTermResponse: {
-            name?: string;
-            slug?: string;
+            name: string;
+            slug: string;
         };
         TechnologyResponse: {
-            name?: string;
-            slug?: string;
+            name: string;
+            slug: string;
         };
         UpdateMediaRequest: {
             altText?: string;

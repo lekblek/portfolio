@@ -4,6 +4,7 @@ import com.scalke.portfolio.backend.publication.application.usecase.AdminPublica
 import com.scalke.portfolio.backend.publication.domain.model.Publication;
 import com.scalke.portfolio.backend.publication.domain.model.PublicationStatus;
 import com.scalke.portfolio.backend.publication.domain.model.PublicationType;
+import org.jspecify.annotations.Nullable;
 
 import java.time.Instant;
 
@@ -16,7 +17,7 @@ public record AdminPublicationSummaryResponse(
     String title,
     String slug,
     PublicationStatus status,
-    Instant publishedAt,
+    @Nullable Instant publishedAt,
     boolean featured,
     Instant updatedAt
 ) {

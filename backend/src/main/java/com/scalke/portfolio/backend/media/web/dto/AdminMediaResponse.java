@@ -3,6 +3,7 @@ package com.scalke.portfolio.backend.media.web.dto;
 import com.scalke.portfolio.backend.media.application.query.MediaQueryService;
 import com.scalke.portfolio.backend.media.domain.model.Media;
 import com.scalke.portfolio.backend.media.domain.model.MediaFormat;
+import org.jspecify.annotations.Nullable;
 
 import java.time.Instant;
 
@@ -17,9 +18,9 @@ public record AdminMediaResponse(
     MediaFormat format,
     String mimeType,
     long sizeBytes,
-    Integer width,
-    Integer height,
-    String altText,
+    @Nullable Integer width,
+    @Nullable Integer height,
+    @Nullable String altText,
     Instant createdAt
 ) {
 

@@ -1378,7 +1378,7 @@ La présence dans cette liste ne signifie pas que tous les endpoints doivent êt
 
 ## Contrats implémentés
 
-Le contrat OpenAPI généré par springdoc est versionné dans [`docs/api/openapi.json`](api/openapi.json) (D-DG) : `OpenApiContractIT` échoue dès que l'API diffère du fichier. Après un changement voulu, régénérer avec `./mvnw verify -Dit.test=OpenApiContractIT -Dopenapi.update=true` et relire le diff du fichier avec le code. Les sections suivantes décrivent les règles que le schéma ne dit pas (visibilité, ordre, effets).
+Le contrat OpenAPI généré par springdoc est versionné dans [`docs/api/openapi.json`](api/openapi.json) (D-DG) : `OpenApiContractIT` échoue dès que l'API diffère du fichier. Après un changement voulu, régénérer avec `./mvnw verify -Dit.test=OpenApiContractIT -Dopenapi.update=true` et relire le diff du fichier avec le code. Dans une réponse, toute propriété est présente (C10) et donc déclarée `required` ; elle n'admet `null` que si la composante du record porte `@Nullable` (JSpecify), et le contrat l'écrit (`"type": ["string", "null"]`, ou `oneOf` avec `null` pour un objet). Un schéma aussi reçu en corps de requête garde les propriétés obligatoires de sa validation (D-DZ). Les sections suivantes décrivent les règles que le schéma ne dit pas (visibilité, ordre, effets).
 
 ### `GET /api/public/profile` (étapes 14 à 16 et 27.3)
 

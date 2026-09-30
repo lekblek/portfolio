@@ -5,6 +5,7 @@ import com.scalke.portfolio.backend.media.application.query.PublicImage;
 import com.scalke.portfolio.backend.profile.application.usecase.PublicProfile;
 import com.scalke.portfolio.backend.profile.domain.model.Profile;
 import com.scalke.portfolio.backend.profile.domain.model.Skill;
+import org.jspecify.annotations.Nullable;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -21,11 +22,11 @@ public record ProfileResponse(
     String displayName,
     String professionalTitle,
     String shortBio,
-    String aboutMarkdown,
-    String publicLocation,
-    String publicEmail,
-    PublicImage avatar,
-    PublicDocument cv,
+    @Nullable String aboutMarkdown,
+    @Nullable String publicLocation,
+    @Nullable String publicEmail,
+    @Nullable PublicImage avatar,
+    @Nullable PublicDocument cv,
     List<ProfessionalLinkResponse> links,
     List<SkillGroupResponse> skillGroups,
     List<ExperienceResponse> experiences,

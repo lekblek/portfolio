@@ -1,6 +1,7 @@
 package com.scalke.portfolio.backend.profile.web.dto;
 
 import com.scalke.portfolio.backend.profile.domain.model.Certification;
+import org.jspecify.annotations.Nullable;
 
 import java.time.LocalDate;
 
@@ -11,8 +12,8 @@ public record CertificationResponse(
     String name,
     String issuer,
     LocalDate issuedAt,
-    LocalDate expiresAt,
-    String credentialUrl
+    @Nullable LocalDate expiresAt,
+    @Nullable String credentialUrl
 ) {
 
     static CertificationResponse from(Certification certification) {

@@ -6,10 +6,9 @@ type PageMetadata = Omit<Schemas['PageResponseProjectSummaryResponse'], 'content
 
 /**
  * Page de résultats (`PageResponse`, 05-conventions-api §14). Métadonnées reprises du contrat, pour
- * suivre sa dérive ; toujours présentes (types primitifs côté serveur), d'où `Required`.
- * `page` est en base 0, comme l'API.
+ * suivre sa dérive. `page` est en base 0, comme l'API.
  */
-export type Page<T> = Required<PageMetadata> & { content: T[] };
+export type Page<T> = PageMetadata & { content: T[] };
 
 /**
  * Page demandée par l'URL (`?page=`, base 1) et filtres de la liste.

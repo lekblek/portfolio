@@ -1,6 +1,7 @@
 package com.scalke.portfolio.backend.series.web.dto;
 
 import com.scalke.portfolio.backend.series.application.usecase.SeriesNavigation;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Contexte de série d'un article (D-BL) : {@code position} sur {@code chapterCount} donne la progression ;
@@ -10,8 +11,8 @@ public record SeriesNavigationResponse(
     SeriesReferenceResponse series,
     int position,
     int chapterCount,
-    ChapterLinkResponse previous,
-    ChapterLinkResponse next
+    @Nullable ChapterLinkResponse previous,
+    @Nullable ChapterLinkResponse next
 ) {
 
     public static SeriesNavigationResponse from(SeriesNavigation navigation) {

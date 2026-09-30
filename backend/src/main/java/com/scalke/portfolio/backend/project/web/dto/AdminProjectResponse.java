@@ -5,6 +5,7 @@ import com.scalke.portfolio.backend.project.domain.model.ProjectScreenshot;
 import com.scalke.portfolio.backend.project.domain.model.ProjectStage;
 import com.scalke.portfolio.backend.project.domain.model.ProjectVisibility;
 import com.scalke.portfolio.backend.project.domain.model.Technology;
+import org.jspecify.annotations.Nullable;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -23,13 +24,13 @@ public record AdminProjectResponse(
     ProjectStage stage,
     ProjectVisibility visibility,
     LocalDate startDate,
-    LocalDate endDate,
-    String repositoryUrl,
-    String demoUrl,
+    @Nullable LocalDate endDate,
+    @Nullable String repositoryUrl,
+    @Nullable String demoUrl,
     boolean featured,
     int displayOrder,
     List<Long> technologyIds,
-    Long coverMediaId,
+    @Nullable Long coverMediaId,
     List<Screenshot> screenshots
 ) {
 
@@ -54,7 +55,7 @@ public record AdminProjectResponse(
             project.screenshots().stream().map(Screenshot::from).toList());
     }
 
-    public record Screenshot(Long mediaId, String caption) {
+    public record Screenshot(Long mediaId, @Nullable String caption) {
 
         static Screenshot from(ProjectScreenshot screenshot) {
             return new Screenshot(screenshot.mediaId(), screenshot.caption());

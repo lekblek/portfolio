@@ -6,6 +6,7 @@ import com.scalke.portfolio.backend.profile.domain.model.Experience;
 import com.scalke.portfolio.backend.profile.domain.model.ProfessionalLink;
 import com.scalke.portfolio.backend.profile.domain.model.Profile;
 import com.scalke.portfolio.backend.profile.domain.model.Skill;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
@@ -18,11 +19,11 @@ public record AdminProfileResponse(
     String displayName,
     String professionalTitle,
     String shortBio,
-    String aboutMarkdown,
-    String publicLocation,
-    String publicEmail,
-    Long avatarMediaId,
-    Long cvMediaId,
+    @Nullable String aboutMarkdown,
+    @Nullable String publicLocation,
+    @Nullable String publicEmail,
+    @Nullable Long avatarMediaId,
+    @Nullable Long cvMediaId,
     List<SaveProfileRequest.Link> links,
     List<SaveProfileRequest.Skill> skills,
     List<SaveProfileRequest.Experience> experiences,

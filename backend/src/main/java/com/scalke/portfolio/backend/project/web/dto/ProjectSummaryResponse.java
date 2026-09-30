@@ -4,6 +4,7 @@ import com.scalke.portfolio.backend.media.application.query.PublicImage;
 import com.scalke.portfolio.backend.project.application.usecase.PublishedProject;
 import com.scalke.portfolio.backend.project.domain.model.Project;
 import com.scalke.portfolio.backend.project.domain.model.ProjectStage;
+import org.jspecify.annotations.Nullable;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -20,9 +21,9 @@ public record ProjectSummaryResponse(
     String shortDescription,
     ProjectStage stage,
     LocalDate startDate,
-    LocalDate endDate,
+    @Nullable LocalDate endDate,
     boolean featured,
-    PublicImage cover,
+    @Nullable PublicImage cover,
     List<TechnologyResponse> technologies
 ) {
 

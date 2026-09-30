@@ -3,6 +3,7 @@ package com.scalke.portfolio.backend.series.web.dto;
 import com.scalke.portfolio.backend.media.application.query.PublicImage;
 import com.scalke.portfolio.backend.series.application.usecase.VisibleSeries;
 import com.scalke.portfolio.backend.series.domain.model.Series;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
@@ -14,7 +15,7 @@ public record SeriesResponse(
     String title,
     String slug,
     String descriptionMarkdown,
-    PublicImage cover,
+    @Nullable PublicImage cover,
     List<SeriesChapterResponse> chapters
 ) {
 

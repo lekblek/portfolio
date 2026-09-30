@@ -3,6 +3,7 @@ package com.scalke.portfolio.backend.series.web.dto;
 import com.scalke.portfolio.backend.publication.domain.model.PublicationStatus;
 import com.scalke.portfolio.backend.series.application.usecase.AdminSeries;
 import com.scalke.portfolio.backend.series.domain.model.Series;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
@@ -16,7 +17,7 @@ public record AdminSeriesResponse(
     String slug,
     boolean slugLocked,
     String descriptionMarkdown,
-    Long coverMediaId,
+    @Nullable Long coverMediaId,
     List<Chapter> chapters
 ) {
 

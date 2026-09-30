@@ -1,6 +1,7 @@
 package com.scalke.portfolio.backend.profile.web.dto;
 
 import com.scalke.portfolio.backend.profile.domain.model.Education;
+import org.jspecify.annotations.Nullable;
 
 import java.time.LocalDate;
 
@@ -13,7 +14,7 @@ public record EducationResponse(
     String field,
     String location,
     LocalDate startDate,
-    LocalDate endDate,
+    @Nullable LocalDate endDate,
     String description
 ) {
 

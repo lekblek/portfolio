@@ -4,6 +4,7 @@ import com.scalke.portfolio.backend.media.application.query.PublicImage;
 import com.scalke.portfolio.backend.publication.application.usecase.VisiblePublication;
 import com.scalke.portfolio.backend.publication.domain.model.Publication;
 import com.scalke.portfolio.backend.publication.domain.model.PublicationType;
+import org.jspecify.annotations.Nullable;
 
 import java.time.Instant;
 import java.util.List;
@@ -24,11 +25,11 @@ public record PublicationResponse(
     Instant publishedAt,
     boolean featured,
     int readingTimeMinutes,
-    PublicImage cover,
-    TaxonomyTermResponse category,
+    @Nullable PublicImage cover,
+    @Nullable TaxonomyTermResponse category,
     List<TaxonomyTermResponse> tags,
-    String seoTitle,
-    String seoDescription
+    @Nullable String seoTitle,
+    @Nullable String seoDescription
 ) {
 
     public static PublicationResponse from(VisiblePublication visible) {

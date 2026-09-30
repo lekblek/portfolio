@@ -4,7 +4,7 @@
       "AdminCategoryResponse" : {
         "properties" : {
           "description" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "id" : {
             "format" : "int64",
@@ -17,6 +17,7 @@
             "type" : "string"
           }
         },
+        "required" : [ "description", "id", "name", "slug" ],
         "type" : "object"
       },
       "AdminContactMessageResponse" : {
@@ -50,6 +51,7 @@
             "type" : "string"
           }
         },
+        "required" : [ "createdAt", "email", "id", "message", "name", "status", "subject", "updatedAt" ],
         "type" : "object"
       },
       "AdminContactMessageSummaryResponse" : {
@@ -76,12 +78,13 @@
             "type" : "string"
           }
         },
+        "required" : [ "createdAt", "email", "id", "name", "status", "subject" ],
         "type" : "object"
       },
       "AdminMediaResponse" : {
         "properties" : {
           "altText" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "createdAt" : {
             "format" : "date-time",
@@ -93,7 +96,7 @@
           },
           "height" : {
             "format" : "int32",
-            "type" : "integer"
+            "type" : [ "integer", "null" ]
           },
           "id" : {
             "format" : "int64",
@@ -114,19 +117,20 @@
           },
           "width" : {
             "format" : "int32",
-            "type" : "integer"
+            "type" : [ "integer", "null" ]
           }
         },
+        "required" : [ "altText", "createdAt", "format", "height", "id", "mimeType", "originalName", "sizeBytes", "url", "width" ],
         "type" : "object"
       },
       "AdminProfileResponse" : {
         "properties" : {
           "aboutMarkdown" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "avatarMediaId" : {
             "format" : "int64",
-            "type" : "integer"
+            "type" : [ "integer", "null" ]
           },
           "certifications" : {
             "items" : {
@@ -136,7 +140,7 @@
           },
           "cvMediaId" : {
             "format" : "int64",
-            "type" : "integer"
+            "type" : [ "integer", "null" ]
           },
           "displayName" : {
             "type" : "string"
@@ -163,10 +167,10 @@
             "type" : "string"
           },
           "publicEmail" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "publicLocation" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "shortBio" : {
             "type" : "string"
@@ -178,16 +182,17 @@
             "type" : "array"
           }
         },
+        "required" : [ "aboutMarkdown", "avatarMediaId", "certifications", "cvMediaId", "displayName", "educations", "experiences", "links", "professionalTitle", "publicEmail", "publicLocation", "shortBio", "skills" ],
         "type" : "object"
       },
       "AdminProjectResponse" : {
         "properties" : {
           "coverMediaId" : {
             "format" : "int64",
-            "type" : "integer"
+            "type" : [ "integer", "null" ]
           },
           "demoUrl" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "descriptionMarkdown" : {
             "type" : "string"
@@ -198,7 +203,7 @@
           },
           "endDate" : {
             "format" : "date",
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "featured" : {
             "type" : "boolean"
@@ -208,7 +213,7 @@
             "type" : "integer"
           },
           "repositoryUrl" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "screenshots" : {
             "items" : {
@@ -248,6 +253,7 @@
             "type" : "string"
           }
         },
+        "required" : [ "coverMediaId", "demoUrl", "descriptionMarkdown", "displayOrder", "endDate", "featured", "id", "repositoryUrl", "screenshots", "shortDescription", "slug", "slugLocked", "stage", "startDate", "technologyIds", "title", "visibility" ],
         "type" : "object"
       },
       "AdminProjectSummaryResponse" : {
@@ -278,20 +284,21 @@
             "type" : "string"
           }
         },
+        "required" : [ "displayOrder", "featured", "id", "slug", "stage", "title", "visibility" ],
         "type" : "object"
       },
       "AdminPublicationResponse" : {
         "properties" : {
           "categoryId" : {
             "format" : "int64",
-            "type" : "integer"
+            "type" : [ "integer", "null" ]
           },
           "contentMarkdown" : {
             "type" : "string"
           },
           "coverMediaId" : {
             "format" : "int64",
-            "type" : "integer"
+            "type" : [ "integer", "null" ]
           },
           "createdAt" : {
             "format" : "date-time",
@@ -306,13 +313,13 @@
           },
           "publishedAt" : {
             "format" : "date-time",
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "seoDescription" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "seoTitle" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "slug" : {
             "type" : "string"
@@ -346,6 +353,7 @@
             "type" : "string"
           }
         },
+        "required" : [ "categoryId", "contentMarkdown", "coverMediaId", "createdAt", "featured", "id", "publishedAt", "seoDescription", "seoTitle", "slug", "slugLocked", "status", "summary", "tagIds", "title", "type", "updatedAt" ],
         "type" : "object"
       },
       "AdminPublicationSummaryResponse" : {
@@ -359,7 +367,7 @@
           },
           "publishedAt" : {
             "format" : "date-time",
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "slug" : {
             "type" : "string"
@@ -380,6 +388,7 @@
             "type" : "string"
           }
         },
+        "required" : [ "featured", "id", "publishedAt", "slug", "status", "title", "type", "updatedAt" ],
         "type" : "object"
       },
       "AdminSeriesResponse" : {
@@ -392,7 +401,7 @@
           },
           "coverMediaId" : {
             "format" : "int64",
-            "type" : "integer"
+            "type" : [ "integer", "null" ]
           },
           "descriptionMarkdown" : {
             "type" : "string"
@@ -411,6 +420,7 @@
             "type" : "string"
           }
         },
+        "required" : [ "chapters", "coverMediaId", "descriptionMarkdown", "id", "slug", "slugLocked", "title" ],
         "type" : "object"
       },
       "AdminSeriesSummaryResponse" : {
@@ -430,6 +440,7 @@
             "type" : "string"
           }
         },
+        "required" : [ "chapterCount", "id", "slug", "title" ],
         "type" : "object"
       },
       "AdminSessionResponse" : {
@@ -442,6 +453,7 @@
             "type" : "string"
           }
         },
+        "required" : [ "lastLoginAt", "login" ],
         "type" : "object"
       },
       "AdminTagResponse" : {
@@ -457,6 +469,7 @@
             "type" : "string"
           }
         },
+        "required" : [ "id", "name", "slug" ],
         "type" : "object"
       },
       "AdminTechnologyResponse" : {
@@ -476,6 +489,7 @@
             "type" : "string"
           }
         },
+        "required" : [ "displayOrder", "id", "name", "slug" ],
         "type" : "object"
       },
       "Certification" : {
@@ -511,11 +525,11 @@
       "CertificationResponse" : {
         "properties" : {
           "credentialUrl" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "expiresAt" : {
             "format" : "date",
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "issuedAt" : {
             "format" : "date",
@@ -528,6 +542,7 @@
             "type" : "string"
           }
         },
+        "required" : [ "credentialUrl", "expiresAt", "issuedAt", "issuer", "name" ],
         "type" : "object"
       },
       "ChangeContactMessageStatusRequest" : {
@@ -588,6 +603,7 @@
             "type" : "string"
           }
         },
+        "required" : [ "position", "publicationId", "slug", "status", "title" ],
         "type" : "object"
       },
       "ChapterLinkResponse" : {
@@ -603,6 +619,7 @@
             "type" : "string"
           }
         },
+        "required" : [ "position", "slug", "title" ],
         "type" : "object"
       },
       "CreatePublicationRequest" : {
@@ -715,7 +732,7 @@
           },
           "endDate" : {
             "format" : "date",
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "field" : {
             "type" : "string"
@@ -731,6 +748,7 @@
             "type" : "string"
           }
         },
+        "required" : [ "degree", "description", "endDate", "field", "institution", "location", "startDate" ],
         "type" : "object"
       },
       "Experience" : {
@@ -774,7 +792,7 @@
           },
           "endDate" : {
             "format" : "date",
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "location" : {
             "type" : "string"
@@ -790,6 +808,7 @@
             "type" : "string"
           }
         },
+        "required" : [ "description", "endDate", "location", "organization", "startDate", "title" ],
         "type" : "object"
       },
       "Link" : {
@@ -856,6 +875,7 @@
             "type" : "integer"
           }
         },
+        "required" : [ "content", "first", "last", "page", "size", "totalElements", "totalPages" ],
         "type" : "object"
       },
       "PageResponseAdminMediaResponse" : {
@@ -889,6 +909,7 @@
             "type" : "integer"
           }
         },
+        "required" : [ "content", "first", "last", "page", "size", "totalElements", "totalPages" ],
         "type" : "object"
       },
       "PageResponseAdminProjectSummaryResponse" : {
@@ -922,6 +943,7 @@
             "type" : "integer"
           }
         },
+        "required" : [ "content", "first", "last", "page", "size", "totalElements", "totalPages" ],
         "type" : "object"
       },
       "PageResponseAdminPublicationSummaryResponse" : {
@@ -955,6 +977,7 @@
             "type" : "integer"
           }
         },
+        "required" : [ "content", "first", "last", "page", "size", "totalElements", "totalPages" ],
         "type" : "object"
       },
       "PageResponseAdminSeriesSummaryResponse" : {
@@ -988,6 +1011,7 @@
             "type" : "integer"
           }
         },
+        "required" : [ "content", "first", "last", "page", "size", "totalElements", "totalPages" ],
         "type" : "object"
       },
       "PageResponseProjectSummaryResponse" : {
@@ -1021,6 +1045,7 @@
             "type" : "integer"
           }
         },
+        "required" : [ "content", "first", "last", "page", "size", "totalElements", "totalPages" ],
         "type" : "object"
       },
       "PageResponsePublicationSummaryResponse" : {
@@ -1054,6 +1079,7 @@
             "type" : "integer"
           }
         },
+        "required" : [ "content", "first", "last", "page", "size", "totalElements", "totalPages" ],
         "type" : "object"
       },
       "PageResponseSearchResultResponse" : {
@@ -1087,6 +1113,7 @@
             "type" : "integer"
           }
         },
+        "required" : [ "content", "first", "last", "page", "size", "totalElements", "totalPages" ],
         "type" : "object"
       },
       "PageResponseSeriesSummaryResponse" : {
@@ -1120,6 +1147,7 @@
             "type" : "integer"
           }
         },
+        "required" : [ "content", "first", "last", "page", "size", "totalElements", "totalPages" ],
         "type" : "object"
       },
       "Pageable" : {
@@ -1152,15 +1180,20 @@
             "type" : "string"
           }
         },
+        "required" : [ "label", "url" ],
         "type" : "object"
       },
       "ProfileResponse" : {
         "properties" : {
           "aboutMarkdown" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "avatar" : {
-            "$ref" : "#/components/schemas/PublicImage"
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/PublicImage"
+            }, {
+              "type" : "null"
+            } ]
           },
           "certifications" : {
             "items" : {
@@ -1169,7 +1202,11 @@
             "type" : "array"
           },
           "cv" : {
-            "$ref" : "#/components/schemas/PublicDocument"
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/PublicDocument"
+            }, {
+              "type" : "null"
+            } ]
           },
           "displayName" : {
             "type" : "string"
@@ -1196,10 +1233,10 @@
             "type" : "string"
           },
           "publicEmail" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "publicLocation" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "shortBio" : {
             "type" : "string"
@@ -1211,28 +1248,33 @@
             "type" : "array"
           }
         },
+        "required" : [ "aboutMarkdown", "avatar", "certifications", "cv", "displayName", "educations", "experiences", "links", "professionalTitle", "publicEmail", "publicLocation", "shortBio", "skillGroups" ],
         "type" : "object"
       },
       "ProjectResponse" : {
         "properties" : {
           "cover" : {
-            "$ref" : "#/components/schemas/PublicImage"
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/PublicImage"
+            }, {
+              "type" : "null"
+            } ]
           },
           "demoUrl" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "descriptionMarkdown" : {
             "type" : "string"
           },
           "endDate" : {
             "format" : "date",
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "featured" : {
             "type" : "boolean"
           },
           "repositoryUrl" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "screenshots" : {
             "items" : {
@@ -1264,27 +1306,33 @@
             "type" : "string"
           }
         },
+        "required" : [ "cover", "demoUrl", "descriptionMarkdown", "endDate", "featured", "repositoryUrl", "screenshots", "shortDescription", "slug", "stage", "startDate", "technologies", "title" ],
         "type" : "object"
       },
       "ProjectScreenshotResponse" : {
         "properties" : {
           "caption" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "image" : {
             "$ref" : "#/components/schemas/PublicImage"
           }
         },
+        "required" : [ "caption", "image" ],
         "type" : "object"
       },
       "ProjectSummaryResponse" : {
         "properties" : {
           "cover" : {
-            "$ref" : "#/components/schemas/PublicImage"
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/PublicImage"
+            }, {
+              "type" : "null"
+            } ]
           },
           "endDate" : {
             "format" : "date",
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "featured" : {
             "type" : "boolean"
@@ -1313,6 +1361,7 @@
             "type" : "string"
           }
         },
+        "required" : [ "cover", "endDate", "featured", "shortDescription", "slug", "stage", "startDate", "technologies", "title" ],
         "type" : "object"
       },
       "PublicDocument" : {
@@ -1325,12 +1374,13 @@
             "type" : "string"
           }
         },
+        "required" : [ "sizeBytes", "url" ],
         "type" : "object"
       },
       "PublicImage" : {
         "properties" : {
           "altText" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "height" : {
             "format" : "int32",
@@ -1344,18 +1394,27 @@
             "type" : "integer"
           }
         },
+        "required" : [ "altText", "height", "url", "width" ],
         "type" : "object"
       },
       "PublicationResponse" : {
         "properties" : {
           "category" : {
-            "$ref" : "#/components/schemas/TaxonomyTermResponse"
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/TaxonomyTermResponse"
+            }, {
+              "type" : "null"
+            } ]
           },
           "contentMarkdown" : {
             "type" : "string"
           },
           "cover" : {
-            "$ref" : "#/components/schemas/PublicImage"
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/PublicImage"
+            }, {
+              "type" : "null"
+            } ]
           },
           "featured" : {
             "type" : "boolean"
@@ -1369,10 +1428,10 @@
             "type" : "integer"
           },
           "seoDescription" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "seoTitle" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "slug" : {
             "type" : "string"
@@ -1394,15 +1453,24 @@
             "type" : "string"
           }
         },
+        "required" : [ "category", "contentMarkdown", "cover", "featured", "publishedAt", "readingTimeMinutes", "seoDescription", "seoTitle", "slug", "summary", "tags", "title", "type" ],
         "type" : "object"
       },
       "PublicationSummaryResponse" : {
         "properties" : {
           "category" : {
-            "$ref" : "#/components/schemas/TaxonomyTermResponse"
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/TaxonomyTermResponse"
+            }, {
+              "type" : "null"
+            } ]
           },
           "cover" : {
-            "$ref" : "#/components/schemas/PublicImage"
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/PublicImage"
+            }, {
+              "type" : "null"
+            } ]
           },
           "featured" : {
             "type" : "boolean"
@@ -1435,6 +1503,7 @@
             "type" : "string"
           }
         },
+        "required" : [ "category", "cover", "featured", "publishedAt", "readingTimeMinutes", "slug", "summary", "tags", "title", "type" ],
         "type" : "object"
       },
       "SampleRequest" : {
@@ -1714,7 +1783,7 @@
         "properties" : {
           "publishedAt" : {
             "format" : "date-time",
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "slug" : {
             "type" : "string"
@@ -1730,6 +1799,7 @@
             "type" : "string"
           }
         },
+        "required" : [ "publishedAt", "slug", "summary", "title", "type" ],
         "type" : "object"
       },
       "SeriesChapterResponse" : {
@@ -1756,6 +1826,7 @@
             "type" : "string"
           }
         },
+        "required" : [ "position", "publishedAt", "readingTimeMinutes", "slug", "summary", "title" ],
         "type" : "object"
       },
       "SeriesNavigationResponse" : {
@@ -1765,19 +1836,28 @@
             "type" : "integer"
           },
           "next" : {
-            "$ref" : "#/components/schemas/ChapterLinkResponse"
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/ChapterLinkResponse"
+            }, {
+              "type" : "null"
+            } ]
           },
           "position" : {
             "format" : "int32",
             "type" : "integer"
           },
           "previous" : {
-            "$ref" : "#/components/schemas/ChapterLinkResponse"
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/ChapterLinkResponse"
+            }, {
+              "type" : "null"
+            } ]
           },
           "series" : {
             "$ref" : "#/components/schemas/SeriesReferenceResponse"
           }
         },
+        "required" : [ "chapterCount", "next", "position", "previous", "series" ],
         "type" : "object"
       },
       "SeriesReferenceResponse" : {
@@ -1789,6 +1869,7 @@
             "type" : "string"
           }
         },
+        "required" : [ "slug", "title" ],
         "type" : "object"
       },
       "SeriesResponse" : {
@@ -1800,7 +1881,11 @@
             "type" : "array"
           },
           "cover" : {
-            "$ref" : "#/components/schemas/PublicImage"
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/PublicImage"
+            }, {
+              "type" : "null"
+            } ]
           },
           "descriptionMarkdown" : {
             "type" : "string"
@@ -1812,6 +1897,7 @@
             "type" : "string"
           }
         },
+        "required" : [ "chapters", "cover", "descriptionMarkdown", "slug", "title" ],
         "type" : "object"
       },
       "SeriesSummaryResponse" : {
@@ -1821,7 +1907,11 @@
             "type" : "integer"
           },
           "cover" : {
-            "$ref" : "#/components/schemas/PublicImage"
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/PublicImage"
+            }, {
+              "type" : "null"
+            } ]
           },
           "descriptionMarkdown" : {
             "type" : "string"
@@ -1833,6 +1923,7 @@
             "type" : "string"
           }
         },
+        "required" : [ "chapterCount", "cover", "descriptionMarkdown", "slug", "title" ],
         "type" : "object"
       },
       "Skill" : {
@@ -1863,6 +1954,7 @@
             "type" : "array"
           }
         },
+        "required" : [ "category", "skills" ],
         "type" : "object"
       },
       "SkillResponse" : {
@@ -1871,6 +1963,7 @@
             "type" : "string"
           }
         },
+        "required" : [ "name" ],
         "type" : "object"
       },
       "TaxonomyTermResponse" : {
@@ -1882,6 +1975,7 @@
             "type" : "string"
           }
         },
+        "required" : [ "name", "slug" ],
         "type" : "object"
       },
       "TechnologyResponse" : {
@@ -1893,6 +1987,7 @@
             "type" : "string"
           }
         },
+        "required" : [ "name", "slug" ],
         "type" : "object"
       },
       "UpdateMediaRequest" : {

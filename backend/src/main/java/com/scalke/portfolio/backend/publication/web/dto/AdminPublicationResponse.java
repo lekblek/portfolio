@@ -4,6 +4,7 @@ import com.scalke.portfolio.backend.publication.application.usecase.AdminPublica
 import com.scalke.portfolio.backend.publication.domain.model.Publication;
 import com.scalke.portfolio.backend.publication.domain.model.PublicationStatus;
 import com.scalke.portfolio.backend.publication.domain.model.PublicationType;
+import org.jspecify.annotations.Nullable;
 
 import java.time.Instant;
 import java.util.List;
@@ -21,13 +22,13 @@ public record AdminPublicationResponse(
     String summary,
     String contentMarkdown,
     PublicationStatus status,
-    Instant publishedAt,
+    @Nullable Instant publishedAt,
     boolean featured,
-    Long categoryId,
+    @Nullable Long categoryId,
     List<Long> tagIds,
-    Long coverMediaId,
-    String seoTitle,
-    String seoDescription,
+    @Nullable Long coverMediaId,
+    @Nullable String seoTitle,
+    @Nullable String seoDescription,
     Instant createdAt,
     Instant updatedAt
 ) {

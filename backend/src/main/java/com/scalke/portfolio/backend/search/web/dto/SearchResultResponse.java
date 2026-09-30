@@ -1,6 +1,7 @@
 package com.scalke.portfolio.backend.search.web.dto;
 
 import com.scalke.portfolio.backend.search.application.usecase.SearchResult;
+import org.jspecify.annotations.Nullable;
 
 import java.time.Instant;
 
@@ -14,7 +15,7 @@ public record SearchResultResponse(
     String title,
     String slug,
     String summary,
-    Instant publishedAt
+    @Nullable Instant publishedAt
 ) {
 
     public static SearchResultResponse from(SearchResult result) {
