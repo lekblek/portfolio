@@ -1,0 +1,135 @@
+/*
+ * Tokens du système de design — source de vérité (docs/frontend/02-design-system.md).
+ * Le thème par défaut de Tailwind est entièrement retiré : seules ces valeurs produisent des utilitaires.
+ * Primitifs (--palette-*) hors des espaces de noms de Tailwind : aucun utilitaire, jamais dans un gabarit.
+ */
+
+:root {
+  --palette-white: #ffffff;
+  --palette-slate-50: #f3f5f8;
+  --palette-slate-200: #d5dbe3;
+  --palette-slate-600: #4a5568;
+  --palette-navy-900: #1a2233;
+  --palette-prussian-600: #1e4f9a;
+  --palette-prussian-800: #163b75;
+  --palette-prussian-100: #d6e2f5;
+  --palette-red-700: #a3261f;
+  --palette-green-700: #1d6b3a;
+  --palette-amber-800: #855000;
+  --palette-plum-700: #8a2c5a;
+  --palette-green-800: #1d6034;
+  --palette-ochre-800: #7a4a00;
+}
+
+@theme static {
+  --*: initial;
+
+  /* Couleurs sémantiques (§4.1, §7) */
+  --color-paper: var(--palette-white);
+  --color-paper-sunken: var(--palette-slate-50);
+  --color-ink: var(--palette-navy-900);
+  --color-ink-muted: var(--palette-slate-600);
+  --color-rule: var(--palette-slate-200);
+  --color-accent: var(--palette-prussian-600);
+  --color-accent-strong: var(--palette-prussian-800);
+  --color-focus: var(--palette-prussian-600);
+  --color-selection: var(--palette-prussian-100);
+  --color-danger: var(--palette-red-700);
+  --color-success: var(--palette-green-700);
+  --color-warning: var(--palette-amber-800);
+  --color-code-keyword: var(--palette-plum-700);
+  --color-code-string: var(--palette-green-800);
+  --color-code-annotation: var(--palette-ochre-800);
+
+  /* Familles (§4.2) */
+  --font-display: 'Schibsted Grotesk Variable', system-ui, sans-serif;
+  --font-text: 'Literata Variable', Georgia, serif;
+  --font-code: 'JetBrains Mono Variable', ui-monospace, monospace;
+
+  /* Échelle typographique (§6) */
+  --text-xs: 0.875rem;
+  --text-sm: 0.9375rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.375rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: clamp(2rem, 1.5rem + 2.2vw, 3.125rem);
+  --text-4xl: clamp(2.5rem, 1.6rem + 3.6vw, 4.75rem);
+
+  --leading-tight: 1.05;
+  --leading-snug: 1.25;
+  --leading-ui: 1.5;
+  --leading-prose: 1.7;
+
+  --tracking-display: -0.035em;
+  --tracking-title: -0.03em;
+  --tracking-heading: -0.02em;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 550;
+  --font-weight-semibold: 650;
+
+  /* Espacement : base de 4 px (§8) ; valeurs de rythme redéfinies par taille d'écran plus bas */
+  --spacing: 0.25rem;
+  --spacing-flow: 1.25rem;
+  --spacing-block: 2rem;
+  --spacing-section: 3rem;
+  --spacing-gutter: 1rem;
+
+  /* Largeurs et points de rupture (§10) */
+  --container-prose: 43rem;
+  --container-content: 88rem;
+  --breakpoint-sm: 40rem;
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 64rem;
+  --breakpoint-xl: 80rem;
+
+  /* Rayons et ombre (§9) */
+  --radius-control: 3px;
+  --radius-media: 2px;
+  --radius-full: 9999px;
+  --shadow-overlay: 0 8px 24px rgb(26 34 51 / 0.12);
+
+  /* Mouvement (§11) */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+}
+
+:root {
+  /* Épaisseurs de trait (§9) et durées (§11) : sans espace de noms Tailwind, utilisées par var() */
+  --border-rule: 1px;
+  --border-strong: 1.5px;
+  --duration-instant: 100ms;
+  --duration-fast: 150ms;
+  --duration-base: 200ms;
+  --duration-slow: 300ms;
+
+  /* Plans (§12) */
+  --z-base: 0;
+  --z-sticky: 10;
+  --z-dropdown: 20;
+  --z-overlay: 30;
+  --z-dialog: 40;
+  --z-toast: 50;
+  --z-skip: 60;
+}
+
+@media (min-width: 48rem) {
+  :root {
+    --spacing-gutter: 2rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  :root {
+    --spacing-block: 2.5rem;
+    --spacing-section: 4rem;
+  }
+}
+
+@media (min-width: 80rem) {
+  :root {
+    --spacing-gutter: 3rem;
+  }
+}

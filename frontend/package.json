@@ -9,6 +9,7 @@
     "e2e": "tsc -p tsconfig.e2e.json && playwright test",
     "e2e:no-api": "tsc -p tsconfig.e2e.json && playwright test --grep @no-api",
     "lint": "ng lint",
+    "lint:styles": "node scripts/check-styles.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "api:types": "openapi-typescript ../docs/api/openapi.json -o src/app/core/api/openapi.d.ts",
@@ -26,6 +27,9 @@
     "@angular/platform-server": "^22.2.0",
     "@angular/router": "^22.2.0",
     "@angular/ssr": "^22.2.0",
+    "@fontsource-variable/jetbrains-mono": "5.3.0",
+    "@fontsource-variable/literata": "5.3.0",
+    "@fontsource-variable/schibsted-grotesk": "5.3.0",
     "express": "^5.1.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"

@@ -1,3 +1,13 @@
-/* You can add global styles to this file, and also import other style files */
+/* Point d'entrée des styles globaux (docs/frontend/02-design-system.md §17) */
 
 @import 'tailwindcss';
+
+/* Polices auto-hébergées (DS03) ; le navigateur ne télécharge que les sous-ensembles utilisés */
+@import '@fontsource-variable/schibsted-grotesk/wght.css';
+@import '@fontsource-variable/literata/wght.css';
+@import '@fontsource-variable/literata/wght-italic.css';
+@import '@fontsource-variable/jetbrains-mono/wght.css';
+
+@import './styles/tokens.css';
+@import './styles/base.css';
+@import './styles/utilities.css';

@@ -1,0 +1,25 @@
+/* Utilitaires de mise en page du projet (docs/frontend/02-design-system.md §17, niveau 3) */
+
+/* Largeur maximale des pages et gouttière latérale, qui varie avec la largeur de l'écran */
+@utility page-container {
+  width: 100%;
+  max-width: var(--container-content);
+  margin-inline: auto;
+  padding-inline: var(--spacing-gutter);
+}
+
+/* Flux vertical : espace entre éléments frères ; stack-flow, stack-block, stack-section */
+@utility stack-* {
+  & > * + * {
+    margin-block-start: --value(--spacing-*);
+  }
+}
+
+/* Éléments en ligne qui passent à la ligne ensemble ; cluster-2, cluster-4, cluster-flow… */
+@utility cluster-* {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: --value(--spacing-*);
+  gap: calc(var(--spacing) * --value(integer));
+}

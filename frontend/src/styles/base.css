@@ -1,0 +1,83 @@
+/* Éléments HTML nus (docs/frontend/02-design-system.md §17, niveau 2) */
+
+@layer base {
+  html {
+    color-scheme: light;
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-display);
+    font-size: 100%;
+    line-height: var(--leading-ui);
+    -webkit-font-smoothing: antialiased;
+    text-size-adjust: 100%;
+    /* L'en-tête collant éventuel ne masque jamais la cible d'une ancre ni l'élément focalisé */
+    scroll-padding-top: calc(var(--spacing) * 6);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--leading-snug);
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Liens : soulignés (la couleur ne porte jamais seule l'information), état visité non distingué */
+  a {
+    color: var(--color-accent);
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+
+  a:active {
+    color: var(--color-accent-strong);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    a:hover {
+      color: var(--color-accent-strong);
+      text-decoration-thickness: 2px;
+    }
+  }
+
+  code,
+  kbd,
+  samp,
+  pre {
+    font-family: var(--font-code);
+    font-size: 0.875em;
+  }
+
+  hr {
+    border: 0;
+    border-top: var(--border-rule) solid var(--color-rule);
+  }
+
+  ::selection {
+    background: var(--color-selection);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+}
+
+/* Mouvement réduit : les déplacements disparaissent, les fondus très courts restent possibles (§11) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 1ms !important;
+  }
+}
