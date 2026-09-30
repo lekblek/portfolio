@@ -37,7 +37,7 @@ jobs:
         run: ./mvnw -B -ntp verify
 
   frontend:
-    name: Frontend — test et build
+    name: Frontend — lint, tests et build
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -52,5 +52,34 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
 
       - run: npm ci
+      # Règles Angular, accessibilité des gabarits, frontières entre dossiers (01-architecture §5)
+      - run: npm run lint
+      - run: npm run format:check
+      # Les types de l'API sont régénérés depuis docs/api/openapi.json : toute dérive fait échouer la CI
+      - name: Types de l'API conformes au contrat
+        run: |
+          npm run api:types
+          git diff --exit-code -- src/app/core/api/openapi.d.ts
       - run: npm test -- --watch=false
       - run: npm run build
+
+  frontend-e2e-no-api:
+    name: Frontend — bout en bout sans API
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - run: npm ci
+      # Version de Chromium fixée par @playwright/test (lockfile)
+      - run: npx playwright install --with-deps chromium
+      # Spécifications marquées @no-api : le backend n'est pas démarré (pile complète plus tard)
+      - run: npm run e2e:no-api
