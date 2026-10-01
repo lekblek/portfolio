@@ -20,11 +20,16 @@ test.describe('markdown rendering', () => {
 
       const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
       expect(scrollWidth).toBeLessThanOrEqual(360);
-      const codeScrolls = await page
-        .locator('.prose pre.code')
-        .nth(2)
-        .evaluate((block) => block.scrollWidth > block.clientWidth);
-      expect(codeScrolls).toBe(true);
+      // Mesure après la mise en page définitive (polices et styles chargés)
+      await page.evaluate(() => document.fonts.ready);
+      await expect
+        .poll(() =>
+          page
+            .locator('.prose pre.code')
+            .nth(2)
+            .evaluate((block) => block.scrollWidth > block.clientWidth),
+        )
+        .toBe(true);
     },
   );
 });

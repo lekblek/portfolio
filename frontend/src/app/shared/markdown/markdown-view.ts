@@ -2,7 +2,7 @@ import { Component, computed, inject, input } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 
-import { renderMarkdown } from './markdown-renderer';
+import { RenderedMarkdown, renderMarkdown } from './markdown-renderer';
 
 /**
  * Affiche un contenu Markdown (texte long d'un profil, d'un projet, d'une publication) avec les
@@ -14,7 +14,10 @@ import { renderMarkdown } from './markdown-renderer';
   template: '',
 })
 export class MarkdownView {
-  readonly source = input.required<string>();
+  /** Markdown à rendre ; ignoré si `rendered` est fourni. */
+  readonly source = input('');
+  /** Rendu déjà calculé par la page (qui en tire aussi le sommaire) : un seul rendu. */
+  readonly rendered = input<RenderedMarkdown | null>(null);
   /** Niveau du plus haut titre du contenu (`RenderOptions.topLevel`). */
   readonly headingLevel = input<2 | 3>(2);
 
@@ -26,7 +29,10 @@ export class MarkdownView {
     // des titres. Le HTML est sûr par construction : HTML brut échappé, liens filtrés, balises
     // produites par les seules règles de markdown-renderer.ts (ADR 0003, corpus des tests).
     this.sanitizer.bypassSecurityTrustHtml(
-      renderMarkdown(this.source(), { path: this.path, topLevel: this.headingLevel() }).html,
+      (
+        this.rendered() ??
+        renderMarkdown(this.source(), { path: this.path, topLevel: this.headingLevel() })
+      ).html,
     ),
   );
 }

@@ -175,4 +175,101 @@
   & td {
     border-block-end: var(--border-rule) solid var(--color-rule);
   }
+
+  /* Bloc de code avec barre (articles) : langage et bouton « Copier » au-dessus du code */
+  & .code-block {
+    overflow: hidden;
+    border: var(--border-rule) solid var(--color-rule);
+    border-radius: var(--radius-media);
+    background: var(--color-paper-sunken);
+  }
+
+  & .code-block > pre.code {
+    border: 0;
+    border-radius: 0;
+  }
+
+  & .code-bar {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--spacing) * 3);
+    padding: calc(var(--spacing) * 1) calc(var(--spacing) * 2) calc(var(--spacing) * 1)
+      calc(var(--spacing) * 5);
+    border-block-end: var(--border-rule) solid var(--color-rule);
+    font-family: var(--font-display);
+    font-size: var(--text-xs);
+    line-height: var(--leading-ui);
+  }
+
+  & .code-language {
+    color: var(--color-ink-muted);
+    font-family: var(--font-code);
+  }
+
+  & .code-copy {
+    margin-inline-start: auto;
+    min-height: calc(var(--spacing) * 8);
+    padding-inline: calc(var(--spacing) * 3);
+    border: 0;
+    border-radius: var(--radius-control);
+    background: transparent;
+    color: var(--color-accent);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    & .code-copy:hover {
+      color: var(--color-accent-strong);
+      text-decoration-line: underline;
+    }
+  }
+
+  /* Notes (02-design-system §4.5) : appel en exposant, note dans le flux après son bloc */
+  & .note-ref {
+    font-size: 0.75em;
+    line-height: 0;
+  }
+
+  & .note-ref a {
+    padding-inline: 0.1em;
+    font-family: var(--font-display);
+    font-weight: var(--font-weight-semibold);
+    text-decoration-line: none;
+  }
+
+  & .note {
+    padding-inline-start: calc(var(--spacing) * 3);
+    border-inline-start: var(--border-rule) solid var(--color-rule);
+    color: var(--color-ink-muted);
+    font-family: var(--font-display);
+    font-size: var(--text-xs);
+    line-height: var(--leading-ui);
+  }
+
+  & .note-number {
+    margin-inline-end: 0.35em;
+    color: var(--color-accent);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  & .note p {
+    display: inline;
+  }
+
+  & .note-back {
+    text-decoration-line: none;
+  }
+}
+
+/* Notes en marge droite dès 80 rem, pour un contenu placé dans la colonne de lecture d'un
+   article (marge de 15 rem, 3,5 rem entre les colonnes) ; dans le flux en dessous */
+@media (min-width: 80rem) {
+  .prose-margin-notes .note {
+    float: right;
+    clear: right;
+    width: 15rem;
+    margin-block: 0 var(--spacing-flow);
+    margin-inline-end: calc(-15rem - calc(var(--spacing) * 14));
+  }
 }
