@@ -2117,6 +2117,7 @@ export interface operations {
         parameters: {
             query: {
                 technology?: string;
+                featured?: boolean;
                 pageable: components["schemas"]["Pageable"];
             };
             header?: never;
