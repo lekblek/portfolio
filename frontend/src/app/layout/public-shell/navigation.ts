@@ -11,5 +11,8 @@ export interface NavItem {
  * son lien avec sa route : aucun lien vers une page qui n'existe pas encore.
  */
 export const PUBLIC_NAVIGATION: readonly NavItem[] = [
+  { path: '/projects', label: 'Projets', footer: true },
+  { path: '/articles', label: 'Articles', footer: true },
+  { path: '/news', label: 'Actualités', footer: false },
   { path: '/about', label: 'À propos', footer: true },
 ];

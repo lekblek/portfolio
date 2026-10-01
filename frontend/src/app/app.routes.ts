@@ -24,6 +24,25 @@ export const routes: Routes = [
     component: PublicShell,
     children: [
       {
+        path: 'projects',
+        loadChildren: () =>
+          import('./features/projects/projects.routes').then((m) => m.projectsRoutes),
+      },
+      {
+        path: 'articles',
+        loadChildren: () =>
+          import('./features/publications/publications.routes').then((m) =>
+            m.publicationRoutes('ARTICLE'),
+          ),
+      },
+      {
+        path: 'news',
+        loadChildren: () =>
+          import('./features/publications/publications.routes').then((m) =>
+            m.publicationRoutes('NEWS'),
+          ),
+      },
+      {
         path: 'about',
         loadChildren: () => import('./features/about/about.routes').then((m) => m.aboutRoutes),
       },

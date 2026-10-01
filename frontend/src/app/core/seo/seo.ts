@@ -9,7 +9,10 @@ export interface SeoData {
   title?: string | null;
   /** Absente : description par défaut du site. */
   description?: string | null;
-  /** Chemin canonique (`/projects/portfolio`), sans requête ni ancre. */
+  /**
+   * Chemin canonique (`/projects/portfolio`), sans ancre ; avec la requête seulement quand elle
+   * désigne une autre page de contenu (`/projects?page=2`).
+   */
   path: string;
   type?: 'website' | 'article' | 'profile';
   /** Adresse de l'image de partage, relative au site ou absolue. */

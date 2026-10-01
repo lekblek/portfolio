@@ -31,7 +31,12 @@ test.describe('public shell', () => {
       }
       const nav = page.getByRole('navigation', { name: 'Navigation principale' });
 
-      await expect(nav.getByRole('link')).toHaveText(['À propos']);
+      await expect(nav.getByRole('link')).toHaveText([
+        'Projets',
+        'Articles',
+        'Actualités',
+        'À propos',
+      ]);
       await expect(nav.getByRole('link', { name: 'À propos' })).toHaveAttribute('href', '/about');
       await expect(nav.locator('[aria-current]')).toHaveCount(0);
       await expect(
