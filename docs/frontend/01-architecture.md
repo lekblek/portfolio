@@ -285,6 +285,7 @@ Le Markdown est la source canonique (`01-perimetre-v1.md` §9) et arrive brut de
 - **assainissement obligatoire** du HTML produit avant insertion (le contenu vient de l'administrateur, mais une faille XSS stockée ne doit pas dépendre de cette confiance) ;
 - KaTeX et Mermaid chargés à la demande, seulement sur les pages qui en contiennent (F15) ;
 - bibliothèques et sûreté : [ADR 0003](../decisions/0003-rendu-markdown.md) — `markdown-it` (HTML brut échappé, liens limités à http(s), mailto et adresses relatives), `highlight.js` (noyau et langages choisis, couleurs par les tokens), sûreté par construction sans bibliothèque d'assainissement ; `shared/markdown/markdown-renderer.ts` (moteur, synchrone, identique au serveur et au navigateur), `markdown-view.ts` (affichage, seul contournement de l'assainisseur d'Angular, qui retire les `id` des titres), `toc.ts` (identifiants de titres) ; titres du contenu décalés sous le `<h1>` de la page, ancres préfixées par le chemin de la page ; le moteur vit dans un lot chargé à la demande (≈ 58 kB transférés), jamais dans le lot initial.
+- F14 : une page qui a besoin des titres (sommaire) rend le Markdown une fois et passe le résultat à la vue (`MarkdownView.rendered`) ; option `codeToolbar` (langage et bouton « Copier », activé par le conteneur `app-code-copy`) ; notes (`markdown-it-footnote`, rendu du projet) placées après le bloc qui les appelle, en marge sous `prose-margin-notes` (D-EE).
 
 ---
 

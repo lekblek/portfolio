@@ -72,6 +72,7 @@ Assainisseur d'Angular (`[innerHTML]`, version 22.2) : il retire l'attribut **`i
   5. un corpus d'attaques dans les tests du moteur, qui échoue à la moindre régression ;
   6. tout greffon ajouté plus tard (KaTeX, notes, Mermaid) doit préserver ces invariants et étendre le corpus.
 - **Pas de greffon avant son besoin** : notes de bas de page (`markdown-it-footnote`) avec la page d'article (F14), KaTeX et Mermaid en F15 (complément de cet ADR).
+- **Complément F14** : `markdown-it-footnote` 4.0.0 (version figée) pour la seule syntaxe ; le rendu est celui du projet (note placée après le bloc de premier niveau qui l'appelle, `role="note"`, liens rattachés au chemin de la page) ; déclaration de types locale (`src/markdown-it-footnote.d.ts`). Poids mesuré du lot paresseux du moteur : 57,00 → 58,76 kB transférés. Barre des blocs de code (langage, bouton « Copier ») produite par la règle `fence` elle-même, sur option (`codeToolbar`) : aucune balise hors des règles du moteur.
 - Titres décalés sous le `<h1>` de la page : le plus haut niveau présent dans le contenu devient `<h2>` (aucun saut de niveau) ; identifiants stables, accents retirés, unicité par suffixe.
 - Liens internes à la page (`#…`) préfixés par le chemin de la page : avec `<base href="/">`, un `#…` seul renverrait à la racine.
 
