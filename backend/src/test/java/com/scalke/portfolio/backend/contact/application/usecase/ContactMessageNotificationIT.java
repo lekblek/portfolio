@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -46,9 +48,16 @@ class ContactMessageNotificationIT extends AbstractIntegrationTest {
         jdbcClient.sql("DELETE FROM contact_message").update();
     }
 
+    /**
+     * Une source par envoi : la limitation de débit (D-EJ) vit aussi longtemps que le contexte Spring partagé.
+     */
+    private static String anotherSource() {
+        return "notification-" + UUID.randomUUID();
+    }
+
     @Test
     void notifies_the_administrator_once_the_message_is_recorded() throws Exception {
-        submitContactMessageUseCase.execute(SUBMISSION);
+        submitContactMessageUseCase.execute(SUBMISSION, anotherSource());
 
         assertThat(greenMail.waitForIncomingEmail(5_000, 1)).isTrue();
         MimeMessage mail = greenMail.getReceivedMessages()[0];
@@ -65,7 +74,7 @@ class ContactMessageNotificationIT extends AbstractIntegrationTest {
     @Test
     void notifies_nobody_when_the_recording_is_rolled_back() {
         transactionTemplate.executeWithoutResult(status -> {
-            submitContactMessageUseCase.execute(SUBMISSION);
+            submitContactMessageUseCase.execute(SUBMISSION, anotherSource());
             status.setRollbackOnly();
         });
 
@@ -80,7 +89,7 @@ class ContactMessageNotificationIT extends AbstractIntegrationTest {
     void keeps_the_message_when_the_mail_server_is_down() {
         greenMail.stop();
         try {
-            submitContactMessageUseCase.execute(SUBMISSION);
+            submitContactMessageUseCase.execute(SUBMISSION, anotherSource());
         } finally {
             greenMail.start();
         }

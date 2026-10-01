@@ -13,8 +13,8 @@ import java.util.regex.Pattern;
  * Invariants (D-CG), doublés par PostgreSQL ({@code V020}) : nom, sujet et message non blancs et bornés,
  * adresse électronique de forme {@code local@domaine.tld}, {@code updatedAt} jamais avant {@code createdAt}.
  * Une valeur hors règle est une erreur de programmation ({@link IllegalArgumentException}, D-N) : la saisie
- * sera validée avant, par le contrat HTTP (étape 48), avec les mêmes bornes. Invariant 29 : le statut ne change
- * que par {@link #moveTo}.
+ * est validée avant, par le contrat HTTP ({@code SubmitContactMessageRequest}, D-EJ), avec les mêmes bornes.
+ * Invariant 29 : le statut ne change que par {@link #moveTo}.
  */
 public record ContactMessage(
     Long id,
@@ -34,9 +34,11 @@ public record ContactMessage(
 
     /**
      * Forme minimale d'une adresse : pas d'espace, un seul {@code @}, un point dans le domaine. Même expression
-     * que {@code contact_message_email_check}.
+     * que {@code contact_message_email_check} ; reprise par la validation du formulaire public (D-EJ).
      */
-    private static final Pattern EMAIL = Pattern.compile("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$");
+    public static final String EMAIL_FORMAT = "[^@\\s]+@[^@\\s]+\\.[^@\\s]+";
+
+    private static final Pattern EMAIL = Pattern.compile(EMAIL_FORMAT);
 
     public ContactMessage {
         requireText(name, "name", NAME_MAX_LENGTH);

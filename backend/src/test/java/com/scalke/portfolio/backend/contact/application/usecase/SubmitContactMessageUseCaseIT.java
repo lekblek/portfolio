@@ -16,7 +16,7 @@ import static com.scalke.portfolio.backend.testsupport.FixedClockConfiguration.N
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Enregistrement d'un message sans HTTP (route à l'étape 48, D-CG), à l'horloge fixe des tests.
+ * Enregistrement d'un message sans HTTP (D-CG), à l'horloge fixe des tests ; la route : {@code PublicContactMessageIT}.
  */
 @Transactional
 class SubmitContactMessageUseCaseIT extends AbstractIntegrationTest {
@@ -36,7 +36,7 @@ class SubmitContactMessageUseCaseIT extends AbstractIntegrationTest {
     @Test
     void records_a_new_message_received_now() {
         ContactMessage submitted = submitContactMessageUseCase.execute(new ContactMessageSubmission(
-            " Camille Martin ", "camille.martin@example.com", "Proposition de mission", "Bonjour,\n\nUne mission ?"));
+            " Camille Martin ", "camille.martin@example.com", "Proposition de mission", "Bonjour,\n\nUne mission ?"), "203.0.113.10");
         entityManager.flush();
         entityManager.clear();
 

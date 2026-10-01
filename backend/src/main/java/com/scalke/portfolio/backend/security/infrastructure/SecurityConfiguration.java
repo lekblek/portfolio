@@ -33,13 +33,15 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
  * Refus rendus par {@code GlobalExceptionHandler} ({@code ProblemDetail} et {@code code}, D-CL). Aucune requête
  * refusée n'est mémorisée en session : un visiteur anonyme ne reçoit jamais de session. CSRF pour une application
  * monopage (D-CP) : jeton dans le cookie {@code XSRF-TOKEN}, renvoyé dans l'en-tête {@code X-XSRF-TOKEN}. En-têtes et
- * attributs des cookies : D-CR.
+ * attributs des cookies : D-CR. Seul {@code POST /public/contact-messages}, anonyme, se passe du jeton CSRF
+ * (D-EJ).
  */
 @Configuration
 @Slf4j
 public class SecurityConfiguration {
 
     private static final String SESSION = "/admin/session";
+    private static final String CONTACT_MESSAGES = "/public/contact-messages";
 
     @Bean
     SecurityFilterChain securityFilterChain(
@@ -60,7 +62,11 @@ public class SecurityConfiguration {
             .requestCache(cache -> cache.requestCache(new NullRequestCache()))
             .csrf(csrf -> csrf
                 .csrfTokenRepository(csrfTokenRepository)
-                .csrfTokenRequestHandler(new AdminCsrfTokenRequestHandler()))
+                .csrfTokenRequestHandler(new AdminCsrfTokenRequestHandler())
+                // Envoi anonyme du formulaire de contact (D-EJ) : aucune session ni aucun droit à détourner, et un
+                // visiteur n'a pas de jeton ; le piège à robots et la limitation de débit protègent la route.
+                .ignoringRequestMatchers(
+                    PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.POST, CONTACT_MESSAGES)))
             .logout(logout -> logout
                 .logoutRequestMatcher(PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.DELETE, SESSION))
                 // Journal des événements de sécurité (D-DF) ; sans session, la déconnexion ne ferme rien.
