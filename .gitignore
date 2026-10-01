@@ -1,6 +1,7 @@
 # ------------------ No IA marks --------------
 CLAUDE.md
 AGENTS.md
+.agents/
 .mcp.json
 .claude/
 .codex/

@@ -340,6 +340,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/public/contact-messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["submit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/public/media/{storageKey}": {
         parameters: {
             query?: never;
@@ -1154,6 +1170,13 @@ export interface components {
         };
         SkillResponse: {
             name: string;
+        };
+        SubmitContactMessageRequest: {
+            email: string;
+            message: string;
+            name: string;
+            subject: string;
+            website?: string;
         };
         TaxonomyTermResponse: {
             name: string;
@@ -2064,6 +2087,28 @@ export interface operations {
         responses: {
             /** @description No Content */
             204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    submit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SubmitContactMessageRequest"];
+            };
+        };
+        responses: {
+            /** @description Accepted */
+            202: {
                 headers: {
                     [name: string]: unknown;
                 };
