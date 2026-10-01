@@ -57,6 +57,16 @@ class OpenApiContractIT extends AbstractIntegrationTest {
             .isEqualTo(normalize(Files.readString(CONTRACT)));
     }
 
+    /**
+     * KI-37 : un contrôleur de test ({@code @TestComponent}) n'entre jamais dans le contrat.
+     */
+    @Test
+    void the_contract_describes_no_test_route() throws Exception {
+        JsonNode paths = JSON.readTree(Files.readString(CONTRACT)).get("paths");
+
+        assertThat(paths.propertyNames()).noneMatch(path -> path.startsWith("/test-"));
+    }
+
     private static String normalize(String contract) throws IOException {
         JsonNode tree = JSON.readTree(contract);
         ((ObjectNode) tree).remove("servers");

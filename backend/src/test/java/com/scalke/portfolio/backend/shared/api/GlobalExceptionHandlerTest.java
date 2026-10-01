@@ -21,10 +21,11 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+// Aucun contrôleur de l'application ; le contrôleur de test, exclu de l'analyse des composants, est importé.
 @WebMvcTest(controllers = ErrorHandlingTestController.class)
 // Rendu des erreurs seulement : les règles de sécurité sont testées par SecurityConfigurationIT.
 @AutoConfigureMockMvc(addFilters = false)
-@Import(GlobalExceptionHandler.class)
+@Import({GlobalExceptionHandler.class, ErrorHandlingTestController.class})
 public class GlobalExceptionHandlerTest {
 
     @Autowired

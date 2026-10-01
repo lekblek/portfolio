@@ -8,6 +8,7 @@ import com.scalke.portfolio.backend.shared.error.ResourceNotFoundException;
 import com.scalke.portfolio.backend.shared.error.TooManyRequestsException;
 import com.scalke.portfolio.backend.shared.error.UnsupportedContentException;
 import jakarta.validation.Valid;
+import org.springframework.boot.test.context.TestComponent;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import jakarta.validation.constraints.NotBlank;
@@ -16,6 +17,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
 
+/**
+ * Routes qui lèvent chaque erreur rendue par {@link GlobalExceptionHandler}, pour {@code GlobalExceptionHandlerTest}
+ * seulement. {@link TestComponent} l'exclut de l'analyse des composants de tout contexte de test (KI-37) : sans cela,
+ * chaque {@code @SpringBootTest} l'enregistrait, et ses routes entraient dans le contrat OpenAPI versionné.
+ */
+@TestComponent
 @RestController
 @RequestMapping("/test-errors")
 public class ErrorHandlingTestController {
