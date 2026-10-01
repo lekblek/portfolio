@@ -1,8 +1,8 @@
 package com.scalke.portfolio.backend.security.application.usecase;
 
 import com.scalke.portfolio.backend.security.domain.model.AdminAccount;
-import com.scalke.portfolio.backend.security.domain.model.LoginAttempts;
 import com.scalke.portfolio.backend.security.domain.port.AdminAccountRepository;
+import com.scalke.portfolio.backend.shared.domain.model.SlidingWindowLimit;
 import com.scalke.portfolio.backend.shared.error.ErrorCode;
 import com.scalke.portfolio.backend.shared.error.TooManyRequestsException;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +38,7 @@ public class AuthenticateAdminUseCase {
 
     private final AuthenticationManager authenticationManager;
     private final AdminAccountRepository adminAccountRepository;
-    private final LoginAttempts loginAttempts;
+    private final SlidingWindowLimit loginAttempts;
     private final Clock clock;
 
     /**
@@ -59,7 +59,7 @@ public class AuthenticateAdminUseCase {
         try {
             authentication = authenticate(login, password);
         } catch (AuthenticationException failure) {
-            loginAttempts.recordFailure(source, now);
+            loginAttempts.record(source, now);
             log.warn("Connexion refusée depuis {} : identifiant ou mot de passe incorrect", source);
             throw failure;
         }

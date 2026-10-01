@@ -1,6 +1,6 @@
 package com.scalke.portfolio.backend.security.infrastructure;
 
-import com.scalke.portfolio.backend.security.domain.model.LoginAttempts;
+import com.scalke.portfolio.backend.shared.domain.model.SlidingWindowLimit;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -59,8 +59,8 @@ public class AdminAuthenticationConfiguration {
      * Limite des connexions manquées (D-CQ) : 5 échecs par adresse en 15 minutes glissantes.
      */
     @Bean
-    LoginAttempts loginAttempts() {
-        return new LoginAttempts(5, Duration.ofMinutes(15));
+    SlidingWindowLimit loginAttempts() {
+        return new SlidingWindowLimit(5, Duration.ofMinutes(15));
     }
 
     /**

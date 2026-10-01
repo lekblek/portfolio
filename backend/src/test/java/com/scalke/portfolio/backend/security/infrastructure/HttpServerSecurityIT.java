@@ -2,7 +2,7 @@ package com.scalke.portfolio.backend.security.infrastructure;
 
 import com.scalke.portfolio.backend.security.application.usecase.AdminCredentials;
 import com.scalke.portfolio.backend.security.application.usecase.InitializeAdminAccountUseCase;
-import com.scalke.portfolio.backend.security.domain.model.LoginAttempts;
+import com.scalke.portfolio.backend.shared.domain.model.SlidingWindowLimit;
 import com.scalke.portfolio.backend.testsupport.ContainersConfiguration;
 import com.scalke.portfolio.backend.testsupport.FixedClockConfiguration;
 import com.scalke.portfolio.backend.testsupport.MailTestConfiguration;
@@ -49,7 +49,7 @@ class HttpServerSecurityIT {
     InitializeAdminAccountUseCase initializeAdminAccountUseCase;
 
     @Autowired
-    LoginAttempts loginAttempts;
+    SlidingWindowLimit loginAttempts;
 
     private final HttpClient client = HttpClient.newHttpClient();
 

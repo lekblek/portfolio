@@ -2,7 +2,7 @@ package com.scalke.portfolio.backend.security.web.controller;
 
 import com.scalke.portfolio.backend.security.application.usecase.AdminCredentials;
 import com.scalke.portfolio.backend.security.application.usecase.InitializeAdminAccountUseCase;
-import com.scalke.portfolio.backend.security.domain.model.LoginAttempts;
+import com.scalke.portfolio.backend.shared.domain.model.SlidingWindowLimit;
 import com.scalke.portfolio.backend.testsupport.AbstractIntegrationTest;
 import jakarta.persistence.EntityManager;
 import jakarta.servlet.http.Cookie;
@@ -61,7 +61,7 @@ class AdminSessionIT extends AbstractIntegrationTest {
     EntityManager entityManager;
 
     @Autowired
-    LoginAttempts loginAttempts;
+    SlidingWindowLimit loginAttempts;
 
     /**
      * Le compteur de tentatives est partagé par tout le contexte : chaque test part d'une adresse sans échec.
