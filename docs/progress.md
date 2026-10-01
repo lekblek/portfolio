@@ -2,24 +2,24 @@
 
 Ce fichier est la **seule** source de vérité sur l'avancement. Il ne répète pas le contenu des autres documents : il pointe vers eux.
 
-Dernière mise à jour : 2026-09-30 (KI-37 corrigé, revue visuelle de F12 faite, F13 et F14 vérifiées)
+Dernière mise à jour : 2026-10-01 (F15 à F18 vérifiées ; tranche arrêtée avant F19)
 
 ---
 
 ## 1. État courant
 
 ```text
-Dernière étape terminée   : F14 — Publications : articles et actualités (à committer) ; F13 et KI-37 (à committer)
-Étape en cours            : aucune
-Prochaine étape prévue    : F15 — Mathématiques (KaTeX) et diagrammes (Mermaid)
-État                      : 39 commits à pousser (F09 à F12 compris) ; KI-37, revue F12, F13 et F14 à committer
+Dernière étape terminée   : F18 — Recherche (à committer) ; F15 à F17 à committer ; KI-37 à F14 commités
+Étape en cours            : aucune (F15 à F18 à committer)
+Prochaine étape prévue    : F19 — Contact (backend puis frontend)
+État                      : 45 commits locaux à pousser (F09 à F14 et KI-37 compris) ; F15 à F18 à committer (10 commits proposés)
 Branche                   : develop
-Vérification              : backend : ./mvnw clean verify → 740 tests verts (340 unitaires, 400 d'intégration), contrat sans /test-errors ni dérive ; frontend : lint, lint:styles, format, 146 tests unitaires, types de l'API sans dérive, build, 59 tests de bout en bout (1 ignoré), production derrière mandataire local ; découpage des commits rejoué dans un clone jetable (chaque commit compile et passe ses tests)
+Vérification              : backend : ./mvnw clean verify → 747 tests verts (346 unitaires, 401 d'intégration), contrat sans dérive ; frontend : lint, lint:styles, format, 177 tests unitaires, types de l'API sans dérive, build (initial 381,36 kB, 104,00 kB transférés), 91 tests de bout en bout (1 ignoré) stables sur 3 exécutions, 81 en production derrière mandataire local (hors pages de développement) stables sur 3 exécutions ; 503 vérifiée sans API ; découpage des commits rejoué dans un clone jetable
 ```
 
 ## 2. Prochaine action
 
-1. F15 (KaTeX, Mermaid) selon `docs/frontend/00-roadmap-frontend.md`. Arrêt volontaire avant F15 (2026-09-30) : l'étape ajoute deux dépendances lourdes (complément de l'ADR 0003) et a besoin d'une publication `dev` avec formules et diagrammes ; or le jeu d'amorçage ne s'applique qu'à une base vide (`PublicationSeeder` : `existsAny()`), donc une publication ajoutée au seed n'atteindrait pas la base de développement existante. Décision à prendre en début d'étape : seed complété et base de développement recréée, seed rendu additif (par slug), ou publication d'exemple saisie par l'administration.
+1. Committer F15 à F18 (commandes de la fin de tranche), pousser, vérifier la CI. Puis F19 (contact : route publique, piège à robots, limitation de débit, primitives `field` et `alert`, Signal Forms) dans une tranche propre ; arrêt avant F20 (inventaire du mouvement à valider par le propriétaire).
 2. Committer KI-37 et les étapes terminées, pousser, vérifier la CI, remplacer les 🟡 par ✅.
 3. Décisions attendues plus tard : contenu de `/admin/settings` (avant F23) ; page de mentions légales avant la mise en production (D-DW).
 4. Étape 36, close (rappel du découpage) :
@@ -133,7 +133,11 @@ Légende : ✅ terminée et poussée · 🟡 terminée et vérifiée, commits à
 | KI-37 | Contrôleur de test hors du contrat OpenAPI : `@TestComponent` (exclu de l'analyse des composants), importé par le seul `GlobalExceptionHandlerTest` ; contrat et types régénérés (170 et 419 lignes retirées) | 🟡 | à committer |
 | F13 | Projets : registre paginé filtré par technologie (URL `?page=`, `?technology=`), détail en planche (fiche, couverture, Markdown, figures), vraies 404 (slug inconnu, page au-delà de la dernière), `CreativeWork`, lien « Projets » (D-ED) ; vérifié : 130 tests unitaires, E2E dév. et production derrière mandataire, HTML serveur sans appel rejoué, axe sans violation de 320 à 1920 px et à 640 / 720 px sur 13 états ; lot initial 371,18 kB bruts / 101,95 kB transférés, pages en lots paresseux (liste 3,09 kB, détail 2,84 kB transférés) | 🟡 | à committer |
 | F14 | Publications : `/articles`, `/news` (registres paginés, filtres catégorie et tag dans l'URL), page d'article en planche (sommaire en marge ou repliable, fiche, notes marginales, code avec « Copier »), redirection 301 vers le bon type, vraies 404, `Article` / `NewsArticle` (D-EE) ; vérifié : 146 tests unitaires, 59 tests de bout en bout (1 ignoré), production derrière mandataire (49), HTML serveur sans appel rejoué, axe sans violation de 320 à 1920 px et à 640 / 720 px ; lot initial 375,41 kB bruts / 102,69 kB transférés, moteur Markdown paresseux 58,76 kB | 🟡 | à committer |
-| F15 → F37 | Frontend : voir `docs/frontend/00-roadmap-frontend.md` (remplace les étapes 37 à 51 et les parties frontend de 52) | ⏳ | — |
+| F15 | Formules (KaTeX au serveur, transmises : aucun JavaScript de KaTeX au premier affichage) et diagrammes (Mermaid 11.17.2 à l'approche, `strict`, titre et description accessibles), feuille de style de KaTeX sur les seules pages concernées, publication de démonstration ajoutée au seed `dev` même dans une base existante (D-EF) ; vérifié : 158 tests unitaires, E2E (8), lots paresseux mesurés sur le build de production ; lot initial 378,36 kB bruts / 103,49 kB transférés | 🟡 | à committer |
+| F16 | Séries : `/series`, `/series/:slug` (table des chapitres, fiche, `CreativeWorkSeries`), bloc de série de l'article (contexte, précédent / suivant avec `rel`), absence de série transmise par le rendu serveur (aucun appel rejoué), grille de registre commune `styles/register.css` (D-EG) ; vérifié : 167 tests unitaires, 75 tests de bout en bout (1 ignoré) stables sur 4 exécutions complètes, axe sans violation de 320 à 1920 px et à 640 / 720 px | 🟡 | à committer |
+| F17 | Accueil : filtre `featured` des projets (backend, tests unitaires et d'intégration, contrat, types), page `/` (énoncé, cartouche, zones projets, articles, séries, actualités ; six requêtes parallèles reprises du cache de transfert), nom du site lié à l'accueil, liens professionnels sur l'accueil (D-EH) | 🟡 | à committer |
+| F18 | Recherche : lien « Recherche » dans la navigation, `/search` (formulaire `GET` natif, rendu serveur des résultats, navigation interne dans le navigateur, résultats mixtes vers la page de leur type, pagination, nombre annoncé, aucun résultat, requête vide sans appel, 201 caractères refusés avant l'API, `noindex`) (D-EI) | 🟡 | à committer |
+| F19 → F37 | Frontend : voir `docs/frontend/00-roadmap-frontend.md` (remplace les étapes 37 à 51 et les parties frontend de 52) | ⏳ | — |
 | 52 | Déploiement : voir `docs/steps/liste_complete_etapes.md` (52.7 à 52.21) | ⏳ | — |
 
 Après le push, remplacer les 🟡 par ✅ et noter les hashes.
@@ -151,7 +155,7 @@ Index : [`decisions/README.md`](decisions/README.md).
 | R-1 … R-8 | Organisation du dépôt et outillage (docs non versionnées, profils Spring, OSIV, CI, TypeScript strict, compose, outillage local hors dépôt, documentation du frontend) | Actives |
 | FA01 … FA12 | Architecture frontend : fonctionnalités, frontières ESLint, `httpResource`, types générés, origine de l'API en SSR, rendu par route, Signal Forms, pas de Material ni de Storybook, Playwright et axe, état dans l'URL, Markdown partagé | Acceptées (2026-09-30) ; FA02, FA04, FA05, FA06, FA10 mises en œuvre (F01 à F04) |
 | D-DM … D-DY | Frontend : montée 22.2 et hôtes SSR en local ; frontières par règle ESLint qui résout les chemins ; intercepteur commun et jeton serveur ; types générés et `overrides` de TypeScript ; banc Playwright ; direction visuelle ; tokens et `lint:styles` ; utilitaires ; primitives d'action ; shell public et identité ; mentions légales reportées ; SEO ; rendu Markdown | Actives (F00 à F11) ; D-DO modifiée en F12 (D-EB) |
-| D-DZ … D-EE | Contrat des réponses dérivé du code (`required`, `@Nullable`) ; `publicEmail` jamais affiché (décision du propriétaire) ; page À propos, cache de transfert et transport serveur ; pied de page sans appel au profil jusqu'à F17 ; projets (filtre par clic, URL, SEO des vues, couvertures 3:2) ; publications (redirection du mauvais type, filtres, page d'article, notes, Copier) | Actives (KI-34, F12, F13, F14) |
+| D-DZ … D-EI | Contrat des réponses dérivé du code (`required`, `@Nullable`) ; `publicEmail` jamais affiché (décision du propriétaire) ; page À propos, cache de transfert et transport serveur ; pied de page sans appel au profil (liens professionnels sur l'accueil et À propos) ; projets (filtre par clic, URL, SEO des vues, couvertures 3:2) ; publications (redirection du mauvais type, filtres, page d'article, notes, Copier) ; formules et diagrammes, seed additif ; séries, absence de série transmise, registre commun ; accueil et filtre `featured` ; recherche | Actives (KI-34, F12 à F18) |
 | ADR 0003 | Rendu du Markdown : `markdown-it`, `highlight.js`, sûreté par construction | Acceptée (2026-09-30, F11) |
 | DS01 … DS08 | Système de design : direction « Planche technique » (F05), tokens Tailwind 4, polices auto-hébergées, stratégie de style, primitives à la demande, mouvement, thème clair, typographie française | Acceptées (2026-09-30) ; DS01 choisie par le propriétaire en F05 |
 | D-O, D-Q | Lecture en 1 + 5 requêtes constantes ; invariants de dates au domaine | Actives (16.3.1) |
@@ -292,7 +296,6 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 
 | Sujet | Reporté à | Raison |
 |---|---|---|
-| Filtre `featured` sur `GET /api/public/projects` | Étape 40 | aucun écran ne l'utilise encore (le filtre `technology` est fait : D-AC) |
 | Liste publique des technologies (`/api/public/technologies`) | Étape 42 | D-AE : les technologies sont exposées par projet |
 | Tri choisi par le client (`sort`) | quand un écran le demande | D-V : ordre fixe, paramètre ignoré |
 | Rejet explicite (400) des paramètres de pagination hors bornes, au lieu de les ramener aux bornes | si un client en a besoin | comportement Spring Data retenu (D-V) |

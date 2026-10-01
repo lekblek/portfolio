@@ -298,6 +298,10 @@ Une primitive n'est créée qu'au premier écran qui en a besoin, et seulement s
 | entrée de projet | composant `app-project-entry` (`shared/content`) | **fait** (F13) | ligne de registre : état et période, titre lié, résumé, technologies, couverture dans un emplacement 3:2 (vignette sur petit écran) ; grille de 12 colonnes dès 60 rem de conteneur ; `<h2>` ou `<h3>` |
 | table des matières | composant `app-table-of-contents` (`shared/markdown`) | **fait** (F14) | `nav` nommé, titres de niveaux 2 et 3 imbriqués (filet à gauche du second niveau) ; sur l'article : collant dans la marge gauche dès 80 rem, repliable (`<details>`) en dessous |
 | bouton Copier des blocs de code | barre du bloc (`codeToolbar`) + `app-code-copy` | **fait** (F14) | langage reconnu à gauche, « Copier » à droite (texte `accent`, 32 px) ; « Copié » deux secondes, annonce `aria-live` ; sans mouvement (F20) |
+| ligne de registre | feuille `styles/register.css` (`register-entry`, `register-meta`, `register-title`, `register-summary`, `register-terms`, `register-cover`) | **fait** (F16) | grille commune des entrées de projet, de publication et de série (troisième usage, §17) |
+| cartouche | `features/home/ui/title-block.ts` | **fait** (F17) | tableau « En bref » de faits réels, trait fort `ink`, cellules en `--text-xs` ; une ligne sans donnée est absente |
+| entrée de série | composant `app-series-entry` (`shared/content`) | **fait** (F16) | nombre de chapitres, titre lié, premier paragraphe de la description, couverture 3:2 |
+| navigation de série | `features/publications/ui/series-navigation.ts` | **fait** (F16) | ligne de contexte sous le résumé ; bloc de fin d'article entre deux traits forts `ink`, précédent et suivant (`rel`) |
 | entrée de publication | composant `app-publication-entry` (`shared/content`) | **fait** (F14) | registre des projets : date et temps de lecture, titre lié, résumé, catégorie puis tags, couverture 3:2 |
 | note marginale | notes du Markdown (`markdown-it-footnote`), rendues après le bloc qui les appelle (`role="note"`) ; styles `prose`, marge avec `prose-margin-notes` | **fait** (F14) | §4.5 : en marge droite dès `xl` (sous la fiche de l'article), dans le flux en dessous ; numéro `accent`, filet gauche `rule`, lien de retour |
 | champ (libellé, aide, erreur) | composant `app-field` + contrôles natifs stylés | F19 | `input`, `textarea`, `select`, case à cocher |
@@ -333,6 +337,14 @@ Chaque page qui affiche des données prévoit, dès sa première version :
 - Les erreurs n'accusent ni ne s'excusent : ce qui s'est passé, puis quoi faire.
 - Pas de texte de remplissage ; aucun élément de texte sans fonction.
 - Les noms techniques (langages, bibliothèques, identifiants) sont protégés de la traduction automatique (`translate="no"`).
+
+### Rédaction du contenu (guide de l'éditeur)
+
+- Formule dans le texte : `$x^2$` (pas d'espace après le `$` ouvrant ni avant le `$` fermant) ; un montant s'écrit `5 $` ou `\$5`.
+- Formule centrée : `$$` seul sur sa ligne, la formule, puis `$$` ; une formule longue défile dans son cadre sur petit écran.
+- Diagramme : bloc ` ```mermaid ` ; toujours `accTitle:` (titre court) et `accDescr:` (phrase qui dit ce que montre le diagramme) : ils sont lus par les technologies d'assistance.
+- Note : appel `[^nom]` dans le texte, définition `[^nom]: texte` n'importe où ; la note se place après le paragraphe (en marge sur grand écran).
+- Code : bloc ` ```langage ` (java, typescript, javascript, python, sql, bash, json, yaml, css, xml) ; le langage s'affiche dans la barre du bloc.
 
 ## 21. Décisions
 

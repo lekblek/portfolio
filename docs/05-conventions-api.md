@@ -843,6 +843,8 @@ Autres exemples possibles :
 
 /api/public/projects?technology=java        (implémenté à l’étape 18)
 
+/api/public/projects?featured=true&size=3   (implémenté en F17, accueil)
+
 /api/public/search?q=postgresql
 ```
 
@@ -1407,11 +1409,13 @@ Règles propres à ce contrat :
 * `avatar` : image publique, même forme que les images des projets (D-BW) ; `cv` : document PDF, `url` vers `GET /api/public/media/{storageKey}` et taille en octets (D-BX) ; `null` s’ils sont absents ;
 * contrat vérifié par `PublicProfileIT` sur la sérialisation réelle.
 
-### `GET /api/public/projects` (étapes 17 et 18)
+### `GET /api/public/projects` (étapes 17 et 18, F17)
 
 ```text
 ?page=0&size=10          page 0-based ; size par défaut 10, plafonnée à 100 ; sort ignoré (ordre fixe)
 ?technology=<slug>       facultatif ; seuls les projets utilisant cette technologie ; slug inconnu → page vide
+?featured=true|false     facultatif ; true : projets mis en avant seulement, false : les autres ; combinable
+                         avec technology ; valeur non booléenne → 400 MALFORMED_REQUEST (D-EH)
 200 → PageResponse<ProjectSummaryResponse>
 {
   content[] { title, slug, shortDescription, stage, startDate, endDate | null, featured,
