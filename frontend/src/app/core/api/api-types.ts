@@ -15,3 +15,11 @@ export type SkillGroup = Schemas['SkillGroupResponse'];
 export type ProfessionalLink = Schemas['ProfessionalLinkResponse'];
 export type PublicImage = Schemas['PublicImage'];
 export type PublicDocument = Schemas['PublicDocument'];
+
+export type ProjectSummary = Schemas['ProjectSummaryResponse'];
+export type Project = Schemas['ProjectResponse'];
+export type ProjectStage = Project['stage'];
+
+export type PublicationSummary = Schemas['PublicationSummaryResponse'];
+export type Publication = Schemas['PublicationResponse'];
+export type PublicationType = Publication['type'];

@@ -34,3 +34,35 @@ export function formatPeriod(start: string, end: string | null): string {
   const to = formatMonth(end);
   return from === to ? from : `${from}${NBSP}– ${to}`;
 }
+
+/**
+ * Fuseau de référence des dates de publication (instants du contrat) : le jour affiché ne dépend
+ * ni du lecteur ni du serveur de rendu, et reste identique à l'hydratation.
+ */
+const SITE_TIME_ZONE = 'Europe/Paris';
+
+const DAY = new Intl.DateTimeFormat('fr-FR', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+  timeZone: SITE_TIME_ZONE,
+});
+
+const ISO_DAY = new Intl.DateTimeFormat('en-CA', {
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+  timeZone: SITE_TIME_ZONE,
+});
+
+/** « 17 septembre 2026 », « 1er octobre 2026 » (ordinal du premier jour, usage français). */
+export function formatDay(instant: string): string {
+  return DAY.formatToParts(new Date(instant))
+    .map((part) => (part.type === 'day' && part.value === '1' ? '1er' : part.value))
+    .join('');
+}
+
+/** Valeur `datetime` d'un `<time>` au jour près, dans le fuseau de référence : « 2026-09-17 ». */
+export function isoDay(instant: string): string {
+  return ISO_DAY.format(new Date(instant));
+}

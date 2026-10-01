@@ -1,4 +1,4 @@
-import { formatMonth, formatPeriod } from './date';
+import { formatDay, formatMonth, formatPeriod, isoDay } from './date';
 
 describe('formatMonth', () => {
   it('writes the month and the year in french', () => {
@@ -23,5 +23,14 @@ describe('formatPeriod', () => {
 
   it('writes a single month when the period starts and ends in it', () => {
     expect(formatPeriod('2024-03-01', '2024-03-28')).toBe('mars 2024');
+  });
+});
+
+describe('formatDay', () => {
+  it('writes the day of the instant in the reference time zone', () => {
+    expect(formatDay('2026-09-17T19:30:00Z')).toBe('17 septembre 2026');
+    // 23 h 30 UTC le 30 septembre : déjà le 1er octobre à Paris
+    expect(formatDay('2026-09-30T23:30:00Z')).toBe('1er octobre 2026');
+    expect(isoDay('2026-09-30T23:30:00Z')).toBe('2026-10-01');
   });
 });
