@@ -1588,6 +1588,23 @@ Règles propres à ce contrat :
 * ni identifiant ni pertinence exposés (D-CE) ;
 * contrat vérifié par `PublicSearchControllerTest` et `PublicSearchIT`.
 
+### `POST /api/public/contact-messages` (F19)
+
+```text
+{ name, email, subject, message, website? }
+202 → sans corps (message reçu ; même réponse quand le piège website est rempli, rien n'est enregistré)
+400 → VALIDATION_FAILED, errors[] { field, message } : name (100), email (254, forme local@domaine.tld),
+      subject (200), message (5 000) obligatoires et non blancs ; website 200 au plus
+429 → TOO_MANY_CONTACT_MESSAGES + Retry-After (5 messages par heure glissante depuis la même adresse)
+```
+
+Règles propres à ce contrat (D-EJ) :
+
+* exception à la convention de création (§8) : 202 sans `Location`, aucune ressource publique ni identifiant à exposer ;
+* route anonyme sans jeton CSRF, protégée par le piège à robots et la limitation de débit ; l'adresse du client n'est jamais enregistrée ;
+* l'administrateur est prévenu après l'enregistrement (D-CJ) ; un échec SMTP n'annule pas le message ;
+* contrat vérifié par `PublicContactMessageControllerTest` et `PublicContactMessageIT`.
+
 En-têtes de sécurité de toute réponse (D-CR) : `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Content-Security-Policy: frame-ancestors 'none'`, `Referrer-Policy: no-referrer`, `Cache-Control: no-store` sauf quand la réponse fixe son propre cache (médias) ; HSTS sur HTTPS.
 
 Chaque module introduit ses routes lors de son étape d’implémentation.
@@ -2065,6 +2082,7 @@ Elles sont simplement inutiles pour le périmètre actuel.
 | `AUTHENTICATION_REQUIRED`        |  401 | Authentification absente ou invalide (D-CL)   |
 | `INVALID_CREDENTIALS`            |  401 | Connexion refusée, cause jamais précisée (D-CO) |
 | `TOO_MANY_LOGIN_ATTEMPTS`        |  429 | Trop d’échecs de connexion, `Retry-After` (D-CQ) |
+| `TOO_MANY_CONTACT_MESSAGES`      |  429 | Trop de messages de contact, `Retry-After` (D-EJ) |
 | `ACCESS_DENIED`                  |  403 | Accès refusé, dont CSRF (D-CL)                |
 | `VALIDATION_FAILED`              |  400 | Échec de validation des champs                |
 | `MALFORMED_REQUEST`              |  400 | Requête HTTP ou JSON invalide                 |

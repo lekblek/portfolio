@@ -304,8 +304,8 @@ Une primitive n'est créée qu'au premier écran qui en a besoin, et seulement s
 | navigation de série | `features/publications/ui/series-navigation.ts` | **fait** (F16) | ligne de contexte sous le résumé ; bloc de fin d'article entre deux traits forts `ink`, précédent et suivant (`rel`) |
 | entrée de publication | composant `app-publication-entry` (`shared/content`) | **fait** (F14) | registre des projets : date et temps de lecture, titre lié, résumé, catégorie puis tags, couverture 3:2 |
 | note marginale | notes du Markdown (`markdown-it-footnote`), rendues après le bloc qui les appelle (`role="note"`) ; styles `prose`, marge avec `prose-margin-notes` | **fait** (F14) | §4.5 : en marge droite dès `xl` (sous la fiche de l'article), dans le flux en dessous ; numéro `accent`, filet gauche `rule`, lien de retour |
-| champ (libellé, aide, erreur) | composant `app-field` + contrôles natifs stylés | F19 | `input`, `textarea`, `select`, case à cocher |
-| message en ligne / région d'annonce | composant `app-alert` | F19 | `role="status"` ou `role="alert"` selon l'urgence |
+| champ (libellé, aide, erreur) | composant `app-field` + directive `appFieldControl`, feuille `styles/controls.css` | **fait** (F19) | libellé visible, aide puis erreur liées par `aria-describedby` (l'erreur d'abord), `aria-invalid` ; contrôles natifs à texte de 16 px, cible de 44 px, bordure `ink`, `danger` si invalide ; case à cocher : au premier usage |
+| message en ligne / région d'annonce | composant `app-alert` | **fait** (F19) | succès (`success`, icône, reçoit le focus) ou échec (`danger`, `role="alert"`) ; filet gauche de la couleur du ton, fond `paper-sunken` |
 | dialogue de confirmation | `<dialog>` natif enveloppé | F24 | actions destructrices de l'administration |
 | notification (toast) | service + région `aria-live="polite"` | F24 | administration seulement |
 | pastille de statut | composant `app-status` | F27 | brouillon, programmé, publié, archivé : texte + couleur |
