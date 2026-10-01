@@ -47,7 +47,7 @@ const DESCRIPTION =
           <div class="mt-2 flex flex-wrap gap-3">
             <input
               id="search-q"
-              class="search-field"
+              class="field-control search-field"
               name="q"
               type="search"
               autocomplete="off"
@@ -123,19 +123,11 @@ const DESCRIPTION =
     }
   `,
   styles: `
+    /* Apparence commune des contrôles (styles/controls.css) ; ici, la place à côté du bouton */
     .search-field {
       flex: 1 1 16rem;
+      width: auto;
       min-width: 0;
-      min-height: calc(var(--spacing) * 11);
-      padding: calc(var(--spacing) * 2) calc(var(--spacing) * 3);
-      border: var(--border-strong) solid var(--color-ink);
-      border-radius: var(--radius-control);
-      background: var(--color-paper);
-      color: var(--color-ink);
-    }
-
-    .search-field[aria-invalid='true'] {
-      border-color: var(--color-danger);
     }
   `,
 })

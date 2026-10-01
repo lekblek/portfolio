@@ -1,0 +1,27 @@
+/*
+ * Contrôles natifs des formulaires (02-design-system §18) : champ de texte, zone de texte, liste.
+ * Texte de 16 px au moins (pas de zoom automatique du clavier mobile), cible de 44 px, bordure
+ * `ink` (un contrôle ne se délimite jamais par un simple filet), état invalide en `danger`.
+ */
+.field-control {
+  display: block;
+  width: 100%;
+  min-height: calc(var(--spacing) * 11);
+  padding: calc(var(--spacing) * 2) calc(var(--spacing) * 3);
+  border: var(--border-strong) solid var(--color-ink);
+  border-radius: var(--radius-control);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font: inherit;
+  font-size: var(--text-base);
+  line-height: var(--leading-ui);
+}
+
+textarea.field-control {
+  min-height: calc(var(--spacing) * 40);
+  resize: vertical;
+}
+
+.field-control[aria-invalid='true'] {
+  border-color: var(--color-danger);
+}

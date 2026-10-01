@@ -300,6 +300,43 @@ ProblemDetail handleResourceNotFound(ResourceNotFoundException ex) &#123;
     </div>
   </section>
 
+  <section class="border-b border-rule py-block" aria-labelledby="ui-formulaires">
+    <h2 id="ui-formulaires" class="text-2xl tracking-heading">Formulaires</h2>
+    <div class="mt-block grid gap-block lg:grid-cols-2 lg:gap-8">
+      <div class="grid content-start gap-6">
+        <h3 class="text-sm text-ink-muted"><code translate="no">app-field</code></h3>
+        <app-field label="Nom" controlId="ui-champ-nom">
+          <input appFieldControl type="text" autocomplete="off" />
+        </app-field>
+        <app-field
+          label="Adresse électronique"
+          controlId="ui-champ-adresse"
+          hint="Pour vous répondre, par exemple nom@domaine.fr."
+          error="Indiquez une adresse complète, par exemple nom@domaine.fr."
+        >
+          <input appFieldControl type="email" value="camille" autocomplete="off" />
+        </app-field>
+        <app-field
+          label="Message"
+          controlId="ui-champ-message"
+          hint="5 000 caractères au plus."
+          optional
+        >
+          <textarea appFieldControl rows="4"></textarea>
+        </app-field>
+      </div>
+      <div class="grid content-start gap-6">
+        <h3 class="text-sm text-ink-muted"><code translate="no">app-alert</code></h3>
+        <app-alert tone="success" title="Message envoyé">
+          <p>Merci, votre message est bien arrivé.</p>
+        </app-alert>
+        <app-alert tone="danger" title="Trop de messages envoyés">
+          <p>Votre texte est conservé&#8239;: réessayez dans 42 minutes.</p>
+        </app-alert>
+      </div>
+    </div>
+  </section>
+
   <section class="border-b border-rule py-block" aria-labelledby="ui-focus">
     <h2 id="ui-focus" class="text-2xl tracking-heading">Focus</h2>
     <p class="mt-3 max-w-prose">

@@ -1,8 +1,10 @@
 import { afterNextRender, Component, computed, DOCUMENT, inject, signal } from '@angular/core';
 
+import { Alert } from '../shared/ui/alert';
 import { Button, ButtonVariant } from '../shared/ui/button';
 import { EmptyState } from '../shared/ui/empty-state';
 import { ErrorState } from '../shared/ui/error-state';
+import { Field, FieldControl } from '../shared/ui/field';
 import { Icon } from '../shared/ui/icon';
 import { contrastRatio, textLevel } from './contrast';
 
@@ -143,7 +145,7 @@ const MOTION = [
  */
 @Component({
   selector: 'app-ui-catalogue',
-  imports: [Button, EmptyState, ErrorState, Icon],
+  imports: [Alert, Button, EmptyState, ErrorState, Field, FieldControl, Icon],
   templateUrl: './ui-catalogue.html',
   styleUrl: './ui-catalogue.css',
 })
