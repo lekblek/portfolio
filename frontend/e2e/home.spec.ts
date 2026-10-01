@@ -41,6 +41,8 @@ test.describe('home', () => {
 
     await expect(page).toHaveURL('/');
     await expect(home).toHaveAttribute('aria-current', 'page');
+    // Toutes les zones chargées : partir plus tôt annulerait les requêtes encore en cours
+    await expect(page.getByRole('link', { name: /^Tous les projets/ })).toBeVisible();
     await page.getByRole('link', { name: /^Tous les articles/ }).click();
     await expect(page).toHaveURL('/articles');
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Articles');

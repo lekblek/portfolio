@@ -1,5 +1,5 @@
 import AxeBuilder from '@axe-core/playwright';
-import { test as base, expect, Page } from '@playwright/test';
+import { test as base, expect, Page, Request } from '@playwright/test';
 
 /** Critères vérifiés par axe : WCAG 2.0, 2.1 et 2.2, niveaux A et AA (D17). */
 const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
@@ -36,10 +36,17 @@ export const test = base.extend<{ guard: PageGuard }>({
         problems.push(`console ${message.type()} : ${message.text()} (${resource})`);
       });
       page.on('pageerror', (error) => problems.push(`exception : ${error.message}`));
-      page.on('requestfailed', (request) =>
-        problems.push(`requête en échec : ${request.url()} (${request.failure()?.errorText})`),
-      );
+      // Requêtes dont la réponse est arrivée : le navigateur signale parfois leur fin comme une
+      // annulation (`net::ERR_ABORTED`) juste après ; la réponse est contrôlée ci-dessous.
+      const answered = new WeakSet<Request>();
+      page.on('requestfailed', (request) => {
+        if (request.failure()?.errorText === 'net::ERR_ABORTED' && answered.has(request)) {
+          return;
+        }
+        problems.push(`requête en échec : ${request.url()} (${request.failure()?.errorText})`);
+      });
       page.on('response', (response) => {
+        answered.add(response.request());
         if (response.status() >= 400 && !isAllowed(response.url())) {
           problems.push(`HTTP ${response.status()} : ${response.url()}`);
         }
