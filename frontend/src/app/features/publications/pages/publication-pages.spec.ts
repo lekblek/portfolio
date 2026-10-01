@@ -62,6 +62,13 @@ async function setUp(url: string) {
   return { harness, http, element, settle };
 }
 
+/** Place dans une série demandée par la page d'article : réponse 404 de l'API (article hors série). */
+function outsideAnySeries(http: HttpTestingController, slug: string): void {
+  http
+    .expectOne(`/api/public/publications/${slug}/series`)
+    .flush({ status: 404 }, { status: 404, statusText: 'Introuvable' });
+}
+
 function page(content: PublicationSummary[], totalElements = content.length) {
   return {
     content,
@@ -130,6 +137,7 @@ describe('PublicationDetail', () => {
   it('renders the article with its sheet, table of contents, notes and copy buttons', async () => {
     const { http, element, settle } = await setUp('/articles/detecter');
     http.expectOne('/api/public/publications/detecter').flush(ARTICLE);
+    outsideAnySeries(http, 'detecter');
     await settle();
 
     expect(element().querySelector('h1')?.textContent).toBe('Détecter des changements');
@@ -159,6 +167,7 @@ describe('PublicationDetail', () => {
     http
       .expectOne('/api/public/publications/detecter')
       .flush({ ...ARTICLE, contentMarkdown: '## Seul titre\n\nTexte.' });
+    outsideAnySeries(http, 'detecter');
     await settle();
 
     expect(element().querySelector('app-table-of-contents, details')).toBeNull();
@@ -167,6 +176,7 @@ describe('PublicationDetail', () => {
   it('sends a news item opened as an article to its own address', async () => {
     const { http, harness } = await setUp('/articles/detecter');
     http.expectOne('/api/public/publications/detecter').flush({ ...ARTICLE, type: 'NEWS' });
+    outsideAnySeries(http, 'detecter');
     await harness.fixture.whenStable();
 
     expect(TestBed.inject(Router).url).toBe('/news/detecter');
@@ -177,6 +187,7 @@ describe('PublicationDetail', () => {
     http
       .expectOne('/api/public/publications/inconnu')
       .flush({ status: 404 }, { status: 404, statusText: 'Introuvable' });
+    outsideAnySeries(http, 'inconnu');
     await settle();
 
     expect(element().querySelector('h1')?.textContent).toBe('Article introuvable');

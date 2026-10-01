@@ -14,12 +14,15 @@ import {
 } from '../../../shared/content/publication-entry';
 import { formatDay, isoDay } from '../../../shared/format/date';
 import { CodeCopy } from '../../../shared/markdown/code-copy';
+import { MarkdownMath } from '../../../shared/markdown/markdown-math';
 import { renderMarkdown } from '../../../shared/markdown/markdown-renderer';
 import { MarkdownView } from '../../../shared/markdown/markdown-view';
 import { TableOfContents } from '../../../shared/markdown/table-of-contents';
 import { ErrorState } from '../../../shared/ui/error-state';
 import { TermLinks } from '../../../shared/ui/term-link';
 import { publicationResource } from '../data/publications.resources';
+import { seriesNavigationResource } from '../data/series-navigation.resource';
+import { SeriesNavigation } from '../ui/series-navigation';
 import { PUBLICATION_LABELS } from './publication-labels';
 import { publicationJsonLd } from './publication-json-ld';
 
@@ -40,6 +43,7 @@ import { publicationJsonLd } from './publication-json-ld';
     NgOptimizedImage,
     NgTemplateOutlet,
     RouterLink,
+    SeriesNavigation,
     TableOfContents,
     TermLinks,
   ],
@@ -99,6 +103,13 @@ import { publicationJsonLd } from './publication-json-ld';
           </p>
           <h1 class="mt-3 text-3xl leading-tight tracking-title">{{ current.title }}</h1>
           <p class="mt-flow max-w-prose font-text text-xl leading-snug">{{ current.summary }}</p>
+          @if (seriesNavigation.hasValue()) {
+            <app-series-navigation
+              class="mt-flow block"
+              variant="context"
+              [navigation]="seriesNavigation.value()"
+            />
+          }
         </header>
 
         <div class="article-sheet-inline">
@@ -137,6 +148,12 @@ import { publicationJsonLd } from './publication-json-ld';
           <app-code-copy>
             <app-markdown-view class="prose-margin-notes" [rendered]="rendered()" />
           </app-code-copy>
+          @if (seriesNavigation.hasValue()) {
+            <app-series-navigation
+              class="mt-section block"
+              [navigation]="seriesNavigation.value()"
+            />
+          }
         </div>
       </article>
     } @else if (error(); as failure) {
@@ -304,6 +321,10 @@ export class PublicationDetail {
   readonly slug = input.required<string>();
 
   protected readonly publication = publicationResource(() => this.slug());
+  /** Place dans la série, pour un article seulement (une actualité n'entre dans aucune série). */
+  protected readonly seriesNavigation = seriesNavigationResource(() =>
+    this.type() === 'ARTICLE' ? this.slug() : null,
+  );
   protected readonly labels = computed(() => PUBLICATION_LABELS[this.type()]);
   protected readonly listPath = computed(() => publicationListPath(this.type()));
   protected readonly canonicalPath = computed(() => publicationPath(this.type(), this.slug()));
@@ -311,11 +332,14 @@ export class PublicationDetail {
     this.publication.error() ? toApiError(this.publication.error()) : null,
   );
 
+  private readonly math = inject(MarkdownMath);
+
   /** Un seul rendu du Markdown, pour le texte et pour le sommaire. */
   protected readonly rendered = computed(() =>
     renderMarkdown(this.publication.hasValue() ? this.publication.value().contentMarkdown : '', {
       path: this.canonicalPath(),
       codeToolbar: true,
+      math: this.math.renderer(),
     }),
   );
   /** Sommaire seulement pour au moins deux titres de premier niveau. */
