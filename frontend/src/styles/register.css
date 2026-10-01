@@ -1,0 +1,109 @@
+/*
+ * Ligne de registre (02-design-system §4.3, §18) : entrées de projet, de publication et de série.
+ * Petit écran : méta, titre (vignette 3:2 à côté s'il y a une couverture), résumé, termes.
+ * Dès que la liste (conteneur de requête, classe `@container`) dispose de 60 rem : grille de
+ * 12 colonnes alignée sur celle des pages, méta sur 3 colonnes, texte sur 6, couverture sur 3.
+ */
+.register-entry {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: 'meta' 'title' 'summary' 'terms';
+  column-gap: calc(var(--spacing) * 4);
+  row-gap: calc(var(--spacing) * 2);
+}
+
+.register-with-cover {
+  grid-template-columns: minmax(0, 1fr) calc(var(--spacing) * 24);
+  grid-template-areas: 'meta cover' 'title cover' 'summary summary' 'terms terms';
+}
+
+.register-title {
+  grid-area: title;
+  font-size: var(--text-xl);
+  letter-spacing: var(--tracking-heading);
+}
+
+/* Titre lié : la ligne entière est un registre de liens, le soulignement vient au survol */
+.register-title a {
+  color: var(--color-ink);
+  text-decoration-line: none;
+}
+
+.register-title a:hover,
+.register-title a:focus-visible {
+  color: var(--color-accent-strong);
+  text-decoration-line: underline;
+}
+
+.register-meta {
+  grid-area: meta;
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: calc(var(--spacing) * 2);
+  font-size: var(--text-sm);
+}
+
+.register-summary {
+  grid-area: summary;
+}
+
+.register-terms {
+  grid-area: terms;
+  margin-block-start: calc(var(--spacing) * 1);
+}
+
+.register-cover {
+  grid-area: cover;
+  align-self: start;
+  position: relative;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  border: var(--border-rule) solid var(--color-rule);
+  border-radius: var(--radius-media);
+  background: var(--color-paper-sunken);
+}
+
+.register-cover img {
+  object-fit: cover;
+}
+
+@container (min-width: 60rem) {
+  .register-entry {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    /* La hauteur de la couverture s'ajoute à la dernière ligne, pas entre titre et résumé */
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas: none;
+    column-gap: calc(var(--spacing) * 8);
+    align-items: start;
+  }
+
+  .register-meta {
+    grid-column: 1 / span 3;
+    grid-row: 1 / span 3;
+    flex-direction: column;
+    padding-block-start: calc(var(--spacing) * 1);
+  }
+
+  .register-title,
+  .register-summary,
+  .register-terms {
+    grid-column: 4 / span 6;
+  }
+
+  .register-title {
+    grid-row: 1;
+  }
+
+  .register-summary {
+    grid-row: 2;
+  }
+
+  .register-terms {
+    grid-row: 3;
+  }
+
+  .register-cover {
+    grid-column: 10 / span 3;
+    grid-row: 1 / span 3;
+  }
+}

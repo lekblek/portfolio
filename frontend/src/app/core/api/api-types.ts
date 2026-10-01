@@ -23,3 +23,11 @@ export type ProjectStage = Project['stage'];
 export type PublicationSummary = Schemas['PublicationSummaryResponse'];
 export type Publication = Schemas['PublicationResponse'];
 export type PublicationType = Publication['type'];
+
+export type SeriesSummary = Schemas['SeriesSummaryResponse'];
+export type Series = Schemas['SeriesResponse'];
+export type SeriesChapter = Schemas['SeriesChapterResponse'];
+export type SeriesNavigation = Schemas['SeriesNavigationResponse'];
+
+export type SearchResult = Schemas['SearchResultResponse'];
+export type SearchResultType = SearchResult['type'];

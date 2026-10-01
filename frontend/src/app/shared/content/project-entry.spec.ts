@@ -51,7 +51,7 @@ describe('ProjectEntry', () => {
     expect(title?.getAttribute('href')).toBe('/projects/detection-de-changements');
     expect(
       element
-        .querySelector('.entry-meta')
+        .querySelector('.register-meta')
         ?.textContent?.replace(/[ \n]+/g, ' ')
         .trim(),
     ).toBe('Terminé, février 2023\u00a0– novembre 2023');
@@ -80,10 +80,10 @@ describe('ProjectEntry', () => {
     );
 
     expect(element.querySelector('h3 a')).not.toBeNull();
-    expect(element.querySelector('img, app-term-links, .entry-cover')).toBeNull();
+    expect(element.querySelector('img, app-term-links, .register-cover')).toBeNull();
     expect(
       element
-        .querySelector('.entry-meta')
+        .querySelector('.register-meta')
         ?.textContent?.replace(/[ \n]+/g, ' ')
         .trim(),
     ).toBe('En cours, depuis février 2023');

@@ -31,26 +31,26 @@ export function projectStageLabel(stage: ProjectStage): string {
   selector: 'app-project-entry',
   imports: [NgOptimizedImage, RouterLink, TermLinks],
   template: `
-    <article class="entry" [class.entry-with-cover]="project().cover">
+    <article class="register-entry" [class.register-with-cover]="project().cover">
       @if (headingLevel() === 2) {
-        <h2 class="entry-title">
+        <h2 class="register-title">
           <a [routerLink]="link()">{{ project().title }}</a>
         </h2>
       } @else {
-        <h3 class="entry-title">
+        <h3 class="register-title">
           <a [routerLink]="link()">{{ project().title }}</a>
         </h3>
       }
-      <p class="entry-meta">
+      <p class="register-meta">
         <span class="font-medium">{{ stage() }}<span class="sr-only">, </span></span>
         <span class="text-ink-muted tabular-nums">{{ period() }}</span>
       </p>
-      <p class="entry-summary max-w-prose font-text leading-prose">
+      <p class="register-summary max-w-prose font-text leading-prose">
         {{ project().shortDescription }}
       </p>
       @if (project().technologies.length > 0) {
         <app-term-links
-          class="entry-terms"
+          class="register-terms"
           [terms]="project().technologies"
           [label]="'Technologies de ' + project().title"
           path="/projects"
@@ -59,117 +59,11 @@ export function projectStageLabel(stage: ProjectStage): string {
         />
       }
       @if (project().cover; as cover) {
-        <div class="entry-cover">
+        <div class="register-cover">
           <img [ngSrc]="cover.url" fill [alt]="cover.altText ?? ''" [priority]="coverPriority()" />
         </div>
       }
     </article>
-  `,
-  styles: `
-    .entry {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr);
-      grid-template-areas: 'meta' 'title' 'summary' 'terms';
-      column-gap: calc(var(--spacing) * 4);
-      row-gap: calc(var(--spacing) * 2);
-    }
-
-    .entry-with-cover {
-      grid-template-columns: minmax(0, 1fr) calc(var(--spacing) * 24);
-      grid-template-areas: 'meta cover' 'title cover' 'summary summary' 'terms terms';
-    }
-
-    .entry-title {
-      grid-area: title;
-      font-size: var(--text-xl);
-      letter-spacing: var(--tracking-heading);
-    }
-
-    /* Titre lié : la ligne entière est un registre de liens, le soulignement vient au survol */
-    .entry-title a {
-      color: var(--color-ink);
-      text-decoration-line: none;
-    }
-
-    .entry-title a:hover,
-    .entry-title a:focus-visible {
-      color: var(--color-accent-strong);
-      text-decoration-line: underline;
-    }
-
-    .entry-meta {
-      grid-area: meta;
-      display: flex;
-      flex-wrap: wrap;
-      column-gap: calc(var(--spacing) * 2);
-      font-size: var(--text-sm);
-    }
-
-    .entry-summary {
-      grid-area: summary;
-    }
-
-    .entry-terms {
-      grid-area: terms;
-      margin-block-start: calc(var(--spacing) * 1);
-    }
-
-    .entry-cover {
-      grid-area: cover;
-      align-self: start;
-      position: relative;
-      aspect-ratio: 3 / 2;
-      overflow: hidden;
-      border: var(--border-rule) solid var(--color-rule);
-      border-radius: var(--radius-media);
-      background: var(--color-paper-sunken);
-    }
-
-    .entry-cover img {
-      object-fit: cover;
-    }
-
-    @container (min-width: 60rem) {
-      .entry,
-      .entry-with-cover {
-        grid-template-columns: repeat(12, minmax(0, 1fr));
-        /* La hauteur de la couverture s'ajoute à la dernière ligne, pas entre titre et résumé */
-        grid-template-rows: auto auto 1fr;
-        grid-template-areas: none;
-        column-gap: calc(var(--spacing) * 8);
-        align-items: start;
-      }
-
-      .entry-meta {
-        grid-column: 1 / span 3;
-        grid-row: 1 / span 3;
-        flex-direction: column;
-        padding-block-start: calc(var(--spacing) * 1);
-      }
-
-      .entry-title,
-      .entry-summary,
-      .entry-terms {
-        grid-column: 4 / span 6;
-      }
-
-      .entry-title {
-        grid-row: 1;
-      }
-
-      .entry-summary {
-        grid-row: 2;
-      }
-
-      .entry-terms {
-        grid-row: 3;
-      }
-
-      .entry-cover {
-        grid-column: 10 / span 3;
-        grid-row: 1 / span 3;
-      }
-    }
   `,
 })
 export class ProjectEntry {

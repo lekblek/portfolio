@@ -36,24 +36,26 @@ export function readingTimeLabel(minutes: number): string {
   selector: 'app-publication-entry',
   imports: [NgOptimizedImage, RouterLink, TermLinks],
   template: `
-    <article class="entry" [class.entry-with-cover]="publication().cover">
+    <article class="register-entry" [class.register-with-cover]="publication().cover">
       @if (headingLevel() === 2) {
-        <h2 class="entry-title">
+        <h2 class="register-title">
           <a [routerLink]="link()">{{ publication().title }}</a>
         </h2>
       } @else {
-        <h3 class="entry-title">
+        <h3 class="register-title">
           <a [routerLink]="link()">{{ publication().title }}</a>
         </h3>
       }
-      <p class="entry-meta">
+      <p class="register-meta">
         <time class="font-medium tabular-nums" [attr.datetime]="datetime()">{{ date() }}</time
         ><span class="sr-only">, </span>
         <span class="text-ink-muted">{{ readingTime() }}</span>
       </p>
-      <p class="entry-summary max-w-prose font-text leading-prose">{{ publication().summary }}</p>
+      <p class="register-summary max-w-prose font-text leading-prose">
+        {{ publication().summary }}
+      </p>
       @if (publication().category || publication().tags.length > 0) {
-        <div class="entry-terms">
+        <div class="register-terms">
           @if (publication().category; as category) {
             <a
               class="entry-category"
@@ -75,62 +77,18 @@ export function readingTimeLabel(minutes: number): string {
         </div>
       }
       @if (publication().cover; as cover) {
-        <div class="entry-cover">
+        <div class="register-cover">
           <img [ngSrc]="cover.url" fill [alt]="cover.altText ?? ''" [priority]="coverPriority()" />
         </div>
       }
     </article>
   `,
   styles: `
-    .entry {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr);
-      grid-template-areas: 'meta' 'title' 'summary' 'terms';
-      column-gap: calc(var(--spacing) * 4);
-      row-gap: calc(var(--spacing) * 2);
-    }
-
-    .entry-with-cover {
-      grid-template-columns: minmax(0, 1fr) calc(var(--spacing) * 24);
-      grid-template-areas: 'meta cover' 'title cover' 'summary summary' 'terms terms';
-    }
-
-    .entry-title {
-      grid-area: title;
-      font-size: var(--text-xl);
-      letter-spacing: var(--tracking-heading);
-    }
-
-    .entry-title a {
-      color: var(--color-ink);
-      text-decoration-line: none;
-    }
-
-    .entry-title a:hover,
-    .entry-title a:focus-visible {
-      color: var(--color-accent-strong);
-      text-decoration-line: underline;
-    }
-
-    .entry-meta {
-      grid-area: meta;
-      display: flex;
-      flex-wrap: wrap;
-      column-gap: calc(var(--spacing) * 2);
-      font-size: var(--text-sm);
-    }
-
-    .entry-summary {
-      grid-area: summary;
-    }
-
-    .entry-terms {
-      grid-area: terms;
+    .register-terms {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
       column-gap: calc(var(--spacing) * 4);
-      margin-block-start: calc(var(--spacing) * 1);
     }
 
     .entry-category {
@@ -144,62 +102,6 @@ export function readingTimeLabel(minutes: number): string {
     .entry-category[aria-current] {
       color: var(--color-ink);
       font-weight: var(--font-weight-semibold);
-    }
-
-    .entry-cover {
-      grid-area: cover;
-      align-self: start;
-      position: relative;
-      aspect-ratio: 3 / 2;
-      overflow: hidden;
-      border: var(--border-rule) solid var(--color-rule);
-      border-radius: var(--radius-media);
-      background: var(--color-paper-sunken);
-    }
-
-    .entry-cover img {
-      object-fit: cover;
-    }
-
-    @container (min-width: 60rem) {
-      .entry,
-      .entry-with-cover {
-        grid-template-columns: repeat(12, minmax(0, 1fr));
-        grid-template-rows: auto auto 1fr;
-        grid-template-areas: none;
-        column-gap: calc(var(--spacing) * 8);
-        align-items: start;
-      }
-
-      .entry-meta {
-        grid-column: 1 / span 3;
-        grid-row: 1 / span 3;
-        flex-direction: column;
-        padding-block-start: calc(var(--spacing) * 1);
-      }
-
-      .entry-title,
-      .entry-summary,
-      .entry-terms {
-        grid-column: 4 / span 6;
-      }
-
-      .entry-title {
-        grid-row: 1;
-      }
-
-      .entry-summary {
-        grid-row: 2;
-      }
-
-      .entry-terms {
-        grid-row: 3;
-      }
-
-      .entry-cover {
-        grid-column: 10 / span 3;
-        grid-row: 1 / span 3;
-      }
     }
   `,
 })
