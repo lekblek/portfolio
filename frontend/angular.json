@@ -24,9 +24,26 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "katex.min.css",
+                "input": "node_modules/katex/dist",
+                "output": "katex"
+              },
+              {
+                "glob": "*.woff2",
+                "input": "node_modules/katex/dist/fonts",
+                "output": "katex/fonts"
               }
             ],
             "styles": ["src/styles.css"],
+            "allowedCommonJsDependencies": [
+              "@braintree/sanitize-url",
+              "cytoscape-cose-bilkent",
+              "cytoscape-fcose",
+              "dayjs",
+              "fastdom"
+            ],
             "server": "src/main.server.ts",
             "outputMode": "server",
             "security": {

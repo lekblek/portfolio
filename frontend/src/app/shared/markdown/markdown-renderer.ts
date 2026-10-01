@@ -49,18 +49,33 @@ export interface RenderOptions {
    * dans un conteneur `app-code-copy`.
    */
   codeToolbar?: boolean;
+  /**
+   * Rendu des formules (`$…$`, `$$…$$`) en HTML sûr : KaTeX au serveur, ou formules transmises
+   * par le rendu serveur (`MarkdownMath`). Absent : la formule reste affichée comme source.
+   */
+  math?: MathRenderer;
 }
+
+/** Formule TeX → HTML (`display` : formule centrée sur sa ligne). */
+export type MathRenderer = (tex: string, display: boolean) => string;
 
 export interface RenderedMarkdown {
   html: string;
   /** Titres du contenu, après décalage sous le `<h1>` de la page. */
   headings: TocEntry[];
+  /** Le contenu contient des formules (feuille de style KaTeX à charger). */
+  hasMath: boolean;
+  /** Le contenu contient des diagrammes Mermaid (rendus dans le navigateur). */
+  hasDiagrams: boolean;
 }
 
 interface RenderEnv extends Env {
   path: string;
   topLevel: number;
   codeToolbar: boolean;
+  math: MathRenderer | undefined;
+  hasMath: boolean;
+  hasDiagrams: boolean;
   headings: TocEntry[];
   externalLinks: boolean[];
 }
@@ -84,6 +99,100 @@ const markdown = new MarkdownIt({ html: false, linkify: true, typographer: false
 markdown.validateLink = isSafeUrl;
 // Notes (`texte[^1]` … `[^1]: note`) : syntaxe du greffon, rendu du projet plus bas (ADR 0003)
 markdown.use(footnote);
+
+// Formules : `$$…$$` en bloc (seul sur sa ou ses lignes), `$…$` dans le texte. Un `$` suivi d'une
+// espace, ou fermant suivi d'un chiffre (« 5 $ et 6 $ »), n'est pas une formule ; `\$` reste un dollar.
+markdown.block.ruler.before(
+  'fence',
+  'math_block',
+  (state, startLine, endLine, silent) => {
+    const start = state.bMarks[startLine] + state.tShift[startLine];
+    const firstLine = state.src.slice(start, state.eMarks[startLine]);
+    if (!firstLine.startsWith('$$') || state.sCount[startLine] - state.blkIndent >= 4) {
+      return false;
+    }
+    if (silent) {
+      return true;
+    }
+    let content: string;
+    let nextLine = startLine + 1;
+    const rest = firstLine.slice(2);
+    if (rest.trim().endsWith('$$') && rest.trim().length > 2) {
+      content = rest.trim().slice(0, -2);
+    } else {
+      const lines = rest.trim() ? [rest] : [];
+      for (; nextLine < endLine; nextLine++) {
+        const line = state.src.slice(
+          state.bMarks[nextLine] + state.tShift[nextLine],
+          state.eMarks[nextLine],
+        );
+        if (line.trim().endsWith('$$')) {
+          lines.push(line.trim().slice(0, -2));
+          nextLine++;
+          break;
+        }
+        lines.push(line);
+      }
+      content = lines.join('\n');
+    }
+    state.line = nextLine;
+    const token = state.push('math_block', 'div', 0);
+    token.content = content.trim();
+    token.map = [startLine, nextLine];
+    return true;
+  },
+  { alt: ['paragraph', 'reference', 'blockquote', 'list'] },
+);
+
+markdown.inline.ruler.after('escape', 'math_inline', (state, silent) => {
+  const start = state.pos;
+  if (
+    state.src[start] !== '$' ||
+    state.src[start + 1] === '$' ||
+    /\s/.test(state.src[start + 1] ?? ' ')
+  ) {
+    return false;
+  }
+  let end = start + 1;
+  while ((end = state.src.indexOf('$', end)) !== -1) {
+    if (state.src[end - 1] !== '\\') {
+      break;
+    }
+    end++;
+  }
+  if (
+    end === -1 ||
+    end >= state.posMax ||
+    /\s/.test(state.src[end - 1]) ||
+    /\d/.test(state.src[end + 1] ?? '')
+  ) {
+    return false;
+  }
+  if (!silent) {
+    state.push('math_inline', 'span', 0).content = state.src.slice(start + 1, end);
+  }
+  state.pos = end + 1;
+  return true;
+});
+
+function renderMath(tex: string, display: boolean, env: RenderEnv): string {
+  env.hasMath = true;
+  if (env.math) {
+    return display
+      ? `<div class="math-display" tabindex="0">${env.math(tex, true)}</div>\n`
+      : env.math(tex, false);
+  }
+  // Source affichée telle quelle jusqu'au rendu (formule non transmise, KaTeX en chargement)
+  const source = escapeHtml(tex);
+  return display
+    ? `<div class="math-display math-pending" tabindex="0"><code>${source}</code></div>\n`
+    : `<code class="math-pending">${source}</code>`;
+}
+
+markdown.renderer.rules['math_inline'] = (tokens, index, _options, env) =>
+  renderMath(tokens[index].content, false, renderEnv(env));
+markdown.renderer.rules['math_block'] = (tokens, index, _options, env) =>
+  renderMath(tokens[index].content, true, renderEnv(env));
 
 const escapeHtml = markdown.utils.escapeHtml;
 
@@ -166,8 +275,23 @@ function renderCode(content: string, info: string, toolbar: boolean): string {
   );
 }
 
-markdown.renderer.rules['fence'] = (tokens, index, _options, env) =>
-  renderCode(tokens[index].content, tokens[index].info, renderEnv(env).codeToolbar);
+// Diagrammes Mermaid : source affichée par le rendu serveur (repli), remplacée par le dessin dans
+// le navigateur à l'entrée dans la fenêtre (`mermaid-diagrams.ts`)
+function renderDiagram(content: string, env: RenderEnv): string {
+  env.hasDiagrams = true;
+  return (
+    '<figure class="diagram" data-diagram>' +
+    `<pre class="code diagram-source" tabindex="0"><code>${escapeHtml(content)}</code></pre>` +
+    '</figure>\n'
+  );
+}
+
+markdown.renderer.rules['fence'] = (tokens, index, _options, env) => {
+  const { content, info } = tokens[index];
+  return info.trim().toLowerCase() === 'mermaid'
+    ? renderDiagram(content, renderEnv(env))
+    : renderCode(content, info, renderEnv(env).codeToolbar);
+};
 markdown.renderer.rules['code_block'] = (tokens, index, _options, env) =>
   renderCode(tokens[index].content, '', renderEnv(env).codeToolbar);
 
@@ -284,9 +408,12 @@ export function renderMarkdown(source: string, options: RenderOptions): Rendered
     path: options.path,
     topLevel: options.topLevel ?? 2,
     codeToolbar: options.codeToolbar ?? false,
+    math: options.math,
+    hasMath: false,
+    hasDiagrams: false,
     headings: [],
     externalLinks: [],
   };
   const html = markdown.render(source, env);
-  return { html, headings: env.headings };
+  return { html, headings: env.headings, hasMath: env.hasMath, hasDiagrams: env.hasDiagrams };
 }

@@ -6,6 +6,8 @@ import { appConfig } from './app.config';
 import { serverRoutes } from './app.routes.server';
 import { API_ORIGIN } from './core/api/api-origin';
 import { ServerApiBackend } from './core/api/server-api-backend';
+import { renderMath } from './shared/markdown/katex-math';
+import { SERVER_MATH_RENDERER } from './shared/markdown/markdown-math';
 import { SITE_URL } from './core/seo/site-config';
 
 const DEFAULT_API_ORIGIN = 'http://localhost:8080';
@@ -21,6 +23,8 @@ const serverConfig: ApplicationConfig = {
     },
     // Appels marqués API_REQUEST envoyés à cette origine, après les intercepteurs et le cache de transfert
     { provide: HttpBackend, useClass: ServerApiBackend },
+    // Formules rendues par KaTeX au serveur seulement, puis transmises au navigateur
+    { provide: SERVER_MATH_RENDERER, useValue: renderMath },
     // Origine publique des adresses canoniques : jamais déduite de l'en-tête Host de la requête
     { provide: SITE_URL, useFactory: siteUrl },
   ],
