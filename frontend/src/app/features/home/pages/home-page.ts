@@ -33,7 +33,7 @@ const STACK = 6;
 /**
  * Accueil : énoncé typographique (nom, titre, présentation courte, CV et liens professionnels)
  * et cartouche de faits réels, puis une zone par contenu — projets mis en avant (à défaut, les
- * premiers projets), derniers articles, séries, dernières actualités. Toutes les requêtes partent
+ * premiers projets), derniers articles, séries, dernières actualités, invitation au contact. Toutes les requêtes partent
  * en même temps ; le rendu serveur les attend. Une zone sans contenu n'est pas affichée, sauf
  * celle des projets ; une requête en échec donne l'état d'erreur de sa zone et la réponse 503
  * au rendu serveur, pour qu'une page incomplète ne soit ni indexée ni mise en cache.
@@ -203,6 +203,13 @@ const STACK = 6;
         </p>
       </app-home-zone>
     }
+
+    <app-home-zone heading="Contact" headingId="zone-contact">
+      <p class="max-w-prose font-text text-lg leading-prose">
+        Une question sur un projet, un article ou une collaboration&#8239;:
+        <a routerLink="/contact">écrire un message</a>.
+      </p>
+    </app-home-zone>
   `,
 })
 export class HomePage {

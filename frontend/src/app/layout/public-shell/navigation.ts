@@ -16,5 +16,6 @@ export const PUBLIC_NAVIGATION: readonly NavItem[] = [
   { path: '/series', label: 'Séries', footer: false },
   { path: '/news', label: 'Actualités', footer: false },
   { path: '/about', label: 'À propos', footer: true },
+  { path: '/contact', label: 'Contact', footer: true },
   { path: '/search', label: 'Recherche', footer: false },
 ];

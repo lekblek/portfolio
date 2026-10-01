@@ -29,6 +29,7 @@ export type ApiErrorCode =
   | 'VALIDATION_FAILED'
   | 'AUTHENTICATION_REQUIRED'
   | 'TOO_MANY_LOGIN_ATTEMPTS'
+  | 'TOO_MANY_CONTACT_MESSAGES'
   | 'SLUG_LOCKED';
 
 /** Erreur d'appel à l'API, prête pour l'affichage (textes de l'API en français, D-DJ). */

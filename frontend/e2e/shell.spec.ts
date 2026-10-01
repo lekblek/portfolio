@@ -37,6 +37,7 @@ test.describe('public shell', () => {
         'Séries',
         'Actualités',
         'À propos',
+        'Contact',
         'Recherche',
       ]);
       await expect(nav.getByRole('link', { name: 'À propos' })).toHaveAttribute('href', '/about');

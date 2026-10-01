@@ -31,3 +31,5 @@ export type SeriesNavigation = Schemas['SeriesNavigationResponse'];
 
 export type SearchResult = Schemas['SearchResultResponse'];
 export type SearchResultType = SearchResult['type'];
+
+export type ContactMessageRequest = Schemas['SubmitContactMessageRequest'];

@@ -166,6 +166,7 @@ describe('HomePage', () => {
       'Derniers articles',
       'Séries',
       'Dernières actualités',
+      'Contact',
     ]);
     expect(headings(element, 'h3')).toEqual([
       'Projet vitrine',
@@ -186,6 +187,7 @@ describe('HomePage', () => {
     ]);
     expect(element.querySelector('a[href="/projects"]')?.textContent).toBe('Tous les projets (4)');
     expect(element.querySelector('a[href="/news"]')?.textContent).toBe('Toutes les actualités (1)');
+    expect(element.querySelector('a[href="/contact"]')?.textContent).toBe('écrire un message');
     expect(element.querySelector('ul[aria-label="Liens professionnels"] a')?.textContent).toContain(
       'GitHub',
     );
@@ -201,7 +203,7 @@ describe('HomePage', () => {
       projects: { content: [project('premier', false, ['Python'])], total: 1 },
     });
 
-    expect(headings(element, 'h2')).toEqual(['Projets']);
+    expect(headings(element, 'h2')).toEqual(['Projets', 'Contact']);
     expect(headings(element, 'h3')).toEqual(['Projet premier']);
     expect(element.querySelector('table')?.textContent).toContain('Python');
     expect(element.querySelector('table')?.textContent).not.toContain('Dernière publication');
