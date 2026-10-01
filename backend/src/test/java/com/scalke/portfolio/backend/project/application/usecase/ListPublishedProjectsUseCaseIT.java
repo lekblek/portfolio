@@ -2,6 +2,7 @@ package com.scalke.portfolio.backend.project.application.usecase;
 
 import com.scalke.portfolio.backend.media.domain.model.Media;
 import com.scalke.portfolio.backend.media.domain.port.MediaRepository;
+import com.scalke.portfolio.backend.project.domain.model.Project;
 import com.scalke.portfolio.backend.project.domain.model.ProjectFilter;
 import com.scalke.portfolio.backend.project.domain.model.ProjectScreenshot;
 import com.scalke.portfolio.backend.project.domain.model.ProjectVisibility;
@@ -22,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static com.scalke.portfolio.backend.project.ProjectFixtures.project;
 import static com.scalke.portfolio.backend.project.ProjectFixtures.published;
@@ -127,6 +129,36 @@ class ListPublishedProjectsUseCaseIT extends AbstractIntegrationTest {
         // le filtre restreint les projets, pas leurs technologies
         assertThat(page.content().get(1).project().technologies()).extracting(technology -> technology.slug().value())
             .containsExactly("java", "angular");
+    }
+
+    /**
+     * D-EH : projets mis en avant seulement (accueil), ou les autres ; combinable avec la technologie.
+     */
+    @Test
+    void filters_published_projects_by_featured_flag() {
+        Technology java = technologyRepository.create(technology("Java", "java", 0));
+        projectRepository.create(featured(published("vitrine", LocalDate.of(2025, 1, 1), 0, java)));
+        projectRepository.create(featured(published("vitrine-sans-java", LocalDate.of(2024, 6, 1), 0)));
+        projectRepository.create(published("ordinaire", LocalDate.of(2024, 1, 1), 0, java));
+        projectRepository.create(featured(project("brouillon-vitrine", ProjectVisibility.DRAFT,
+            DateRange.ongoingSince(LocalDate.of(2026, 1, 1)), 0)));
+
+        assertThat(slugs(ProjectFilter.of(null, true))).containsExactly("vitrine", "vitrine-sans-java");
+        assertThat(slugs(ProjectFilter.of(null, false))).containsExactly("ordinaire");
+        assertThat(slugs(ProjectFilter.of("java", true))).containsExactly("vitrine");
+    }
+
+    private List<String> slugs(ProjectFilter filter) {
+        return listPublishedProjectsUseCase.execute(filter, new PageQuery(0, 10)).content().stream()
+            .map(published -> published.project().slug().value())
+            .toList();
+    }
+
+    private static Project featured(Project project) {
+        return new Project(project.id(), project.title(), project.slug(), project.shortDescription(),
+            project.descriptionMarkdown(), project.stage(), project.visibility(), project.period(),
+            project.repositoryUrl(), project.demoUrl(), true, project.displayOrder(), project.technologies(),
+            project.coverMediaId(), project.screenshots(), project.everPublished());
     }
 
     @Test

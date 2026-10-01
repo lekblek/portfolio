@@ -150,6 +150,23 @@ class PublicProjectControllerTest {
     }
 
     @Test
+    void passes_the_featured_filter_and_the_page_size_to_the_use_case() throws Exception {
+        given(listPublishedProjectsUseCase.execute(any(), any())).willReturn(new PageResult<>(List.of(), 0, 3, 0));
+
+        mockMvc.perform(get("/api/public/projects").contextPath("/api").param("featured", "true").param("size", "3"))
+            .andExpect(status().isOk());
+
+        then(listPublishedProjectsUseCase).should().execute(ProjectFilter.of(null, true), new PageQuery(0, 3));
+    }
+
+    @Test
+    void refuses_a_featured_flag_that_is_not_a_boolean() throws Exception {
+        mockMvc.perform(get("/api/public/projects").contextPath("/api").param("featured", "souvent"))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.code").exists());
+    }
+
+    @Test
     void returns_the_project_detail_with_explicit_nulls() throws Exception {
         given(getPublishedProjectUseCase.execute("portfolio-full-stack")).willReturn(new PublishedProject(
             PORTFOLIO, null, List.of(new PublishedScreenshot(SCREENSHOT, "Accueil"))));

@@ -18,6 +18,14 @@ class ProjectFilterTest {
     }
 
     @Test
+    void combines_the_featured_flag_with_the_technology() {
+        assertThat(ProjectFilter.of(null, null)).isEqualTo(ProjectFilter.none());
+        assertThat(ProjectFilter.of(" ", true)).isEqualTo(new ProjectFilter(null, true));
+        assertThat(ProjectFilter.of("java", false)).isEqualTo(new ProjectFilter("java", false));
+        assertThat(ProjectFilter.of("java", null).hasFeatured()).isFalse();
+    }
+
+    @Test
     void keeps_the_technology_slug_without_surrounding_spaces() {
         ProjectFilter filter = ProjectFilter.byTechnology(" java ");
 

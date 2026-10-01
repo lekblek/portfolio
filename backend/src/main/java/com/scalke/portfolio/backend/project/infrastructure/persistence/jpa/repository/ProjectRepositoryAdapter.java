@@ -59,9 +59,17 @@ public class ProjectRepositoryAdapter implements ProjectRepository {
     @Transactional(readOnly = true)
     public PageResult<Project> findPublished(ProjectFilter filter, PageQuery query) {
         Pageable pageable = PageRequest.of(query.page(), query.size(), PUBLIC_ORDER);
-        Page<ProjectEntity> entities = filter.hasTechnology()
-            ? repository.findByVisibilityAndTechnologiesSlug(PUBLISHED, filter.technologySlug(), pageable)
-            : repository.findByVisibility(PUBLISHED, pageable);
+        Page<ProjectEntity> entities;
+        if (filter.hasFeatured() && filter.hasTechnology()) {
+            entities = repository.findByVisibilityAndFeaturedAndTechnologiesSlug(
+                PUBLISHED, filter.featured(), filter.technologySlug(), pageable);
+        } else if (filter.hasFeatured()) {
+            entities = repository.findByVisibilityAndFeatured(PUBLISHED, filter.featured(), pageable);
+        } else if (filter.hasTechnology()) {
+            entities = repository.findByVisibilityAndTechnologiesSlug(PUBLISHED, filter.technologySlug(), pageable);
+        } else {
+            entities = repository.findByVisibility(PUBLISHED, pageable);
+        }
         Page<Project> page = entities.map(ProjectPersistenceMapper::toDomain);
         return new PageResult<>(page.getContent(), page.getNumber(), page.getSize(), page.getTotalElements());
     }

@@ -3168,6 +3168,13 @@
           }
         }, {
           "in" : "query",
+          "name" : "featured",
+          "required" : false,
+          "schema" : {
+            "type" : "boolean"
+          }
+        }, {
+          "in" : "query",
           "name" : "pageable",
           "required" : true,
           "schema" : {

@@ -25,6 +25,11 @@ public interface ProjectJpaRepository extends Repository<ProjectEntity, Long> {
     Page<ProjectEntity> findByVisibilityAndTechnologiesSlug(
         ProjectVisibility visibility, String technologySlug, Pageable pageable);
 
+    Page<ProjectEntity> findByVisibilityAndFeatured(ProjectVisibility visibility, boolean featured, Pageable pageable);
+
+    Page<ProjectEntity> findByVisibilityAndFeaturedAndTechnologiesSlug(
+        ProjectVisibility visibility, boolean featured, String technologySlug, Pageable pageable);
+
     Optional<ProjectEntity> findBySlugAndVisibility(String slug, ProjectVisibility visibility);
 
     List<ProjectEntity> findByVisibilityAndIdIn(ProjectVisibility visibility, Collection<Long> ids);

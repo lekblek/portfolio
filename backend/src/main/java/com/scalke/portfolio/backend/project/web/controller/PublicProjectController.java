@@ -31,14 +31,17 @@ public class PublicProjectController {
      * L'ordre est fixe (D-V) : un paramètre {@code sort} est ignoré.
      * <p>
      * {@code technology} : slug d'une technologie ; absent ou vide, aucun filtre ; inconnu, page vide (D-AC).
+     * {@code featured} : {@code true}, projets mis en avant seulement ; {@code false}, les autres ; absent, tous
+     * (D-EH, accueil).
      */
     @GetMapping
     PageResponse<ProjectSummaryResponse> listProjects(
         @RequestParam(required = false) String technology,
+        @RequestParam(required = false) Boolean featured,
         @PageableDefault(size = ApiPaging.PUBLIC_PAGE_SIZE) Pageable pageable) {
         PageQuery query = new PageQuery(pageable.getPageNumber(), pageable.getPageSize());
         return PageResponse.from(listPublishedProjectsUseCase
-            .execute(ProjectFilter.byTechnology(technology), query)
+            .execute(ProjectFilter.of(technology, featured), query)
             .map(ProjectSummaryResponse::from));
     }
 
