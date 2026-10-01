@@ -39,11 +39,12 @@ describe('PublicShell', () => {
     expect(element.querySelector('app-public-shell')?.firstElementChild).toBe(skip);
   });
 
-  it('names the site in the header and the footer, without a link to a missing home page', async () => {
+  it('names the site in the header, with a link to the home page, and in the footer', async () => {
     const element = await render('/x');
 
-    expect(element.querySelector('header')?.textContent).toContain(SITE_NAME);
-    expect(element.querySelector('header a[href="/"]')).toBeNull();
+    const home = element.querySelector('header a[href="/"]');
+    expect(home?.textContent).toBe(SITE_NAME);
+    expect(home?.getAttribute('aria-current')).toBeNull();
     expect(element.querySelector('footer')?.textContent).toContain(`© ${new Date().getFullYear()}`);
   });
 });

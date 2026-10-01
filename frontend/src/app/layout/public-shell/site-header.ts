@@ -1,21 +1,28 @@
 import { Component } from '@angular/core';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 
 import { SITE_NAME, SITE_SIGNATURE } from '../../core/seo/site-config';
 import { PUBLIC_NAVIGATION } from './navigation';
 import { SiteNav } from './site-nav';
 
 /**
- * En-tête du site : identité et navigation principale. Le nom n'est pas un lien tant que la
- * page d'accueil n'existe pas (il mènerait à la page introuvable).
+ * En-tête du site : identité (le nom mène à l'accueil) et navigation principale.
  */
 @Component({
   selector: 'app-site-header',
-  imports: [SiteNav],
+  imports: [RouterLink, RouterLinkActive, SiteNav],
   template: `
     <header class="border-b border-rule">
       <div class="site-header-inner page-container">
         <p class="site-identity">
-          <span class="block font-semibold tracking-heading">{{ name }}</span>
+          <a
+            class="site-name"
+            routerLink="/"
+            routerLinkActive
+            [routerLinkActiveOptions]="{ exact: true }"
+            ariaCurrentWhenActive="page"
+            >{{ name }}</a
+          >
           <span class="block text-sm text-ink-muted">{{ signature }}</span>
         </p>
         <app-site-nav [items]="navigation" />
@@ -37,6 +44,20 @@ import { SiteNav } from './site-nav';
 
     .site-identity {
       grid-area: identity;
+    }
+
+    .site-name {
+      display: inline-block;
+      color: var(--color-ink);
+      font-weight: var(--font-weight-semibold);
+      letter-spacing: var(--tracking-heading);
+      text-decoration-line: none;
+    }
+
+    .site-name:hover,
+    .site-name:focus-visible {
+      color: var(--color-accent-strong);
+      text-decoration-line: underline;
     }
 
     @media (min-width: 64rem) {

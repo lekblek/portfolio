@@ -13,6 +13,8 @@ export interface NavItem {
 export const PUBLIC_NAVIGATION: readonly NavItem[] = [
   { path: '/projects', label: 'Projets', footer: true },
   { path: '/articles', label: 'Articles', footer: true },
+  { path: '/series', label: 'Séries', footer: false },
   { path: '/news', label: 'Actualités', footer: false },
   { path: '/about', label: 'À propos', footer: true },
+  { path: '/search', label: 'Recherche', footer: false },
 ];

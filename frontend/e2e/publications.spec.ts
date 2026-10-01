@@ -1,6 +1,6 @@
 import { Page } from '@playwright/test';
 
-import { expect, expectAccessible, test } from './support/fixtures';
+import { expect, expectAccessible, PageGuard, test } from './support/fixtures';
 
 // Rendu serveur, filtres et redirections : backend de développement (profil `dev`). Sommaire et
 // bouton Copier : article long simulé dans le navigateur, après une navigation client.
@@ -38,8 +38,16 @@ async function articles(request: import('@playwright/test').APIRequestContext): 
   return (await (await request.get(`${API}?type=ARTICLE`)).json()).content;
 }
 
-async function openFirstArticleWithLongContent(page: Page, first: Summary): Promise<void> {
-  await page.goto('/articles');
+async function openFirstArticleWithLongContent(
+  page: Page,
+  first: Summary,
+  guard: PageGuard,
+): Promise<void> {
+  // Navigation dans le navigateur : un article hors série reçoit la 404 attendue de l'API (D-BL)
+  guard.allowHttpError(`${API}/${first.slug}/series`);
+  // Liste hydratée : le clic est une navigation dans le navigateur (réponse simulée), pas un
+  // rechargement rendu par le serveur
+  await page.goto('/articles', { waitUntil: 'networkidle' });
   await page.route(`**${API}/${first.slug}`, async (route) => {
     const real = await (await route.fetch()).json();
     await route.fulfill({ json: { ...real, ...LONG_ARTICLE } });
@@ -156,9 +164,10 @@ test.describe('publications', () => {
   test('reaches the sections from the table of contents with the keyboard', async ({
     page,
     request,
+    guard,
   }, info) => {
     const [first] = await articles(request);
-    await openFirstArticleWithLongContent(page, first);
+    await openFirstArticleWithLongContent(page, first, guard);
 
     if (info.project.name === 'mobile') {
       const summary = page.locator('summary', { hasText: 'Sommaire' });
@@ -176,10 +185,10 @@ test.describe('publications', () => {
     await expectAccessible(page);
   });
 
-  test('copies a code block and announces it', async ({ page, request, context }) => {
+  test('copies a code block and announces it', async ({ page, request, context, guard }) => {
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
     const [first] = await articles(request);
-    await openFirstArticleWithLongContent(page, first);
+    await openFirstArticleWithLongContent(page, first, guard);
 
     await page.getByRole('button', { name: 'Copier le code' }).click();
 

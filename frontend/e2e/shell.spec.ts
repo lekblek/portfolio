@@ -34,14 +34,16 @@ test.describe('public shell', () => {
       await expect(nav.getByRole('link')).toHaveText([
         'Projets',
         'Articles',
+        'Séries',
         'Actualités',
         'À propos',
+        'Recherche',
       ]);
       await expect(nav.getByRole('link', { name: 'À propos' })).toHaveAttribute('href', '/about');
       await expect(nav.locator('[aria-current]')).toHaveCount(0);
-      await expect(
-        page.getByRole('banner').getByRole('link', { name: 'Blek Ngossanga' }),
-      ).toHaveCount(0);
+      const home = page.getByRole('banner').getByRole('link', { name: 'Blek Ngossanga' });
+      await expect(home).toHaveAttribute('href', '/');
+      await expect(home).not.toHaveAttribute('aria-current', 'page');
       await expect(
         page.getByRole('contentinfo').getByRole('link', { name: 'À propos' }),
       ).toBeVisible();

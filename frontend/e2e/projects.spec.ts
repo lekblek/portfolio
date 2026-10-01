@@ -76,7 +76,7 @@ test.describe('projects', () => {
     const api = await (await request.get(LIST_API)).json();
     const technology = (api.content as Summary[])[0].technologies[0];
     const filtered = await (await request.get(`${LIST_API}?technology=${technology.slug}`)).json();
-    await page.goto('/projects');
+    await page.goto('/projects', { waitUntil: 'networkidle' });
 
     await page
       .getByRole('list', { name: `Technologies de ${api.content[0].title}` })
@@ -95,7 +95,7 @@ test.describe('projects', () => {
   });
 
   test('keeps the filter across pages, from the keyboard', async ({ page }) => {
-    await page.goto('/projects');
+    await page.goto('/projects', { waitUntil: 'networkidle' });
     await page.route(`**${LIST_API}?**`, (route) => {
       const url = new URL(route.request().url());
       expect(url.searchParams.get('technology')).toBe('java');

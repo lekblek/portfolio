@@ -24,6 +24,11 @@ export const routes: Routes = [
     component: PublicShell,
     children: [
       {
+        path: '',
+        pathMatch: 'full',
+        loadComponent: () => import('./features/home/pages/home-page').then((m) => m.HomePage),
+      },
+      {
         path: 'projects',
         loadChildren: () =>
           import('./features/projects/projects.routes').then((m) => m.projectsRoutes),
@@ -36,6 +41,10 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'series',
+        loadChildren: () => import('./features/series/series.routes').then((m) => m.seriesRoutes),
+      },
+      {
         path: 'news',
         loadChildren: () =>
           import('./features/publications/publications.routes').then((m) =>
@@ -45,6 +54,10 @@ export const routes: Routes = [
       {
         path: 'about',
         loadChildren: () => import('./features/about/about.routes').then((m) => m.aboutRoutes),
+      },
+      {
+        path: 'search',
+        loadChildren: () => import('./features/search/search.routes').then((m) => m.searchRoutes),
       },
       {
         path: '**',
