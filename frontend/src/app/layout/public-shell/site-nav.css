@@ -21,6 +21,21 @@
   padding-block: calc(var(--spacing) * 2);
 }
 
+/* Ouverture sur mobile (F20) : la liste descend de 4 px depuis l'identité en se révélant, 200 ms ;
+   fermeture immédiate (Échap, navigation). Jamais au chargement : le menu est alors fermé. */
+@media (width < 64rem) and (prefers-reduced-motion: no-preference) {
+  .site-nav-open .site-nav-list {
+    transition:
+      opacity var(--duration-base) var(--ease-out),
+      transform var(--duration-base) var(--ease-out);
+
+    @starting-style {
+      opacity: 0;
+      transform: translateY(calc(var(--spacing) * -1));
+    }
+  }
+}
+
 .site-nav-link {
   display: flex;
   align-items: center;

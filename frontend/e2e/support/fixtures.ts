@@ -64,6 +64,8 @@ export { expect };
 
 /** Aucune violation axe des critères WCAG A et AA sur l'état courant de la page. */
 export async function expectAccessible(page: Page): Promise<void> {
+  // Un élément encore en fondu fausserait le calcul des contrastes : mouvements terminés d'abord
+  await page.evaluate(() => Promise.all(document.getAnimations().map((motion) => motion.finished)));
   const { violations } = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
   const summary = violations.map(
     (violation) =>

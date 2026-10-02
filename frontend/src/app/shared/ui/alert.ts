@@ -14,7 +14,9 @@ const ICON: Record<AlertTone, IconName> = {
  * Message d'issue d'une action (02-design-system §18) : envoi réussi, refus, échec. Titre et texte
  * projeté ; la couleur n'est jamais seule (icône et titre). Un échec est annoncé dès son apparition
  * (`role="alert"`) ; un succès reçoit le focus (`focus()`), ce qui l'annonce et place le lecteur
- * au bon endroit quand le formulaire disparaît.
+ * au bon endroit quand le formulaire disparaît. Apparition : fondu et montée de 4 px en 200 ms
+ * (`@starting-style`), absente sous mouvement réduit ; un message ne fait jamais partie du rendu
+ * serveur, sans quoi il entrerait au chargement de la page (02-design-system §11).
  */
 @Component({
   selector: 'app-alert',
@@ -62,6 +64,20 @@ const ICON: Record<AlertTone, IconName> = {
 
     :host(.alert-danger) .alert-icon {
       color: var(--color-danger);
+    }
+
+    /* Le message monte de 4 px en apparaissant, 200 ms (F20) */
+    @media (prefers-reduced-motion: no-preference) {
+      :host {
+        transition:
+          opacity var(--duration-base) var(--ease-out),
+          transform var(--duration-base) var(--ease-out);
+
+        @starting-style {
+          opacity: 0;
+          transform: translateY(calc(var(--spacing) * 1));
+        }
+      }
     }
   `,
 })
