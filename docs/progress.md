@@ -2,27 +2,28 @@
 
 Ce fichier est la **seule** source de vérité sur l'avancement. Il ne répète pas le contenu des autres documents : il pointe vers eux.
 
-Dernière mise à jour : 2026-10-02 (F00 à F22 poussées, CI verte ; F23 vérifiée)
+Dernière mise à jour : 2026-10-02 (F00 à F23 poussées, CI verte ; lot F24 + F25 vérifié)
 
 ---
 
 ## 1. État courant
 
 ```text
-Dernière étape terminée   : F23 — Shell d'administration et tableau de bord (à committer) ; F00 à F22 poussées, CI verte (run 36948186371)
+Dernière étape terminée   : lot F24 + F25 — Taxonomie, primitives d'administration et médiathèque (à committer) ; F00 à F23 poussées, CI verte (run 36952913904)
 Étape en cours            : aucune
-Prochaine étape prévue    : F24 — Taxonomie et primitives d'administration
-État                      : F23 : commits proposés
+Prochaine étape prévue    : F26 — Profil (nouvelle dépendance @angular/cdk : validation du propriétaire attendue avant)
+État                      : lot F24 + F25 : commits proposés
 Branche                   : develop
-Vérification              : backend inchangé depuis F22 (./mvnw clean verify → 756 tests verts) ; frontend : lint, lint:styles, format, 228 tests unitaires, types de l'API sans dérive, build (initial 393,65 kB bruts, 109,04 kB transférés estimés), 133 tests de bout en bout (5 ignorés) stables sur 5 exécutions en développement, 123 en production derrière mandataire local (hors pages de développement) stables sur 3 exécutions ; shell sans violation axe ni débordement de 320 à 1920 px, menu ouvert compris ; découpage des commits rejoué dans un clone jetable
+Vérification              : backend inchangé ; frontend : lint, lint:styles, format, 267 tests unitaires, types de l'API sans dérive, build de production, 153 tests de bout en bout (5 ignorés) stables sur 5 exécutions en développement, et en production derrière mandataire local sur 3 exécutions ; écrans d'administration sans violation axe ni débordement de 320 à 1920 px ; mouvement réduit vérifié ; découpage des commits rejoué dans un clone jetable
 ```
 
 ## 2. Prochaine action
 
-1. Committer F23 (commandes de la fin de tranche), pousser, vérifier la CI, remplacer le 🟡 par ✅.
-2. Renseigner `ADMIN_USERNAME` et `ADMIN_PASSWORD` dans `deploy/.env` (compte administrateur de développement, mot de passe de 15 caractères au moins) : nécessaires pour utiliser l'administration et pour `e2e/admin-auth.spec.ts`.
-3. Vérification avec un lecteur d'écran (NVDA) du site public (audit F21, constat A7). Plus tard : page de mentions légales avant la mise en production (D-DW).
-4. Étape 36, close (rappel du découpage) :
+1. Committer le lot F24 + F25 (commandes de la fin de tranche), pousser, vérifier la CI, remplacer les 🟡 par ✅.
+2. Avant F26 : valider l'ajout de `@angular/cdk` (liste ordonnable au glisser-déposer, avec boutons « Monter » / « Descendre »), ou choisir des boutons seuls sans dépendance.
+3. Renseigner `ADMIN_USERNAME` et `ADMIN_PASSWORD` dans `deploy/.env` (compte administrateur de développement, mot de passe de 15 caractères au moins) : nécessaires pour utiliser l'administration et pour `e2e/admin-auth.spec.ts`.
+4. Vérification avec un lecteur d'écran (NVDA) du site public (audit F21, constat A7). Plus tard : page de mentions légales avant la mise en production (D-DW).
+5. Étape 36, close (rappel du découpage) :
 
    ```text
    36.1  Taxonomie : catégories et tags                                    ✔ poussée
@@ -141,8 +142,10 @@ Légende : ✅ terminée et poussée · 🟡 terminée et vérifiée, commits à
 | F20 | Mouvement du site public (choix délégués par le propriétaire) : ouverture de la navigation mobile (200 ms), pression du bouton « Copier » (100 ms), entrée des messages d'issue (200 ms) ; neuf candidats refusés ; rien au chargement ni sous mouvement réduit ; tests de mouvement (D-EL) | ✅ | `4063a0d`, docs `252be22` (CI : run 36948186371) |
 | F21 | Audit public : axe sur 21 états et 4 pages en erreur, clavier, 320 à 1920 px, captures comparées, revue d'interface ; corrections typographiques et `autocomplete` ; rapport `audits/2026-10-02-audit-frontend-public.md` (D-EM) | ✅ | `d1b1362`, `2da7edc`, docs `252be22` (CI : run 36948186371) |
 | F22 | Authentification d'administration : `/admin/login`, session (`AdminSession`), garde, `returnUrl` limité à l'administration, déconnexion, accueil minimal ; jeton CSRF lisible et renouvelé (backend) ; intercepteur des 401 reporté à F23 (D-EN, D-EO) | ✅ | `98dc531`, `f1c682a`, `282db16`, docs `252be22` (CI : run 36948186371) |
-| F23 | Shell d'administration (en-tête, barre latérale repliée en menu sous 64 rem, lien d'évitement) et tableau de bord (relevé : messages non lus, publications, projets, séries, médias, lus dans les listes existantes) ; session expirée pendant le travail → connexion avec `returnUrl` ; `/admin/settings` retiré de la V1 (D25) ; brouillons reportés à F28 (D-EP) | 🟡 | à committer |
-| F24 → F37 | Frontend : voir `docs/frontend/00-roadmap-frontend.md` (remplace les étapes 37 à 51 et les parties frontend de 52) | ⏳ | — |
+| F23 | Shell d'administration (en-tête, barre latérale repliée en menu sous 64 rem, lien d'évitement) et tableau de bord (relevé : messages non lus, publications, projets, séries, médias, lus dans les listes existantes) ; session expirée pendant le travail → connexion avec `returnUrl` ; `/admin/settings` retiré de la V1 (D25) ; brouillons reportés à F28 (D-EP) | ✅ | `7f162fa`, `c75762e`, docs `d66883b` (CI : run 36952913904) |
+| F24 | Taxonomie (une entrée, trois sous-sections : catégories, tags, technologies) et primitives d'administration : tableau, dialogue de confirmation, notifications, variante `danger`, erreurs du serveur sur les champs, garde des modifications non enregistrées (D-EQ) | 🟡 | à committer |
+| F25 | Médiathèque : envoi (bouton ou dépôt, plusieurs fichiers, progression, vérification locale puis du serveur), tableau paginé, texte alternatif exigé pour une image, suppression contrôlée ; sélecteur de médias reporté à F26 (D-ER) | 🟡 | à committer |
+| F26 → F37 | Frontend : voir `docs/frontend/00-roadmap-frontend.md` (remplace les étapes 37 à 51 et les parties frontend de 52) | ⏳ | — |
 | 52 | Déploiement : voir `docs/steps/liste_complete_etapes.md` (52.7 à 52.21) | ⏳ | — |
 
 Après le push, remplacer les 🟡 par ✅ et noter les hashes.
@@ -160,6 +163,7 @@ Index : [`decisions/README.md`](decisions/README.md).
 | R-1 … R-8 | Organisation du dépôt et outillage (docs non versionnées, profils Spring, OSIV, CI, TypeScript strict, compose, outillage local hors dépôt, documentation du frontend) | Actives |
 | FA01 … FA12 | Architecture frontend : fonctionnalités, frontières ESLint, `httpResource`, types générés, origine de l'API en SSR, rendu par route, Signal Forms, pas de Material ni de Storybook, Playwright et axe, état dans l'URL, Markdown partagé | Acceptées (2026-09-30) ; FA02, FA04, FA05, FA06, FA10 mises en œuvre (F01 à F04) |
 | D-DM … D-DY | Frontend : montée 22.2 et hôtes SSR en local ; frontières par règle ESLint qui résout les chemins ; intercepteur commun et jeton serveur ; types générés et `overrides` de TypeScript ; banc Playwright ; direction visuelle ; tokens et `lint:styles` ; utilitaires ; primitives d'action ; shell public et identité ; mentions légales reportées ; SEO ; rendu Markdown | Actives (F00 à F11) ; D-DO modifiée en F12 (D-EB) |
+| D-EQ, D-ER | Taxonomie et primitives d'administration (décisions du propriétaire : tableaux, formulaires séparés, suppression confirmée, notifications, entrée « Taxonomie ») ; médiathèque | Actives (F24, F25) |
 | D25, D-EP | `/admin/settings` retiré de la V1 (décision du propriétaire) ; shell d'administration, relevé du tableau de bord, intercepteur des sessions expirées | Actives (F23) |
 | D-EL … D-EO | Mouvement du site public (trois mouvements, refus consignés) ; audit public ; authentification d'administration (session, garde, `returnUrl`, intercepteur en F23) ; jeton CSRF au chemin `/` et renouvelé à la connexion | Actives (F20 à F22) |
 | D-DZ … D-EK | Contrat des réponses dérivé du code (`required`, `@Nullable`) ; `publicEmail` jamais affiché (décision du propriétaire) ; page À propos, cache de transfert et transport serveur ; pied de page sans appel au profil (liens professionnels sur l'accueil et À propos) ; projets (filtre par clic, URL, SEO des vues, couvertures 3:2) ; publications (redirection du mauvais type, filtres, page d'article, notes, Copier) ; formules et diagrammes, seed additif ; séries, absence de série transmise, registre commun ; accueil et filtre `featured` ; recherche ; contact public (piège, limite, 202) et formulaire | Actives (KI-34, F12 à F19) |
@@ -325,6 +329,8 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | Liens professionnels (GitHub, CV) dans le pied de page, lus dans le profil | F17 au plus tard | D-EC : décision du propriétaire (2026-09-30) : pied de page minimal, aucun appel global au profil depuis le shell, aucun lien inventé |
 | Politique de cache HTTP des réponses publiques de l'API (`Cache-Control` au lieu du `no-store` de Spring Security) | F34 / étape 52 | D-EB : le cache de transfert est ouvert explicitement aux GET de `/api/public/` |
 | Nombre de brouillons sur le tableau de bord (filtre de statut de la liste d'administration des publications) | F28 | D-EP : la liste n'a pas de filtre de statut ; il viendra avec son écran |
+| Sélecteur de médias (dialogue réutilisé par le profil, les projets, les publications et les séries) | F26 | D-ER : aucun écran ne choisit encore un média |
+| Primitives `select` et case à cocher | premier formulaire qui les demande (F27, F28) | D-EQ : aucun champ de la taxonomie ni de la médiathèque |
 | Page de mentions légales (éditeur, hébergeur) | avant la mise en production publique, une fois l'hébergement connu | D-DW : décision du propriétaire (2026-09-30) ; aucun lien provisoire d'ici là |
 | HSTS derrière le mandataire inverse (requête vue en HTTP par Tomcat) | fait (P-B03) | D-DC : `X-Forwarded-Proto` accepté depuis un réseau de confiance |
 | Adresse réelle du client derrière le mandataire inverse (en-têtes de transfert) pour la limite des essais | fait (P-B03) | D-DC : `X-Forwarded-For` accepté depuis un réseau de confiance ; à vérifier avec le réseau Docker réel à l'étape 52 |

@@ -261,9 +261,10 @@ Aucune donnée d'authentification dans `localStorage` ou `sessionStorage`.
 ## 10. Formulaires
 
 - Signal Forms : modèle signal, `form()`, schéma de validation reprenant les bornes du backend (longueurs, formats) pour un retour immédiat ; le serveur reste l'arbitre.
-- Les erreurs de champ renvoyées par l'API (400 `VALIDATION_FAILED`, 409 sur un champ) sont rattachées au champ concerné ; les autres s'affichent en tête du formulaire, annoncées par une région `aria-live`.
+- Les erreurs de champ renvoyées par l'API (400 `VALIDATION_FAILED`, 409 sur un champ) sont rattachées au champ concerné par `serverFieldErrors` (`shared/forms/server-errors.ts` : champs connus, et conflits dont le code désigne un champ, comme `NAME_ALREADY_USED`) ; les autres s'affichent en tête du formulaire, annoncées par une région `aria-live`.
 - Soumission : le bouton garde son libellé, indique l'envoi (« Enregistrement… »), empêche la double soumission ; le focus va à la première erreur après un échec.
-- Modifications non enregistrées : garde `canDeactivate` sur les formulaires d'administration.
+- Modifications non enregistrées : garde `unsavedChangesGuard` (`shared/forms/unsaved-changes.guard.ts`) sur les formulaires d'administration ; la page implémente `canLeave()` (dialogue de confirmation si la saisie a changé) et déclenche l'avertissement du navigateur (`beforeunload`) pour une fermeture ou un rechargement.
+- Motif des écrans d'administration (F24) : liste en tableau, formulaire de création ou de modification sur une page séparée, suppression par dialogue de confirmation, résultat en notification ; retour à la liste après un enregistrement.
 
 ---
 
@@ -337,7 +338,7 @@ Cible WCAG 2.2 AA (D17). Règles d'architecture :
 | Niveau | Outil | Fichiers | Ce qu'il prouve |
 |---|---|---|---|
 | unitaire | Vitest | `*.spec.ts` à côté du code | fonctions pures (conversion d'erreurs, paramètres de pagination, formatage) |
-| composant | Vitest + `TestBed` | `*.spec.ts` | rendu d'un composant d'affichage selon ses entrées ; états d'une page avec `provideHttpClientTesting` |
+| composant | Vitest + `TestBed` | `*.spec.ts` | rendu d'un composant d'affichage selon ses entrées ; états d'une page avec `provideHttpClientTesting` ; jsdom complété par `src/test-setup.ts` (dialogue modal et `ResizeObserver` minimaux, le comportement réel étant vérifié en E2E) |
 | bout en bout | Playwright Test | `e2e/*.spec.ts` | parcours réels dans un navigateur, statut HTTP SSR, accessibilité (axe), clavier |
 | visuel | Playwright (captures) | `e2e/visual/*.spec.ts` | non-régression des primitives et des pages stabilisées (F36) |
 
