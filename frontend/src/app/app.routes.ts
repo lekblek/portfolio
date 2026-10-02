@@ -19,6 +19,11 @@ export const routes: Routes = [
     loadComponent: () => import('./dev/ui-catalogue').then((m) => m.UiCatalogue),
   },
   {
+    // Administration : rendue dans le navigateur seulement, lot chargé à la demande (F22)
+    path: 'admin',
+    loadChildren: () => import('./features/admin/admin.routes').then((m) => m.adminRoutes),
+  },
+  {
     // Cadre commun des pages publiques ; chaque page publique s'ajoute à ses enfants
     path: '',
     component: PublicShell,
