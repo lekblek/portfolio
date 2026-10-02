@@ -1,73 +1,96 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { provideRouter, Router } from '@angular/router';
-import { RouterTestingHarness } from '@angular/router/testing';
 
-import { AdminSession } from '../auth/admin-session';
 import { DashboardPage } from './dashboard-page';
 
-const URL = '/api/admin/session';
+const COUNTS: Record<string, number> = {
+  '/api/admin/contact-messages': 3,
+  '/api/admin/publications': 12,
+  '/api/admin/projects': 4,
+  '/api/admin/series': 2,
+  '/api/admin/media': 27,
+};
 
-@Component({ template: '<h1>Connexion</h1>' })
-class LoginStub {}
+function page(totalElements: number) {
+  return {
+    content: [],
+    page: 0,
+    size: 1,
+    totalElements,
+    totalPages: totalElements,
+    first: true,
+    last: totalElements <= 1,
+  };
+}
 
-async function setUp() {
-  TestBed.configureTestingModule({
-    providers: [
-      provideHttpClient(),
-      provideHttpClientTesting(),
-      provideRouter([
-        { path: 'admin', component: DashboardPage },
-        { path: 'admin/login', component: LoginStub },
-      ]),
-    ],
-  });
+function setUp() {
+  TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting()] });
+  const fixture = TestBed.createComponent(DashboardPage);
+  // Les requêtes partent au premier passage ; la page reste instable tant qu'elles n'ont pas répondu
+  TestBed.tick();
   const http = TestBed.inject(HttpTestingController);
-  const session = TestBed.inject(AdminSession);
-  const opening = session.open({ login: 'admin', password: 'mot de passe' });
-  http.expectOne(URL).flush({ login: 'admin', lastLoginAt: '2026-10-02T08:00:00Z' });
-  await opening;
-  const harness = await RouterTestingHarness.create();
-  await harness.navigateByUrl('/admin');
-  const element = () => harness.routeNativeElement as HTMLElement;
-  const signOut = async () => {
-    element().querySelector('button')!.click();
-    await harness.fixture.whenStable();
-  };
+  const element = fixture.nativeElement as HTMLElement;
   const settle = async () => {
-    await new Promise((resolve) => setTimeout(resolve));
-    await harness.fixture.whenStable();
-    harness.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
   };
-  return { http, session, element, signOut, settle };
+  const rows = () =>
+    Array.from(element.querySelectorAll('.dashboard-row')).map((row) => [
+      row.querySelector('dt')?.textContent?.trim(),
+      row.querySelector('dd')?.textContent?.trim(),
+    ]);
+  return { http, element, settle, rows };
 }
 
 describe('DashboardPage', () => {
-  it('names the administrator, then closes the session and goes to the login', async () => {
-    const { http, session, element, signOut, settle } = await setUp();
-    expect(element().textContent).toContain('Connecté en tant que admin.');
+  it('counts the unread messages and the contents from the existing lists', async () => {
+    const { http, settle, rows } = setUp();
 
-    await signOut();
-    http.expectOne({ method: 'DELETE', url: URL }).flush(null, { status: 204, statusText: '' });
+    for (const request of http.match(() => true)) {
+      expect(request.request.params.get('size')).toBe('1');
+      request.flush(page(COUNTS[request.request.url]));
+    }
     await settle();
 
-    expect(TestBed.inject(Router).url).toBe('/admin/login');
-    expect(session.closedByUser()).toBe(true);
+    expect(http.match(() => true)).toEqual([]);
+    expect(rows()).toEqual([
+      ['Messages non lus', '3'],
+      ['Publications', '12'],
+      ['Projets', '4'],
+      ['Séries', '2'],
+      ['Médias', '27'],
+    ]);
   });
 
-  it('keeps the session and says so when the server does not answer', async () => {
-    const { http, session, element, signOut, settle } = await setUp();
+  it('asks for the new messages only', async () => {
+    const { http } = setUp();
 
-    await signOut();
-    http.expectOne(URL).error(new ProgressEvent('error'));
+    const unread = http.expectOne((request) => request.url === '/api/admin/contact-messages');
+
+    expect(unread.request.params.get('status')).toBe('NEW');
+  });
+
+  it('offers to retry when a count cannot be read, then shows the tally', async () => {
+    const { http, element, settle, rows } = setUp();
+    for (const request of http.match(() => true)) {
+      if (request.request.url === '/api/admin/series') {
+        request.flush({ status: 500 }, { status: 500, statusText: 'Server Error' });
+      } else {
+        request.flush(page(COUNTS[request.request.url]));
+      }
+    }
     await settle();
 
-    expect(element().querySelector('[role="alert"]')?.textContent).toContain(
-      'Déconnexion impossible',
+    expect(element.querySelector('[role="alert"]')?.textContent).toContain(
+      'Le relevé n’a pas pu être chargé.',
     );
-    expect(TestBed.inject(Router).url).toBe('/admin');
-    expect(session.account()?.login).toBe('admin');
+    element.querySelector<HTMLButtonElement>('[role="alert"] button')!.click();
+    TestBed.tick();
+    http.expectOne('/api/admin/series?size=1').flush(page(2));
+    await settle();
+
+    expect(element.querySelector('[role="alert"]')).toBeNull();
+    expect(rows()).toHaveLength(5);
   });
 });

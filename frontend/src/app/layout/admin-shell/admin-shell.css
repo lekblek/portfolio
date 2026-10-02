@@ -1,0 +1,170 @@
+/* Cadre d'administration (F23) : outil dense, mêmes traits que le site (filets, encre, accent),
+   sans sa mise en page éditoriale. Une colonne sous 64 rem ; dès 64 rem, barre latérale de 15 rem. */
+
+.admin-shell {
+  display: grid;
+  grid-template-areas:
+    'header'
+    'nav'
+    'main';
+  grid-template-columns: minmax(0, 1fr);
+  /* Le contenu prend la hauteur restante : en-tête et navigation gardent leur hauteur propre */
+  grid-template-rows: auto auto 1fr;
+  min-height: 100dvh;
+}
+
+.admin-header {
+  grid-area: header;
+  display: grid;
+  grid-template-areas:
+    'identity toggle'
+    'session session';
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: calc(var(--spacing) * 6);
+  padding: calc(var(--spacing) * 3) var(--spacing-gutter);
+  border-bottom: var(--border-strong) solid var(--color-ink);
+}
+
+.admin-identity {
+  grid-area: identity;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: calc(var(--spacing) * 3);
+}
+
+.admin-site-name {
+  color: var(--color-ink);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-heading);
+  text-decoration-line: none;
+}
+
+.admin-site-name:hover,
+.admin-site-name:focus-visible {
+  color: var(--color-accent-strong);
+  text-decoration-line: underline;
+}
+
+.admin-context {
+  color: var(--color-ink-muted);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.admin-menu-toggle {
+  grid-area: toggle;
+  justify-self: end;
+}
+
+.admin-session {
+  grid-area: session;
+  display: none;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(var(--spacing) * 3) calc(var(--spacing) * 6);
+  padding-block-start: calc(var(--spacing) * 3);
+  font-size: var(--text-sm);
+}
+
+.admin-nav {
+  grid-area: nav;
+  display: none;
+  padding: calc(var(--spacing) * 2) var(--spacing-gutter) calc(var(--spacing) * 4);
+  border-bottom: var(--border-rule) solid var(--color-rule);
+  background: var(--color-paper-sunken);
+}
+
+.admin-panel-open {
+  display: flex;
+}
+
+.admin-nav.admin-panel-open {
+  display: block;
+}
+
+.admin-nav-link {
+  display: flex;
+  align-items: center;
+  min-height: calc(var(--spacing) * 11);
+  padding-inline-start: calc(var(--spacing) * 3);
+  color: var(--color-ink);
+  font-weight: var(--font-weight-medium);
+  text-decoration-line: none;
+}
+
+/* Page courante : filet accent à gauche, comme la navigation du site */
+.admin-nav-link-current {
+  box-shadow: inset 2px 0 0 var(--color-accent);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .admin-nav-link:hover {
+    color: var(--color-accent-strong);
+  }
+}
+
+.admin-nav-site {
+  margin-block-start: calc(var(--spacing) * 4);
+  padding-block-start: calc(var(--spacing) * 3);
+  padding-inline-start: calc(var(--spacing) * 3);
+  border-top: var(--border-rule) solid var(--color-rule);
+  font-size: var(--text-sm);
+}
+
+.admin-main {
+  grid-area: main;
+  min-width: 0;
+  padding: var(--spacing-block) var(--spacing-gutter) var(--spacing-section);
+}
+
+/* Ouverture sur mobile (F20) : le panneau se révèle en descendant de 4 px, 200 ms ; fermeture
+   immédiate. Jamais au chargement : le menu est alors fermé. */
+@media (width < 64rem) and (prefers-reduced-motion: no-preference) {
+  .admin-panel-open {
+    transition:
+      opacity var(--duration-base) var(--ease-out),
+      transform var(--duration-base) var(--ease-out);
+
+    @starting-style {
+      opacity: 0;
+      transform: translateY(calc(var(--spacing) * -1));
+    }
+  }
+}
+
+@media (min-width: 64rem) {
+  .admin-shell {
+    grid-template-areas:
+      'header header'
+      'nav main';
+    grid-template-columns: calc(var(--spacing) * 60) minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+  }
+
+  .admin-header {
+    grid-template-areas: 'identity session';
+  }
+
+  .admin-menu-toggle {
+    display: none;
+  }
+
+  .admin-session {
+    display: flex;
+    justify-content: flex-end;
+    padding-block-start: 0;
+  }
+
+  .admin-nav {
+    display: block;
+    padding-block: var(--spacing-block);
+    border-bottom: 0;
+    border-inline-end: var(--border-rule) solid var(--color-rule);
+  }
+
+  .admin-main {
+    padding-inline: calc(var(--spacing) * 10);
+  }
+}

@@ -1,4 +1,7 @@
-import { adminReturnUrl } from './return-url';
+import { TestBed } from '@angular/core/testing';
+import { provideRouter, Router } from '@angular/router';
+
+import { adminReturnUrl, loginTree } from './return-url';
 
 describe('adminReturnUrl', () => {
   it('keeps a page of the administration, with its query and anchor', () => {
@@ -27,5 +30,25 @@ describe('adminReturnUrl', () => {
     ]) {
       expect(adminReturnUrl(outside), outside).toBe('/admin');
     }
+  });
+});
+
+describe('loginTree', () => {
+  beforeEach(() => TestBed.configureTestingModule({ providers: [provideRouter([])] }));
+
+  function serialize(requested: string): string {
+    const router = TestBed.inject(Router);
+    return router.serializeUrl(loginTree(router, requested));
+  }
+
+  it('keeps the requested page of the administration as the return address', () => {
+    expect(serialize('/admin/projects?page=2')).toBe(
+      '/admin/login?returnUrl=%2Fadmin%2Fprojects%3Fpage%3D2',
+    );
+  });
+
+  it('omits the return address for the home of the administration or an outside page', () => {
+    expect(serialize('/admin')).toBe('/admin/login');
+    expect(serialize('/articles')).toBe('/admin/login');
   });
 });

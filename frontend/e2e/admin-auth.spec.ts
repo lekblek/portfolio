@@ -1,41 +1,21 @@
-import { Page } from '@playwright/test';
-
+import {
+  ADMIN_LOGIN,
+  ADMIN_PASSWORD,
+  NO_ADMIN_ACCOUNT,
+  openLogin,
+  SESSION,
+  signIn,
+  signInFromItsOwnAddress,
+  unfoldMenuIfFolded,
+} from './support/admin';
 import { expect, expectAccessible, test } from './support/fixtures';
 
-// Backend de développement avec un compte administrateur : ADMIN_USERNAME et ADMIN_PASSWORD lus
-// dans l'environnement (ceux de deploy/.env), jamais écrits dans le dépôt ni dans les journaux.
-const SESSION = '/api/admin/session';
-const LOGIN = process.env['ADMIN_USERNAME'] ?? '';
-const PASSWORD = process.env['ADMIN_PASSWORD'] ?? '';
-
-/**
- * Adresse de client propre au test, transmise comme le ferait le mandataire inverse : la limite de
- * 5 échecs par adresse en 15 minutes (D-CQ) ne dépend pas des exécutions précédentes.
- */
-async function signInFromItsOwnAddress(page: Page): Promise<void> {
-  const address = `203.0.113.${Math.floor(Math.random() * 250) + 1}`;
-  await page.route(`**${SESSION}`, (route) =>
-    route.request().method() === 'POST'
-      ? route.continue({ headers: { ...route.request().headers(), 'x-forwarded-for': address } })
-      : route.continue(),
-  );
-}
-
-async function openLogin(page: Page): Promise<void> {
-  await page.goto('/admin', { waitUntil: 'networkidle' });
-  await expect(page).toHaveURL('/admin/login');
-  await expect(page.getByLabel('Identifiant')).toBeFocused();
-}
-
-async function signIn(page: Page, login: string, password: string): Promise<void> {
-  await page.getByLabel('Identifiant').fill(login);
-  await page.getByLabel('Mot de passe').fill(password);
-  await page.getByLabel('Mot de passe').press('Enter');
-}
+// Connexion, refus, déconnexion et cloisonnement du lot d'administration (F22), avec le backend de
+// développement et un compte administrateur (support/admin.ts).
 
 test.describe('admin authentication', () => {
   test.beforeEach(({ guard }) => {
-    test.skip(!LOGIN || !PASSWORD, 'ADMIN_USERNAME et ADMIN_PASSWORD absents de l’environnement');
+    test.skip(!ADMIN_LOGIN || !ADMIN_PASSWORD, NO_ADMIN_ACCOUNT);
     // Sans session, GET /api/admin/session répond 401 : c'est la réponse attendue
     guard.allowHttpError(SESSION);
   });
@@ -54,10 +34,10 @@ test.describe('admin authentication', () => {
     await openLogin(page);
     await signInFromItsOwnAddress(page);
 
-    await signIn(page, LOGIN, `${PASSWORD}-faux`);
+    await signIn(page, ADMIN_LOGIN, `${ADMIN_PASSWORD}-faux`);
 
     await expect(page.getByRole('alert')).toContainText('Identifiant ou mot de passe incorrect');
-    await expect(page.getByLabel('Identifiant')).toHaveValue(LOGIN);
+    await expect(page.getByLabel('Identifiant')).toHaveValue(ADMIN_LOGIN);
     await expect(page.getByLabel('Mot de passe')).toHaveValue('');
     await expect(page.getByLabel('Mot de passe')).toBeFocused();
     await expect(page).toHaveURL('/admin/login');
@@ -76,7 +56,7 @@ test.describe('admin authentication', () => {
         : route.continue(),
     );
 
-    await signIn(page, LOGIN, 'peu importe');
+    await signIn(page, ADMIN_LOGIN, 'peu importe');
 
     await expect(page.getByRole('alert')).toContainText('Réessayez dans 14 minutes.');
   });
@@ -88,12 +68,15 @@ test.describe('admin authentication', () => {
       (request) => request.url().endsWith(SESSION) && request.method() === 'POST',
     );
 
-    await signIn(page, LOGIN, PASSWORD);
+    await signIn(page, ADMIN_LOGIN, ADMIN_PASSWORD);
 
     expect((await post).headers()['x-xsrf-token']).toBeTruthy();
     await expect(page).toHaveURL('/admin');
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Tableau de bord');
-    await expect(page.getByRole('main')).toContainText(`Connecté en tant que ${LOGIN}.`);
+    await unfoldMenuIfFolded(page);
+    await expect(page.getByRole('banner')).toContainText(
+      `Connecté en tant que ${ADMIN_LOGIN}, depuis le`,
+    );
     const sessionCookie = (await context.cookies()).find((cookie) => cookie.name === 'JSESSIONID');
     expect(sessionCookie?.httpOnly).toBe(true);
     expect(sessionCookie?.sameSite).toBe('Strict');
@@ -112,7 +95,7 @@ test.describe('admin authentication', () => {
   test('asks to sign in again once the session is gone', async ({ page, context }) => {
     await openLogin(page);
     await signInFromItsOwnAddress(page);
-    await signIn(page, LOGIN, PASSWORD);
+    await signIn(page, ADMIN_LOGIN, ADMIN_PASSWORD);
     await expect(page).toHaveURL('/admin');
 
     // Session expirée ou supprimée par le serveur : le cookie n'est plus valable

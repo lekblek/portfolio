@@ -66,3 +66,14 @@ export function formatDay(instant: string): string {
 export function isoDay(instant: string): string {
   return ISO_DAY.format(new Date(instant));
 }
+
+const TIME = new Intl.DateTimeFormat('fr-FR', {
+  hour: '2-digit',
+  minute: '2-digit',
+  timeZone: SITE_TIME_ZONE,
+});
+
+/** « 2 octobre 2026 à 10:42 », dans le fuseau de référence. */
+export function formatDayTime(instant: string): string {
+  return `${formatDay(instant)} à ${TIME.format(new Date(instant))}`;
+}

@@ -1,3 +1,5 @@
+import { Router, UrlTree } from '@angular/router';
+
 const HOME = '/admin';
 const LOGIN = '/admin/login';
 // Origine fictive : sert seulement à reconnaître une adresse qui sortirait du site
@@ -18,4 +20,13 @@ export function adminReturnUrl(value: string | null | undefined): string {
     return HOME;
   }
   return `${url.pathname}${url.search}${url.hash}`;
+}
+
+/**
+ * Page de connexion avec la page demandée en `returnUrl` (omis pour l'accueil de l'administration),
+ * pour la garde et pour une session expirée pendant le travail.
+ */
+export function loginTree(router: Router, requested: string): UrlTree {
+  const returnUrl = adminReturnUrl(requested);
+  return router.createUrlTree([LOGIN], returnUrl === HOME ? {} : { queryParams: { returnUrl } });
 }

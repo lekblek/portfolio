@@ -5,6 +5,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router, withComponentInputBinding } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 
+import { AdminSession } from '../admin-session';
 import { LoginPage } from './login-page';
 
 const URL = '/api/admin/session';
@@ -13,7 +14,7 @@ const ACCOUNT = { login: 'admin', lastLoginAt: '2026-10-02T08:00:00Z' };
 @Component({ template: '<h1>Administration</h1>' })
 class AdminPage {}
 
-async function setUp(path = '/admin/login') {
+async function setUp(path = '/admin/login', before?: (session: AdminSession) => void) {
   TestBed.configureTestingModule({
     providers: [
       provideHttpClient(),
@@ -28,6 +29,7 @@ async function setUp(path = '/admin/login') {
       ),
     ],
   });
+  before?.(TestBed.inject(AdminSession));
   const harness = await RouterTestingHarness.create();
   await harness.navigateByUrl(path);
   const http = TestBed.inject(HttpTestingController);
@@ -168,5 +170,14 @@ describe('LoginPage', () => {
       Array.from(element().querySelectorAll('.field-error')).map((e) => e.textContent?.trim()),
     ).toEqual(['Indiquez votre identifiant.', 'Indiquez votre mot de passe.']);
     expect(document().activeElement).toBe(control('connexion-identifiant'));
+  });
+
+  it('says that the session expired and gives it the focus', async () => {
+    const { element, noSession } = await setUp('/admin/login', (session) => session.expire());
+    await noSession();
+
+    const notice = element().querySelector('app-alert')!;
+    expect(notice.textContent).toContain('Session expirée');
+    expect(document().activeElement).toBe(notice);
   });
 });

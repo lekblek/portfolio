@@ -44,7 +44,8 @@ interface Failure {
  * est d'abord demandée au serveur : déjà ouverte, la page mène à l'adresse de retour ; sinon, la
  * réponse dépose le jeton CSRF. Refus uniforme (401 : mot de passe effacé et focalisé), trop
  * d'essais (429, délai), serveur injoignable : message `role="alert"`, identifiant conservé.
- * Après une déconnexion, la confirmation reçoit le focus ; sinon, le champ Identifiant.
+ * Après une déconnexion ou une session expirée, le message reçoit le focus ; sinon, le champ
+ * Identifiant.
  */
 @Component({
   selector: 'app-login-page',
@@ -57,10 +58,17 @@ interface Failure {
           <h1 class="mt-2 text-3xl leading-tight tracking-title">Connexion</h1>
         </div>
 
-        @if (session.closedByUser()) {
-          <app-alert #closed tone="success" title="Vous êtes déconnecté">
-            <p>Reconnectez-vous pour reprendre l’administration.</p>
-          </app-alert>
+        @switch (session.end()) {
+          @case ('closed') {
+            <app-alert #ended tone="success" title="Vous êtes déconnecté">
+              <p>Reconnectez-vous pour reprendre l’administration.</p>
+            </app-alert>
+          }
+          @case ('expired') {
+            <app-alert #ended tone="danger" title="Session expirée">
+              <p>Reconnectez-vous pour reprendre là où vous en étiez.</p>
+            </app-alert>
+          }
         }
 
         <form class="grid gap-6" [formRoot]="loginForm">
@@ -117,7 +125,7 @@ export class LoginPage {
   protected readonly session = inject(AdminSession);
   private readonly router = inject(Router);
   private readonly injector = inject(Injector);
-  private readonly closedNotice = viewChild<Alert>('closed');
+  private readonly endNotice = viewChild<Alert>('ended');
 
   private readonly model = signal<Credentials>({ login: '', password: '' });
 
@@ -147,7 +155,7 @@ export class LoginPage {
   constructor() {
     void this.leaveIfAlreadyOpen();
     afterNextRender(() => {
-      const notice = this.closedNotice();
+      const notice = this.endNotice();
       if (notice) {
         notice.focus();
       } else {

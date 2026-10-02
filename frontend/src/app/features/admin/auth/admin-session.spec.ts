@@ -55,14 +55,14 @@ describe('AdminSession', () => {
     post.flush(ACCOUNT);
     await opening;
     expect(session.account()).toEqual(ACCOUNT);
-    expect(session.closedByUser()).toBe(false);
+    expect(session.end()).toBeNull();
 
     const closing = session.close();
     http.expectOne({ method: 'DELETE', url: URL }).flush(null, { status: 204, statusText: '' });
     await closing;
 
     expect(session.account()).toBeNull();
-    expect(session.closedByUser()).toBe(true);
+    expect(session.end()).toBe('closed');
   });
 
   it('keeps the session when the server refuses to close it', async () => {
@@ -76,5 +76,22 @@ describe('AdminSession', () => {
 
     await expect(closing).rejects.toBeDefined();
     expect(session.account()).toEqual(ACCOUNT);
+  });
+
+  it('forgets a session that the server no longer accepts', async () => {
+    const { session, http } = setUp();
+    const opening = session.open({ login: 'admin', password: 'secret' });
+    http.expectOne(URL).flush(ACCOUNT);
+    await opening;
+
+    session.expire();
+
+    expect(session.account()).toBeNull();
+    expect(session.end()).toBe('expired');
+    const check = session.isOpen();
+    http
+      .expectOne({ method: 'GET', url: URL })
+      .flush({ status: 401 }, { status: 401, statusText: '' });
+    expect(await check).toBe(false);
   });
 });

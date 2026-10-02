@@ -2,6 +2,7 @@ import { inject } from '@angular/core';
 import { CanMatchFn, Router } from '@angular/router';
 
 import { AdminSession } from './admin-session';
+import { loginTree } from './return-url';
 
 /**
  * Pages de l'administration (hors connexion) : sans session ouverte, renvoie à la connexion avec
@@ -18,9 +19,5 @@ export const adminGuard: CanMatchFn = async (_route, segments) => {
   } catch {
     // Vérification impossible : la page de connexion refait la demande et affiche l'échec
   }
-  const requested = ['/admin', ...segments.map((segment) => segment.path)].join('/');
-  return router.createUrlTree(
-    ['/admin/login'],
-    requested === '/admin' ? {} : { queryParams: { returnUrl: requested } },
-  );
+  return loginTree(router, ['/admin', ...segments.map((segment) => segment.path)].join('/'));
 };
