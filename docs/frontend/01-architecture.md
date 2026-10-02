@@ -270,7 +270,9 @@ Aucune donnée d'authentification dans `localStorage` ou `sessionStorage`.
 ## 11. Administration
 
 - Connexion par session serveur (D-CO) : `POST /api/admin/session`, lecture par `GET /api/admin/session` (200 avec `login`, sinon 401), déconnexion par `DELETE /api/admin/session` (204, filtre de Spring Security : absente de `openapi.json`, présente dans `SecurityConfiguration`).
-- `canMatch` sur `/admin` (hors `/admin/login`) : la session est vérifiée une fois puis gardée dans `AdminSession` ; une 401 ultérieure (session expirée après 30 minutes, D-CR) la vide et renvoie à la connexion avec `returnUrl`.
+- `canMatch` sur `/admin` (hors `/admin/login`) : la session est vérifiée une fois puis gardée dans `AdminSession` ; sans session (ou serveur injoignable), retour à la connexion avec `returnUrl`, limité aux pages `/admin/**` (`adminReturnUrl`, aucune redirection ouverte). Une 401 ultérieure (session expirée après 30 minutes, D-CR) la videra et renverra à la connexion : intercepteur ajouté avec la première requête d'administration autre que la session (F23, D-EN).
+- Jeton CSRF : le cookie `XSRF-TOKEN` est au chemin `/` (lisible par `document.cookie` depuis `/admin/**`) et renouvelé dans la réponse de la connexion (D-EO) ; la première requête de la page de connexion (`GET /api/admin/session`) le dépose.
+- Page de connexion et accueil de l'administration : D-EN (F22).
 - Rendu client uniquement ; le lot d'administration n'est jamais chargé par le site public (chargement paresseux, aucune importation depuis `features/<public>`).
 - Aperçu d'un brouillon (D07) : même composant de rendu Markdown que le site public (`shared/markdown`).
 

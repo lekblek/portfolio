@@ -215,6 +215,16 @@ Principe : **aucun mouvement tant qu'il n'a pas de raison.** Une animation montr
 
 Règles : `transform` et `opacity` seulement ; jamais `transition: all` ; jamais depuis `scale(0)` ; transitions CSS interruptibles plutôt qu'images clés ; `@starting-style` pour les entrées ; aucune animation au chargement d'une page publique ; `prefers-reduced-motion: reduce` supprime les déplacements (les fondus très courts peuvent rester) ; aucune boucle automatique.
 
+Mouvements du site public, décidés en F20 (D-EL) ; tout autre mouvement passe par la même décision (fréquence, but, budget) :
+
+| Interaction | Mouvement | Sous mouvement réduit |
+|---|---|---|
+| pression d'un bouton (`appButton`, « Copier » des blocs de code) | `scale(0.97)`, `--duration-instant`, `--ease-out` | aucun |
+| ouverture de la navigation mobile | liste révélée (opacité) en descendant de 4 px, `--duration-base`, `--ease-out`, `@starting-style` ; fermeture immédiate | apparition immédiate |
+| message d'issue (`app-alert`) | fondu et montée de 4 px, `--duration-base`, `--ease-out`, `@starting-style` ; jamais dans le rendu serveur | apparition immédiate |
+
+Refusés en F20 : transitions entre pages, apparitions en cascade, transitions de survol, hauteur des `<details>`, défilement doux vers les ancres, fondu du libellé « Copié », apparition des diagrammes, rotation de l'icône du menu (raisons : D-EL).
+
 ## 12. Plans (z-index)
 
 | Token | Valeur | Élément |
@@ -290,14 +300,14 @@ Une primitive n'est créée qu'au premier écran qui en a besoin, et seulement s
 | bouton | directive `button[appButton]`, `a[appButton]` (`shared/ui/button.ts`) | **fait** (F08) | variantes `primary` (fond `ink`, survol `accent-strong`), `secondary` (trait fort `ink`), `quiet` (texte `accent`) ; `danger` en F24 ; tailles `md` (44 px) et `sm` (32 px) ; `disabled` retire de la tabulation, `aria-disabled="true"` garde le focus et ignore l'activation ; `loading` garde le libellé, pose `aria-busy` et ignore les activations (écouteur en phase de capture) ; les libellés longs passent à la ligne ; retour de pression `scale(0.97)` en 100 ms `--ease-out`, absent sous mouvement réduit, à l'état désactivé et pendant le chargement |
 | icône | composant `app-icon` + registre `shared/ui/icons.ts` | **fait** (F08) | `menu`, `close` (tracés Lucide, `frontend/THIRD-PARTY-NOTICES.md`) ; 1,25 em, `currentColor`, `aria-hidden` |
 | lien d'évitement | gabarit du shell (`layout/public-shell`) | **fait** (F09) | premier élément focalisable, visible au focus ; cible l'adresse courante suivie de `#contenu` (avec `<base href="/">`, un `#contenu` seul renverrait à la racine) |
-| navigation principale et mobile | `layout/public-shell/site-nav.ts` | **fait** (F09) | motif « disclosure » : bouton `Menu` (`aria-expanded`, `aria-controls`) hors du `<nav>`, même liste de liens pour le bureau et le mobile, dépliée **dans le flux** sous l'identité (ni `popover` ni `<dialog>` : rien n'est recouvert, aucun focus à piéger) ; `Échap` referme et rend le focus au bouton, une navigation referme ; lien courant repéré par un filet `accent` (`aria-current="page"`) ; aucun rendu tant qu'aucune page publique n'existe ; sans animation (décision de mouvement en F20) |
+| navigation principale et mobile | `layout/public-shell/site-nav.ts` | **fait** (F09) | motif « disclosure » : bouton `Menu` (`aria-expanded`, `aria-controls`) hors du `<nav>`, même liste de liens pour le bureau et le mobile, dépliée **dans le flux** sous l'identité (ni `popover` ni `<dialog>` : rien n'est recouvert, aucun focus à piéger) ; `Échap` referme et rend le focus au bouton, une navigation referme ; lien courant repéré par un filet `accent` (`aria-current="page"`) ; aucun rendu tant qu'aucune page publique n'existe ; ouverture en 200 ms, fermeture immédiate (§11, F20) |
 | état vide, état d'erreur, page introuvable | `shared/ui/empty-state.ts`, `shared/ui/error-state.ts`, `features/not-found` | **fait** (F09) | état vide : phrase + suite projetée ; erreur : `role="alert"`, texte de l'API si fourni, « Réessayer » ; page introuvable : repère « Erreur 404 » dans la colonne de repères, statut HTTP 404, liens de sortie ajoutés avec les pages publiques |
 | registre de parcours | composants de `features/about/ui` (`app-career-entry`, listes) | **fait** (F12) | propre à la page À propos : une entrée par `<li>`, titre `<h3>` puis précisions, date ou période en colonne fixe de 12 rem dès que la liste (conteneur de requête) dispose de 36 rem, filet entre deux entrées ; compétences en liste de définitions, séparateurs « · » sans texte de remplacement ; déplacé dans `shared/` seulement si une autre fonctionnalité en a besoin |
 | pagination | composant `app-pagination` (`shared/ui/pagination.ts`) | **fait** (F13) | liens, pas boutons ; `?page=` en base 1, première page sans paramètre, autres paramètres (filtres) conservés ; première, dernière, courante et voisines, ellipses ; `aria-current="page"` et filet `accent` sur la page courante ; « Précédente » / « Suivante » ; cibles de 44 px ; rien pour une seule page |
 | terme (catégorie, tag, technologie) | composant `app-term-links` (`shared/ui/term-link.ts`) | **fait** (F13) | liens typographiques vers la liste filtrée, séparés par « · » sans texte de remplacement, jamais des pastilles ; cible de 24 px au moins ; terme du filtre en cours marqué (`aria-current`, graisse) |
 | entrée de projet | composant `app-project-entry` (`shared/content`) | **fait** (F13) | ligne de registre : état et période, titre lié, résumé, technologies, couverture dans un emplacement 3:2 (vignette sur petit écran) ; grille de 12 colonnes dès 60 rem de conteneur ; `<h2>` ou `<h3>` |
 | table des matières | composant `app-table-of-contents` (`shared/markdown`) | **fait** (F14) | `nav` nommé, titres de niveaux 2 et 3 imbriqués (filet à gauche du second niveau) ; sur l'article : collant dans la marge gauche dès 80 rem, repliable (`<details>`) en dessous |
-| bouton Copier des blocs de code | barre du bloc (`codeToolbar`) + `app-code-copy` | **fait** (F14) | langage reconnu à gauche, « Copier » à droite (texte `accent`, 32 px) ; « Copié » deux secondes, annonce `aria-live` ; sans mouvement (F20) |
+| bouton Copier des blocs de code | barre du bloc (`codeToolbar`) + `app-code-copy` | **fait** (F14) | langage reconnu à gauche, « Copier » à droite (texte `accent`, 32 px) ; « Copié » deux secondes, annonce `aria-live` ; retour de pression des boutons (§11, F20) |
 | ligne de registre | feuille `styles/register.css` (`register-entry`, `register-meta`, `register-title`, `register-summary`, `register-terms`, `register-cover`) | **fait** (F16) | grille commune des entrées de projet, de publication et de série (troisième usage, §17) |
 | cartouche | `features/home/ui/title-block.ts` | **fait** (F17) | tableau « En bref » de faits réels, trait fort `ink`, cellules en `--text-xs` ; une ligne sans donnée est absente |
 | entrée de série | composant `app-series-entry` (`shared/content`) | **fait** (F16) | nombre de chapitres, titre lié, premier paragraphe de la description, couverture 3:2 |
@@ -305,7 +315,7 @@ Une primitive n'est créée qu'au premier écran qui en a besoin, et seulement s
 | entrée de publication | composant `app-publication-entry` (`shared/content`) | **fait** (F14) | registre des projets : date et temps de lecture, titre lié, résumé, catégorie puis tags, couverture 3:2 |
 | note marginale | notes du Markdown (`markdown-it-footnote`), rendues après le bloc qui les appelle (`role="note"`) ; styles `prose`, marge avec `prose-margin-notes` | **fait** (F14) | §4.5 : en marge droite dès `xl` (sous la fiche de l'article), dans le flux en dessous ; numéro `accent`, filet gauche `rule`, lien de retour |
 | champ (libellé, aide, erreur) | composant `app-field` + directive `appFieldControl`, feuille `styles/controls.css` | **fait** (F19) | libellé visible, aide puis erreur liées par `aria-describedby` (l'erreur d'abord), `aria-invalid` ; contrôles natifs à texte de 16 px, cible de 44 px, bordure `ink`, `danger` si invalide ; case à cocher : au premier usage |
-| message en ligne / région d'annonce | composant `app-alert` | **fait** (F19) | succès (`success`, icône, reçoit le focus) ou échec (`danger`, `role="alert"`) ; filet gauche de la couleur du ton, fond `paper-sunken` |
+| message en ligne / région d'annonce | composant `app-alert` | **fait** (F19) | succès (`success`, icône, reçoit le focus) ou échec (`danger`, `role="alert"`) ; filet gauche de la couleur du ton, fond `paper-sunken` ; entrée en 200 ms (§11, F20), d'où la règle : jamais dans le rendu serveur d'une page |
 | dialogue de confirmation | `<dialog>` natif enveloppé | F24 | actions destructrices de l'administration |
 | notification (toast) | service + région `aria-live="polite"` | F24 | administration seulement |
 | pastille de statut | composant `app-status` | F27 | brouillon, programmé, publié, archivé : texte + couleur |
@@ -345,6 +355,7 @@ Chaque page qui affiche des données prévoit, dès sa première version :
 - Diagramme : bloc ` ```mermaid ` ; toujours `accTitle:` (titre court) et `accDescr:` (phrase qui dit ce que montre le diagramme) : ils sont lus par les technologies d'assistance.
 - Note : appel `[^nom]` dans le texte, définition `[^nom]: texte` n'importe où ; la note se place après le paragraphe (en marge sur grand écran).
 - Code : bloc ` ```langage ` (java, typescript, javascript, python, sql, bash, json, yaml, css, xml) ; le langage s'affiche dans la barre du bloc.
+- Typographie française des titres, résumés et textes : espace insécable avant `;`, `:`, `!`, `?` et à l'intérieur des guillemets « » (une ligne ne commence jamais par une ponctuation) ; constat de l'audit F21, aide à la saisie prévue avec l'éditeur (F31).
 
 ## 21. Décisions
 

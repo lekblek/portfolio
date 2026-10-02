@@ -67,6 +67,7 @@ Prérequis, une fois par poste : `npx playwright install chromium` (version fix�
 - `playwright.config.ts` : projets `desktop` (1440 × 900) et `mobile` (390 × 844, tactile) ; le serveur de développement est démarré, ou réutilisé s'il tourne déjà.
 - Toute spécification importe `test`, `expect` et `expectAccessible` de `e2e/support/fixtures.ts` : un test échoue sur une erreur de console, une requête en échec, une réponse HTTP en erreur non déclarée (`guard.allowHttpError('/chemin')`) ou une violation axe (WCAG 2.2 A et AA).
 - Une spécification qui n'a pas besoin du backend porte l'étiquette `@no-api`.
+- Les tests de l'administration (`e2e/admin-auth.spec.ts`) lisent `ADMIN_USERNAME` et `ADMIN_PASSWORD` dans l'environnement (les valeurs de `deploy/.env`, données aussi au backend) ; sans elles, ils sont ignorés.
 - Captures, traces et rapports : `test-results/`, `playwright-report/` (ignorés par Git).
 
 ## État
