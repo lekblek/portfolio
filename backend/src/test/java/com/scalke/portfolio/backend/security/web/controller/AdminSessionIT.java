@@ -21,6 +21,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
+import java.util.Arrays;
 
 import static com.scalke.portfolio.backend.testsupport.CsrfTestSupport.xsrf;
 import static com.scalke.portfolio.backend.testsupport.FixedClockConfiguration.NOW;
@@ -172,7 +173,8 @@ class AdminSessionIT extends AbstractIntegrationTest {
 
     /**
      * Parcours d'Angular : une première requête d'administration (refusée) dépose le cookie {@code XSRF-TOKEN} ; la
-     * connexion le renvoie dans l'en-tête {@code X-XSRF-TOKEN} et reçoit un nouveau jeton.
+     * connexion le renvoie dans l'en-tête {@code X-XSRF-TOKEN} et reçoit un nouveau jeton, valable pour la requête
+     * modifiante suivante (D-EO).
      */
     @Test
     void follows_the_csrf_flow_of_a_single_page_application() throws Exception {
@@ -184,11 +186,20 @@ class AdminSessionIT extends AbstractIntegrationTest {
         mockMvc.perform(login("admin", PASSWORD))
             .andExpect(status().isForbidden())
             .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
-        Cookie renewed = mockMvc.perform(login("admin", PASSWORD).cookie(token).header("X-XSRF-TOKEN", token.getValue()))
+        MvcResult opened = mockMvc.perform(login("admin", PASSWORD).cookie(token).header("X-XSRF-TOKEN", token.getValue()))
             .andExpect(status().isOk())
-            .andReturn().getResponse().getCookie("XSRF-TOKEN");
-        assertThat(renewed).isNotNull();
-        assertThat(renewed.getValue()).isNotEqualTo(token.getValue());
+            .andReturn();
+        // L'ancien cookie est d'abord supprimé, puis le nouveau écrit : le navigateur garde le dernier
+        Cookie renewed = Arrays.stream(opened.getResponse().getCookies())
+            .filter(cookie -> cookie.getName().equals("XSRF-TOKEN"))
+            .reduce((first, second) -> second)
+            .orElseThrow();
+        assertThat(renewed.getValue()).isNotBlank().isNotEqualTo(token.getValue());
+        assertThat(renewed.getMaxAge()).isNotZero();
+
+        mockMvc.perform(delete("/api/admin/session").contextPath("/api").session(session(opened))
+                .cookie(renewed).header("X-XSRF-TOKEN", renewed.getValue()))
+            .andExpect(status().isNoContent());
     }
 
     @Test

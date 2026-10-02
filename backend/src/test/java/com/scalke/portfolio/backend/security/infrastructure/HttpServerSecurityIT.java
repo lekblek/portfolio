@@ -75,13 +75,15 @@ class HttpServerSecurityIT {
 
     /**
      * Les deux cookies de l'administration : {@code Secure} et {@code SameSite=Strict} ; la session n'est jamais lisible
-     * par JavaScript, le jeton CSRF doit l'être (Angular le recopie dans l'en-tête).
+     * par JavaScript, le jeton CSRF doit l'être (Angular le recopie dans l'en-tête), depuis toutes les pages du site
+     * (chemin {@code /}, D-EO).
      */
     @Test
     void sets_secure_same_site_cookies_for_the_administration() throws Exception {
         HttpResponse<String> first = send(HttpRequest.newBuilder(uri("/api/admin/session")));
         String csrfCookie = cookie(first, "XSRF-TOKEN").orElseThrow();
-        assertThat(csrfCookie).contains("Secure").containsIgnoringCase("SameSite=Strict").doesNotContain("HttpOnly");
+        assertThat(csrfCookie).contains("Secure").containsIgnoringCase("SameSite=Strict").doesNotContain("HttpOnly")
+            .containsPattern("; Path=/(;|$)");
 
         HttpResponse<String> login = login(value(csrfCookie));
 

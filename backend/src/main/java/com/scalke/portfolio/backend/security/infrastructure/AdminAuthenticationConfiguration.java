@@ -64,12 +64,14 @@ public class AdminAuthenticationConfiguration {
     }
 
     /**
-     * À la connexion : nouvel identifiant de session (contre la fixation de session) et nouveau jeton CSRF.
+     * À la connexion : nouvel identifiant de session (contre la fixation de session) et nouveau jeton CSRF. Le gestionnaire
+     * du projet écrit le nouveau jeton dans la réponse de la connexion (D-EO) : avec celui par défaut, l'ancien cookie était
+     * seulement supprimé et la requête modifiante suivante (déconnexion) refusée faute de jeton.
      */
     @Bean
     SessionAuthenticationStrategy sessionAuthenticationStrategy(CookieCsrfTokenRepository csrfTokenRepository) {
-        return new CompositeSessionAuthenticationStrategy(List.of(
-            new ChangeSessionIdAuthenticationStrategy(),
-            new CsrfAuthenticationStrategy(csrfTokenRepository)));
+        CsrfAuthenticationStrategy csrf = new CsrfAuthenticationStrategy(csrfTokenRepository);
+        csrf.setRequestHandler(new AdminCsrfTokenRequestHandler());
+        return new CompositeSessionAuthenticationStrategy(List.of(new ChangeSessionIdAuthenticationStrategy(), csrf));
     }
 }

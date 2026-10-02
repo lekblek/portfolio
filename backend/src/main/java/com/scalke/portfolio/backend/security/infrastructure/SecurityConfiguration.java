@@ -92,13 +92,16 @@ public class SecurityConfiguration {
 
     /**
      * Jeton CSRF en cookie lisible par l'application Angular (D-CP), avec les mêmes attributs que le cookie de session
-     * ({@code server.servlet.session.cookie.*}, D-CR) : {@code Secure} et {@code SameSite=Strict}.
+     * ({@code server.servlet.session.cookie.*}, D-CR) : {@code Secure} et {@code SameSite=Strict}. Chemin {@code /} et non
+     * le chemin de contexte {@code /api} : Angular lit le jeton dans {@code document.cookie}, qui ne montre aux pages
+     * {@code /admin/**} que les cookies de leur chemin (D-EO).
      */
     @Bean
     CookieCsrfTokenRepository csrfTokenRepository(
         @Value("${server.servlet.session.cookie.secure}") boolean secure,
         @Value("${server.servlet.session.cookie.same-site}") String sameSite) {
         CookieCsrfTokenRepository repository = CookieCsrfTokenRepository.withHttpOnlyFalse();
+        repository.setCookiePath("/");
         repository.setCookieCustomizer(cookie -> cookie.secure(secure).sameSite(sameSite));
         return repository;
     }
