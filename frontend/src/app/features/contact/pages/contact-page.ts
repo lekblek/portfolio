@@ -23,6 +23,7 @@ import {
 
 import { retryAfterMinutes, toApiError } from '../../../core/api/api-error';
 import { Seo } from '../../../core/seo/seo';
+import { serverFieldErrors } from '../../../shared/forms/server-errors';
 import { Alert } from '../../../shared/ui/alert';
 import { Button } from '../../../shared/ui/button';
 import { Field, FieldControl } from '../../../shared/ui/field';
@@ -277,23 +278,13 @@ export class ContactPage {
 
   /** Erreurs de champ du serveur rattachées à leur champ ; refus et pannes dans un message. */
   private handleFailure(error: unknown): TreeValidationResult {
-    const failure = toApiError(error);
-    const fieldErrors = failure.fieldErrors.filter(
-      (
-        item,
-      ): item is typeof item & {
-        field: VisibleField;
-      } => (FIELDS as readonly string[]).includes(item.field),
-    );
-    if (failure.code === 'VALIDATION_FAILED' && fieldErrors.length > 0) {
+    const { name, email, subject, message } = this.contactForm;
+    const fieldErrors = serverFieldErrors(error, { name, email, subject, message });
+    if (fieldErrors.length > 0) {
       this.focusFirstError();
-      return fieldErrors.map((item) => ({
-        fieldTree: this.contactForm[item.field],
-        kind: 'server',
-        message: item.message,
-      }));
+      return fieldErrors;
     }
-    if (failure.code === 'TOO_MANY_CONTACT_MESSAGES') {
+    if (toApiError(error).code === 'TOO_MANY_CONTACT_MESSAGES') {
       this.failure.set({ title: 'Trop de messages envoyés', text: this.retryText(error) });
     } else {
       this.failure.set({

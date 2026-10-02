@@ -31,6 +31,12 @@ export type ApiErrorCode =
   | 'INVALID_CREDENTIALS'
   | 'TOO_MANY_LOGIN_ATTEMPTS'
   | 'TOO_MANY_CONTACT_MESSAGES'
+  | 'NAME_ALREADY_USED'
+  | 'SLUG_ALREADY_USED'
+  | 'TERM_STILL_USED'
+  | 'MEDIA_STILL_REFERENCED'
+  | 'MEDIA_TOO_LARGE'
+  | 'UNSUPPORTED_MEDIA_FORMAT'
   | 'SLUG_LOCKED';
 
 /** Erreur d'appel à l'API, prête pour l'affichage (textes de l'API en français, D-DJ). */
