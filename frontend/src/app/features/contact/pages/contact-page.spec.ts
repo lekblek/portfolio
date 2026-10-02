@@ -83,6 +83,16 @@ describe('ContactPage', () => {
     expect(trap.getAttribute('tabindex')).toBe('-1');
   });
 
+  it('says how the data of the form are used, in the words validated by the owner', async () => {
+    const { element } = await setUp();
+
+    expect(element().textContent?.replace(/\s+/g, ' ')).toContain(
+      'Votre nom, votre adresse électronique et votre message sont utilisés uniquement pour ' +
+        'traiter votre demande et vous répondre. Ils ne sont jamais publiés sur le site et ' +
+        'votre adresse IP n’est pas enregistrée.',
+    );
+  });
+
   it('shows each error next to its field and moves the focus to the first one', async () => {
     const { http, element, control, type, submit } = await setUp();
     type('contact-adresse', 'camille');

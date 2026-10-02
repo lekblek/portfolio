@@ -28,6 +28,7 @@ export type ApiErrorCode =
   | 'RESOURCE_NOT_FOUND'
   | 'VALIDATION_FAILED'
   | 'AUTHENTICATION_REQUIRED'
+  | 'INVALID_CREDENTIALS'
   | 'TOO_MANY_LOGIN_ATTEMPTS'
   | 'TOO_MANY_CONTACT_MESSAGES'
   | 'SLUG_LOCKED';
@@ -57,6 +58,16 @@ export function toApiError(error: unknown): ApiError {
     detail: problem?.detail ?? null,
     fieldErrors: problem?.errors ?? [],
   };
+}
+
+/**
+ * Délai d'attente d'un refus 429, en minutes arrondies au-dessus, lu dans `Retry-After` (secondes,
+ * D-CQ, D-EJ) ; `null` si l'en-tête manque ou n'est pas un nombre de secondes positif.
+ */
+export function retryAfterMinutes(error: unknown): number | null {
+  const seconds =
+    error instanceof HttpErrorResponse ? Number(error.headers.get('Retry-After')) : Number.NaN;
+  return Number.isFinite(seconds) && seconds > 0 ? Math.ceil(seconds / 60) : null;
 }
 
 function isApiProblem(body: unknown): body is ApiProblem {

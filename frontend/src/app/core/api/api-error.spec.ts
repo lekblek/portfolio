@@ -1,6 +1,6 @@
 import { HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 
-import { ApiProblem, toApiError } from './api-error';
+import { ApiProblem, retryAfterMinutes, toApiError } from './api-error';
 
 function problemResponse(problem: ApiProblem): HttpErrorResponse {
   return new HttpErrorResponse({
@@ -68,5 +68,27 @@ describe('toApiError', () => {
 
   it('treats any other error as a network failure', () => {
     expect(toApiError(new Error('boom'))).toMatchObject({ status: 0, code: null });
+  });
+});
+
+describe('retryAfterMinutes', () => {
+  const refusal = (retryAfter: string | null) =>
+    new HttpErrorResponse({
+      status: 429,
+      headers:
+        retryAfter === null ? new HttpHeaders() : new HttpHeaders({ 'Retry-After': retryAfter }),
+    });
+
+  it('rounds the delay up to the next minute', () => {
+    expect(retryAfterMinutes(refusal('600'))).toBe(10);
+    expect(retryAfterMinutes(refusal('61'))).toBe(2);
+    expect(retryAfterMinutes(refusal('1'))).toBe(1);
+  });
+
+  it('gives no delay without a usable header', () => {
+    expect(retryAfterMinutes(refusal(null))).toBeNull();
+    expect(retryAfterMinutes(refusal('demain'))).toBeNull();
+    expect(retryAfterMinutes(refusal('0'))).toBeNull();
+    expect(retryAfterMinutes(new Error('réseau'))).toBeNull();
   });
 });

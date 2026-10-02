@@ -1,4 +1,4 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import {
   afterNextRender,
   Component,
@@ -21,7 +21,7 @@ import {
   validate,
 } from '@angular/forms/signals';
 
-import { toApiError } from '../../../core/api/api-error';
+import { retryAfterMinutes, toApiError } from '../../../core/api/api-error';
 import { Seo } from '../../../core/seo/seo';
 import { Alert } from '../../../shared/ui/alert';
 import { Button } from '../../../shared/ui/button';
@@ -130,7 +130,12 @@ function notBlank(path: SchemaPath<string>, message: string): void {
               controlId="contact-sujet"
               [error]="errorOf(contactForm.subject)"
             >
-              <input appFieldControl type="text" [formField]="contactForm.subject" />
+              <input
+                appFieldControl
+                type="text"
+                autocomplete="off"
+                [formField]="contactForm.subject"
+              />
             </app-field>
             <app-field
               label="Message"
@@ -138,7 +143,12 @@ function notBlank(path: SchemaPath<string>, message: string): void {
               hint="5 000 caractères au plus."
               [error]="errorOf(contactForm.message)"
             >
-              <textarea appFieldControl rows="8" [formField]="contactForm.message"></textarea>
+              <textarea
+                appFieldControl
+                rows="8"
+                autocomplete="off"
+                [formField]="contactForm.message"
+              ></textarea>
             </app-field>
 
             <!-- Piège à robots : hors de l'écran, de l'arbre d'accessibilité et de la tabulation -->
@@ -154,9 +164,9 @@ function notBlank(path: SchemaPath<string>, message: string): void {
             </div>
 
             <p class="text-sm text-ink-muted">
-              Votre nom, votre adresse électronique et votre message servent uniquement à vous
-              répondre. Ils ne sont jamais publiés sur le site, et votre adresse IP n’est pas
-              enregistrée.
+              Votre nom, votre adresse électronique et votre message sont utilisés uniquement pour
+              traiter votre demande et vous répondre. Ils ne sont jamais publiés sur le site et
+              votre adresse IP n’est pas enregistrée.
             </p>
             @if (failure(); as current) {
               <app-alert tone="danger" [title]="current.title">
@@ -295,12 +305,10 @@ export class ContactPage {
   }
 
   private retryText(error: unknown): string {
-    const seconds =
-      error instanceof HttpErrorResponse ? Number(error.headers.get('Retry-After')) : NaN;
-    if (!Number.isFinite(seconds) || seconds <= 0) {
+    const minutes = retryAfterMinutes(error);
+    if (minutes === null) {
       return 'Votre texte est conservé\u202f: réessayez plus tard.';
     }
-    const minutes = Math.ceil(seconds / 60);
     return `Votre texte est conservé\u202f: réessayez dans ${minutes} ${minutes === 1 ? 'minute' : 'minutes'}.`;
   }
 
