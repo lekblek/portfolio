@@ -14,7 +14,7 @@ Servies depuis les paquets `@fontsource-variable/*` ; texte complet de la licenc
 
 ## Icônes : tracés de Lucide
 
-Tracés des icônes de `src/app/shared/ui/icons.ts`, repris de Lucide 1.49.0 (<https://lucide.dev>) : `menu` ; `x` (nommée `close`), dérivée de Feather.
+Tracés des icônes de `src/app/shared/ui/icons.ts`, repris de Lucide 1.49.0 (<https://lucide.dev>) : `menu` ; `x` (nommée `close`), dérivée de Feather ; `circle-alert` et `circle-check` (cercles réécrits en arcs) ; `upload` et `file-text` (tracés des versions antérieures de Lucide).
 
 ```text
 ISC License
