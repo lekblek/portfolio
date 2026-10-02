@@ -37,7 +37,9 @@ describe('SeriesNavigation', () => {
 
     expect(element.querySelector('a[rel="prev"]')).toBeNull();
     expect(element.querySelector('a[rel="next"]')?.getAttribute('href')).toBe('/articles/deuxieme');
-    expect(element.querySelector('nav')?.getAttribute('aria-label')).toBe('Série « Spring Boot »');
+    expect(element.querySelector('nav')?.getAttribute('aria-label')).toBe(
+      'Série «\u00a0Spring Boot\u00a0»',
+    );
   });
 
   it('offers only the previous chapter on the last one', () => {

@@ -21,7 +21,7 @@ import { SeriesNavigation as Navigation } from '../../../core/api/api-types';
     } @else {
       <nav
         class="series-chapters"
-        [attr.aria-label]="'Série « ' + navigation().series.title + ' »'"
+        [attr.aria-label]="'Série «&#160;' + navigation().series.title + '&#160;»'"
       >
         <p class="series-chapters-title">
           <span class="text-sm text-ink-muted tabular-nums"

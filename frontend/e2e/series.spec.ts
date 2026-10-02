@@ -48,7 +48,7 @@ test.describe('series', () => {
     const [first, second] = series.chapters;
     await page.goto(`/articles/${first.slug}`);
 
-    const block = page.getByRole('navigation', { name: `Série « ${series.title} »` });
+    const block = page.getByRole('navigation', { name: `Série «\u00a0${series.title}\u00a0»` });
     await expect(block.locator('a[rel="prev"]')).toHaveCount(0);
     const next = block.locator('a[rel="next"]');
     await expect(next).toHaveText(second.title);

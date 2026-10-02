@@ -58,7 +58,7 @@ async function draw(figure: HTMLElement): Promise<void> {
   } catch {
     const note = figure.ownerDocument.createElement('figcaption');
     note.className = 'diagram-error';
-    note.textContent = 'Le diagramme n’a pas pu être dessiné ; sa source est affichée.';
+    note.textContent = 'Le diagramme n’a pas pu être dessiné\u202f; sa source est affichée.';
     figure.appendChild(note);
     figure.dataset['diagramState'] = 'failed';
   }

@@ -92,7 +92,7 @@ import { publicationJsonLd } from './publication-json-ld';
         <app-table-of-contents
           [entries]="rendered().headings"
           [path]="canonicalPath()"
-          [label]="'Sommaire de « ' + current.title + ' »'"
+          [label]="'Sommaire de «&#160;' + current.title + '&#160;»'"
         />
       </ng-template>
 

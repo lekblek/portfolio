@@ -1,6 +1,7 @@
 import { Page } from '@playwright/test';
 
 import { expect, expectAccessible, PageGuard, test } from './support/fixtures';
+import { recordTransitions } from './support/motion';
 
 // Rendu serveur, filtres et redirections : backend de développement (profil `dev`). Sommaire et
 // bouton Copier : article long simulé dans le navigateur, après une navigation client.
@@ -174,7 +175,7 @@ test.describe('publications', () => {
       await summary.focus();
       await page.keyboard.press('Enter');
     }
-    const toc = page.getByRole('navigation', { name: `Sommaire de « ${first.title} »` });
+    const toc = page.getByRole('navigation', { name: `Sommaire de «\u00a0${first.title}\u00a0»` });
     const link = toc.getByRole('link', { name: 'Réalisation' });
     await link.focus();
     await page.keyboard.press('Enter');
@@ -189,12 +190,33 @@ test.describe('publications', () => {
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
     const [first] = await articles(request);
     await openFirstArticleWithLongContent(page, first, guard);
+    const transitions = await recordTransitions(page, '.code-copy');
 
     await page.getByRole('button', { name: 'Copier le code' }).click();
 
     await expect(page.getByText('Code copié dans le presse-papiers.')).toBeAttached();
+    // Retour de pression des boutons (F08, F20)
+    await expect.poll(transitions).toEqual(['transform']);
     expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
       'record Detection(String zone) {}',
     );
+  });
+
+  test.describe('with reduced motion', () => {
+    test.use({ reducedMotion: 'reduce' });
+
+    test('copies a code block without moving its button', async ({ page, request, guard }) => {
+      const [first] = await articles(request);
+      await openFirstArticleWithLongContent(page, first, guard);
+      const button = page.getByRole('button', { name: 'Copier le code' });
+      const transitions = await recordTransitions(page, '.code-copy');
+
+      await button.hover();
+      await page.mouse.down();
+      await expect(button).toHaveCSS('transform', 'none');
+      await page.mouse.up();
+
+      expect(await transitions()).toEqual([]);
+    });
   });
 });
