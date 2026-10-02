@@ -26,23 +26,6 @@ const CONTENT_ID = 'contenu';
     </main>
     <app-site-footer />
   `,
-  styles: `
-    .skip-link {
-      position: absolute;
-      inset-inline-start: var(--spacing-gutter);
-      top: calc(var(--spacing) * -16);
-      z-index: var(--z-skip);
-      padding: calc(var(--spacing) * 3) calc(var(--spacing) * 4);
-      border-radius: var(--radius-control);
-      background: var(--color-ink);
-      color: var(--color-paper);
-      font-weight: var(--font-weight-medium);
-    }
-
-    .skip-link:focus {
-      top: calc(var(--spacing) * 2);
-    }
-  `,
 })
 export class PublicShell {
   protected readonly contentId = CONTENT_ID;

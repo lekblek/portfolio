@@ -23,3 +23,20 @@
   gap: --value(--spacing-*);
   gap: calc(var(--spacing) * --value(integer));
 }
+
+/* Lien d'évitement des cadres public et d'administration : hors de l'écran, visible au focus */
+@utility skip-link {
+  position: absolute;
+  inset-inline-start: var(--spacing-gutter);
+  top: calc(var(--spacing) * -16);
+  z-index: var(--z-skip);
+  padding: calc(var(--spacing) * 3) calc(var(--spacing) * 4);
+  border-radius: var(--radius-control);
+  background: var(--color-ink);
+  color: var(--color-paper);
+  font-weight: var(--font-weight-medium);
+
+  &:focus {
+    top: calc(var(--spacing) * 2);
+  }
+}
