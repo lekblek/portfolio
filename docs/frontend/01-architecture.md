@@ -270,9 +270,9 @@ Aucune donnée d'authentification dans `localStorage` ou `sessionStorage`.
 ## 11. Administration
 
 - Connexion par session serveur (D-CO) : `POST /api/admin/session`, lecture par `GET /api/admin/session` (200 avec `login`, sinon 401), déconnexion par `DELETE /api/admin/session` (204, filtre de Spring Security : absente de `openapi.json`, présente dans `SecurityConfiguration`).
-- `canMatch` sur `/admin` (hors `/admin/login`) : la session est vérifiée une fois puis gardée dans `AdminSession` ; sans session (ou serveur injoignable), retour à la connexion avec `returnUrl`, limité aux pages `/admin/**` (`adminReturnUrl`, aucune redirection ouverte). Une 401 ultérieure (session expirée après 30 minutes, D-CR) la videra et renverra à la connexion : intercepteur ajouté avec la première requête d'administration autre que la session (F23, D-EN).
+- `canMatch` sur `/admin` (hors `/admin/login`) : la session est vérifiée une fois puis gardée dans `AdminSession` ; sans session (ou serveur injoignable), retour à la connexion avec `returnUrl`, limité aux pages `/admin/**` (`adminReturnUrl`, aucune redirection ouverte). Une 401 ultérieure de `/api/admin/` (session expirée après 30 minutes, D-CR) la vide et renvoie à la connexion avec la page en cours en `returnUrl` : intercepteur fourni par la route d'administration seulement, avant ceux de l'application (D-EP).
 - Jeton CSRF : le cookie `XSRF-TOKEN` est au chemin `/` (lisible par `document.cookie` depuis `/admin/**`) et renouvelé dans la réponse de la connexion (D-EO) ; la première requête de la page de connexion (`GET /api/admin/session`) le dépose.
-- Page de connexion et accueil de l'administration : D-EN (F22).
+- Page de connexion : D-EN (F22). Cadre : `layout/admin-shell` (présentation) et `features/admin/admin-frame.ts` (session, déconnexion, `ADMIN_NAVIGATION`, une entrée par écran existant) ; tableau de bord : D-EP (F23).
 - Rendu client uniquement ; le lot d'administration n'est jamais chargé par le site public (chargement paresseux, aucune importation depuis `features/<public>`).
 - Aperçu d'un brouillon (D07) : même composant de rendu Markdown que le site public (`shared/markdown`).
 
@@ -372,6 +372,6 @@ Cible WCAG 2.2 AA (D17). Règles d'architecture :
 | Route publique d'envoi d'un message (`POST /api/public/contact-messages`, piège à robots, limitation de débit) | F19 (backend puis frontend) |
 | Filtre `featured` des projets pour l'accueil | F17 |
 | Liste publique des technologies, catégories et tags (filtres) | F13, F14, si l'écran les affiche |
-| Contenu de `/admin/settings` (`01-perimetre-v1.md` §3) : aucune API ni besoin défini | à décider par le propriétaire avant F23 |
+| Contenu de `/admin/settings` | retiré de la V1 par le propriétaire (D25, 2026-10-02) |
 | Sitemap et `robots.txt` : serveur SSR ou API | F33 |
 | Suppression d'un message de contact avant la mise en ligne | F30 (backend puis frontend) |

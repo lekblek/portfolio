@@ -220,7 +220,7 @@ Mouvements du site public, décidés en F20 (D-EL) ; tout autre mouvement passe 
 | Interaction | Mouvement | Sous mouvement réduit |
 |---|---|---|
 | pression d'un bouton (`appButton`, « Copier » des blocs de code) | `scale(0.97)`, `--duration-instant`, `--ease-out` | aucun |
-| ouverture de la navigation mobile | liste révélée (opacité) en descendant de 4 px, `--duration-base`, `--ease-out`, `@starting-style` ; fermeture immédiate | apparition immédiate |
+| ouverture de la navigation mobile (site public et administration) | liste révélée (opacité) en descendant de 4 px, `--duration-base`, `--ease-out`, `@starting-style` ; fermeture immédiate | apparition immédiate |
 | message d'issue (`app-alert`) | fondu et montée de 4 px, `--duration-base`, `--ease-out`, `@starting-style` ; jamais dans le rendu serveur | apparition immédiate |
 
 Refusés en F20 : transitions entre pages, apparitions en cascade, transitions de survol, hauteur des `<details>`, défilement doux vers les ancres, fondu du libellé « Copié », apparition des diagrammes, rotation de l'icône du menu (raisons : D-EL).
@@ -316,6 +316,8 @@ Une primitive n'est créée qu'au premier écran qui en a besoin, et seulement s
 | note marginale | notes du Markdown (`markdown-it-footnote`), rendues après le bloc qui les appelle (`role="note"`) ; styles `prose`, marge avec `prose-margin-notes` | **fait** (F14) | §4.5 : en marge droite dès `xl` (sous la fiche de l'article), dans le flux en dessous ; numéro `accent`, filet gauche `rule`, lien de retour |
 | champ (libellé, aide, erreur) | composant `app-field` + directive `appFieldControl`, feuille `styles/controls.css` | **fait** (F19) | libellé visible, aide puis erreur liées par `aria-describedby` (l'erreur d'abord), `aria-invalid` ; contrôles natifs à texte de 16 px, cible de 44 px, bordure `ink`, `danger` si invalide ; case à cocher : au premier usage |
 | message en ligne / région d'annonce | composant `app-alert` | **fait** (F19) | succès (`success`, icône, reçoit le focus) ou échec (`danger`, `role="alert"`) ; filet gauche de la couleur du ton, fond `paper-sunken` ; entrée en 200 ms (§11, F20), d'où la règle : jamais dans le rendu serveur d'une page |
+| cadre d'administration | `layout/admin-shell/admin-shell.ts` | **fait** (F23) | en-tête à trait fort `ink` (identité, administrateur connecté, « Se déconnecter »), barre latérale de 15 rem sur `paper-sunken` dès 64 rem (page courante : filet `accent`, « Voir le site »), « Menu » dépliant dans le flux en dessous ; titres de page en `text-2xl` (densité d'outil), aucune carte ni ombre |
+| relevé (tableau de bord) | gabarit du tableau de bord (`features/admin/dashboard`) | **fait** (F23) | cartouche à trait fort `ink`, lignes à filet, libellé à gauche, nombre à droite en `--font-code` à chasse fixe ; une primitive seulement au second usage |
 | dialogue de confirmation | `<dialog>` natif enveloppé | F24 | actions destructrices de l'administration |
 | notification (toast) | service + région `aria-live="polite"` | F24 | administration seulement |
 | pastille de statut | composant `app-status` | F27 | brouillon, programmé, publié, archivé : texte + couleur |

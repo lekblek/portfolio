@@ -62,8 +62,9 @@ Routes prévues :
 /admin/tags
 /admin/media
 /admin/contacts
-/admin/settings
 ```
+
+Pas d'écran de paramètres en V1 (D25) : les réglages fonctionnels vivent dans leur module (profil, contenus, médias…), les réglages techniques dans la configuration du déploiement.
 
 Un seul compte administrateur existe en V1.
 
@@ -473,6 +474,7 @@ La V1 inclut :
 | D22 | Rendu serveur à la demande par défaut ; prerender décidé route par route à l'étape 52.1 |
 | D23 | Compose de développement local dans `deploy/compose.dev.yaml` (PostgreSQL seul, variables dans `deploy/.env`) ; `deploy/compose.yaml` réservé à la production (étape 52.9) |
 | D24 | Flyway est l'unique propriétaire du schéma ; Hibernate sera configuré en validate et jamais en update |
+| D25 | Pas de `/admin/settings` en V1 (décision du propriétaire, 2026-10-02) : aucun besoin métier ni API ; réintroduit si un besoin applicatif concret apparaît |
 
 Décisions d'architecture et d'implémentation postérieures : voir [`decisions/README.md`](decisions/README.md).
 
