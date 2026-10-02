@@ -33,3 +33,6 @@ export type SearchResult = Schemas['SearchResultResponse'];
 export type SearchResultType = SearchResult['type'];
 
 export type ContactMessageRequest = Schemas['SubmitContactMessageRequest'];
+
+export type AdminAccount = Schemas['AdminSessionResponse'];
+export type AdminCredentials = Schemas['OpenAdminSessionRequest'];
