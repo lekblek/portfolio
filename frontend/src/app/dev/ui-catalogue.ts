@@ -1,11 +1,22 @@
-import { afterNextRender, Component, computed, DOCUMENT, inject, signal } from '@angular/core';
+import {
+  afterNextRender,
+  Component,
+  computed,
+  DOCUMENT,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
 
 import { Alert } from '../shared/ui/alert';
 import { Button, ButtonVariant } from '../shared/ui/button';
+import { ConfirmDialog } from '../shared/ui/confirm-dialog';
+import { DataTable } from '../shared/ui/data-table';
 import { EmptyState } from '../shared/ui/empty-state';
 import { ErrorState } from '../shared/ui/error-state';
 import { Field, FieldControl } from '../shared/ui/field';
 import { Icon } from '../shared/ui/icon';
+import { ToastRegion, Toaster, ToastTone } from '../shared/ui/toast';
 import { contrastRatio, textLevel } from './contrast';
 
 interface ColorToken {
@@ -145,7 +156,18 @@ const MOTION = [
  */
 @Component({
   selector: 'app-ui-catalogue',
-  imports: [Alert, Button, EmptyState, ErrorState, Field, FieldControl, Icon],
+  imports: [
+    Alert,
+    Button,
+    ConfirmDialog,
+    DataTable,
+    EmptyState,
+    ErrorState,
+    Field,
+    FieldControl,
+    Icon,
+    ToastRegion,
+  ],
   templateUrl: './ui-catalogue.html',
   styleUrl: './ui-catalogue.css',
 })
@@ -153,7 +175,7 @@ export class UiCatalogue {
   protected readonly colors = COLORS;
   protected readonly typeScale = TYPE_SCALE;
   protected readonly spacing = SPACING;
-  protected readonly buttonVariants: ButtonVariant[] = ['primary', 'secondary', 'quiet'];
+  protected readonly buttonVariants: ButtonVariant[] = ['primary', 'secondary', 'quiet', 'danger'];
   protected readonly stacks = STACKS;
   protected readonly terms = TERMS;
   protected readonly motion = MOTION;
@@ -176,7 +198,16 @@ export class UiCatalogue {
     }),
   );
 
+  protected readonly tableRows = [
+    { name: 'Java', slug: 'java', order: 0 },
+    { name: 'Spring Boot', slug: 'spring-boot', order: 1 },
+    { name: 'Angular', slug: 'angular', order: 2 },
+  ];
+  protected readonly dialogAnswer = signal('');
+
   private readonly document = inject(DOCUMENT);
+  private readonly confirm = viewChild.required<ConfirmDialog>('confirm');
+  private readonly toaster = inject(Toaster);
 
   constructor() {
     afterNextRender(() => {
@@ -193,5 +224,21 @@ export class UiCatalogue {
         ),
       );
     });
+  }
+
+  protected async askToDelete(): Promise<void> {
+    const confirmed = await this.confirm().ask({
+      title: 'Supprimer le tag «\u00a0Java\u00a0»\u202f?',
+      message: 'Démonstration\u202f: rien n’est supprimé.',
+      confirmLabel: 'Supprimer le tag',
+    });
+    this.dialogAnswer.set(confirmed ? 'Réponse : confirmé.' : 'Réponse : annulé.');
+  }
+
+  protected notify(tone: ToastTone): void {
+    this.toaster.show(
+      tone === 'success' ? 'Tag «\u00a0Java\u00a0» enregistré.' : 'La suppression a échoué.',
+      tone,
+    );
   }
 }

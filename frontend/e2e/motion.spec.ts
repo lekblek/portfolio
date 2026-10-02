@@ -1,12 +1,19 @@
 import { Page } from '@playwright/test';
 
-import { expect, test } from './support/fixtures';
+import { expect, PageGuard, test } from './support/fixtures';
 import { recordMotionFromLoad, recordTransitions } from './support/motion';
 
 // Mouvement du site public (F20, 02-design-system §11) : rien ne bouge au chargement d'une page ;
 // navigation mobile et messages d'issue entrent en 200 ms ; rien ne se déplace sous mouvement réduit.
 const CONTACT_API = '/api/public/contact-messages';
 const NAV_LIST = '#navigation-principale ul';
+
+/** Catalogue `/_ui` : servi en développement seulement ; le test s'ignore sur un build de production. */
+async function openCatalogue(page: Page, guard: PageGuard): Promise<void> {
+  guard.allowHttpError('/_ui');
+  const response = await page.goto('/_ui', { waitUntil: 'networkidle' });
+  test.skip(response?.status() === 404, 'catalogue de développement absent en production');
+}
 
 async function failContactMessage(page: Page): Promise<void> {
   await page.route(`**${CONTACT_API}`, (route) =>
@@ -89,6 +96,24 @@ test.describe('motion', () => {
     await expect.poll(transitions).toEqual(['opacity', 'transform']);
   });
 
+  test(
+    'brings in the confirmation dialog and the notifications',
+    { tag: '@no-api' },
+    async ({ page, guard }) => {
+      // Catalogue de développement : dialogue et notifications sans compte administrateur (F24)
+      await openCatalogue(page, guard);
+      const dialog = await recordTransitions(page, 'dialog');
+      await page.getByRole('button', { name: 'Ouvrir le dialogue de confirmation' }).click();
+      await expect(page.getByRole('dialog')).toBeVisible();
+      await expect.poll(dialog).toEqual(['opacity', 'transform']);
+      await page.keyboard.press('Escape');
+
+      const toast = await recordTransitions(page, '.toast');
+      await page.getByRole('button', { name: 'Notifier une réussite' }).click();
+      await expect.poll(toast).toEqual(['opacity', 'transform']);
+    },
+  );
+
   test.describe('with reduced motion', () => {
     test.use({ reducedMotion: 'reduce' });
 
@@ -122,6 +147,23 @@ test.describe('motion', () => {
 
         expect(await transitions()).toEqual([]);
         await expect(page.locator('app-alert')).toHaveCSS('transform', 'none');
+      },
+    );
+
+    test(
+      'opens the dialog and shows a notification without moving them',
+      { tag: '@no-api' },
+      async ({ page, guard }) => {
+        await openCatalogue(page, guard);
+        const motion = await recordTransitions(page, 'dialog, .toast');
+
+        await page.getByRole('button', { name: 'Ouvrir le dialogue de confirmation' }).click();
+        await expect(page.getByRole('dialog')).toBeVisible();
+        await page.keyboard.press('Escape');
+        await page.getByRole('button', { name: 'Notifier une réussite' }).click();
+        await expect(page.locator('.toast')).toBeVisible();
+
+        expect(await motion()).toEqual([]);
       },
     );
   });

@@ -9,7 +9,7 @@ import {
   Renderer2,
 } from '@angular/core';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'quiet';
+export type ButtonVariant = 'primary' | 'secondary' | 'quiet' | 'danger';
 export type ButtonSize = 'sm' | 'md';
 
 // Retour de pression : seul mouvement retenu (transform, 100 ms), absent sous mouvement réduit (motion-safe)
@@ -34,6 +34,11 @@ const VARIANTS: Record<ButtonVariant, string> = {
   quiet:
     'border-transparent bg-transparent text-accent hover:bg-paper-sunken hover:text-accent-strong ' +
     'disabled:text-ink-muted aria-disabled:text-ink-muted',
+  // Action destructive seulement (suppression confirmée) : fond danger, inversé au survol
+  danger:
+    'border-danger bg-danger text-paper hover:bg-paper hover:text-danger ' +
+    'disabled:border-rule disabled:bg-paper-sunken disabled:text-ink-muted ' +
+    'aria-disabled:border-rule aria-disabled:bg-paper-sunken aria-disabled:text-ink-muted',
 };
 
 // md : cible de 44 px (tactile) ; sm : 32 px, au-dessus du minimum de 24 px (WCAG 2.5.8)

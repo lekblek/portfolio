@@ -337,6 +337,57 @@ ProblemDetail handleResourceNotFound(ResourceNotFoundException ex) &#123;
     </div>
   </section>
 
+  <section class="border-b border-rule py-block" aria-labelledby="ui-administration">
+    <h2 id="ui-administration" class="text-2xl tracking-heading">Administration</h2>
+    <p class="mt-3 max-w-prose text-ink-muted">
+      Tableau de données, dialogue de confirmation d’une action destructive et notifications légères
+      (F24).
+    </p>
+    <app-data-table class="mt-block" label="Exemple de tableau">
+      <table class="data-table">
+        <caption class="sr-only">
+          Exemple de tableau
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">Nom</th>
+            <th scope="col">Slug</th>
+            <th scope="col" class="data-table-number">Ordre</th>
+            <th scope="col" class="data-table-actions"><span class="sr-only">Actions</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of tableRows; track row.slug) {
+            <tr>
+              <th scope="row">{{ row.name }}</th>
+              <td class="data-table-code" translate="no">{{ row.slug }}</td>
+              <td class="data-table-number">{{ row.order }}</td>
+              <td class="data-table-actions">
+                <button appButton type="button" variant="quiet" size="sm">
+                  Modifier<span class="sr-only"> {{ row.name }}</span>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </app-data-table>
+    <div class="mt-block flex flex-wrap gap-3">
+      <button appButton type="button" variant="secondary" (click)="askToDelete()">
+        Ouvrir le dialogue de confirmation
+      </button>
+      <button appButton type="button" variant="secondary" (click)="notify('success')">
+        Notifier une réussite
+      </button>
+      <button appButton type="button" variant="secondary" (click)="notify('danger')">
+        Notifier un échec
+      </button>
+    </div>
+    <p class="mt-3 text-sm text-ink-muted" aria-live="polite">{{ dialogAnswer() }}</p>
+    <app-confirm-dialog #confirm />
+    <app-toast-region />
+  </section>
+
   <section class="border-b border-rule py-block" aria-labelledby="ui-focus">
     <h2 id="ui-focus" class="text-2xl tracking-heading">Focus</h2>
     <p class="mt-3 max-w-prose">

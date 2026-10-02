@@ -77,6 +77,12 @@
     outline-offset: 2px;
   }
 
+  /* Notifications affichées en bas de l'écran : un élément qui reçoit le focus n'est jamais placé
+     dessous (WCAG 2.4.11) */
+  html:has(.toast) {
+    scroll-padding-block-end: calc(var(--spacing) * 32);
+  }
+
   /* Cibles de focus programmatique non interactives (<main>, titre après une navigation) */
   :where([tabindex='-1']):focus-visible {
     outline: none;

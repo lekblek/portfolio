@@ -40,6 +40,8 @@
   --color-code-keyword: var(--palette-plum-700);
   --color-code-string: var(--palette-green-800);
   --color-code-annotation: var(--palette-ochre-800);
+  /* Fond derrière un dialogue modal (::backdrop) : encre à 45 %, la page reste lisible dessous */
+  --color-backdrop: rgb(26 34 51 / 0.45);
 
   /* Familles (§4.2) */
   --font-display: 'Schibsted Grotesk Variable', system-ui, sans-serif;
