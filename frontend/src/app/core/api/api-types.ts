@@ -36,3 +36,13 @@ export type ContactMessageRequest = Schemas['SubmitContactMessageRequest'];
 
 export type AdminAccount = Schemas['AdminSessionResponse'];
 export type AdminCredentials = Schemas['OpenAdminSessionRequest'];
+
+export type AdminCategory = Schemas['AdminCategoryResponse'];
+export type AdminTag = Schemas['AdminTagResponse'];
+export type AdminTechnology = Schemas['AdminTechnologyResponse'];
+export type SaveCategoryRequest = Schemas['SaveCategoryRequest'];
+export type SaveTagRequest = Schemas['SaveTagRequest'];
+export type SaveTechnologyRequest = Schemas['SaveTechnologyRequest'];
+
+export type AdminMedia = Schemas['AdminMediaResponse'];
+export type MediaFormat = AdminMedia['format'];

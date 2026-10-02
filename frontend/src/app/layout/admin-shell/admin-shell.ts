@@ -19,25 +19,28 @@ import { SITE_NAME } from '../../core/seo/site-config';
 import { formatDayTime } from '../../shared/format/date';
 import { Button } from '../../shared/ui/button';
 import { Icon } from '../../shared/ui/icon';
+import { ToastRegion, Toaster } from '../../shared/ui/toast';
 
 export interface AdminNavItem {
   /** Chemin absolu de la page (`/admin`). */
   path: string;
   label: string;
+  /** Repérée sur ce seul chemin (accueil) ; sinon aussi sur ses sous-pages (`/admin/taxonomy/tags`). */
+  exact: boolean;
 }
 
 const CONTENT_ID = 'contenu';
 
 /**
  * Cadre des pages d'administration : lien d'évitement, en-tête (identité, administrateur connecté,
- * déconnexion), navigation en barre latérale dès 64 rem, `<main>`. En dessous, un bouton « Menu »
+ * déconnexion), navigation en barre latérale dès 64 rem, `<main>`, région des notifications. En dessous, un bouton « Menu »
  * déplie dans le flux la navigation et la session (même motif que le site public : `Échap`
  * referme et rend le focus au bouton, une navigation referme). Présentation seulement : la session
  * et la déconnexion sont fournies par la page qui l'utilise.
  */
 @Component({
   selector: 'app-admin-shell',
-  imports: [Button, Icon, RouterLink, RouterLinkActive],
+  imports: [Button, Icon, RouterLink, RouterLinkActive, ToastRegion],
   host: { '(keydown.escape)': 'closeAndFocusToggle()' },
   template: `
     <a class="skip-link" [attr.href]="skipLink()">Aller au contenu</a>
@@ -93,7 +96,7 @@ const CONTENT_ID = 'contenu';
                 class="admin-nav-link"
                 [routerLink]="item.path"
                 routerLinkActive="admin-nav-link-current"
-                [routerLinkActiveOptions]="{ exact: true }"
+                [routerLinkActiveOptions]="{ exact: item.exact }"
                 ariaCurrentWhenActive="page"
                 >{{ item.label }}</a
               >
@@ -104,10 +107,16 @@ const CONTENT_ID = 'contenu';
           <a href="/">Voir le site</a>
         </p>
       </nav>
-      <main class="admin-main" [id]="contentId" tabindex="-1">
+      <main
+        class="admin-main"
+        [class.admin-main-under-toasts]="toaster.toasts().length > 0"
+        [id]="contentId"
+        tabindex="-1"
+      >
         <ng-content />
       </main>
     </div>
+    <app-toast-region />
   `,
   styleUrl: './admin-shell.css',
 })
@@ -125,6 +134,8 @@ export class AdminShell {
     const current = this.account();
     return current ? formatDayTime(current.lastLoginAt) : '';
   });
+
+  protected readonly toaster = inject(Toaster);
 
   private readonly toggle = viewChild<ElementRef<HTMLButtonElement>>('toggle');
   private readonly router = inject(Router);

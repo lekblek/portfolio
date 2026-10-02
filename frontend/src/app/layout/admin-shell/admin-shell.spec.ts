@@ -11,7 +11,7 @@ import { AdminShell } from './admin-shell';
   template: `
     <app-admin-shell
       [account]="account()"
-      [navigation]="[{ path: '/admin', label: 'Tableau de bord' }]"
+      [navigation]="[{ path: '/admin', label: 'Tableau de bord', exact: true }]"
       (signOut)="signedOut.set(true)"
     >
       <h1>Contenu</h1>

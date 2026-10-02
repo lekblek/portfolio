@@ -119,6 +119,11 @@
   padding: var(--spacing-block) var(--spacing-gutter) var(--spacing-section);
 }
 
+/* Notifications affichées : place en bas pour faire défiler le contenu au-dessus d'elles */
+.admin-main-under-toasts {
+  padding-block-end: calc(var(--spacing) * 40);
+}
+
 /* Ouverture sur mobile (F20) : le panneau se révèle en descendant de 4 px, 200 ms ; fermeture
    immédiate. Jamais au chargement : le menu est alors fermé. */
 @media (width < 64rem) and (prefers-reduced-motion: no-preference) {

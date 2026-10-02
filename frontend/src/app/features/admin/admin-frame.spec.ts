@@ -10,10 +10,10 @@ import { AdminSession } from './auth/admin-session';
 
 const URL = '/api/admin/session';
 
-@Component({ template: '<h1>Tableau de bord</h1>' })
+@Component({ selector: 'app-test-admin-dashboard', template: '<h1>Tableau de bord</h1>' })
 class DashboardStub {}
 
-@Component({ template: '<h1>Connexion</h1>' })
+@Component({ selector: 'app-test-admin-login', template: '<h1>Connexion</h1>' })
 class LoginStub {}
 
 async function setUp() {
@@ -84,7 +84,7 @@ describe('AdminFrame', () => {
     http.expectOne(URL).error(new ProgressEvent('error'));
     await settle();
 
-    expect(element().querySelector('[role="alert"]')?.textContent).toContain(
+    expect(element().querySelector('app-toast-region')?.textContent).toContain(
       'Déconnexion impossible',
     );
     expect(TestBed.inject(Router).url).toBe('/admin');
