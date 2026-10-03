@@ -11,8 +11,11 @@ import { AdminSession } from './auth/admin-session';
  */
 export const ADMIN_NAVIGATION: readonly AdminNavItem[] = [
   { path: '/admin', label: 'Tableau de bord', exact: true },
+  { path: '/admin/messages', label: 'Messages', exact: false },
   { path: '/admin/profile', label: 'Profil', exact: false },
   { path: '/admin/projects', label: 'Projets', exact: false },
+  { path: '/admin/publications', label: 'Publications', exact: false },
+  { path: '/admin/series', label: 'Séries', exact: false },
   { path: '/admin/taxonomy', label: 'Taxonomie', exact: false },
   { path: '/admin/media', label: 'Médias', exact: false },
 ];

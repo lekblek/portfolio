@@ -49,6 +49,19 @@ export const adminRoutes: Routes = [
         loadChildren: () => import('./projects/projects.routes').then((m) => m.projectRoutes),
       },
       {
+        path: 'publications',
+        loadChildren: () =>
+          import('./publications/publications.routes').then((m) => m.publicationRoutes),
+      },
+      {
+        path: 'series',
+        loadChildren: () => import('./series/series.routes').then((m) => m.seriesRoutes),
+      },
+      {
+        path: 'messages',
+        loadChildren: () => import('./messages/messages.routes').then((m) => m.messageRoutes),
+      },
+      {
         path: 'taxonomy',
         loadChildren: () => import('./taxonomy/taxonomy.routes').then((m) => m.taxonomyRoutes),
       },

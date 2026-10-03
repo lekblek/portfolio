@@ -19,8 +19,9 @@ import { expect, expectAccessible, test } from './support/fixtures';
 const LISTS = ['contact-messages', 'publications', 'projects', 'series', 'media'];
 
 /**
- * Totaux reçus par la page elle-même, liste par liste (réponses réelles transmises telles quelles) :
- * d'autres tests, en parallèle, peuvent ajouter des messages entre deux lectures de l'API.
+ * Totaux reçus par la page elle-même, liste par liste et statut par statut (réponses réelles
+ * transmises telles quelles) : d'autres tests, en parallèle, peuvent ajouter des messages entre
+ * deux lectures de l'API.
  */
 async function recordTotals(page: Page): Promise<Map<string, string>> {
   const totals = new Map<string, string>();
@@ -28,7 +29,8 @@ async function recordTotals(page: Page): Promise<Map<string, string>> {
     await page.route(`**/api/admin/${list}?**`, async (route) => {
       const response = await route.fetch();
       const body = await response.json();
-      totals.set(list, String(body.totalElements));
+      const status = new URL(route.request().url()).searchParams.get('status');
+      totals.set(status ? `${list}:${status}` : list, String(body.totalElements));
       await route.fulfill({ response, json: body });
     });
   }
@@ -50,9 +52,10 @@ test.describe('admin shell', () => {
     await expect(page.getByRole('main')).toHaveCount(1);
     await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
     const rows = page.locator('.dashboard-row');
-    await expect(rows).toHaveCount(5);
+    await expect(rows).toHaveCount(6);
     await expect(rows).toHaveText([
-      `Messages non lus${totals.get('contact-messages')}`,
+      `Messages non lus${totals.get('contact-messages:NEW')}`,
+      `Brouillons de publications${totals.get('publications:DRAFT')}`,
       `Publications${totals.get('publications')}`,
       `Projets${totals.get('projects')}`,
       `Séries${totals.get('series')}`,
@@ -150,6 +153,6 @@ test.describe('admin shell', () => {
     await signInFromItsOwnAddress(page);
     await signIn(page, ADMIN_LOGIN, ADMIN_PASSWORD);
     await expect(page).toHaveURL('/admin');
-    await expect(page.locator('.dashboard-row')).toHaveCount(5);
+    await expect(page.locator('.dashboard-row')).toHaveCount(6);
   });
 });

@@ -1,18 +1,20 @@
 import { Component, computed } from '@angular/core';
 
+import { RouterLink } from '@angular/router';
+
 import { ErrorState } from '../../../shared/ui/error-state';
 import { adminCountResource } from './data/dashboard.resources';
 
 /**
  * Tableau de bord (`/admin`) : relevé de ce qui attend l'administrateur (messages non lus) et des
  * contenus enregistrés, tous statuts confondus. Chaque nombre vient du total d'une liste
- * d'administration existante. Les liens vers les écrans viendront avec eux (F24 à F30). Une
+ * d'administration et mène à cette liste, filtrée quand il le faut (messages nouveaux, brouillons). Une
  * requête en échec : état d'erreur et « Réessayer » ; une 401 renvoie à la connexion
  * (intercepteur des pages d'administration).
  */
 @Component({
   selector: 'app-dashboard-page',
-  imports: [ErrorState],
+  imports: [ErrorState, RouterLink],
   template: `
     <h1 class="text-2xl tracking-heading">Tableau de bord</h1>
 
@@ -23,10 +25,14 @@ import { adminCountResource } from './data/dashboard.resources';
         <section aria-labelledby="a-traiter">
           <h2 id="a-traiter" class="dashboard-heading">À traiter</h2>
           <dl class="dashboard-tally">
-            <div class="dashboard-row">
-              <dt>Messages non lus</dt>
-              <dd>{{ unread.value()?.totalElements }}</dd>
-            </div>
+            @for (row of toDo(); track row.label) {
+              <div class="dashboard-row">
+                <dt>
+                  <a [routerLink]="row.path" [queryParams]="row.query">{{ row.label }}</a>
+                </dt>
+                <dd>{{ row.count }}</dd>
+              </div>
+            }
           </dl>
         </section>
         <section aria-labelledby="contenus">
@@ -34,7 +40,9 @@ import { adminCountResource } from './data/dashboard.resources';
           <dl class="dashboard-tally">
             @for (row of contents(); track row.label) {
               <div class="dashboard-row">
-                <dt>{{ row.label }}</dt>
+                <dt>
+                  <a [routerLink]="row.path">{{ row.label }}</a>
+                </dt>
                 <dd>{{ row.count }}</dd>
               </div>
             }
@@ -84,21 +92,48 @@ import { adminCountResource } from './data/dashboard.resources';
 })
 export class DashboardPage {
   protected readonly unread = adminCountResource('/api/admin/contact-messages', { status: 'NEW' });
+  private readonly drafts = adminCountResource('/api/admin/publications', { status: 'DRAFT' });
   private readonly publications = adminCountResource('/api/admin/publications');
   private readonly projects = adminCountResource('/api/admin/projects');
   private readonly series = adminCountResource('/api/admin/series');
   private readonly media = adminCountResource('/api/admin/media');
 
-  private readonly all = [this.unread, this.publications, this.projects, this.series, this.media];
+  private readonly all = [
+    this.unread,
+    this.drafts,
+    this.publications,
+    this.projects,
+    this.series,
+    this.media,
+  ];
 
   protected readonly failed = computed(() => this.all.some((resource) => resource.error()));
   protected readonly ready = computed(() => this.all.every((resource) => resource.hasValue()));
 
+  protected readonly toDo = computed(() => [
+    {
+      label: 'Messages non lus',
+      path: '/admin/messages',
+      query: { status: 'NEW' },
+      count: this.unread.value()?.totalElements,
+    },
+    {
+      label: 'Brouillons de publications',
+      path: '/admin/publications',
+      query: { status: 'DRAFT' },
+      count: this.drafts.value()?.totalElements,
+    },
+  ]);
+
   protected readonly contents = computed(() => [
-    { label: 'Publications', count: this.publications.value()?.totalElements },
-    { label: 'Projets', count: this.projects.value()?.totalElements },
-    { label: 'Séries', count: this.series.value()?.totalElements },
-    { label: 'Médias', count: this.media.value()?.totalElements },
+    {
+      label: 'Publications',
+      path: '/admin/publications',
+      count: this.publications.value()?.totalElements,
+    },
+    { label: 'Projets', path: '/admin/projects', count: this.projects.value()?.totalElements },
+    { label: 'Séries', path: '/admin/series', count: this.series.value()?.totalElements },
+    { label: 'Médias', path: '/admin/media', count: this.media.value()?.totalElements },
   ]);
 
   protected reload(): void {
