@@ -33,6 +33,11 @@ export const test = base.extend<{ guard: PageGuard }>({
         if (message.text().startsWith('Failed to load resource') && isAllowed(resource)) {
           return;
         }
+        // KI-38 (connu, mesuré en F27) : les médias n'existent qu'en taille d'origine, et Angular le
+        // signale en développement pour chaque vignette (NG0913) ; ce seul avertissement est toléré
+        if (message.type() === 'warning' && message.text().startsWith('NG0913')) {
+          return;
+        }
         problems.push(`console ${message.type()} : ${message.text()} (${resource})`);
       });
       page.on('pageerror', (error) => problems.push(`exception : ${error.message}`));

@@ -1,6 +1,7 @@
 import { Page } from '@playwright/test';
 
 import { expect, expectAccessible, test } from './support/fixtures';
+import { isDataCall } from './support/api-calls';
 
 // Rendu serveur et détail : backend de développement (profil `dev`). Pagination au-delà des
 // données d'amorçage : réponses simulées dans le navigateur, après une navigation client.
@@ -54,7 +55,7 @@ test.describe('projects', () => {
     }
 
     const calls: string[] = [];
-    page.on('request', (r) => r.url().includes('/api/public/') && calls.push(r.url()));
+    page.on('request', (r) => isDataCall(r.url()) && calls.push(r.url()));
     await page.goto('/projects', { waitUntil: 'networkidle' });
 
     expect(calls).toEqual([]);
@@ -150,7 +151,7 @@ test.describe('projects', () => {
     expect(html).toContain('"@type":"CreativeWork"');
 
     const calls: string[] = [];
-    page.on('request', (r) => r.url().includes('/api/public/') && calls.push(r.url()));
+    page.on('request', (r) => isDataCall(r.url()) && calls.push(r.url()));
     await page.goto(`/projects/${slug}`, { waitUntil: 'networkidle' });
 
     expect(calls).toEqual([]);

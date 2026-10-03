@@ -1,4 +1,5 @@
 import { expect, expectAccessible, test } from './support/fixtures';
+import { isDataCall } from './support/api-calls';
 
 // Backend de développement (profil `dev`) : profil, projets mis en avant, publications et série.
 test.describe('home', () => {
@@ -19,7 +20,7 @@ test.describe('home', () => {
     expect(html).not.toContain(profile.publicEmail ?? 'aucune adresse publique');
 
     const calls: string[] = [];
-    page.on('request', (r) => r.url().includes('/api/public/') && calls.push(r.url()));
+    page.on('request', (r) => isDataCall(r.url()) && calls.push(r.url()));
     await page.goto('/', { waitUntil: 'networkidle' });
 
     expect(calls).toEqual([]);

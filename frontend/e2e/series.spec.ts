@@ -1,4 +1,5 @@
 import { expect, expectAccessible, test } from './support/fixtures';
+import { isDataCall } from './support/api-calls';
 
 // Série du profil `dev` (SeriesSeeder) : au moins deux chapitres visibles.
 const API = '/api/public/series';
@@ -26,7 +27,7 @@ test.describe('series', () => {
     }
 
     const calls: string[] = [];
-    page.on('request', (r) => r.url().includes('/api/public/') && calls.push(r.url()));
+    page.on('request', (r) => isDataCall(r.url()) && calls.push(r.url()));
     await page.goto(`/series/${series.slug}`, { waitUntil: 'networkidle' });
 
     expect(calls).toEqual([]);

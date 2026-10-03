@@ -1,6 +1,7 @@
 import { test as withoutGuard } from '@playwright/test';
 
 import { expect, expectAccessible, test } from './support/fixtures';
+import { isDataCall } from './support/api-calls';
 
 // Backend de développement (profil `dev`) : publications et projets d'amorçage.
 const API = '/api/public/search';
@@ -20,7 +21,7 @@ test.describe('search', () => {
     expect(html).toContain('<meta name="robots" content="noindex">');
 
     const calls: string[] = [];
-    page.on('request', (r) => r.url().includes('/api/public/') && calls.push(r.url()));
+    page.on('request', (r) => isDataCall(r.url()) && calls.push(r.url()));
     await page.goto(`/search?q=${encodeURIComponent('démonstrations')}`, {
       waitUntil: 'networkidle',
     });

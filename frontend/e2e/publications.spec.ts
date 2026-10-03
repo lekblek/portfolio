@@ -2,6 +2,7 @@ import { Page } from '@playwright/test';
 
 import { expect, expectAccessible, PageGuard, test } from './support/fixtures';
 import { recordTransitions } from './support/motion';
+import { isDataCall } from './support/api-calls';
 
 // Rendu serveur, filtres et redirections : backend de développement (profil `dev`). Sommaire et
 // bouton Copier : article long simulé dans le navigateur, après une navigation client.
@@ -69,7 +70,7 @@ test.describe('publications', () => {
     }
 
     const calls: string[] = [];
-    page.on('request', (r) => r.url().includes('/api/public/') && calls.push(r.url()));
+    page.on('request', (r) => isDataCall(r.url()) && calls.push(r.url()));
     await page.goto('/articles', { waitUntil: 'networkidle' });
 
     expect(calls).toEqual([]);
@@ -132,7 +133,7 @@ test.describe('publications', () => {
     expect(html).toContain('"@type":"Article"');
 
     const calls: string[] = [];
-    page.on('request', (r) => r.url().includes('/api/public/') && calls.push(r.url()));
+    page.on('request', (r) => isDataCall(r.url()) && calls.push(r.url()));
     await page.goto(`/articles/${first.slug}`, { waitUntil: 'networkidle' });
 
     expect(calls).toEqual([]);
