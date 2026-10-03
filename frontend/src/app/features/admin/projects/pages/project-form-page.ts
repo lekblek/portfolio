@@ -125,7 +125,7 @@ export class ProjectFormPage implements UnsavedChanges {
     (path) => {
       projectSchema(path);
       // D11 : le slug d'un projet déjà publié ne change plus
-      readonly(path.slug, () => this.slugLocked());
+      readonly(path.slug, { when: () => this.slugLocked() });
     },
     {
       name: 'projet',
