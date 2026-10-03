@@ -527,6 +527,15 @@ export interface components {
             name: string;
             slug: string;
         };
+        AdminCertification: {
+            credentialUrl: string | null;
+            /** Format: date */
+            expiresAt: string | null;
+            /** Format: date */
+            issuedAt: string;
+            issuer: string;
+            name: string;
+        };
         AdminContactMessageResponse: {
             /** Format: date-time */
             createdAt: string;
@@ -552,6 +561,31 @@ export interface components {
             status: "NEW" | "READ" | "PROCESSED" | "ARCHIVED";
             subject: string;
         };
+        AdminEducation: {
+            degree: string;
+            description: string;
+            /** Format: date */
+            endDate: string | null;
+            field: string;
+            institution: string;
+            location: string;
+            /** Format: date */
+            startDate: string;
+        };
+        AdminExperience: {
+            description: string;
+            /** Format: date */
+            endDate: string | null;
+            location: string;
+            organization: string;
+            /** Format: date */
+            startDate: string;
+            title: string;
+        };
+        AdminLink: {
+            label: string;
+            url: string;
+        };
         AdminMediaResponse: {
             altText: string | null;
             /** Format: date-time */
@@ -574,18 +608,18 @@ export interface components {
             aboutMarkdown: string | null;
             /** Format: int64 */
             avatarMediaId: number | null;
-            certifications: components["schemas"]["Certification"][];
+            certifications: components["schemas"]["AdminCertification"][];
             /** Format: int64 */
             cvMediaId: number | null;
             displayName: string;
-            educations: components["schemas"]["Education"][];
-            experiences: components["schemas"]["Experience"][];
-            links: components["schemas"]["Link"][];
+            educations: components["schemas"]["AdminEducation"][];
+            experiences: components["schemas"]["AdminExperience"][];
+            links: components["schemas"]["AdminLink"][];
             professionalTitle: string;
             publicEmail: string | null;
             publicLocation: string | null;
             shortBio: string;
-            skills: components["schemas"]["Skill"][];
+            skills: components["schemas"]["AdminSkill"][];
         };
         AdminProjectResponse: {
             /** Format: int64 */
@@ -600,7 +634,7 @@ export interface components {
             /** Format: int64 */
             id: number;
             repositoryUrl: string | null;
-            screenshots: components["schemas"]["Screenshot"][];
+            screenshots: components["schemas"]["AdminScreenshot"][];
             shortDescription: string;
             slug: string;
             slugLocked: boolean;
@@ -668,6 +702,11 @@ export interface components {
             /** Format: date-time */
             updatedAt: string;
         };
+        AdminScreenshot: {
+            caption: string | null;
+            /** Format: int64 */
+            mediaId: number;
+        };
         AdminSeriesResponse: {
             chapters: components["schemas"]["Chapter"][];
             /** Format: int64 */
@@ -691,6 +730,10 @@ export interface components {
             /** Format: date-time */
             lastLoginAt: string;
             login: string;
+        };
+        AdminSkill: {
+            category: string;
+            name: string;
         };
         AdminTagResponse: {
             /** Format: int64 */

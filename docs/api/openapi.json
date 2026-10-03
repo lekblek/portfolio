@@ -20,6 +20,29 @@
         "required" : [ "description", "id", "name", "slug" ],
         "type" : "object"
       },
+      "AdminCertification" : {
+        "properties" : {
+          "credentialUrl" : {
+            "type" : [ "string", "null" ]
+          },
+          "expiresAt" : {
+            "format" : "date",
+            "type" : [ "string", "null" ]
+          },
+          "issuedAt" : {
+            "format" : "date",
+            "type" : "string"
+          },
+          "issuer" : {
+            "type" : "string"
+          },
+          "name" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "credentialUrl", "expiresAt", "issuedAt", "issuer", "name" ],
+        "type" : "object"
+      },
       "AdminContactMessageResponse" : {
         "properties" : {
           "createdAt" : {
@@ -81,6 +104,73 @@
         "required" : [ "createdAt", "email", "id", "name", "status", "subject" ],
         "type" : "object"
       },
+      "AdminEducation" : {
+        "properties" : {
+          "degree" : {
+            "type" : "string"
+          },
+          "description" : {
+            "type" : "string"
+          },
+          "endDate" : {
+            "format" : "date",
+            "type" : [ "string", "null" ]
+          },
+          "field" : {
+            "type" : "string"
+          },
+          "institution" : {
+            "type" : "string"
+          },
+          "location" : {
+            "type" : "string"
+          },
+          "startDate" : {
+            "format" : "date",
+            "type" : "string"
+          }
+        },
+        "required" : [ "degree", "description", "endDate", "field", "institution", "location", "startDate" ],
+        "type" : "object"
+      },
+      "AdminExperience" : {
+        "properties" : {
+          "description" : {
+            "type" : "string"
+          },
+          "endDate" : {
+            "format" : "date",
+            "type" : [ "string", "null" ]
+          },
+          "location" : {
+            "type" : "string"
+          },
+          "organization" : {
+            "type" : "string"
+          },
+          "startDate" : {
+            "format" : "date",
+            "type" : "string"
+          },
+          "title" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "description", "endDate", "location", "organization", "startDate", "title" ],
+        "type" : "object"
+      },
+      "AdminLink" : {
+        "properties" : {
+          "label" : {
+            "type" : "string"
+          },
+          "url" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "label", "url" ],
+        "type" : "object"
+      },
       "AdminMediaResponse" : {
         "properties" : {
           "altText" : {
@@ -134,7 +224,7 @@
           },
           "certifications" : {
             "items" : {
-              "$ref" : "#/components/schemas/Certification"
+              "$ref" : "#/components/schemas/AdminCertification"
             },
             "type" : "array"
           },
@@ -147,19 +237,19 @@
           },
           "educations" : {
             "items" : {
-              "$ref" : "#/components/schemas/Education"
+              "$ref" : "#/components/schemas/AdminEducation"
             },
             "type" : "array"
           },
           "experiences" : {
             "items" : {
-              "$ref" : "#/components/schemas/Experience"
+              "$ref" : "#/components/schemas/AdminExperience"
             },
             "type" : "array"
           },
           "links" : {
             "items" : {
-              "$ref" : "#/components/schemas/Link"
+              "$ref" : "#/components/schemas/AdminLink"
             },
             "type" : "array"
           },
@@ -177,7 +267,7 @@
           },
           "skills" : {
             "items" : {
-              "$ref" : "#/components/schemas/Skill"
+              "$ref" : "#/components/schemas/AdminSkill"
             },
             "type" : "array"
           }
@@ -217,7 +307,7 @@
           },
           "screenshots" : {
             "items" : {
-              "$ref" : "#/components/schemas/Screenshot"
+              "$ref" : "#/components/schemas/AdminScreenshot"
             },
             "type" : "array"
           },
@@ -391,6 +481,19 @@
         "required" : [ "featured", "id", "publishedAt", "slug", "status", "title", "type", "updatedAt" ],
         "type" : "object"
       },
+      "AdminScreenshot" : {
+        "properties" : {
+          "caption" : {
+            "type" : [ "string", "null" ]
+          },
+          "mediaId" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        },
+        "required" : [ "caption", "mediaId" ],
+        "type" : "object"
+      },
       "AdminSeriesResponse" : {
         "properties" : {
           "chapters" : {
@@ -454,6 +557,18 @@
           }
         },
         "required" : [ "lastLoginAt", "login" ],
+        "type" : "object"
+      },
+      "AdminSkill" : {
+        "properties" : {
+          "category" : {
+            "type" : "string"
+          },
+          "name" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "category", "name" ],
         "type" : "object"
       },
       "AdminTagResponse" : {

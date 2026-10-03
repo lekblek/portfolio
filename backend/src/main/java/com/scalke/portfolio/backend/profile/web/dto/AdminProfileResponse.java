@@ -6,14 +6,20 @@ import com.scalke.portfolio.backend.profile.domain.model.Experience;
 import com.scalke.portfolio.backend.profile.domain.model.ProfessionalLink;
 import com.scalke.portfolio.backend.profile.domain.model.Profile;
 import com.scalke.portfolio.backend.profile.domain.model.Skill;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.jspecify.annotations.Nullable;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
  * Profil vu par l'administration (D-CY) : la forme même de {@link SaveProfileRequest}, pour qu'un formulaire relise
  * et renvoie ce qu'il a reçu ; médias par identifiant ; collections dans leur ordre d'affichage, sans identifiant
  * (elles sont remplacées d'un bloc).
+ *
+ * <p>Les records internes sont distincts de ceux de {@link SaveProfileRequest} pour que le contrat OpenAPI différencie
+ * les schémas de requête (champs optionnels de validation) des schémas de réponse (champs toujours présents) (KI-36,
+ * D-ES).</p>
  */
 public record AdminProfileResponse(
     String displayName,
@@ -24,11 +30,11 @@ public record AdminProfileResponse(
     @Nullable String publicEmail,
     @Nullable Long avatarMediaId,
     @Nullable Long cvMediaId,
-    List<SaveProfileRequest.Link> links,
-    List<SaveProfileRequest.Skill> skills,
-    List<SaveProfileRequest.Experience> experiences,
-    List<SaveProfileRequest.Education> educations,
-    List<SaveProfileRequest.Certification> certifications
+    List<AdminLink> links,
+    List<AdminSkill> skills,
+    List<AdminExperience> experiences,
+    List<AdminEducation> educations,
+    List<AdminCertification> certifications
 ) {
 
     public static AdminProfileResponse from(Profile profile) {
@@ -48,27 +54,63 @@ public record AdminProfileResponse(
             profile.certifications().stream().map(AdminProfileResponse::certification).toList());
     }
 
-    private static SaveProfileRequest.Link link(ProfessionalLink link) {
-        return new SaveProfileRequest.Link(link.label(), link.url());
+    private static AdminLink link(ProfessionalLink link) {
+        return new AdminLink(link.label(), link.url());
     }
 
-    private static SaveProfileRequest.Skill skill(Skill skill) {
-        return new SaveProfileRequest.Skill(skill.name(), skill.category());
+    private static AdminSkill skill(Skill skill) {
+        return new AdminSkill(skill.name(), skill.category());
     }
 
-    private static SaveProfileRequest.Experience experience(Experience experience) {
-        return new SaveProfileRequest.Experience(experience.organization(), experience.title(), experience.location(),
+    private static AdminExperience experience(Experience experience) {
+        return new AdminExperience(experience.organization(), experience.title(), experience.location(),
             experience.period().startDate(), experience.period().endDate(), experience.description());
     }
 
-    private static SaveProfileRequest.Education education(Education education) {
-        return new SaveProfileRequest.Education(education.institution(), education.degree(), education.field(),
+    private static AdminEducation education(Education education) {
+        return new AdminEducation(education.institution(), education.degree(), education.field(),
             education.location(), education.period().startDate(), education.period().endDate(),
             education.description());
     }
 
-    private static SaveProfileRequest.Certification certification(Certification certification) {
-        return new SaveProfileRequest.Certification(certification.name(), certification.issuer(),
+    private static AdminCertification certification(Certification certification) {
+        return new AdminCertification(certification.name(), certification.issuer(),
             certification.issuedAt(), certification.expiresAt(), certification.credentialUrl());
     }
+
+    @Schema(name = "AdminLink")
+    public record AdminLink(String label, String url) {}
+
+    @Schema(name = "AdminSkill")
+    public record AdminSkill(String name, String category) {}
+
+    @Schema(name = "AdminExperience")
+    public record AdminExperience(
+        String organization,
+        String title,
+        String location,
+        LocalDate startDate,
+        @Nullable LocalDate endDate,
+        String description
+    ) {}
+
+    @Schema(name = "AdminEducation")
+    public record AdminEducation(
+        String institution,
+        String degree,
+        String field,
+        String location,
+        LocalDate startDate,
+        @Nullable LocalDate endDate,
+        String description
+    ) {}
+
+    @Schema(name = "AdminCertification")
+    public record AdminCertification(
+        String name,
+        String issuer,
+        LocalDate issuedAt,
+        @Nullable LocalDate expiresAt,
+        @Nullable String credentialUrl
+    ) {}
 }

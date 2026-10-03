@@ -5,6 +5,7 @@ import com.scalke.portfolio.backend.project.domain.model.ProjectScreenshot;
 import com.scalke.portfolio.backend.project.domain.model.ProjectStage;
 import com.scalke.portfolio.backend.project.domain.model.ProjectVisibility;
 import com.scalke.portfolio.backend.project.domain.model.Technology;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.jspecify.annotations.Nullable;
 
 import java.time.LocalDate;
@@ -55,6 +56,8 @@ public record AdminProjectResponse(
             project.screenshots().stream().map(Screenshot::from).toList());
     }
 
+    /** Nom de schéma distinct de la capture reçue en requête ({@code SaveProjectRequest.Screenshot}) : KI-36, D-ES. */
+    @Schema(name = "AdminScreenshot")
     public record Screenshot(Long mediaId, @Nullable String caption) {
 
         static Screenshot from(ProjectScreenshot screenshot) {
