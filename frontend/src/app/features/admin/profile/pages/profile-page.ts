@@ -19,6 +19,7 @@ import {
 } from '@angular/forms/signals';
 import { RouterLink } from '@angular/router';
 
+import { adminMediaResource, mediaPickerPageResource } from '../../../../core/api/admin-media';
 import { toApiError } from '../../../../core/api/api-error';
 import { AdminMedia } from '../../../../core/api/api-types';
 import { serverFieldErrors } from '../../../../shared/forms/server-errors';
@@ -31,13 +32,9 @@ import { ConfirmDialog } from '../../../../shared/ui/confirm-dialog';
 import { ErrorState } from '../../../../shared/ui/error-state';
 import { Field, FieldControl } from '../../../../shared/ui/field';
 import { MediaKind, MediaPicker } from '../../../../shared/ui/media-picker';
+import { MediaSlot } from '../../../../shared/ui/media-slot';
 import { Toaster } from '../../../../shared/ui/toast';
-import {
-  adminProfileResource,
-  chosenMediaResource,
-  pickerPageResource,
-  saveProfile,
-} from '../data/profile';
+import { adminProfileResource, saveProfile } from '../data/profile';
 import {
   CertificationModel,
   EducationModel,
@@ -56,7 +53,6 @@ import {
   toModel,
   toRequest,
 } from '../data/profile-form';
-import { MediaSlot } from '../ui/media-slot';
 import { CollectionItem, ProfileCollection } from '../ui/profile-collection';
 
 type FieldRef = ValidationError.WithFieldTree['fieldTree'];
@@ -129,13 +125,13 @@ export class ProfilePage implements UnsavedChanges {
   protected readonly preview = signal(false);
   protected readonly failure = signal<string | null>(null);
 
-  protected readonly avatar = chosenMediaResource(() => this.model().avatarMediaId);
-  protected readonly cv = chosenMediaResource(() => this.model().cvMediaId);
+  protected readonly avatar = adminMediaResource(() => this.model().avatarMediaId);
+  protected readonly cv = adminMediaResource(() => this.model().cvMediaId);
 
   /** Sélecteur de médias : sorte attendue et page affichée (aucune requête avant l'ouverture). */
   protected readonly pickerKind = signal<MediaKind>('image');
   protected readonly pickerPage = signal<number | null>(null);
-  protected readonly pickerMedia = pickerPageResource(this.pickerPage);
+  protected readonly pickerMedia = mediaPickerPageResource(this.pickerPage);
   protected readonly pickerState = computed(() =>
     this.pickerMedia.error() ? 'error' : this.pickerMedia.hasValue() ? 'ready' : 'loading',
   );
@@ -206,7 +202,7 @@ export class ProfilePage implements UnsavedChanges {
       return true;
     }
     return this.confirm().ask({
-      title: 'Quitter sans enregistrer ?',
+      title: 'Quitter sans enregistrer\u202f?',
       message: 'Les modifications du profil seront perdues.',
       confirmLabel: 'Quitter sans enregistrer',
       cancelLabel: 'Rester sur la page',
@@ -231,7 +227,7 @@ export class ProfilePage implements UnsavedChanges {
         return fieldErrors;
       }
       this.failure.set(
-        'Le serveur ne répond pas pour le moment. Votre saisie est conservée : réessayez dans quelques instants.',
+        'Le serveur ne répond pas pour le moment. Votre saisie est conservée\u202f: réessayez dans quelques instants.',
       );
       return undefined;
     }

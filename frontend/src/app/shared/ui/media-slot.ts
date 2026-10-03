@@ -1,15 +1,15 @@
 import { Component, input, output } from '@angular/core';
 
-import { AdminMedia } from '../../../../core/api/api-types';
-import { formatFileSize } from '../../../../shared/format/file-size';
-import { Button } from '../../../../shared/ui/button';
-import { Icon } from '../../../../shared/ui/icon';
-import { MediaKind } from '../../../../shared/ui/media-picker';
+import { AdminMedia } from '../../core/api/api-types';
+import { formatFileSize } from '../format/file-size';
+import { Button } from './button';
+import { Icon } from './icon';
+import { MediaKind } from './media-picker';
 
 let nextId = 0;
 
 /**
- * Emplacement d'un média du profil (avatar, CV) : le média choisi (aperçu, nom, poids) ou son
+ * Emplacement d'un média (02-design-system §18) : avatar et CV du profil, couverture d'un projet ; le média choisi (aperçu, nom, poids) ou son
  * absence, et les actions « Choisir » ou « Changer », « Retirer ». Le choix se fait dans le
  * sélecteur de médias ouvert par la page ; une erreur du serveur (pas une image, pas un PDF)
  * s'affiche sous l'emplacement et décrit le bouton.
