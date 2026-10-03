@@ -1,6 +1,7 @@
 package com.scalke.portfolio.backend.project.infrastructure.persistence.jpa.repository;
 
 import com.scalke.portfolio.backend.project.domain.model.Project;
+import com.scalke.portfolio.backend.project.domain.model.ProjectAdminFilter;
 import com.scalke.portfolio.backend.project.domain.model.ProjectFilter;
 import com.scalke.portfolio.backend.project.domain.model.Technology;
 import com.scalke.portfolio.backend.project.domain.port.ProjectRepository;
@@ -122,9 +123,20 @@ public class ProjectRepositoryAdapter implements ProjectRepository {
 
     @Override
     @Transactional(readOnly = true)
-    public PageResult<Project> findPage(PageQuery query) {
-        Page<Project> page = repository.findAll(PageRequest.of(query.page(), query.size(), PUBLIC_ORDER))
-            .map(ProjectPersistenceMapper::toDomain);
+    public PageResult<Project> findPage(ProjectAdminFilter filter, PageQuery query) {
+        Pageable pageable = PageRequest.of(query.page(), query.size(), PUBLIC_ORDER);
+        Page<ProjectEntity> entities;
+        if (filter.hasVisibility() && filter.hasTechnology()) {
+            entities = repository.findByVisibilityAndTechnologiesSlug(
+                filter.visibility(), filter.technologySlug(), pageable);
+        } else if (filter.hasVisibility()) {
+            entities = repository.findByVisibility(filter.visibility(), pageable);
+        } else if (filter.hasTechnology()) {
+            entities = repository.findByTechnologiesSlug(filter.technologySlug(), pageable);
+        } else {
+            entities = repository.findAll(pageable);
+        }
+        Page<Project> page = entities.map(ProjectPersistenceMapper::toDomain);
         return new PageResult<>(page.getContent(), page.getNumber(), page.getSize(), page.getTotalElements());
     }
 

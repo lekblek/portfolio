@@ -5,6 +5,8 @@ import com.scalke.portfolio.backend.project.application.usecase.GetProjectUseCas
 import com.scalke.portfolio.backend.project.application.usecase.ListProjectsUseCase;
 import com.scalke.portfolio.backend.project.application.usecase.UpdateProjectUseCase;
 import com.scalke.portfolio.backend.project.domain.model.Project;
+import com.scalke.portfolio.backend.project.domain.model.ProjectAdminFilter;
+import com.scalke.portfolio.backend.project.domain.model.ProjectVisibility;
 import com.scalke.portfolio.backend.project.web.dto.AdminProjectResponse;
 import com.scalke.portfolio.backend.project.web.dto.AdminProjectSummaryResponse;
 import com.scalke.portfolio.backend.project.web.dto.SaveProjectRequest;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -39,10 +42,19 @@ public class AdminProjectController {
     private final CreateProjectUseCase createProjectUseCase;
     private final UpdateProjectUseCase updateProjectUseCase;
 
+    /**
+     * {@code visibility} : {@code DRAFT}, {@code PUBLISHED} ou {@code ARCHIVED} ; absente, toutes. {@code technology} :
+     * slug d'une technologie ; absent ou vide, toutes ; inconnu, page vide (F27).
+     */
     @GetMapping
-    PageResponse<AdminProjectSummaryResponse> list(@PageableDefault(size = ApiPaging.ADMIN_PAGE_SIZE) Pageable pageable) {
+    PageResponse<AdminProjectSummaryResponse> list(
+        @RequestParam(required = false) ProjectVisibility visibility,
+        @RequestParam(required = false) String technology,
+        @PageableDefault(size = ApiPaging.ADMIN_PAGE_SIZE) Pageable pageable) {
         PageQuery query = new PageQuery(pageable.getPageNumber(), pageable.getPageSize());
-        return PageResponse.from(listProjectsUseCase.execute(query).map(AdminProjectSummaryResponse::from));
+        return PageResponse.from(listProjectsUseCase
+            .execute(ProjectAdminFilter.of(visibility, technology), query)
+            .map(AdminProjectSummaryResponse::from));
     }
 
     @GetMapping("/{id}")

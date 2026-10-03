@@ -25,6 +25,11 @@ public interface ProjectJpaRepository extends Repository<ProjectEntity, Long> {
     Page<ProjectEntity> findByVisibilityAndTechnologiesSlug(
         ProjectVisibility visibility, String technologySlug, Pageable pageable);
 
+    /**
+     * Toutes visibilités (administration), même jointure que ci-dessus (D-AC).
+     */
+    Page<ProjectEntity> findByTechnologiesSlug(String technologySlug, Pageable pageable);
+
     Page<ProjectEntity> findByVisibilityAndFeatured(ProjectVisibility visibility, boolean featured, Pageable pageable);
 
     Page<ProjectEntity> findByVisibilityAndFeaturedAndTechnologiesSlug(

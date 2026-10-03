@@ -1,6 +1,7 @@
 package com.scalke.portfolio.backend.project.domain.port;
 
 import com.scalke.portfolio.backend.project.domain.model.Project;
+import com.scalke.portfolio.backend.project.domain.model.ProjectAdminFilter;
 import com.scalke.portfolio.backend.project.domain.model.ProjectFilter;
 import com.scalke.portfolio.backend.shared.domain.model.PageQuery;
 import com.scalke.portfolio.backend.shared.domain.model.PageResult;
@@ -51,9 +52,10 @@ public interface ProjectRepository {
     boolean existsAny();
 
     /**
-     * Tous les projets, quelle que soit leur visibilité (administration, D-CX), dans l'ordre d'affichage public.
+     * Projets de toute visibilité (administration, D-CX) restreints par {@code filter} (F27), dans l'ordre d'affichage
+     * public. Chaque projet est renvoyé avec ses technologies.
      */
-    PageResult<Project> findPage(PageQuery query);
+    PageResult<Project> findPage(ProjectAdminFilter filter, PageQuery query);
 
     Optional<Project> findById(Long id);
 

@@ -3,6 +3,7 @@ package com.scalke.portfolio.backend.project.web.controller;
 import com.scalke.portfolio.backend.media.MediaFixtures;
 import com.scalke.portfolio.backend.media.domain.port.MediaRepository;
 import com.scalke.portfolio.backend.project.domain.model.Project;
+import com.scalke.portfolio.backend.project.domain.model.ProjectAdminFilter;
 import com.scalke.portfolio.backend.project.domain.model.ProjectScreenshot;
 import com.scalke.portfolio.backend.project.domain.model.ProjectVisibility;
 import com.scalke.portfolio.backend.project.domain.model.Technology;
@@ -257,6 +258,41 @@ class AdminProjectIT extends AbstractIntegrationTest {
     }
 
     /**
+     * Filtres de la liste (F27) : visibilité, technologie, les deux ensemble ; absents ou vides, aucun ; slug inconnu,
+     * page vide ; visibilité inconnue, 400.
+     */
+    @Test
+    void filters_the_list_by_visibility_and_technology() throws Exception {
+        Technology java = technologyRepository.create(technology("Java", "java", 0));
+        Technology python = technologyRepository.create(technology("Python", "python", 1));
+        projectRepository.create(project("brouillon-java", ProjectVisibility.DRAFT, DateRange.ongoingSince(START), 0, java));
+        projectRepository.create(published("public-java", START, 1, java));
+        projectRepository.create(published("public-python", START, 2, python));
+        projectRepository.create(project("archive", ProjectVisibility.ARCHIVED, DateRange.ongoingSince(START), 3));
+
+        list("?visibility=PUBLISHED")
+            .andExpect(jsonPath("$.totalElements").value(2))
+            .andExpect(jsonPath("$.content[0].slug").value("public-java"))
+            .andExpect(jsonPath("$.content[1].slug").value("public-python"));
+        list("?technology=java")
+            .andExpect(jsonPath("$.totalElements").value(2))
+            .andExpect(jsonPath("$.content[0].slug").value("brouillon-java"))
+            .andExpect(jsonPath("$.content[1].slug").value("public-java"));
+        list("?visibility=DRAFT&technology=java")
+            .andExpect(jsonPath("$.totalElements").value(1))
+            .andExpect(jsonPath("$.content[0].slug").value("brouillon-java"));
+        list("?visibility=&technology=").andExpect(jsonPath("$.totalElements").value(4));
+        list("?technology=inconnue").andExpect(jsonPath("$.totalElements").value(0));
+        mockMvc.perform(get("/api/admin/projects?visibility=VISIBLE").contextPath("/api").with(user("admin")))
+            .andExpect(status().isBadRequest());
+    }
+
+    private ResultActions list(String query) throws Exception {
+        return mockMvc.perform(get("/api/admin/projects" + query).contextPath("/api").with(user("admin")))
+            .andExpect(status().isOk());
+    }
+
+    /**
      * Invariant 28 : le document de recherche suit les technologies d'un projet publié.
      */
     @Test
@@ -339,7 +375,8 @@ class AdminProjectIT extends AbstractIntegrationTest {
     }
 
     private long idOf(String slug) {
-        return projectRepository.findPage(new com.scalke.portfolio.backend.shared.domain.model.PageQuery(0, 100))
+        return projectRepository.findPage(ProjectAdminFilter.of(null, null),
+                new com.scalke.portfolio.backend.shared.domain.model.PageQuery(0, 100))
             .content().stream()
             .filter(project -> project.slug().equals(Slug.of(slug)))
             .map(Project::id)

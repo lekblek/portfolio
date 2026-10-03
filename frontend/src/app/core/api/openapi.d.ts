@@ -1582,6 +1582,8 @@ export interface operations {
     list_4: {
         parameters: {
             query: {
+                visibility?: "DRAFT" | "PUBLISHED" | "ARCHIVED";
+                technology?: string;
                 pageable: components["schemas"]["Pageable"];
             };
             header?: never;

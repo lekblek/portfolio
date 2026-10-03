@@ -2599,6 +2599,21 @@
         "operationId" : "list_4",
         "parameters" : [ {
           "in" : "query",
+          "name" : "visibility",
+          "required" : false,
+          "schema" : {
+            "enum" : [ "DRAFT", "PUBLISHED", "ARCHIVED" ],
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "technology",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
           "name" : "pageable",
           "required" : true,
           "schema" : {
