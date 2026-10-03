@@ -1,0 +1,15 @@
+{
+  "series": [
+    {
+      "title": "La vision par ordinateur appliquée",
+      "description": "RoadSense, de l'annotation au détecteur embarqué : données, mesures et déploiement.",
+      "chapters": [
+        "Annoter 48 000 images sans perdre la tête",
+        "Mesurer la latence de bout en bout d'une chaîne vidéo",
+        "Détecter les piétons en 31 ms : de l'annotation à la carte embarquée",
+        "Suivi multi-objets : associer les détections d'une image à l'autre"
+      ],
+      "cover": "autoroute-vue-aerienne.webp"
+    }
+  ]
+}

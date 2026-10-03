@@ -1,0 +1,556 @@
+{
+  "technologies": [
+    "Java",
+    "Spring Boot",
+    "Angular",
+    "PostgreSQL",
+    "Docker",
+    "TypeScript",
+    "Python",
+    "PyTorch",
+    "OpenCV",
+    "Vision par ordinateur",
+    "Kubernetes",
+    "Redis",
+    "Kafka",
+    "FastAPI",
+    "Grafana"
+  ],
+  "projects": [
+    {
+      "title": "Portfolio full-stack",
+      "shortDescription": "Portfolio professionnel : Spring Boot, Angular SSR et PostgreSQL.",
+      "descriptionMarkdown": "## Objectif\n\nCe site : un portfolio dont le contenu se gère depuis une administration, rendu côté serveur et accessible.\n\n## Architecture\n\n- backend Spring Boot en monolithe modulaire, PostgreSQL, migrations Flyway ;\n- frontend Angular avec rendu serveur, sans appel rejoué par le navigateur ;\n- contrat OpenAPI vérifié et types du frontend générés depuis ce contrat.",
+      "stage": "IN_PROGRESS",
+      "visibility": "PUBLISHED",
+      "startDate": "2026-09-01",
+      "endDate": null,
+      "repositoryUrl": "https://example.test/portfolio",
+      "demoUrl": null,
+      "featured": true,
+      "displayOrder": 0,
+      "technologies": [
+        "Java",
+        "Spring Boot",
+        "Angular",
+        "PostgreSQL",
+        "Docker"
+      ],
+      "cover": "poste-de-developpement.webp",
+      "screenshots": []
+    },
+    {
+      "title": "Projet terminé de démonstration",
+      "shortDescription": "Projet de démonstration terminé.",
+      "descriptionMarkdown": "## Bilan\n\nProjet de démonstration.",
+      "stage": "COMPLETED",
+      "visibility": "PUBLISHED",
+      "startDate": "2024-01-01",
+      "endDate": "2024-06-30",
+      "repositoryUrl": null,
+      "demoUrl": "https://example.test/demo",
+      "featured": false,
+      "displayOrder": 1,
+      "technologies": [
+        "Java",
+        "PostgreSQL"
+      ],
+      "cover": null,
+      "screenshots": []
+    },
+    {
+      "title": "Brouillon de démonstration",
+      "shortDescription": "Projet non publié : absent de l'API publique.",
+      "descriptionMarkdown": "Brouillon.",
+      "stage": "IN_PROGRESS",
+      "visibility": "DRAFT",
+      "startDate": "2026-01-01",
+      "endDate": null,
+      "repositoryUrl": null,
+      "demoUrl": null,
+      "featured": false,
+      "displayOrder": 2,
+      "technologies": [
+        "Angular"
+      ],
+      "cover": null,
+      "screenshots": []
+    },
+    {
+      "title": "Atlas ERP, gestion SaaS pour PME",
+      "shortDescription": "ERP multi-entreprises pour les PME : ventes, factures, stocks et comptabilité, avec un tableau de bord qui répond en moins de 200 ms.",
+      "descriptionMarkdown": "## Contexte\n\nLes PME clientes géraient leurs ventes dans un tableur et leurs factures dans un second outil. Les ruptures de stock étaient découvertes au moment d'expédier.\n\n## Ce que j'ai construit\n\n- un **monolithe modulaire** Spring Boot : ventes, facturation, stocks, comptabilité, chaque module propriétaire de ses tables ;\n- une interface Angular rendue côté serveur, utilisable au clavier de bout en bout ;\n- l'isolation des données de chaque entreprise par une colonne `tenant_id` et des politiques de sécurité PostgreSQL ;\n- des exports comptables au format FEC vérifiés par des tests de contrat.\n\n## Résultats\n\n| Indicateur | Avant | Après |\n|---|---|---|\n| Saisie d'une facture | 6 min | 1 min 30 |\n| Ruptures non anticipées par mois | 11 | 2 |\n| Tableau de bord (p95) | — | 180 ms |\n\n## Ce que je referais autrement\n\nJ'introduirais plus tôt les tests d'architecture : deux dépendances circulaires entre modules ont coûté une semaine de démêlage.",
+      "stage": "COMPLETED",
+      "visibility": "PUBLISHED",
+      "startDate": "2024-03-01",
+      "endDate": "2025-06-30",
+      "repositoryUrl": "https://example.test/git/atlas-erp",
+      "demoUrl": "https://example.test/demo/atlas-erp",
+      "featured": true,
+      "displayOrder": 0,
+      "technologies": [
+        "Java",
+        "Spring Boot",
+        "Angular",
+        "PostgreSQL",
+        "Docker",
+        "Kafka"
+      ],
+      "cover": "bureau-de-gestion.webp",
+      "screenshots": [
+        {
+          "file": "erp-tableau-de-bord.webp",
+          "caption": "Tableau de bord : chiffre d'affaires, commandes et alertes de stock."
+        },
+        {
+          "file": "erp-factures.webp",
+          "caption": "Liste des factures filtrée par statut, avec les retards en évidence."
+        }
+      ]
+    },
+    {
+      "title": "RoadSense, détection routière pour l'aide à la conduite",
+      "shortDescription": "Détection des piétons, véhicules et feux pour un système d'aide à la conduite, entraînée sur 48 000 images et exécutée en 31 ms sur carte embarquée.",
+      "descriptionMarkdown": "## Objectif\n\nAlerter le conducteur d'un usager vulnérable avant qu'il n'entre dans la trajectoire, avec moins d'un faux négatif sur dix piétons.\n\n## Démarche\n\n1. Constitution d'un jeu de 48 000 images annotées (jour, nuit, pluie), réparties par trajet pour éviter les fuites entre entraînement et validation.\n2. Entraînement d'un détecteur à une étape en entrée 640 px, avec augmentation photométrique et mosaïque.\n3. Évaluation par classe et par condition : le rappel des piétons de nuit était le point faible.\n4. Export ONNX puis TensorRT FP16 sur Jetson Orin.\n\n## Résultats\n\n| Mesure | Valeur |\n|---|---|\n| mAP@0,5 | 0,871 |\n| Rappel piétons | 0,903 |\n| Latence embarquée | 31 ms |\n\nLe projet continue : suivi multi-objets et estimation de la distance.",
+      "stage": "IN_PROGRESS",
+      "visibility": "PUBLISHED",
+      "startDate": "2023-01-09",
+      "endDate": null,
+      "repositoryUrl": "https://example.test/git/roadsense",
+      "demoUrl": null,
+      "featured": true,
+      "displayOrder": 0,
+      "technologies": [
+        "Python",
+        "PyTorch",
+        "OpenCV",
+        "Vision par ordinateur",
+        "Docker"
+      ],
+      "cover": "autoroute-vue-aerienne.webp",
+      "screenshots": [
+        {
+          "file": "detection-carrefour.webp",
+          "caption": "Détections sur une scène urbaine : piétons, véhicules, bus et feux, avec leur score."
+        },
+        {
+          "file": "roadsense-entrainement.webp",
+          "caption": "Suivi d'un entraînement : pertes, mAP et matrice de confusion par classe."
+        }
+      ]
+    },
+    {
+      "title": "Kora, transfert d'argent vers les portefeuilles mobiles",
+      "shortDescription": "Application et API de transfert d'argent de l'Europe vers les portefeuilles mobiles d'Afrique de l'Ouest, avec paiements idempotents et réconciliation quotidienne.",
+      "descriptionMarkdown": "## Le problème\n\nUn transfert ne doit jamais être débité deux fois, même si le réseau mobile coupe au milieu de la confirmation.\n\n## Solution\n\n- clé d'idempotence fournie par l'application et conservée 24 h ;\n- machine à états explicite (`CREATED → DEBITED → SENT → CREDITED`) et transitions refusées par la base ;\n- file de messages vers les opérateurs partenaires, avec reprises exponentielles ;\n- réconciliation quotidienne entre nos écritures et les relevés des opérateurs.\n\n```java\npublic Transfer debit(IdempotencyKey key) {\n    return transfers.findByKey(key)\n        .orElseGet(() -> transfers.save(Transfer.debited(key, clock.instant())));\n}\n```\n\n## Bilan\n\n42 secondes en médiane entre l'envoi et le crédit du bénéficiaire, aucun double débit en dix-huit mois.",
+      "stage": "COMPLETED",
+      "visibility": "PUBLISHED",
+      "startDate": "2021-09-01",
+      "endDate": "2022-12-23",
+      "repositoryUrl": null,
+      "demoUrl": "https://example.test/demo/kora",
+      "featured": true,
+      "displayOrder": 1,
+      "technologies": [
+        "Java",
+        "Spring Boot",
+        "PostgreSQL",
+        "Redis",
+        "Kafka"
+      ],
+      "cover": "telephone-et-cafe.webp",
+      "screenshots": [
+        {
+          "file": "transfert-ecrans.webp",
+          "caption": "Envoi, confirmation et historique des transferts dans l'application."
+        }
+      ]
+    },
+    {
+      "title": "Pulse Analytics, tableau de bord d'audience",
+      "shortDescription": "Tableau de bord d'audience et de conversion pour une boutique en ligne : sessions, entonnoir et cohortes, calculés chaque nuit dans PostgreSQL.",
+      "descriptionMarkdown": "## Besoin\n\nL'équipe marketing voulait savoir où les visiteurs abandonnaient, sans envoyer les données à un service tiers.\n\n## Réalisation\n\n- collecte d'événements anonymisés (aucune adresse IP conservée) ;\n- agrégats nocturnes en SQL : vues matérialisées par jour, source et étape de l'entonnoir ;\n- interface Angular avec graphiques SVG accessibles (tableau de données équivalent sous chaque graphique).\n\n## Ce que j'ai appris\n\nUne vue matérialisée rafraîchie la nuit suffit largement quand personne ne regarde les chiffres à la minute.",
+      "stage": "COMPLETED",
+      "visibility": "PUBLISHED",
+      "startDate": "2025-07-01",
+      "endDate": "2025-12-19",
+      "repositoryUrl": "https://example.test/git/pulse",
+      "demoUrl": "https://example.test/demo/pulse",
+      "featured": false,
+      "displayOrder": 2,
+      "technologies": [
+        "Angular",
+        "TypeScript",
+        "PostgreSQL",
+        "Spring Boot"
+      ],
+      "cover": "statistiques-sur-portable.webp",
+      "screenshots": [
+        {
+          "file": "pulse-tableau-analytique.webp",
+          "caption": "Vue d'ensemble : sessions par jour comparées à l'an dernier et entonnoir de conversion."
+        }
+      ]
+    },
+    {
+      "title": "DocuAPI, API documentaire versionnée",
+      "shortDescription": "API de gestion documentaire : versions, recherche plein texte et webhooks, décrite par un contrat OpenAPI vérifié à chaque build.",
+      "descriptionMarkdown": "## Principes\n\n- le contrat OpenAPI est **généré depuis le code** et comparé à la version publiée : toute dérive fait échouer le build ;\n- erreurs au format `application/problem+json` avec un code stable ;\n- chaque document garde ses versions ; la recherche porte sur la dernière.\n\n## Recherche\n\nIndex plein texte PostgreSQL avec dictionnaire français sans accents, classement par pertinence puis par date.\n\n## Webhooks\n\nSignature HMAC des notifications et rejeu possible depuis l'interface d'administration.",
+      "stage": "COMPLETED",
+      "visibility": "PUBLISHED",
+      "startDate": "2025-01-06",
+      "endDate": "2025-05-30",
+      "repositoryUrl": "https://example.test/git/docuapi",
+      "demoUrl": null,
+      "featured": false,
+      "displayOrder": 2,
+      "technologies": [
+        "Java",
+        "Spring Boot",
+        "PostgreSQL",
+        "Docker"
+      ],
+      "cover": "lignes-de-code.webp",
+      "screenshots": [
+        {
+          "file": "docuapi-reference.webp",
+          "caption": "Référence de l'API : création d'un document, requête et réponse."
+        }
+      ]
+    },
+    {
+      "title": "Sésame, service d'authentification",
+      "shortDescription": "Service d'authentification centralisé : sessions sécurisées, double facteur par application TOTP et journal d'audit consultable.",
+      "descriptionMarkdown": "## Périmètre\n\nUn seul service pour quatre applications internes : connexion, double facteur, réinitialisation du mot de passe et révocation des sessions.\n\n## Choix de sécurité\n\n- mots de passe hachés avec un coût réévalué à chaque connexion ;\n- limitation des tentatives par compte **et** par adresse ;\n- jeton CSRF lié à la session, cookies `HttpOnly`, `Secure` et `SameSite=Lax` ;\n- journal d'audit append-only, conservé treize mois.\n\n## Tests\n\nScénarios d'attaque automatisés : fixation de session, énumération des comptes, rejeu de codes TOTP.",
+      "stage": "COMPLETED",
+      "visibility": "PUBLISHED",
+      "startDate": "2024-09-02",
+      "endDate": "2025-02-28",
+      "repositoryUrl": "https://example.test/git/sesame",
+      "demoUrl": null,
+      "featured": false,
+      "displayOrder": 3,
+      "technologies": [
+        "Java",
+        "Spring Boot",
+        "PostgreSQL",
+        "Redis",
+        "Docker"
+      ],
+      "cover": "cle-de-securite.webp",
+      "screenshots": []
+    },
+    {
+      "title": "Chaîne de traitement vidéo pour la vision par ordinateur",
+      "shortDescription": "Chaîne de traitement de flux vidéo : décodage, détection, suivi et publication des événements, dimensionnée pour seize caméras par serveur.",
+      "descriptionMarkdown": "## Architecture\n\nChaque caméra est lue par un processus de décodage ; les images passent par une file partagée vers deux processus de détection sur GPU, puis vers le suivi multi-objets. Les événements (entrée de zone, comptage) sont publiés dans Kafka.\n\n## Points délicats\n\n- éviter la copie des images entre processus (mémoire partagée) ;\n- dégrader proprement : sous charge, on saute des images plutôt que d'accumuler du retard ;\n- mesurer la latence de bout en bout, pas seulement celle du modèle.\n\nEn cours : export des métriques vers Grafana.",
+      "stage": "IN_PROGRESS",
+      "visibility": "PUBLISHED",
+      "startDate": "2025-10-01",
+      "endDate": null,
+      "repositoryUrl": "https://example.test/git/vision-pipeline",
+      "demoUrl": null,
+      "featured": false,
+      "displayOrder": 3,
+      "technologies": [
+        "Python",
+        "PyTorch",
+        "OpenCV",
+        "Kafka",
+        "Docker"
+      ],
+      "cover": null,
+      "screenshots": []
+    },
+    {
+      "title": "Vigie, supervision d'un cluster Kubernetes",
+      "shortDescription": "Supervision d'un cluster de production : latences par percentile, taux d'erreurs, saturation des nœuds et alertes réglées sur les objectifs de service.",
+      "descriptionMarkdown": "## Objectifs de service\n\nDisponibilité de 99,9 % sur trente jours et latence p95 inférieure à 300 ms. Les alertes se déclenchent sur la consommation du budget d'erreurs, pas sur des seuils bruts.\n\n## Mise en œuvre\n\n- métriques exposées par chaque service, collectées toutes les quinze secondes ;\n- tableaux de bord versionnés dans le dépôt ;\n- exercices de panne trimestriels avec compte rendu.",
+      "stage": "IN_PROGRESS",
+      "visibility": "PUBLISHED",
+      "startDate": "2026-02-02",
+      "endDate": null,
+      "repositoryUrl": null,
+      "demoUrl": null,
+      "featured": false,
+      "displayOrder": 4,
+      "technologies": [
+        "Kubernetes",
+        "Docker",
+        "Grafana"
+      ],
+      "cover": "baie-de-serveurs.webp",
+      "screenshots": [
+        {
+          "file": "vigie-supervision.webp",
+          "caption": "Supervision de production : disponibilité, latences, débit et saturation des nœuds."
+        }
+      ]
+    },
+    {
+      "title": "Ardoise UI, bibliothèque de composants Angular",
+      "shortDescription": "Bibliothèque de composants Angular accessibles (boutons, champs, dialogues, tableaux), documentée par un catalogue vivant et testée au clavier.",
+      "descriptionMarkdown": "## Pourquoi\n\nTrois applications réimplémentaient leurs propres boutons et dialogues, chacune avec ses défauts d'accessibilité.\n\n## Contenu\n\n- 18 composants, chacun avec ses états (survol, focus, désactivé, chargement) ;\n- tests automatisés d'accessibilité et tests au clavier ;\n- jetons de design partagés (couleurs, espacements, rayons).\n\nLe catalogue sert aussi de documentation : chaque exemple est le code réel du composant.",
+      "stage": "COMPLETED",
+      "visibility": "PUBLISHED",
+      "startDate": "2025-03-03",
+      "endDate": "2025-09-26",
+      "repositoryUrl": "https://example.test/git/ardoise-ui",
+      "demoUrl": "https://example.test/demo/ardoise-ui",
+      "featured": false,
+      "displayOrder": 5,
+      "technologies": [
+        "Angular",
+        "TypeScript"
+      ],
+      "cover": "editeur-de-code.webp",
+      "screenshots": [
+        {
+          "file": "composants-catalogue.webp",
+          "caption": "Page du bouton dans le catalogue : variantes, code et règles d'accessibilité."
+        }
+      ]
+    },
+    {
+      "title": "Lecture automatique de factures",
+      "shortDescription": "Extraction des champs d'une facture fournisseur (numéro, dates, montants) avec contrôle de cohérence et proposition d'écriture comptable.",
+      "descriptionMarkdown": "## Fonctionnement\n\nLa facture est redressée, la reconnaissance de caractères produit le texte et sa position, puis un modèle repère les champs. Un contrôle vérifie que le total hors taxes plus la TVA donne le total TTC.\n\n## Résultats\n\nSur 1 200 factures réelles anonymisées, 94 % des champs sont extraits sans correction ; les factures incohérentes sont envoyées en vérification humaine.",
+      "stage": "COMPLETED",
+      "visibility": "PUBLISHED",
+      "startDate": "2025-04-07",
+      "endDate": "2025-08-29",
+      "repositoryUrl": "https://example.test/git/lecture-factures",
+      "demoUrl": null,
+      "featured": false,
+      "displayOrder": 5,
+      "technologies": [
+        "Python",
+        "OpenCV",
+        "FastAPI"
+      ],
+      "cover": null,
+      "screenshots": [
+        {
+          "file": "ocr-facture.webp",
+          "caption": "Facture analysée et champs extraits, avec leur niveau de confiance."
+        }
+      ]
+    },
+    {
+      "title": "Assistant documentaire par recherche augmentée",
+      "shortDescription": "Assistant qui répond aux questions sur une base documentaire interne en citant ses sources, avec recherche hybride plein texte et vectorielle.",
+      "descriptionMarkdown": "## Principe\n\nLa question est cherchée à la fois par mots-clés et par similarité ; les passages retenus sont fournis au modèle de langage, qui doit citer ceux qu'il utilise.\n\n## Garde-fous\n\n- refus de répondre sans passage pertinent ;\n- citations vérifiées automatiquement contre les passages fournis ;\n- évaluation hebdomadaire sur 150 questions de référence.",
+      "stage": "IN_PROGRESS",
+      "visibility": "PUBLISHED",
+      "startDate": "2026-04-06",
+      "endDate": null,
+      "repositoryUrl": "https://example.test/git/assistant-documentaire",
+      "demoUrl": null,
+      "featured": false,
+      "displayOrder": 6,
+      "technologies": [
+        "Python",
+        "FastAPI",
+        "PostgreSQL"
+      ],
+      "cover": "portable-et-code.webp",
+      "screenshots": []
+    },
+    {
+      "title": "Moteur de recherche plein texte",
+      "shortDescription": "Recherche plein texte en français dans PostgreSQL : dictionnaire sans accents, pondération des champs et extraits surlignés.",
+      "descriptionMarkdown": "## Pourquoi PostgreSQL\n\nPour 200 000 documents, un index GIN et un dictionnaire adapté suffisent : un moteur dédié aurait ajouté un service à exploiter et une synchronisation à surveiller.\n\n## Détails\n\n- titre pondéré plus fortement que le corps ;\n- requêtes au format des moteurs web (guillemets, exclusion) ;\n- extraits avec les termes trouvés en évidence.",
+      "stage": "COMPLETED",
+      "visibility": "PUBLISHED",
+      "startDate": "2024-04-01",
+      "endDate": "2024-07-12",
+      "repositoryUrl": "https://example.test/git/recherche-plein-texte",
+      "demoUrl": null,
+      "featured": false,
+      "displayOrder": 7,
+      "technologies": [
+        "PostgreSQL",
+        "Java"
+      ],
+      "cover": null,
+      "screenshots": []
+    },
+    {
+      "title": "Gestion de stock pour un réseau de boulangeries",
+      "shortDescription": "Application de suivi des stocks et des commandes fournisseurs pour six boulangeries, avec propositions de réapprovisionnement.",
+      "descriptionMarkdown": "## Le besoin\n\nChaque boutique commandait la farine au jugé. L'application calcule la consommation moyenne par jour de la semaine et propose une commande avant le passage du fournisseur.\n\n## Résultat\n\nMoins de pertes sur les produits frais et plus aucune rupture de farine en six mois.",
+      "stage": "COMPLETED",
+      "visibility": "PUBLISHED",
+      "startDate": "2023-03-06",
+      "endDate": "2023-06-30",
+      "repositoryUrl": null,
+      "demoUrl": null,
+      "featured": false,
+      "displayOrder": 8,
+      "technologies": [
+        "Angular",
+        "Spring Boot",
+        "PostgreSQL"
+      ],
+      "cover": null,
+      "screenshots": []
+    },
+    {
+      "title": "Planification de tournées de livraison",
+      "shortDescription": "Calcul de tournées de livraison sous contraintes (créneaux, capacité des véhicules) pour une entreprise de transport régionale.",
+      "descriptionMarkdown": "## Approche\n\nUne première solution gloutonne, améliorée par recherche locale pendant un temps borné. Les chauffeurs peuvent verrouiller un arrêt avant le recalcul.\n\n## Gain\n\n14 % de kilomètres en moins sur un mois de tournées réelles, à nombre de véhicules égal.",
+      "stage": "COMPLETED",
+      "visibility": "PUBLISHED",
+      "startDate": "2022-05-02",
+      "endDate": "2022-09-30",
+      "repositoryUrl": "https://example.test/git/tournees",
+      "demoUrl": null,
+      "featured": false,
+      "displayOrder": 9,
+      "technologies": [
+        "Java",
+        "PostgreSQL"
+      ],
+      "cover": null,
+      "screenshots": []
+    },
+    {
+      "title": "Assistant de revue de code",
+      "shortDescription": "Outil qui commente automatiquement les demandes de fusion : conventions, tests manquants et dépendances entre modules.",
+      "descriptionMarkdown": "Brouillon : périmètre en cours de définition.",
+      "stage": "IN_PROGRESS",
+      "visibility": "DRAFT",
+      "startDate": "2026-08-03",
+      "endDate": null,
+      "repositoryUrl": null,
+      "demoUrl": null,
+      "featured": false,
+      "displayOrder": 10,
+      "technologies": [
+        "Python",
+        "TypeScript"
+      ],
+      "cover": null,
+      "screenshots": []
+    },
+    {
+      "title": "Jumeau numérique d'entrepôt",
+      "shortDescription": "Représentation en temps réel d'un entrepôt (emplacements, chariots, commandes) pour simuler l'effet d'une réorganisation.",
+      "descriptionMarkdown": "Brouillon : à compléter après la démonstration au client.",
+      "stage": "IN_PROGRESS",
+      "visibility": "DRAFT",
+      "startDate": "2026-06-01",
+      "endDate": null,
+      "repositoryUrl": null,
+      "demoUrl": null,
+      "featured": false,
+      "displayOrder": 10,
+      "technologies": [
+        "Java",
+        "Kafka",
+        "PostgreSQL"
+      ],
+      "cover": "ville-de-nuit.webp",
+      "screenshots": []
+    },
+    {
+      "title": "Migration d'une application vers Kubernetes",
+      "shortDescription": "Passage d'une application de machines virtuelles à Kubernetes : conteneurs, déploiements progressifs et secrets externalisés.",
+      "descriptionMarkdown": "Brouillon : retour d'expérience à rédiger.",
+      "stage": "COMPLETED",
+      "visibility": "DRAFT",
+      "startDate": "2025-09-01",
+      "endDate": "2026-01-30",
+      "repositoryUrl": null,
+      "demoUrl": null,
+      "featured": false,
+      "displayOrder": 10,
+      "technologies": [
+        "Kubernetes",
+        "Docker"
+      ],
+      "cover": null,
+      "screenshots": [
+        {
+          "file": "pipeline-ci.webp",
+          "caption": "Pipeline de livraison après la migration."
+        }
+      ]
+    },
+    {
+      "title": "Covoiturage entre campus",
+      "shortDescription": "Application de covoiturage pour les étudiants de trois campus, avec réservation et notation des trajets.",
+      "descriptionMarkdown": "Brouillon.",
+      "stage": "IN_PROGRESS",
+      "visibility": "DRAFT",
+      "startDate": "2026-09-07",
+      "endDate": null,
+      "repositoryUrl": null,
+      "demoUrl": null,
+      "featured": false,
+      "displayOrder": 11,
+      "technologies": [
+        "Angular",
+        "Spring Boot"
+      ],
+      "cover": null,
+      "screenshots": []
+    },
+    {
+      "title": "Site d'une association sportive",
+      "shortDescription": "Site d'une association sportive : calendrier des rencontres, inscriptions et galerie, remplacé depuis par une plateforme fédérale.",
+      "descriptionMarkdown": "## Archivé\n\nLe site a été remplacé en 2024 par la plateforme de la fédération. Les données ont été exportées pour l'association.",
+      "stage": "COMPLETED",
+      "visibility": "ARCHIVED",
+      "startDate": "2020-10-05",
+      "endDate": "2021-01-29",
+      "repositoryUrl": null,
+      "demoUrl": null,
+      "featured": false,
+      "displayOrder": 12,
+      "technologies": [
+        "Angular",
+        "Java"
+      ],
+      "cover": null,
+      "screenshots": []
+    },
+    {
+      "title": "Robot de suivi des tickets",
+      "shortDescription": "Robot de messagerie qui résumait chaque matin les tickets ouverts d'une équipe, retiré quand l'outil de tickets l'a proposé lui-même.",
+      "descriptionMarkdown": "Archivé : la fonction existe désormais dans l'outil de tickets.",
+      "stage": "COMPLETED",
+      "visibility": "ARCHIVED",
+      "startDate": "2022-01-10",
+      "endDate": "2022-03-25",
+      "repositoryUrl": "https://example.test/git/robot-tickets",
+      "demoUrl": null,
+      "featured": false,
+      "displayOrder": 12,
+      "technologies": [
+        "Python"
+      ],
+      "cover": null,
+      "screenshots": []
+    },
+    {
+      "title": "Prototype de reconnaissance vocale",
+      "shortDescription": "Prototype de commandes vocales hors ligne pour un terminal industriel, abandonné au profit d'un écran tactile.",
+      "descriptionMarkdown": "Archivé : le bruit de l'atelier rendait la reconnaissance trop peu fiable.",
+      "stage": "COMPLETED",
+      "visibility": "ARCHIVED",
+      "startDate": "2023-07-03",
+      "endDate": "2023-09-29",
+      "repositoryUrl": null,
+      "demoUrl": null,
+      "featured": false,
+      "displayOrder": 12,
+      "technologies": [
+        "Python",
+        "PyTorch"
+      ],
+      "cover": "trafic-de-nuit.webp",
+      "screenshots": []
+    }
+  ]
+}

@@ -32,9 +32,13 @@ public class TaxonomySeeder implements ApplicationRunner {
     static final List<Category> CATEGORIES = List.of(
         category("Backend", "Spring Boot, API, persistance."),
         category("Frontend", "Angular, rendu serveur, accessibilité."),
-        category("Architecture", null));
+        category("Architecture", null),
+        category("Vision par ordinateur", "Détection, suivi, évaluation et déploiement embarqué."),
+        category("DevOps", "Conteneurs, intégration continue, déploiement et supervision."));
 
-    static final List<Tag> TAGS = List.of(tag("Java"), tag("Spring Boot"), tag("Angular"), tag("PostgreSQL"), tag("Tests"));
+    static final List<Tag> TAGS = List.of(tag("Java"), tag("Spring Boot"), tag("Angular"), tag("PostgreSQL"), tag("Tests"),
+        tag("Python"), tag("PyTorch"), tag("OpenCV"), tag("Docker"), tag("Kubernetes"), tag("CI/CD"), tag("TypeScript"),
+        tag("Accessibilité"), tag("Performance"), tag("Observabilité"));
 
     private final CategoryRepository categoryRepository;
     private final TagRepository tagRepository;

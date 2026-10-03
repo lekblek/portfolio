@@ -33,6 +33,11 @@ public class InMemoryMediaRepository implements MediaRepository {
     }
 
     @Override
+    public Optional<Media> findFirstByOriginalName(String originalName) {
+        return media.stream().filter(stored -> stored.originalName().equals(originalName)).findFirst();
+    }
+
+    @Override
     public List<Media> findAllById(Collection<Long> ids) {
         return media.stream().filter(stored -> ids.contains(stored.id())).toList();
     }

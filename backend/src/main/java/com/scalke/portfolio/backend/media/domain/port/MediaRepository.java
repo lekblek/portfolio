@@ -21,6 +21,11 @@ public interface MediaRepository {
     Optional<Media> findById(Long id);
 
     /**
+     * Le plus ancien média portant ce nom d'origine, s'il en existe (jeux de démonstration du profil {@code dev}).
+     */
+    Optional<Media> findFirstByOriginalName(String originalName);
+
+    /**
      * Une seule requête, quel que soit le nombre d'identifiants ; les identifiants inconnus sont ignorés.
      */
     List<Media> findAllById(Collection<Long> ids);

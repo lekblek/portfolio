@@ -49,6 +49,12 @@ public class MediaRepositoryAdapter implements MediaRepository {
 
     @Override
     @Transactional(readOnly = true)
+    public Optional<Media> findFirstByOriginalName(String originalName) {
+        return repository.findFirstByOriginalNameOrderByIdAsc(originalName).map(MediaPersistenceMapper::toDomain);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<Media> findAllById(Collection<Long> ids) {
         return repository.findAllById(ids).stream().map(MediaPersistenceMapper::toDomain).toList();
     }

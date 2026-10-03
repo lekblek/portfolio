@@ -1,126 +1,133 @@
 package com.scalke.portfolio.backend.project.infrastructure.seed;
 
-import com.scalke.portfolio.backend.media.application.usecase.MediaUpload;
-import com.scalke.portfolio.backend.media.application.usecase.UploadMediaUseCase;
+import com.scalke.portfolio.backend.media.application.query.MediaQueryService;
 import com.scalke.portfolio.backend.media.domain.model.Media;
-import com.scalke.portfolio.backend.project.domain.model.Project;
-import com.scalke.portfolio.backend.project.domain.model.ProjectScreenshot;
+import com.scalke.portfolio.backend.project.application.usecase.CreateProjectUseCase;
+import com.scalke.portfolio.backend.project.application.usecase.ProjectDraft;
 import com.scalke.portfolio.backend.project.domain.model.ProjectStage;
 import com.scalke.portfolio.backend.project.domain.model.ProjectVisibility;
 import com.scalke.portfolio.backend.project.domain.model.Technology;
 import com.scalke.portfolio.backend.project.domain.port.ProjectRepository;
 import com.scalke.portfolio.backend.project.domain.port.TechnologyRepository;
-import com.scalke.portfolio.backend.shared.domain.model.DateRange;
 import com.scalke.portfolio.backend.shared.domain.model.Slug;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.databind.json.JsonMapper;
 
-import javax.imageio.ImageIO;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
- * Technologies et projets de démonstration du profil `dev`, créés uniquement si la base ne contient
- * aucun projet. Ce ne sont pas des données réelles (voir docs/01-perimetre-v1.md §20). Le brouillon
- * permet de vérifier à la main qu'un projet non publié reste invisible.
+ * Technologies et projets de démonstration du profil {@code dev}, décrits par {@code dev-seed/projects.json} (D-EU) :
+ * assez de projets pour franchir deux pages de la liste publique (10 par page) et de l'administration (20), dans
+ * tous les états (brouillon, publié, archivé ; en cours, terminé ; mis en avant ou non ; avec ou sans couverture,
+ * captures et adresses). Ce ne sont pas des données réelles (voir docs/01-perimetre-v1.md §20).
  * <p>
- * Transactionnel : le vocabulaire, les images et les projets sont créés ensemble ou pas du tout, pour qu'un
- * redémarrage ne tente jamais de recréer des technologies déjà présentes. Les images de démonstration
- * (couverture et capture du premier projet) sont générées à la volée et envoyées par le cas d'usage du
- * module {@code media} : aucun fichier binaire dans le dépôt.
+ * Additif et idempotent : une technologie ou un projet n'est créé que si son slug manque ; rien d'existant n'est
+ * modifié, une saisie manuelle est donc préservée. Les projets passent par le cas d'usage de création (mêmes
+ * vérifications que l'administration) ; leurs images sont les médias de démonstration envoyés par le module
+ * {@code media} (retrouvés par leur nom, absents si les fichiers manquent).
  */
 @Component
 @Profile("dev")
+@Order(1)
 @RequiredArgsConstructor
 @Slf4j
 public class ProjectSeeder implements ApplicationRunner {
 
+    static final String SOURCE = "dev-seed/projects.json";
+
     private final ProjectRepository projectRepository;
     private final TechnologyRepository technologyRepository;
-    private final UploadMediaUseCase uploadMediaUseCase;
+    private final CreateProjectUseCase createProjectUseCase;
+    private final MediaQueryService media;
+    private final JsonMapper jsonMapper;
 
     @Override
-    @Transactional
     public void run(ApplicationArguments args) {
-        if (projectRepository.existsAny()) {
+        ClassPathResource source = new ClassPathResource(SOURCE);
+        if (!source.exists()) {
             return;
         }
-        Technology java = technologyRepository.create(technology("Java", 0));
-        Technology springBoot = technologyRepository.create(technology("Spring Boot", 1));
-        Technology angular = technologyRepository.create(technology("Angular", 2));
-        Technology postgresql = technologyRepository.create(technology("PostgreSQL", 3));
-        Technology docker = technologyRepository.create(technology("Docker", 4));
-        Media cover = demoImage("portfolio-couverture.png", "Couverture de démonstration du portfolio",
-            1200, 630, new Color(0x1E3A5F));
-        Media screenshot = demoImage("portfolio-liste-des-projets.png", "Capture de démonstration : liste des projets",
-            1280, 800, new Color(0x2E7D32));
-
-        List.of(
-            new Project(null, "Portfolio full-stack", Slug.fromText("Portfolio full-stack"),
-                "Portfolio professionnel : Spring Boot, Angular SSR et PostgreSQL.",
-                "## Objectif\n\nProjet de démonstration.",
-                ProjectStage.IN_PROGRESS, ProjectVisibility.PUBLISHED,
-                DateRange.ongoingSince(LocalDate.of(2026, 9, 1)),
-                "https://example.test/portfolio", null, true, 0,
-                List.of(java, springBoot, angular, postgresql, docker),
-                cover.id(),
-                List.of(new ProjectScreenshot(screenshot.id(), "Liste des projets", 0)), false),
-            new Project(null, "Projet terminé de démonstration", Slug.fromText("Projet terminé de démonstration"),
-                "Projet de démonstration terminé.",
-                "## Bilan\n\nProjet de démonstration.",
-                ProjectStage.COMPLETED, ProjectVisibility.PUBLISHED,
-                DateRange.between(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 6, 30)),
-                null, "https://example.test/demo", false, 1,
-                List.of(java, postgresql),
-                null,
-                List.of(), false),
-            new Project(null, "Brouillon de démonstration", Slug.fromText("Brouillon de démonstration"),
-                "Projet non publié : absent de l'API publique.",
-                "Brouillon.",
-                ProjectStage.IN_PROGRESS, ProjectVisibility.DRAFT,
-                DateRange.ongoingSince(LocalDate.of(2026, 1, 1)),
-                null, null, false, 2,
-                List.of(angular),
-                null,
-                List.of(), false)
-        ).forEach(projectRepository::create);
-        log.info("Technologies et projets de démonstration créés (profil dev)");
+        DemoProjects demo = read(source);
+        Map<String, Technology> technologies = technologies(demo.technologies());
+        int created = 0;
+        for (DemoProject project : demo.projects()) {
+            if (!projectRepository.existsBySlug(Slug.fromText(project.title()), null)) {
+                createProjectUseCase.execute(null, draft(project, technologies));
+                created++;
+            }
+        }
+        if (created > 0) {
+            log.info("{} projets de démonstration créés (profil dev)", created);
+        }
     }
 
     /**
-     * Image PNG unie, générée en mémoire puis envoyée comme le ferait l'administration.
+     * Technologies manquantes créées dans l'ordre du fichier ; toutes renvoyées par nom.
      */
-    private Media demoImage(String name, String altText, int width, int height, Color color) {
-        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        Graphics2D graphics = image.createGraphics();
-        graphics.setColor(color);
-        graphics.fillRect(0, 0, width, height);
-        graphics.dispose();
-        ByteArrayOutputStream png = new ByteArrayOutputStream();
-        try {
-            ImageIO.write(image, "png", png);
+    private Map<String, Technology> technologies(List<String> names) {
+        Map<String, Technology> existing = technologyRepository.findAll().stream()
+            .collect(Collectors.toMap(technology -> technology.slug().value(), Function.identity()));
+        for (int order = 0; order < names.size(); order++) {
+            Slug slug = Slug.fromText(names.get(order));
+            if (!existing.containsKey(slug.value())) {
+                existing.put(slug.value(), technologyRepository.create(new Technology(null, names.get(order), slug, order)));
+            }
+        }
+        return names.stream().collect(Collectors.toMap(Function.identity(),
+            name -> existing.get(Slug.fromText(name).value())));
+    }
+
+    private ProjectDraft draft(DemoProject project, Map<String, Technology> technologies) {
+        Set<Long> technologyIds = project.technologies().stream()
+            .map(name -> technologies.get(name).id())
+            .collect(Collectors.toSet());
+        List<ProjectDraft.Screenshot> screenshots = project.screenshots().stream()
+            .flatMap(screenshot -> mediaId(screenshot.file()).stream()
+                .map(id -> new ProjectDraft.Screenshot(id, screenshot.caption())))
+            .toList();
+        return new ProjectDraft(project.title(), project.shortDescription(), project.descriptionMarkdown(),
+            project.stage(), project.visibility(), project.startDate(), project.endDate(), project.repositoryUrl(),
+            project.demoUrl(), project.featured(), project.displayOrder(), technologyIds,
+            project.cover() == null ? null : mediaId(project.cover()).orElse(null), screenshots);
+    }
+
+    private Optional<Long> mediaId(String file) {
+        return media.findByOriginalName(file).map(Media::id);
+    }
+
+    private DemoProjects read(ClassPathResource source) {
+        try (InputStream content = source.getInputStream()) {
+            return jsonMapper.readValue(content, DemoProjects.class);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
-        return uploadMediaUseCase.execute(new MediaUpload(name, altText, new ByteArrayInputStream(png.toByteArray())));
     }
 
-    /**
-     * Slugs générés depuis les noms et les titres, comme le fera l'administration (D-BA).
-     */
-    private static Technology technology(String name, int displayOrder) {
-        return new Technology(null, name, Slug.fromText(name), displayOrder);
+    record DemoProjects(List<String> technologies, List<DemoProject> projects) {
+    }
+
+    record DemoProject(String title, String shortDescription, String descriptionMarkdown, ProjectStage stage,
+                       ProjectVisibility visibility, LocalDate startDate, LocalDate endDate, String repositoryUrl,
+                       String demoUrl, boolean featured, int displayOrder, List<String> technologies, String cover,
+                       List<DemoScreenshot> screenshots) {
+    }
+
+    record DemoScreenshot(String file, String caption) {
     }
 }

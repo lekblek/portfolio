@@ -1,5 +1,7 @@
 package com.scalke.portfolio.backend.publication.infrastructure.seed;
 
+import com.scalke.portfolio.backend.media.application.query.MediaQueryService;
+import com.scalke.portfolio.backend.media.domain.model.Media;
 import com.scalke.portfolio.backend.publication.domain.model.Publication;
 import com.scalke.portfolio.backend.publication.domain.model.PublicationStatus;
 import com.scalke.portfolio.backend.publication.domain.model.PublicationType;
@@ -14,13 +16,22 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.databind.json.JsonMapper;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -37,6 +48,13 @@ import java.util.stream.Stream;
  * Exception additive (F15) : la publication de démonstration des formules et diagrammes est créée
  * dès que son slug manque, même dans une base déjà amorcée : une base de développement existante
  * la reçoit sans être recréée. Contenu de démonstration, pas un contenu scientifique réel.
+ * <p>
+ * Jeu représentatif (D-EU, F27) : les publications de {@code dev-seed/publications.json} sont créées de la même façon,
+ * chacune dès que son slug manque : assez d'articles et d'actualités publiés pour deux pages de chaque liste, des
+ * brouillons, une planification future et des archives, avec ou sans couverture ; trois articles riches (Mermaid,
+ * formules, code, tableaux, figures légendées) dont le Markdown est dans {@code dev-seed/publications/}. Une image du
+ * contenu s'écrit {@code {{media:nom-du-fichier}}}, remplacé par l'adresse publique du média de démonstration. Dates
+ * fixes, sauf la planification future, relative à l'horloge ({@code +P21D}).
  */
 @Component
 @Profile("dev")
@@ -47,6 +65,8 @@ public class PublicationSeeder implements ApplicationRunner {
 
     private final PublicationRepository publicationRepository;
     private final TaxonomyQueryService taxonomy;
+    private final MediaQueryService media;
+    private final JsonMapper jsonMapper;
     private final Clock clock;
 
     @Override
@@ -57,6 +77,7 @@ public class PublicationSeeder implements ApplicationRunner {
             seedVisibilityCases(now);
         }
         seedScientificDemoIfMissing(now);
+        seedDemoContentIfMissing(now);
     }
 
     private void seedVisibilityCases(Instant now) {
@@ -142,6 +163,87 @@ public class PublicationSeeder implements ApplicationRunner {
             SCIENTIFIC_DEMO_CONTENT, PublicationStatus.PUBLISHED, publishedAt, publishedAt, false,
             category("architecture"), tags("tests"), null, null, now, now, null));
         log.info("Publication de démonstration des formules et diagrammes créée (profil dev)");
+    }
+
+    static final String SOURCE = "dev-seed/publications.json";
+    static final String CONTENT_ROOT = "dev-seed/publications/";
+    private static final Pattern MEDIA_REFERENCE = Pattern.compile("\\{\\{media:([^}]+)}}");
+
+    private void seedDemoContentIfMissing(Instant now) {
+        ClassPathResource source = new ClassPathResource(SOURCE);
+        if (!source.exists()) {
+            return;
+        }
+        int created = 0;
+        for (DemoPublication demo : read(source, DemoPublications.class).publications()) {
+            Slug slug = Slug.fromText(demo.title());
+            if (publicationRepository.findBySlug(slug).isEmpty()) {
+                publicationRepository.create(publication(demo, slug, now));
+                created++;
+            }
+        }
+        if (created > 0) {
+            log.info("{} publications de démonstration créées (profil dev)", created);
+        }
+    }
+
+    private Publication publication(DemoPublication demo, Slug slug, Instant now) {
+        Instant publishedAt = demo.publishedAt() == null ? null
+            : demo.publishedAt().startsWith("+") ? now.plus(Duration.parse(demo.publishedAt().substring(1)))
+            : Instant.parse(demo.publishedAt());
+        Instant written = publishedAt != null && publishedAt.isBefore(now) ? publishedAt : now;
+        String content = demo.contentFile() == null ? demo.content() : text(CONTENT_ROOT + demo.contentFile());
+        return new Publication(null, demo.type(), demo.title(), slug, demo.summary(), withMediaUrls(content),
+            demo.status(), publishedAt, publishedAt, demo.featured(),
+            demo.category() == null ? null : category(demo.category()), tags(demo.tags().toArray(String[]::new)),
+            null, null, written, written, demo.cover() == null ? null : mediaOf(demo.cover()).map(Media::id).orElse(null));
+    }
+
+    /**
+     * {@code {{media:fichier}}} → adresse publique du média de démonstration ; un média absent laisse une adresse
+     * vide, que le rendu Markdown affiche comme un texte.
+     */
+    private String withMediaUrls(String content) {
+        Matcher matcher = MEDIA_REFERENCE.matcher(content);
+        StringBuilder result = new StringBuilder();
+        while (matcher.find()) {
+            String url = mediaOf(matcher.group(1)).map(found -> MediaQueryService.publicUrl(found.storageKey())).orElse("");
+            matcher.appendReplacement(result, Matcher.quoteReplacement(url));
+        }
+        matcher.appendTail(result);
+        return result.toString();
+    }
+
+    private Optional<Media> mediaOf(String file) {
+        return media.findByOriginalName(file);
+    }
+
+    private <T> T read(ClassPathResource source, Class<T> type) {
+        try (InputStream content = source.getInputStream()) {
+            return jsonMapper.readValue(content, type);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    private static String text(String path) {
+        try (InputStream content = new ClassPathResource(path).getInputStream()) {
+            return new String(content.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    record DemoPublications(List<DemoPublication> publications) {
+    }
+
+    /**
+     * {@code publishedAt} : instant ISO, durée relative à l'horloge ({@code +P21D}) ou absente ; le contenu est dans
+     * {@code content} ou dans le fichier {@code contentFile}.
+     */
+    record DemoPublication(PublicationType type, String title, String summary, String content, String contentFile,
+                           PublicationStatus status, String publishedAt, boolean featured, String category,
+                           List<String> tags, String cover) {
     }
 
     private Long category(String slug) {

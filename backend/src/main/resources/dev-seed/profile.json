@@ -1,0 +1,108 @@
+{
+  "displayName": "Blek Gedeon Ngossanga",
+  "professionalTitle": "Ingénieur logiciel full-stack et vision par ordinateur",
+  "shortBio": "Je conçois des applications web robustes, de l'API à l'interface, et des systèmes de vision par ordinateur qui tiennent en production.",
+  "aboutMarkdown": "Ingénieur logiciel depuis 2021, je travaille sur toute la chaîne d'une application : modèle métier, API, base de données, interface et déploiement. Une partie de mon parcours s'est faite en vision par ordinateur embarquée, où chaque milliseconde et chaque faux négatif comptent.\n\n## Ce que je fais\n\n- **Backend** : Java et Spring Boot, architecture modulaire, PostgreSQL, API documentées et testées.\n- **Frontend** : Angular, rendu serveur, accessibilité (WCAG 2.2 AA) et performances mesurées.\n- **Vision par ordinateur** : détection d'objets, annotation, entraînement et intégration sur cible embarquée.\n- **Exploitation** : conteneurs, intégration continue, supervision et sauvegardes vérifiées.\n\n## Ma façon de travailler\n\nJe commence par les règles du métier et leurs invariants, puis j'écris les tests qui les protègent. Je préfère une solution simple, mesurée et documentée à une architecture spectaculaire. Chaque décision importante est consignée avec ses raisons, pour qu'on puisse la remettre en cause en connaissance de cause.\n\nEn dehors du code, j'écris sur ce site des articles techniques : architecture backend, vision par ordinateur et exploitation.",
+  "publicLocation": "Tanger, Maroc",
+  "avatar": "avatar-monogramme.webp",
+  "cv": "cv-blek-ngossanga.pdf",
+  "links": [
+    { "label": "GitHub", "url": "https://example.test/github/blek-ngossanga" },
+    { "label": "LinkedIn", "url": "https://example.test/linkedin/blek-ngossanga" },
+    { "label": "GitLab", "url": "https://example.test/gitlab/blek" },
+    { "label": "Kaggle", "url": "https://example.test/kaggle/blek" }
+  ],
+  "skills": [
+    { "name": "Java", "category": "Backend" },
+    { "name": "Spring Boot", "category": "Backend" },
+    { "name": "API REST et OpenAPI", "category": "Backend" },
+    { "name": "PostgreSQL", "category": "Backend" },
+    { "name": "Angular", "category": "Frontend" },
+    { "name": "TypeScript", "category": "Frontend" },
+    { "name": "Accessibilité web", "category": "Frontend" },
+    { "name": "Python", "category": "IA et données" },
+    { "name": "PyTorch", "category": "IA et données" },
+    { "name": "OpenCV", "category": "IA et données" },
+    { "name": "Détection d'objets", "category": "IA et données" },
+    { "name": "Docker", "category": "Exploitation" },
+    { "name": "Kubernetes", "category": "Exploitation" },
+    { "name": "Intégration continue", "category": "Exploitation" }
+  ],
+  "experiences": [
+    {
+      "organization": "Atlas Logiciels",
+      "title": "Ingénieur logiciel full-stack",
+      "location": "Casablanca",
+      "startDate": "2024-03-01",
+      "endDate": null,
+      "description": "Conception d'un ERP SaaS pour PME (ventes, factures, stocks) : monolithe modulaire Spring Boot, Angular avec rendu serveur, PostgreSQL. Mise en place des tests d'architecture, de la documentation OpenAPI et d'un pipeline de livraison en moins de dix minutes."
+    },
+    {
+      "organization": "RoadSense Labs",
+      "title": "Ingénieur vision par ordinateur",
+      "location": "Tanger",
+      "startDate": "2023-01-09",
+      "endDate": "2024-02-29",
+      "description": "Détection des usagers vulnérables pour un système d'aide à la conduite : constitution d'un jeu de 48 000 images annotées, entraînement et évaluation des détecteurs, intégration TensorRT sur Jetson Orin (31 ms par image)."
+    },
+    {
+      "organization": "Kora Paiements",
+      "title": "Développeur backend Java",
+      "location": "Rabat",
+      "startDate": "2021-09-01",
+      "endDate": "2022-12-23",
+      "description": "Service de transfert d'argent vers les portefeuilles mobiles : idempotence des paiements, réconciliation quotidienne, file de messages pour les opérateurs partenaires et tableaux de bord de supervision."
+    },
+    {
+      "organization": "Studio numérique du Détroit",
+      "title": "Développeur web, stage de fin d'études",
+      "location": "Tanger",
+      "startDate": "2021-02-01",
+      "endDate": "2021-07-30",
+      "description": "Refonte d'un portail associatif : interface Angular accessible, API Spring Boot, migration des données historiques."
+    }
+  ],
+  "educations": [
+    {
+      "institution": "Institut supérieur d'informatique de Tanger",
+      "degree": "Diplôme d'ingénieur",
+      "field": "Génie logiciel et systèmes intelligents",
+      "location": "Tanger",
+      "startDate": "2018-09-03",
+      "endDate": "2021-07-15",
+      "description": "Projet de fin d'études : détection de piétons en temps réel sur carte embarquée. Mention très bien."
+    },
+    {
+      "institution": "Lycée du Détroit",
+      "degree": "Classes préparatoires",
+      "field": "Mathématiques et physique",
+      "location": "Tanger",
+      "startDate": "2016-09-05",
+      "endDate": "2018-06-29",
+      "description": ""
+    }
+  ],
+  "certifications": [
+    {
+      "name": "Développeur Java SE 17 certifié",
+      "issuer": "Oracle",
+      "issuedAt": "2023-05-12",
+      "expiresAt": null,
+      "credentialUrl": "https://example.test/certifications/java-se-17"
+    },
+    {
+      "name": "Développeur d'applications Kubernetes (CKAD)",
+      "issuer": "Cloud Native Computing Foundation",
+      "issuedAt": "2024-11-04",
+      "expiresAt": "2026-11-04",
+      "credentialUrl": "https://example.test/certifications/ckad"
+    },
+    {
+      "name": "Apprentissage profond, spécialisation",
+      "issuer": "DeepLearning.AI",
+      "issuedAt": "2022-08-20",
+      "expiresAt": null,
+      "credentialUrl": null
+    }
+  ]
+}

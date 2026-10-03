@@ -1,0 +1,391 @@
+{
+  "publications": [
+    {
+      "type": "ARTICLE",
+      "title": "Un monolithe modulaire avec Spring Boot : frontières, tests et contrat d'API",
+      "summary": "Neuf modules dans un seul processus, zéro dépendance circulaire : comment les tests d'architecture et un contrat OpenAPI vérifié gardent un monolithe sain.",
+      "contentFile": "monolithe-modulaire.md",
+      "status": "PUBLISHED",
+      "publishedAt": "2026-06-16T08:00:00Z",
+      "featured": true,
+      "category": "architecture",
+      "tags": [
+        "java",
+        "spring-boot",
+        "tests"
+      ],
+      "cover": "code-sur-ecran.webp"
+    },
+    {
+      "type": "ARTICLE",
+      "title": "Détecter les piétons en 31 ms : de l'annotation à la carte embarquée",
+      "summary": "Retour d'expérience sur RoadSense : annotation, évaluation par condition, suppression des doublons et export TensorRT, chiffres à l'appui.",
+      "contentFile": "detection-pietons.md",
+      "status": "PUBLISHED",
+      "publishedAt": "2026-08-25T07:30:00Z",
+      "featured": true,
+      "category": "vision-par-ordinateur",
+      "tags": [
+        "python",
+        "pytorch",
+        "opencv",
+        "performance"
+      ],
+      "cover": "passage-pieton.webp"
+    },
+    {
+      "type": "ARTICLE",
+      "title": "Livrer en moins de dix minutes : pipeline, conteneurs et supervision",
+      "summary": "Le pipeline de livraison de DocuAPI et d'Atlas : étapes parallèles, image signée, déploiement progressif et retour arrière en une commande.",
+      "contentFile": "livrer-en-dix-minutes.md",
+      "status": "PUBLISHED",
+      "publishedAt": "2026-04-21T08:00:00Z",
+      "featured": false,
+      "category": "devops",
+      "tags": [
+        "docker",
+        "kubernetes",
+        "ci-cd",
+        "observabilite"
+      ],
+      "cover": "baie-de-serveurs.webp"
+    },
+    {
+      "type": "ARTICLE",
+      "title": "Signal Forms en pratique : un formulaire imbriqué sans perdre le focus",
+      "summary": "Listes ordonnables, erreurs du serveur rattachées au bon champ et focus maîtrisé : ce qu'apportent les formulaires à base de signaux d'Angular.",
+      "content": "Un formulaire de profil contient cinq listes : liens, compétences, expériences, formations, certifications. Chacune se réordonne, s'allonge et se vide. Les formulaires à base de signaux suivent chaque élément **par identité**, si bien qu'un élément déplacé garde son état (champ touché, erreur affichée).\n\n## Trois règles\n\n1. Un ajout place le focus sur le premier champ du nouvel élément.\n2. Un retrait le place sur l'élément suivant, ou sur le bouton d'ajout.\n3. Une erreur du serveur nommée `experiences[2].endDate` s'affiche sous ce champ précis.\n\n```typescript\nconst refs = Object.fromEntries(\n  model.experiences.flatMap((_, i) => [[`experiences[${i}].endDate`, form.experiences[i].endDate]]),\n);\n```\n\n## Le piège\n\nAprès un enregistrement, remplacer tout le modèle par la réponse du serveur recrée chaque ligne : les éléments inchangés doivent garder leur identité.",
+      "status": "PUBLISHED",
+      "publishedAt": "2026-09-15T08:00:00Z",
+      "featured": false,
+      "category": "frontend",
+      "tags": [
+        "angular",
+        "typescript",
+        "accessibilite"
+      ],
+      "cover": "editeur-de-code.webp"
+    },
+    {
+      "type": "ARTICLE",
+      "title": "Pagination par liens : l'état dans l'adresse",
+      "summary": "Une liste paginée dont la page et les filtres vivent dans l'URL se partage, se recharge et fonctionne sans JavaScript.",
+      "content": "Une pagination par boutons garde la page en mémoire ; une pagination par liens la met dans l'adresse. La seconde se partage, survit au rechargement et fonctionne avant même que le JavaScript ne soit chargé.\n\n## Les règles retenues\n\n- la première page n'a pas de paramètre : une seule adresse par page ;\n- changer de filtre ramène à la première page ;\n- une page au-delà de la dernière répond 404 ;\n- la page courante porte `aria-current=\"page\"`.\n\n| Adresse | Résultat |\n|---|---|\n| `/projects` | page 1 |\n| `/projects?page=2` | page 2 |\n| `/projects?page=99` | 404 |\n| `/projects?technology=java&page=2` | page 2 du filtre |",
+      "status": "PUBLISHED",
+      "publishedAt": "2026-05-12T08:00:00Z",
+      "featured": false,
+      "category": "frontend",
+      "tags": [
+        "angular",
+        "accessibilite"
+      ],
+      "cover": null
+    },
+    {
+      "type": "ARTICLE",
+      "title": "Idempotence des paiements : la clé avant tout",
+      "summary": "Pourquoi un transfert d'argent doit porter sa propre clé d'idempotence, et comment la base de données refuse les doubles débits.",
+      "content": "Quand le réseau coupe au milieu d'une confirmation, l'application ne sait pas si le paiement est passé. Elle renvoie donc la requête. Sans précaution, le client est débité deux fois.\n\n## La clé d'idempotence\n\nL'application génère une clé unique par intention de paiement et l'envoie avec chaque tentative. Le serveur enregistre la clé avec le résultat ; une seconde requête portant la même clé reçoit le même résultat, sans nouveau débit.\n\n```sql\nCREATE TABLE transfer (\n    id              BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,\n    idempotency_key UUID        NOT NULL UNIQUE,\n    status          VARCHAR(16) NOT NULL,\n    amount_cents    BIGINT      NOT NULL CHECK (amount_cents > 0)\n);\n```\n\nLa contrainte `UNIQUE` est la vraie protection : deux requêtes simultanées ne peuvent pas toutes les deux réussir l'insertion.",
+      "status": "PUBLISHED",
+      "publishedAt": "2025-11-18T08:00:00Z",
+      "featured": false,
+      "category": "backend",
+      "tags": [
+        "java",
+        "spring-boot",
+        "postgresql"
+      ],
+      "cover": "telephone-et-cafe.webp"
+    },
+    {
+      "type": "ARTICLE",
+      "title": "Recherche plein texte en français avec PostgreSQL",
+      "summary": "Dictionnaire sans accents, pondération du titre et requêtes au format web : une recherche correcte sans moteur dédié.",
+      "content": "Pour quelques centaines de milliers de documents, PostgreSQL suffit. Il faut seulement lui apprendre le français sans accents.\n\n```sql\nCREATE TEXT SEARCH CONFIGURATION french_unaccent (COPY = french);\nALTER TEXT SEARCH CONFIGURATION french_unaccent\n    ALTER MAPPING FOR hword, hword_part, word WITH unaccent, french_stem;\n```\n\n## Pondérer\n\nLe titre compte plus que le corps : `setweight(to_tsvector(title), 'A')` puis le corps en `'B'`. La requête `websearch_to_tsquery` comprend les guillemets et l'exclusion, comme un moteur web.\n\n## Mesure\n\nSur 200 000 documents, la requête médiane prend 4 ms avec un index GIN, contre 1,8 s sans.",
+      "status": "PUBLISHED",
+      "publishedAt": "2025-09-09T08:00:00Z",
+      "featured": false,
+      "category": "backend",
+      "tags": [
+        "postgresql",
+        "performance"
+      ],
+      "cover": null
+    },
+    {
+      "type": "ARTICLE",
+      "title": "Annoter 48 000 images sans perdre la tête",
+      "summary": "Consignes d'annotation, double vérification et répartition par trajet : ce qui a rendu le jeu de données de RoadSense fiable.",
+      "content": "Un jeu de données mal annoté plafonne le meilleur modèle. Pour RoadSense, l'annotation a pris plus de temps que l'entraînement, et c'était le bon choix.\n\n## Consignes écrites\n\nUn piéton partiellement caché est annoté s'il est visible à plus de 30 % ; un reflet dans une vitrine ne l'est jamais. Chaque cas limite rencontré rejoint les consignes, avec une image d'exemple.\n\n## Double vérification\n\n10 % des images sont annotées deux fois. L'accord entre annotateurs, mesuré par l'IoU moyen des boîtes appariées, doit dépasser 0,8 ; en dessous, la consigne est précisée et le lot repris.\n\n## Répartition par trajet\n\nDeux images d'un même trajet se ressemblent trop pour être l'une en entraînement et l'autre en test.",
+      "status": "PUBLISHED",
+      "publishedAt": "2025-06-03T08:00:00Z",
+      "featured": false,
+      "category": "vision-par-ordinateur",
+      "tags": [
+        "python",
+        "opencv"
+      ],
+      "cover": "trafic-de-nuit.webp"
+    },
+    {
+      "type": "ARTICLE",
+      "title": "Mesurer la latence de bout en bout d'une chaîne vidéo",
+      "summary": "La latence du modèle n'est qu'une partie du délai : décodage, file d'attente et publication comptent autant.",
+      "content": "Annoncer « 18 ms par image » quand le délai entre la caméra et l'alerte atteint 140 ms, c'est mesurer la mauvaise chose.\n\n## Décomposer\n\nLe délai total est la somme des étapes :\n\n$$\nT = t_{\\text{décodage}} + t_{\\text{file}} + t_{\\text{inférence}} + t_{\\text{suivi}} + t_{\\text{publication}}\n$$\n\nChaque image porte l'horodatage de sa capture ; chaque étape ajoute le sien.\n\n| Étape | p50 | p95 |\n|---|---|---|\n| Décodage | 6 ms | 11 ms |\n| File d'attente | 9 ms | 48 ms |\n| Inférence | 18 ms | 22 ms |\n| Suivi | 3 ms | 5 ms |\n| Publication | 4 ms | 12 ms |\n\nLa file d'attente domine au 95e centile : c'est elle qu'il fallait réduire, pas le modèle.",
+      "status": "PUBLISHED",
+      "publishedAt": "2026-02-10T08:00:00Z",
+      "featured": false,
+      "category": "vision-par-ordinateur",
+      "tags": [
+        "python",
+        "performance"
+      ],
+      "cover": null
+    },
+    {
+      "type": "ARTICLE",
+      "title": "Testcontainers : des tests d'intégration qui ressemblent à la production",
+      "summary": "Une vraie base PostgreSQL par suite de tests, démarrée en deux secondes : fini les différences entre la base de test et celle de production.",
+      "content": "Une base en mémoire accepte des requêtes que PostgreSQL refuse, et inversement. Les tests passent, la production casse.\n\n## Un conteneur partagé\n\nUn seul conteneur PostgreSQL est démarré pour toute la suite ; chaque test tourne dans une transaction annulée à la fin.\n\n```java\n@Testcontainers\nabstract class AbstractIntegrationTest {\n    @Container @ServiceConnection\n    static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>(\"postgres:18\");\n}\n```\n\n## Bilan\n\n96 tests d'intégration en 3 minutes, migrations Flyway comprises, sur la même version de PostgreSQL que la production.",
+      "status": "PUBLISHED",
+      "publishedAt": "2025-03-25T08:00:00Z",
+      "featured": false,
+      "category": "backend",
+      "tags": [
+        "tests",
+        "docker",
+        "postgresql"
+      ],
+      "cover": "portable-et-code.webp"
+    },
+    {
+      "type": "ARTICLE",
+      "title": "Budget d'erreurs : alerter sur ce qui compte",
+      "summary": "Des alertes sur la consommation du budget d'erreurs plutôt que sur des seuils bruts : moins de réveils nocturnes, plus d'incidents vus à temps.",
+      "content": "Une alerte « CPU à 90 % » réveille quelqu'un pour rien la moitié du temps. Une alerte « le budget d'erreurs du mois se consume quatorze fois trop vite » signale un vrai problème.\n\n## Le calcul\n\nAvec un objectif de disponibilité de 99,9 %, le budget est de 0,1 % des requêtes sur trente jours. Le taux de consommation compare les erreurs observées à ce budget :\n\n$$\n\\text{taux} = \\frac{\\text{erreurs} / \\text{requêtes}}{1 - 0{,}999}\n$$\n\nUn taux de 14 sur une heure épuise 2 % du budget mensuel : il faut agir tout de suite.\n\n## Résultat\n\nLes alertes nocturnes sont passées de neuf à deux par mois, et aucune panne réelle n'a été manquée.",
+      "status": "PUBLISHED",
+      "publishedAt": "2026-07-07T08:00:00Z",
+      "featured": false,
+      "category": "devops",
+      "tags": [
+        "kubernetes",
+        "observabilite"
+      ],
+      "cover": "ville-de-nuit.webp"
+    },
+    {
+      "type": "ARTICLE",
+      "title": "Accessibilité d'un tableau de données : ce que le lecteur d'écran entend",
+      "summary": "Légende, en-têtes de colonnes et de lignes, actions nommées : un tableau d'administration qui se lit aussi bien à l'oreille qu'à l'écran.",
+      "content": "Un lecteur d'écran annonce chaque cellule avec ses en-têtes. Encore faut-il qu'ils existent.\n\n## Le minimum\n\n- une `<caption>`, même masquée visuellement ;\n- `<th scope=\"col\">` pour les colonnes, `<th scope=\"row\">` pour la colonne qui nomme la ligne ;\n- des actions nommées en entier : « Modifier le projet Atlas », pas « Modifier ».\n\n## Sur petit écran\n\nLe tableau défile dans son cadre ; le cadre devient alors une région nommée, atteignable au clavier, pour que le défilement reste possible sans souris.",
+      "status": "PUBLISHED",
+      "publishedAt": "2026-01-20T08:00:00Z",
+      "featured": false,
+      "category": "frontend",
+      "tags": [
+        "accessibilite",
+        "angular"
+      ],
+      "cover": "lignes-de-code.webp"
+    },
+    {
+      "type": "ARTICLE",
+      "title": "Comparer trois détecteurs embarqués",
+      "summary": "Brouillon : comparaison de trois architectures de détection sur la même carte.",
+      "content": "Brouillon en cours de rédaction.\n\n| Détecteur | mAP@0,5 | Latence |\n|---|---|---|\n| A | à mesurer | à mesurer |",
+      "status": "DRAFT",
+      "publishedAt": null,
+      "featured": false,
+      "category": "vision-par-ordinateur",
+      "tags": [
+        "pytorch"
+      ],
+      "cover": null
+    },
+    {
+      "type": "ARTICLE",
+      "title": "Suivi multi-objets : associer les détections d'une image à l'autre",
+      "summary": "Associer les détections successives d'un même piéton pour estimer sa trajectoire : algorithme hongrois et filtre de Kalman.",
+      "content": "Article programmé : publication prévue dans trois semaines.\n\n## Association\n\nLe coût d'association de deux détections est $1 - \\mathrm{IoU}$ ; l'algorithme hongrois trouve l'affectation de coût minimal.",
+      "status": "SCHEDULED",
+      "publishedAt": "+P21D",
+      "featured": false,
+      "category": "vision-par-ordinateur",
+      "tags": [
+        "python",
+        "opencv"
+      ],
+      "cover": null
+    },
+    {
+      "type": "ARTICLE",
+      "title": "Notes sur la migration de Spring Boot 2 vers 3",
+      "summary": "Notes de migration devenues obsolètes depuis Spring Boot 4.",
+      "content": "Article archivé : son contenu concerne une version dépassée.",
+      "status": "ARCHIVED",
+      "publishedAt": "2024-02-06T08:00:00Z",
+      "featured": false,
+      "category": "backend",
+      "tags": [
+        "spring-boot"
+      ],
+      "cover": null
+    },
+    {
+      "type": "NEWS",
+      "title": "RoadSense passe sous les 35 ms sur carte embarquée",
+      "summary": "Le détecteur de RoadSense tourne désormais en 31 ms par image sur Jetson Orin, sans perte de précision notable.",
+      "content": "Après l'export TensorRT en demi-précision, le détecteur de RoadSense traite une image en 31 ms sur la carte embarquée, contre 58 ms au printemps. La précision moyenne ne perd que 0,002 point.\n\nLe détail de la démarche est dans l'article consacré à la détection des piétons.",
+      "status": "PUBLISHED",
+      "publishedAt": "2026-09-02T09:00:00Z",
+      "featured": false,
+      "category": null,
+      "tags": [
+        "pytorch",
+        "performance"
+      ],
+      "cover": "detection-carrefour.webp"
+    },
+    {
+      "type": "NEWS",
+      "title": "Atlas ERP adopté par trois nouvelles PME",
+      "summary": "Une boulangerie, une menuiserie et un cabinet comptable utilisent désormais Atlas ERP au quotidien.",
+      "content": "Trois entreprises ont migré leurs factures et leurs stocks vers Atlas ERP ce trimestre. La reprise des données historiques a pris moins d'une journée pour chacune.",
+      "status": "PUBLISHED",
+      "publishedAt": "2025-10-01T09:00:00Z",
+      "featured": false,
+      "category": null,
+      "tags": [
+        "spring-boot"
+      ],
+      "cover": "erp-tableau-de-bord.webp"
+    },
+    {
+      "type": "NEWS",
+      "title": "Intervention au meetup Java de Tanger",
+      "summary": "Présentation « Un monolithe modulaire qui tient dans le temps » devant une soixantaine de développeurs.",
+      "content": "J'ai présenté les tests d'architecture et le contrat OpenAPI vérifié qui protègent l'ERP Atlas. Les diapositives et le code d'exemple sont disponibles sur demande.",
+      "status": "PUBLISHED",
+      "publishedAt": "2026-06-27T17:00:00Z",
+      "featured": false,
+      "category": null,
+      "tags": [
+        "java"
+      ],
+      "cover": null
+    },
+    {
+      "type": "NEWS",
+      "title": "Ardoise UI publiée en source ouverte",
+      "summary": "La bibliothèque de composants Angular accessibles est disponible, avec son catalogue en ligne.",
+      "content": "Dix-huit composants, leurs tests d'accessibilité et un catalogue vivant : Ardoise UI est publiée sous licence MIT.",
+      "status": "PUBLISHED",
+      "publishedAt": "2025-10-14T09:00:00Z",
+      "featured": false,
+      "category": null,
+      "tags": [
+        "angular",
+        "accessibilite"
+      ],
+      "cover": "composants-catalogue.webp"
+    },
+    {
+      "type": "NEWS",
+      "title": "Certification Kubernetes obtenue",
+      "summary": "Certification de développeur d'applications Kubernetes obtenue en novembre.",
+      "content": "Deux heures d'exercices pratiques sur un vrai cluster : déploiements, sondes, configuration et réseau. Une bonne occasion de revoir les sondes de disponibilité, souvent mal réglées.",
+      "status": "PUBLISHED",
+      "publishedAt": "2024-11-05T09:00:00Z",
+      "featured": false,
+      "category": null,
+      "tags": [
+        "kubernetes"
+      ],
+      "cover": null
+    },
+    {
+      "type": "NEWS",
+      "title": "Nouvelle série : la vision par ordinateur appliquée",
+      "summary": "Une série d'articles suit RoadSense de l'annotation au déploiement embarqué.",
+      "content": "Les articles sur l'annotation, la mesure de latence et la détection des piétons forment désormais une série, à lire dans l'ordre.",
+      "status": "PUBLISHED",
+      "publishedAt": "2026-08-26T09:00:00Z",
+      "featured": false,
+      "category": null,
+      "tags": [
+        "python"
+      ],
+      "cover": null
+    },
+    {
+      "type": "NEWS",
+      "title": "Pulse Analytics ouvert en démonstration",
+      "summary": "Le tableau de bord d'audience est consultable en démonstration, sur des données fictives.",
+      "content": "La démonstration de Pulse Analytics présente trente jours de données fictives : sessions, entonnoir de conversion et sources de trafic.",
+      "status": "PUBLISHED",
+      "publishedAt": "2026-01-08T09:00:00Z",
+      "featured": false,
+      "category": null,
+      "tags": [
+        "angular"
+      ],
+      "cover": "statistiques-sur-portable.webp"
+    },
+    {
+      "type": "NEWS",
+      "title": "Le portfolio passe au rendu serveur",
+      "summary": "Les pages publiques du portfolio sont désormais rendues côté serveur : affichage plus rapide et contenu lisible sans JavaScript.",
+      "content": "Chaque page publique arrive complète dans le HTML, formules comprises. Le navigateur ne rejoue aucun appel à l'API au chargement.",
+      "status": "PUBLISHED",
+      "publishedAt": "2026-03-17T09:00:00Z",
+      "featured": false,
+      "category": null,
+      "tags": [
+        "angular",
+        "performance"
+      ],
+      "cover": null
+    },
+    {
+      "type": "NEWS",
+      "title": "Atelier : écrire ses tests d'architecture",
+      "summary": "Atelier de deux heures pour mettre en place des tests d'architecture dans un projet Spring Boot existant.",
+      "content": "Au programme : repérer les dépendances réelles, écrire les premières règles, puis corriger les violations par petites étapes.",
+      "status": "PUBLISHED",
+      "publishedAt": "2025-04-29T09:00:00Z",
+      "featured": false,
+      "category": null,
+      "tags": [
+        "tests",
+        "java"
+      ],
+      "cover": null
+    },
+    {
+      "type": "NEWS",
+      "title": "DocuAPI 2.3 : webhooks signés",
+      "summary": "Les notifications de DocuAPI sont désormais signées et peuvent être rejouées depuis l'administration.",
+      "content": "Chaque webhook porte une signature HMAC calculée avec la clé du client. Une notification en échec peut être rejouée depuis l'interface d'administration.",
+      "status": "PUBLISHED",
+      "publishedAt": "2025-05-20T09:00:00Z",
+      "featured": false,
+      "category": null,
+      "tags": [
+        "spring-boot"
+      ],
+      "cover": "docuapi-reference.webp"
+    },
+    {
+      "type": "NEWS",
+      "title": "Bientôt : un tableau de bord pour la chaîne vidéo",
+      "summary": "Brouillon d'annonce du tableau de bord de supervision de la chaîne vidéo.",
+      "content": "Brouillon.",
+      "status": "DRAFT",
+      "publishedAt": null,
+      "featured": false,
+      "category": null,
+      "tags": [],
+      "cover": null
+    }
+  ]
+}

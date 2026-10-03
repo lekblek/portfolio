@@ -1,0 +1,110 @@
+[
+  {
+    "file": "poste-de-developpement.webp",
+    "altText": "Poste de développement avec deux écrans affichant du code, un casque et un téléphone sur le bureau."
+  },
+  {
+    "file": "code-sur-ecran.webp",
+    "altText": "Lignes de code colorées sur un écran d'ordinateur, vues de près."
+  },
+  {
+    "file": "lignes-de-code.webp",
+    "altText": "Code source coloré affiché en biais sur un écran sombre."
+  },
+  {
+    "file": "portable-et-code.webp",
+    "altText": "Ordinateur portable ouvert affichant du code sur fond clair."
+  },
+  {
+    "file": "editeur-de-code.webp",
+    "altText": "Éditeur de code ouvert sur un ordinateur portable, en gros plan."
+  },
+  {
+    "file": "baie-de-serveurs.webp",
+    "altText": "Arrière d'une baie de serveurs avec ses câbles, en noir et blanc."
+  },
+  {
+    "file": "autoroute-vue-aerienne.webp",
+    "altText": "Route traversant une forêt, vue d'un drone, avec deux voitures."
+  },
+  {
+    "file": "trafic-de-nuit.webp",
+    "altText": "Traînées lumineuses des voitures sur une voie rapide la nuit."
+  },
+  {
+    "file": "ville-de-nuit.webp",
+    "altText": "Ville illuminée la nuit, vue d'en haut, avec un échangeur routier."
+  },
+  {
+    "file": "telephone-et-cafe.webp",
+    "altText": "Personne tenant un smartphone au-dessus d'une table, à côté d'une tasse de café."
+  },
+  {
+    "file": "statistiques-sur-portable.webp",
+    "altText": "Ordinateur portable affichant un tableau de bord de statistiques."
+  },
+  {
+    "file": "bureau-de-gestion.webp",
+    "altText": "Bureau blanc avec un carnet ouvert, un smartphone, des lunettes et un ordinateur portable."
+  },
+  {
+    "file": "cle-de-securite.webp",
+    "altText": "Clé USB branchée sur un ordinateur portable posé sur une table en bois."
+  },
+  {
+    "file": "passage-pieton.webp",
+    "altText": "Piétons traversant une avenue animée, entre voitures et bus, au milieu des immeubles."
+  },
+  {
+    "file": "detection-carrefour.webp",
+    "altText": "Scène urbaine annotée par un détecteur : boîtes autour des piétons, des voitures, d'un camion, d'un bus et des feux, avec leur score."
+  },
+  {
+    "file": "erp-tableau-de-bord.webp",
+    "altText": "Tableau de bord d'Atlas ERP : chiffre d'affaires, commandes, factures en retard, graphique des ventes mensuelles et dernières commandes."
+  },
+  {
+    "file": "erp-factures.webp",
+    "altText": "Liste des factures d'Atlas ERP avec leurs montants, échéances et statuts (payée, envoyée, en retard)."
+  },
+  {
+    "file": "transfert-ecrans.webp",
+    "altText": "Trois écrans de l'application Kora : envoi d'argent, confirmation du transfert et historique."
+  },
+  {
+    "file": "pulse-tableau-analytique.webp",
+    "altText": "Tableau de bord de Pulse Analytics : indicateurs d'audience, sessions par jour et entonnoir de conversion."
+  },
+  {
+    "file": "docuapi-reference.webp",
+    "altText": "Référence de DocuAPI : création d'un document, champs de la requête, exemple curl et réponse JSON."
+  },
+  {
+    "file": "vigie-supervision.webp",
+    "altText": "Tableau de bord de supervision Vigie : disponibilité, latence p95, erreurs et courbes par nœud."
+  },
+  {
+    "file": "roadsense-entrainement.webp",
+    "altText": "Suivi d'un entraînement RoadSense : indicateurs, courbes de pertes et matrice de confusion."
+  },
+  {
+    "file": "ocr-facture.webp",
+    "altText": "Facture scannée à gauche, champs extraits avec leur niveau de confiance à droite."
+  },
+  {
+    "file": "pipeline-ci.webp",
+    "altText": "Pipeline d'intégration continue : étapes de construction, tests, analyse, recette et production."
+  },
+  {
+    "file": "composants-catalogue.webp",
+    "altText": "Page du bouton dans le catalogue Ardoise UI : variantes, exemple de code et règles d'accessibilité."
+  },
+  {
+    "file": "avatar-monogramme.webp",
+    "altText": "Monogramme BN sur fond bleu nuit."
+  },
+  {
+    "file": "cv-blek-ngossanga.pdf",
+    "altText": null
+  }
+]

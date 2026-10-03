@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -34,6 +35,14 @@ public class MediaQueryService {
     }
 
     private final MediaRepository mediaRepository;
+
+    /**
+     * Le plus ancien média portant ce nom d'origine : contenus de démonstration du profil {@code dev} (D-EU), qui
+     * retrouvent ainsi les fichiers envoyés par {@code DemoMediaSeeder}.
+     */
+    public Optional<Media> findByOriginalName(String originalName) {
+        return mediaRepository.findFirstByOriginalName(originalName);
+    }
 
     /**
      * Images parmi {@code ids}, sous leur forme publique ; un PDF ou un identifiant inconnu est absent. Une

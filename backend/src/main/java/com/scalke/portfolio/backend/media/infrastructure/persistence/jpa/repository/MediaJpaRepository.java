@@ -17,6 +17,8 @@ public interface MediaJpaRepository extends Repository<MediaEntity, Long> {
 
     Optional<MediaEntity> findById(Long id);
 
+    Optional<MediaEntity> findFirstByOriginalNameOrderByIdAsc(String originalName);
+
     List<MediaEntity> findAllById(Iterable<Long> ids);
 
     Page<MediaEntity> findAll(Pageable pageable);
