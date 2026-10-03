@@ -124,6 +124,7 @@ POST   /api/admin/publications
 GET    /api/admin/publications/{id}
 
 GET    /api/admin/contact-messages
+DELETE /api/admin/contact-messages/{id}
 GET    /api/admin/media
 ```
 
@@ -1684,7 +1685,7 @@ Règles propres à ces contrats (D-CT) :
 
 ```text
 GET    /api/admin/publications              200 PageResponse<AdminPublicationSummaryResponse>, 20 par page,
-                                            tous statuts, les dernières modifiées d'abord
+       ?type=&status=                       tous statuts, les dernières modifiées d'abord
 GET    /api/admin/publications/{id}         200 AdminPublicationResponse
 POST   /api/admin/publications              { type, title, slug?, summary, contentMarkdown, featured?, categoryId?,
                                               tagIds?, coverMediaId?, seoTitle?, seoDescription? }
@@ -1711,6 +1712,7 @@ Règles propres à ces contrats (D-CU) :
 * une publication naît brouillon ; son type ne change plus ; son statut ne change que par la route `/status` ;
 * `slug` facultatif : généré depuis le titre à la création, conservé à la modification ; s’il est pris, le premier suffixe libre est ajouté ; après la première publication, un slug différent est refusé ;
 * `status` est le statut observable : une publication planifiée dont la date est passée est `PUBLISHED` ; `slugLocked` dit si le slug peut encore changer ;
+* filtres de la liste (F28, D-EY) : `type` (`ARTICLE`, `NEWS`) et `status` (statut observable : `PUBLISHED` comprend les planifications échues, `SCHEDULED` seulement celles à venir), combinables ; absents ou vides, aucun ; valeur inexistante → 400 `MALFORMED_REQUEST` ;
 * bornes : `title` 160, `summary` 500, `contentMarkdown` 100 000 caractères (vide permis), `seoTitle` 120, `seoDescription` 300 ; champs SEO vides → `null`, `tagIds` absent → aucun tag, `featured` absent → `false` ;
 * pas de suppression : l’archivage (`ARCHIVED`) retire une publication du site ;
 * contrats vérifiés par `AdminPublicationIT`.
@@ -1835,6 +1837,7 @@ GET  /api/admin/contact-messages[?status=]   200 PageResponse<AdminContactMessag
 GET  /api/admin/contact-messages/{id}        200 AdminContactMessageResponse
                                              { id, name, email, subject, message, status, createdAt, updatedAt }
 POST /api/admin/contact-messages/{id}/status { status } → 200 AdminContactMessageResponse
+DELETE /api/admin/contact-messages/{id}      204 (suppression définitive, F30)
 
 400 MALFORMED_REQUEST                   statut inexistant (filtre ou corps) ; 400 VALIDATION_FAILED statut absent
 404 RESOURCE_NOT_FOUND                  identifiant inconnu
@@ -1845,7 +1848,7 @@ Règles propres à ces contrats (D-CZ) :
 
 * session de l’administrateur et jeton CSRF obligatoires (401 et 403 sinon) ;
 * lire un message ne change pas son statut ; le statut avance par sa route, en sautant éventuellement des étapes, jamais en arrière (invariant 29) ;
-* pas de suppression ;
+* suppression définitive (F30, D-EX) : quel que soit le statut, pour effacer des données personnelles à la demande de la personne ; ranger un message reste l'affaire de l'archivage ; ensuite, `GET` et `DELETE` répondent 404 ;
 * contrats vérifiés par `AdminContactMessageIT`.
 
 # 31. Ressources administratives prévues
