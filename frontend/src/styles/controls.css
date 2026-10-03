@@ -25,3 +25,53 @@ textarea.field-control {
 .field-control[aria-invalid='true'] {
   border-color: var(--color-danger);
 }
+
+select.field-control {
+  padding-inline-end: calc(var(--spacing) * 8);
+  cursor: pointer;
+}
+
+/*
+ * Choix (F27) : groupe de boutons radio ou case à cocher, contrôle natif agrandi à 20 px et teinté
+ * `accent`, libellé cliquable sur une cible de 44 px, explication éventuelle sous le libellé.
+ */
+.choice-group {
+  display: grid;
+  gap: calc(var(--spacing) * 1);
+  min-width: 0;
+}
+
+.choice-group > legend {
+  margin-block-end: calc(var(--spacing) * 2);
+  font-weight: var(--font-weight-semibold);
+}
+
+.choice {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: calc(var(--spacing) * 3);
+  align-items: start;
+  min-height: calc(var(--spacing) * 11);
+  padding-block: calc(var(--spacing) * 2.5);
+  cursor: pointer;
+}
+
+.choice > input {
+  width: calc(var(--spacing) * 5);
+  height: calc(var(--spacing) * 5);
+  margin: 0;
+  accent-color: var(--color-accent);
+  cursor: pointer;
+}
+
+.choice-hint {
+  grid-column: 2;
+  color: var(--color-ink-muted);
+  font-size: var(--text-sm);
+}
+
+/* Valeur figée (slug d'un contenu déjà publié) : lisible et sélectionnable, visiblement non modifiable. */
+.field-control[readonly] {
+  background: var(--color-paper-sunken);
+  color: var(--color-ink-muted);
+}
