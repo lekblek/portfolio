@@ -2,28 +2,27 @@
 
 Ce fichier est la **seule** source de vérité sur l'avancement. Il ne répète pas le contenu des autres documents : il pointe vers eux.
 
-Dernière mise à jour : 2026-10-02 (F00 à F23 poussées, CI verte ; lot F24 + F25 vérifié)
+Dernière mise à jour : 2026-10-02 (F00 à F23 poussées, CI verte ; F24 et F25 commitées, à pousser ; F26 vérifiée)
 
 ---
 
 ## 1. État courant
 
 ```text
-Dernière étape terminée   : lot F24 + F25 — Taxonomie, primitives d'administration et médiathèque (à committer) ; F00 à F23 poussées, CI verte (run 36952913904)
+Dernière étape terminée   : F26 — Profil (à committer) ; F24 et F25 commitées (284e518 à 9c2642d), à pousser ; F00 à F23 poussées, CI verte (run 36952913904)
 Étape en cours            : aucune
-Prochaine étape prévue    : F26 — Profil (nouvelle dépendance @angular/cdk : validation du propriétaire attendue avant)
-État                      : lot F24 + F25 : commits proposés
+Prochaine étape prévue    : F27 — Projets (administration)
+État                      : F26 : commits proposés
 Branche                   : develop
-Vérification              : backend inchangé ; frontend : lint, lint:styles, format, 267 tests unitaires, types de l'API sans dérive, build de production, 153 tests de bout en bout (5 ignorés) stables sur 5 exécutions en développement, et en production derrière mandataire local sur 3 exécutions ; écrans d'administration sans violation axe ni débordement de 320 à 1920 px ; mouvement réduit vérifié ; découpage des commits rejoué dans un clone jetable
+Vérification              : backend : contrat OpenAPI régénéré et vérifié (OpenApiContractIT, AdminProfileIT, AdminProjectIT ; KI-36) ; frontend : lint, lint:styles, format, 293 tests unitaires, types de l'API régénérés, build de production (CDK dans le lot de la page Profil seulement ; lot initial 400,61 kB bruts / 110,85 kB transférés, +1,5 kB par le planificateur de RxJS que le CDK importe, D-ET), 158 tests de bout en bout (6 ignorés) en développement, nouveaux scénarios stables sur 5 exécutions, et en production derrière mandataire local sur 3 exécutions ; page Profil sans violation axe ni débordement à 390 et 1440 px (plein, vide, erreurs, sélecteur) ; glisser-déposer et mouvement réduit vérifiés ; découpage des commits rejoué dans un clone jetable
 ```
 
 ## 2. Prochaine action
 
-1. Committer le lot F24 + F25 (commandes de la fin de tranche), pousser, vérifier la CI, remplacer les 🟡 par ✅.
-2. Avant F26 : valider l'ajout de `@angular/cdk` (liste ordonnable au glisser-déposer, avec boutons « Monter » / « Descendre »), ou choisir des boutons seuls sans dépendance.
-3. Renseigner `ADMIN_USERNAME` et `ADMIN_PASSWORD` dans `deploy/.env` (compte administrateur de développement, mot de passe de 15 caractères au moins) : nécessaires pour utiliser l'administration et pour `e2e/admin-auth.spec.ts`.
-4. Vérification avec un lecteur d'écran (NVDA) du site public (audit F21, constat A7). Plus tard : page de mentions légales avant la mise en production (D-DW).
-5. Étape 36, close (rappel du découpage) :
+1. Committer F26 (commandes de la fin de tranche), pousser avec F24 et F25, vérifier la CI, remplacer les 🟡 par ✅.
+2. Renseigner `ADMIN_USERNAME` et `ADMIN_PASSWORD` dans `deploy/.env` (compte administrateur de développement, mot de passe de 15 caractères au moins) : nécessaires pour utiliser l'administration et pour `e2e/admin-auth.spec.ts`.
+3. Vérification avec un lecteur d'écran (NVDA) du site public (audit F21, constat A7). Plus tard : page de mentions légales avant la mise en production (D-DW).
+4. Étape 36, close (rappel du découpage) :
 
    ```text
    36.1  Taxonomie : catégories et tags                                    ✔ poussée
@@ -143,9 +142,10 @@ Légende : ✅ terminée et poussée · 🟡 terminée et vérifiée, commits à
 | F21 | Audit public : axe sur 21 états et 4 pages en erreur, clavier, 320 à 1920 px, captures comparées, revue d'interface ; corrections typographiques et `autocomplete` ; rapport `audits/2026-10-02-audit-frontend-public.md` (D-EM) | ✅ | `d1b1362`, `2da7edc`, docs `252be22` (CI : run 36948186371) |
 | F22 | Authentification d'administration : `/admin/login`, session (`AdminSession`), garde, `returnUrl` limité à l'administration, déconnexion, accueil minimal ; jeton CSRF lisible et renouvelé (backend) ; intercepteur des 401 reporté à F23 (D-EN, D-EO) | ✅ | `98dc531`, `f1c682a`, `282db16`, docs `252be22` (CI : run 36948186371) |
 | F23 | Shell d'administration (en-tête, barre latérale repliée en menu sous 64 rem, lien d'évitement) et tableau de bord (relevé : messages non lus, publications, projets, séries, médias, lus dans les listes existantes) ; session expirée pendant le travail → connexion avec `returnUrl` ; `/admin/settings` retiré de la V1 (D25) ; brouillons reportés à F28 (D-EP) | ✅ | `7f162fa`, `c75762e`, docs `d66883b` (CI : run 36952913904) |
-| F24 | Taxonomie (une entrée, trois sous-sections : catégories, tags, technologies) et primitives d'administration : tableau, dialogue de confirmation, notifications, variante `danger`, erreurs du serveur sur les champs, garde des modifications non enregistrées (D-EQ) | 🟡 | à committer |
-| F25 | Médiathèque : envoi (bouton ou dépôt, plusieurs fichiers, progression, vérification locale puis du serveur), tableau paginé, texte alternatif exigé pour une image, suppression contrôlée ; sélecteur de médias reporté à F26 (D-ER) | 🟡 | à committer |
-| F26 → F37 | Frontend : voir `docs/frontend/00-roadmap-frontend.md` (remplace les étapes 37 à 51 et les parties frontend de 52) | ⏳ | — |
+| F24 | Taxonomie (une entrée, trois sous-sections : catégories, tags, technologies) et primitives d'administration : tableau, dialogue de confirmation, notifications, variante `danger`, erreurs du serveur sur les champs, garde des modifications non enregistrées (D-EQ) | 🟡 | `284e518`, `11b9b05`, `0bb21d3`, docs `9c2642d` (à pousser) |
+| F25 | Médiathèque : envoi (bouton ou dépôt, plusieurs fichiers, progression, vérification locale puis du serveur), tableau paginé, texte alternatif exigé pour une image, suppression contrôlée ; sélecteur de médias reporté à F26 (D-ER) | 🟡 | `cb4fb5a`, `0bb21d3`, docs `9c2642d` (à pousser) |
+| F26 | Profil : un formulaire et un enregistrement (identité, présentation Markdown avec aperçu, avatar et CV par le sélecteur de médias, cinq collections ordonnables au clavier ou au glisser-déposer), erreurs du serveur jusque dans les collections ; `@angular/cdk` ajouté ; KI-36 résolu (D-ES, D-ET) | 🟡 | à committer |
+| F27 → F37 | Frontend : voir `docs/frontend/00-roadmap-frontend.md` (remplace les étapes 37 à 51 et les parties frontend de 52) | ⏳ | — |
 | 52 | Déploiement : voir `docs/steps/liste_complete_etapes.md` (52.7 à 52.21) | ⏳ | — |
 
 Après le push, remplacer les 🟡 par ✅ et noter les hashes.
@@ -164,6 +164,7 @@ Index : [`decisions/README.md`](decisions/README.md).
 | FA01 … FA12 | Architecture frontend : fonctionnalités, frontières ESLint, `httpResource`, types générés, origine de l'API en SSR, rendu par route, Signal Forms, pas de Material ni de Storybook, Playwright et axe, état dans l'URL, Markdown partagé | Acceptées (2026-09-30) ; FA02, FA04, FA05, FA06, FA10 mises en œuvre (F01 à F04) |
 | D-DM … D-DY | Frontend : montée 22.2 et hôtes SSR en local ; frontières par règle ESLint qui résout les chemins ; intercepteur commun et jeton serveur ; types générés et `overrides` de TypeScript ; banc Playwright ; direction visuelle ; tokens et `lint:styles` ; utilitaires ; primitives d'action ; shell public et identité ; mentions légales reportées ; SEO ; rendu Markdown | Actives (F00 à F11) ; D-DO modifiée en F12 (D-EB) |
 | D-EQ, D-ER | Taxonomie et primitives d'administration (décisions du propriétaire : tableaux, formulaires séparés, suppression confirmée, notifications, entrée « Taxonomie ») ; médiathèque | Actives (F24, F25) |
+| D-ES, D-ET | Réponses d'administration séparées des requêtes dans le contrat (KI-36) ; profil, liste ordonnable (CDK), sélecteur de médias | Actives (F26) |
 | D25, D-EP | `/admin/settings` retiré de la V1 (décision du propriétaire) ; shell d'administration, relevé du tableau de bord, intercepteur des sessions expirées | Actives (F23) |
 | D-EL … D-EO | Mouvement du site public (trois mouvements, refus consignés) ; audit public ; authentification d'administration (session, garde, `returnUrl`, intercepteur en F23) ; jeton CSRF au chemin `/` et renouvelé à la connexion | Actives (F20 à F22) |
 | D-DZ … D-EK | Contrat des réponses dérivé du code (`required`, `@Nullable`) ; `publicEmail` jamais affiché (décision du propriétaire) ; page À propos, cache de transfert et transport serveur ; pied de page sans appel au profil (liens professionnels sur l'accueil et À propos) ; projets (filtre par clic, URL, SEO des vues, couvertures 3:2) ; publications (redirection du mauvais type, filtres, page d'article, notes, Copier) ; formules et diagrammes, seed additif ; séries, absence de série transmise, registre commun ; accueil et filtre `featured` ; recherche ; contact public (piège, limite, 202) et formulaire | Actives (KI-34, F12 à F19) |
@@ -218,9 +219,14 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | KI-22 | AMÉLIORATION | SSR : `security.allowedHosts` vide ; depuis Angular 22.2, le build SSR refuse alors **tout** hôte (400), `localhost` compris : obligatoire avant la mise en production ; en local, `NG_ALLOWED_HOSTS=localhost` (D-DM) | F35 |
 | KI-16 | OPTIONNEL | `V001` : virgule manquante avant `CONSTRAINT profile_single_row` (comportement identique) ; migration appliquée, non modifiable | aucun |
 | KI-38 | AMÉLIORATION | Médias publics servis en une seule taille (`GET /api/public/media/…`) : aucune variante pour `srcset` ; une couverture de 1 600 px est téléchargée entière sur un écran de 320 px (`NG02960` en développement) | F34 (performance) : variantes produites à l'envoi (backend) ou service de redimensionnement, puis `ngSrcset` / chargeur d'images |
-| KI-36 | AMÉLIORATION | Contrat OpenAPI : un schéma à la fois reçu en requête et renvoyé en réponse garde la sémantique de la requête (propriétés facultatives omissibles) : éléments du profil d'administration (`Link`, `Skill`, `Experience`, `Education`, `Certification`, partagés par `SaveProfileRequest` et `AdminProfileResponse`) et `Screenshot` (nom commun à la requête et à la réponse d'administration des projets, un seul schéma retenu) | avec l'administration (F26, F27) : records de réponse distincts ou noms distincts (D-DZ) |
 | KI-35 | OPTIONNEL | `npm ci` avertit que quatre paquets de la chaîne de build (`esbuild`, `lmdb`, `msgpackr-extract`, `@parcel/watcher`) ont des scripts d'installation non listés dans `allowScripts` (npm 11) ; sans effet sur l'installation | décider d'une liste `allowScripts` explicite, ou ignorer |
 | KI-30 | OPTIONNEL | Les `*IT` transactionnels (écriture de statut, lectures publiques) ne prouvent pas le comportement après commit | à reprendre si un défaut de transaction apparaît |
+
+### Résolus le 2026-10-02 (F26)
+
+| ID | Problème | Résolution |
+|---|---|---|
+| KI-36 | Contrat OpenAPI : les éléments du profil d'administration et `Screenshot`, partagés entre requête et réponse, gardaient la sémantique de la requête (propriétés facultatives omissibles) | records de réponse distincts (`AdminLink` … `AdminCertification`) et `AdminScreenshot` : contrat régénéré, `OpenApiContractIT` (D-ES) |
 
 ### Résolus le 2026-09-30 (socle frontend)
 
@@ -329,7 +335,7 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | Liens professionnels (GitHub, CV) dans le pied de page, lus dans le profil | F17 au plus tard | D-EC : décision du propriétaire (2026-09-30) : pied de page minimal, aucun appel global au profil depuis le shell, aucun lien inventé |
 | Politique de cache HTTP des réponses publiques de l'API (`Cache-Control` au lieu du `no-store` de Spring Security) | F34 / étape 52 | D-EB : le cache de transfert est ouvert explicitement aux GET de `/api/public/` |
 | Nombre de brouillons sur le tableau de bord (filtre de statut de la liste d'administration des publications) | F28 | D-EP : la liste n'a pas de filtre de statut ; il viendra avec son écran |
-| Sélecteur de médias (dialogue réutilisé par le profil, les projets, les publications et les séries) | F26 | D-ER : aucun écran ne choisit encore un média |
+| Sélecteur de médias (dialogue réutilisé par le profil, les projets, les publications et les séries) | fait (F26) | D-ER, D-ET : `app-media-picker` |
 | Primitives `select` et case à cocher | premier formulaire qui les demande (F27, F28) | D-EQ : aucun champ de la taxonomie ni de la médiathèque |
 | Page de mentions légales (éditeur, hébergeur) | avant la mise en production publique, une fois l'hébergement connu | D-DW : décision du propriétaire (2026-09-30) ; aucun lien provisoire d'ici là |
 | HSTS derrière le mandataire inverse (requête vue en HTTP par Tomcat) | fait (P-B03) | D-DC : `X-Forwarded-Proto` accepté depuis un réseau de confiance |

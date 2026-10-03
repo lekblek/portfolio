@@ -220,7 +220,8 @@ Mouvements du site public, décidés en F20 (D-EL) ; tout autre mouvement passe 
 | Interaction | Mouvement | Sous mouvement réduit |
 |---|---|---|
 | pression d'un bouton (`appButton`, « Copier » des blocs de code) | `scale(0.97)`, `--duration-instant`, `--ease-out` | aucun |
-| dialogue de confirmation | fondu et `scale(0.97)` → 1, fond en fondu, `--duration-base`, `--ease-out`, `@starting-style` ; fermeture immédiate | apparition immédiate |
+| dialogue de confirmation, sélecteur de médias | fondu et `scale(0.97)` → 1, fond en fondu, `--duration-base`, `--ease-out`, `@starting-style` ; fermeture immédiate | apparition immédiate |
+| réordonnancement au glisser-déposer (liste ordonnable) | les voisins s'écartent (`transform`) et l'élément lâché rejoint sa place, `--duration-base`, `--ease-out` ; déplacement au clavier immédiat | aucun |
 | notification | fondu et montée de 8 px, `--duration-base`, `--ease-out`, `@starting-style` ; retrait immédiat | apparition immédiate |
 | ouverture de la navigation mobile (site public et administration) | liste révélée (opacité) en descendant de 4 px, `--duration-base`, `--ease-out`, `@starting-style` ; fermeture immédiate | apparition immédiate |
 | message d'issue (`app-alert`) | fondu et montée de 4 px, `--duration-base`, `--ease-out`, `@starting-style` ; jamais dans le rendu serveur | apparition immédiate |
@@ -325,7 +326,8 @@ Une primitive n'est créée qu'au premier écran qui en a besoin, et seulement s
 | pastille de statut | composant `app-status` | F27 | brouillon, programmé, publié, archivé : texte + couleur |
 | tableau de données | cadre `app-data-table` + `<table class="data-table">` (`shared/ui/data-table.ts`) | **fait** (F24) | `<caption>`, `<th scope>` (colonnes et ligne), en-têtes sous un trait fort `ink`, lignes à filet, aucune bordure verticale ; colonnes `data-table-number` (chiffres à chasse fixe, à droite ; jamais tout le tableau : la ponctuation s'élargirait), `data-table-code` (slug), `data-table-actions` (actions de la ligne, noms accessibles complets) ; sur écran étroit le tableau défile dans son cadre, qui devient alors une région nommée atteignable au clavier ; ordre fixé par le serveur (D-V) ; styles chargés avec le premier tableau |
 | envoi de fichier | composant `app-file-drop` (`shared/ui/file-drop.ts`) | **fait** (F25) | bouton « Choisir des fichiers » décrit par la consigne (formats, tailles), champ natif masqué hors de la tabulation ; dépôt de fichiers sur la zone en raccourci à la souris (trait pointillé, plein `accent` au survol d'un dépôt) ; émet les fichiers, la page les vérifie et les envoie |
-| liste ordonnable | CDK glisser-déposer + boutons monter/descendre | F26 | alternative clavier obligatoire |
+| liste ordonnable | `app-sortable-list` + `app-sortable-item` (`shared/ui/sortable-list.ts`, CDK glisser-déposer) | **fait** (F26) | éléments encadrés d'un filet `rule` ; barre sur `paper-sunken` : poignée (souris et toucher, masquée aux lecteurs d'écran), position « 2 / 3 », « Monter », « Descendre », « Retirer » en variante `quiet` nommés avec l'élément ; alternative clavier par ces boutons, déplacement annoncé, focus gardé sur le bouton utilisé (ou l'autre à une extrémité) ; pendant un glisser : place marquée en pointillé, élément saisi avec l'ombre `overlay` |
+| sélecteur de médias | composant `app-media-picker` (`shared/ui/media-picker.ts`) | **fait** (F26) | `<dialog>` modal comme le dialogue de confirmation ; grille de boutons « Choisir … » (vignette, nom, dimensions et poids ; le média courant cerclé `accent`, `aria-current`), réduite à la sorte attendue ; « Plus récents » / « Plus anciens » ; lien vers la médiathèque ; états chargement, vide, erreur avec « Réessayer » |
 | combobox à choix multiples | Angular Aria | F27 | tags, technologies |
 | onglets | Angular Aria | F31 | Visuel / Markdown / Aperçu |
 | menu | Angular Aria | à la demande | pas de besoin identifié |
