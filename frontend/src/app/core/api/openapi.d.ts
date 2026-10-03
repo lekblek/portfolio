@@ -62,7 +62,7 @@ export interface paths {
         get: operations["get_5"];
         put?: never;
         post?: never;
-        delete?: never;
+        delete: operations["delete_4"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1390,6 +1390,26 @@ export interface operations {
             };
         };
     };
+    delete_4: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     changeStatus_1: {
         parameters: {
             query?: never;
@@ -1678,6 +1698,8 @@ export interface operations {
     list_3: {
         parameters: {
             query: {
+                type?: "ARTICLE" | "NEWS";
+                status?: "DRAFT" | "IN_REVIEW" | "SCHEDULED" | "PUBLISHED" | "ARCHIVED";
                 pageable: components["schemas"]["Pageable"];
             };
             header?: never;

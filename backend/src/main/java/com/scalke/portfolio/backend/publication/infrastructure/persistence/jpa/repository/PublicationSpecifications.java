@@ -8,6 +8,7 @@ import org.springframework.data.jpa.domain.Specification;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Set;
+import com.scalke.portfolio.backend.publication.domain.model.PublicationAdminFilter;
 
 /**
  * Critères des requêtes publiques (D-AR). Chaque règle est écrite une seule fois ; les requêtes les
@@ -45,6 +46,29 @@ final class PublicationSpecifications {
             // Sous-requête sur publication_tag : pas de jointure, donc ni doublon ni comptage faussé.
             specification = specification.and((root, query, cb) ->
                 cb.isMember(filter.tagId(), root.<Set<Long>>get("tagIds")));
+        }
+        return specification;
+    }
+
+    /**
+     * Liste d'administration (F28) : tout statut, restreint par type et par statut observable à {@code now} :
+     * {@code PUBLISHED} comprend les planifiées échues ({@link #visibleAt(Instant)}), {@code SCHEDULED} ne garde que
+     * les planifiées à venir.
+     */
+    static Specification<PublicationEntity> administered(PublicationAdminFilter filter, Instant now) {
+        Specification<PublicationEntity> specification = (root, query, cb) -> cb.conjunction();
+        if (filter.hasType()) {
+            specification = specification.and((root, query, cb) -> cb.equal(root.get("type"), filter.type()));
+        }
+        if (filter.hasStatus()) {
+            Specification<PublicationEntity> status = switch (filter.status()) {
+                case PUBLISHED -> visibleAt(now);
+                case SCHEDULED -> (root, query, cb) -> cb.and(
+                    cb.equal(root.get("status"), PublicationStatus.SCHEDULED),
+                    cb.greaterThan(root.get("publishedAt"), now));
+                default -> (root, query, cb) -> cb.equal(root.get("status"), filter.status());
+            };
+            specification = specification.and(status);
         }
         return specification;
     }

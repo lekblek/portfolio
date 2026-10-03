@@ -2339,6 +2339,24 @@
       }
     },
     "/admin/contact-messages/{id}" : {
+      "delete" : {
+        "operationId" : "delete_4",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "admin-contact-message-controller" ]
+      },
       "get" : {
         "operationId" : "get_5",
         "parameters" : [ {
@@ -2727,6 +2745,22 @@
       "get" : {
         "operationId" : "list_3",
         "parameters" : [ {
+          "in" : "query",
+          "name" : "type",
+          "required" : false,
+          "schema" : {
+            "enum" : [ "ARTICLE", "NEWS" ],
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "status",
+          "required" : false,
+          "schema" : {
+            "enum" : [ "DRAFT", "IN_REVIEW", "SCHEDULED", "PUBLISHED", "ARCHIVED" ],
+            "type" : "string"
+          }
+        }, {
           "in" : "query",
           "name" : "pageable",
           "required" : true,

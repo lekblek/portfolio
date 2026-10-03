@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.time.Instant;
+import com.scalke.portfolio.backend.publication.domain.model.PublicationAdminFilter;
 
 /**
  * Toutes les publications, quel que soit leur statut, pour l'administration (D-CU) : les dernières modifiées d'abord.
@@ -21,8 +22,9 @@ public class ListPublicationsUseCase {
     private final Clock clock;
 
     @Transactional(readOnly = true)
-    public PageResult<AdminPublication> execute(PageQuery query) {
+    public PageResult<AdminPublication> execute(PublicationAdminFilter filter, PageQuery query) {
         Instant now = clock.instant();
-        return publicationRepository.findPage(query).map(publication -> AdminPublication.at(publication, now));
+        return publicationRepository.findPage(filter, now, query)
+            .map(publication -> AdminPublication.at(publication, now));
     }
 }

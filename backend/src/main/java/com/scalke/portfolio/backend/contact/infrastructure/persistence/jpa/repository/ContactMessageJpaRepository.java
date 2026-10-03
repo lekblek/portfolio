@@ -17,6 +17,10 @@ public interface ContactMessageJpaRepository extends Repository<ContactMessageEn
 
     long count();
 
+    void deleteById(Long id);
+
+    void flush();
+
     ContactMessageEntity save(ContactMessageEntity entity);
 
     Page<ContactMessageEntity> findAll(Pageable pageable);

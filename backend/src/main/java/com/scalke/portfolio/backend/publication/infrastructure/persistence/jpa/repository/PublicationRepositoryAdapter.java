@@ -27,7 +27,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import com.scalke.portfolio.backend.publication.domain.model.PublicationAdminFilter;
 
+import static com.scalke.portfolio.backend.publication.infrastructure.persistence.jpa.repository.PublicationSpecifications.administered;
 import static com.scalke.portfolio.backend.publication.infrastructure.persistence.jpa.repository.PublicationSpecifications.hasIdIn;
 import static com.scalke.portfolio.backend.publication.infrastructure.persistence.jpa.repository.PublicationSpecifications.hasSlug;
 import static com.scalke.portfolio.backend.publication.infrastructure.persistence.jpa.repository.PublicationSpecifications.visibleAt;
@@ -128,9 +130,9 @@ public class PublicationRepositoryAdapter implements PublicationRepository {
 
     @Override
     @Transactional(readOnly = true)
-    public PageResult<Publication> findPage(PageQuery query) {
+    public PageResult<Publication> findPage(PublicationAdminFilter filter, Instant now, PageQuery query) {
         Page<Publication> page = repository
-            .findAll(PageRequest.of(query.page(), query.size(), ADMIN_ORDER))
+            .findAll(administered(filter, now), PageRequest.of(query.page(), query.size(), ADMIN_ORDER))
             .map(PublicationPersistenceMapper::toDomain);
         return new PageResult<>(page.getContent(), page.getNumber(), page.getSize(), page.getTotalElements());
     }

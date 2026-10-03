@@ -6,6 +6,9 @@ import com.scalke.portfolio.backend.publication.application.usecase.CreatePublic
 import com.scalke.portfolio.backend.publication.application.usecase.GetPublicationUseCase;
 import com.scalke.portfolio.backend.publication.application.usecase.ListPublicationsUseCase;
 import com.scalke.portfolio.backend.publication.application.usecase.UpdatePublicationUseCase;
+import com.scalke.portfolio.backend.publication.domain.model.PublicationAdminFilter;
+import com.scalke.portfolio.backend.publication.domain.model.PublicationStatus;
+import com.scalke.portfolio.backend.publication.domain.model.PublicationType;
 import com.scalke.portfolio.backend.publication.web.dto.AdminPublicationResponse;
 import com.scalke.portfolio.backend.publication.web.dto.AdminPublicationSummaryResponse;
 import com.scalke.portfolio.backend.publication.web.dto.ChangePublicationStatusRequest;
@@ -25,6 +28,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -44,11 +48,19 @@ public class AdminPublicationController {
     private final UpdatePublicationUseCase updatePublicationUseCase;
     private final ChangePublicationStatusUseCase changePublicationStatusUseCase;
 
+    /**
+     * {@code type} : {@code ARTICLE} ou {@code NEWS} ; {@code status} : statut observable (une planification échue est
+     * {@code PUBLISHED}) ; absents, tous ; valeur inexistante, 400 (F28).
+     */
     @GetMapping
     PageResponse<AdminPublicationSummaryResponse> list(
+        @RequestParam(required = false) PublicationType type,
+        @RequestParam(required = false) PublicationStatus status,
         @PageableDefault(size = ApiPaging.ADMIN_PAGE_SIZE) Pageable pageable) {
         PageQuery query = new PageQuery(pageable.getPageNumber(), pageable.getPageSize());
-        return PageResponse.from(listPublicationsUseCase.execute(query).map(AdminPublicationSummaryResponse::from));
+        return PageResponse.from(listPublicationsUseCase
+            .execute(new PublicationAdminFilter(type, status), query)
+            .map(AdminPublicationSummaryResponse::from));
     }
 
     @GetMapping("/{id}")

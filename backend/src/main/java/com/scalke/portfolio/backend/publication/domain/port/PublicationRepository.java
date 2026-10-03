@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import com.scalke.portfolio.backend.publication.domain.model.PublicationAdminFilter;
 
 /**
  * Port de persistance des publications.
@@ -68,10 +69,11 @@ public interface PublicationRepository {
     boolean existsAny();
 
     /**
-     * Toutes les publications, quel que soit leur statut (administration, D-CU) : les dernières modifiées d'abord
-     * ({@code updatedAt} décroissant, puis identifiant décroissant : tri total).
+     * Publications de tout statut (administration, D-CU) restreintes par {@code filter} (F28), statut observable
+     * évalué à {@code now} : les dernières modifiées d'abord ({@code updatedAt} décroissant, puis identifiant
+     * décroissant : tri total).
      */
-    PageResult<Publication> findPage(PageQuery query);
+    PageResult<Publication> findPage(PublicationAdminFilter filter, Instant now, PageQuery query);
 
     /**
      * Vrai si une autre publication que {@code excludedId} ({@code null} : aucune) porte ce slug.

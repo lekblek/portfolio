@@ -18,6 +18,7 @@ import static com.scalke.portfolio.backend.testsupport.CsrfTestSupport.xsrf;
 import static com.scalke.portfolio.backend.testsupport.FixedClockConfiguration.NOW;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -106,6 +107,27 @@ class AdminContactMessageIT extends AbstractIntegrationTest {
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.errors[0].field").value("status"));
         changeStatus(999_999L, "{\"status\":\"READ\"}").andExpect(status().isNotFound());
+    }
+
+    /**
+     * F30 : suppression définitive, quel que soit le statut ; jeton CSRF exigé ; 404 ensuite.
+     */
+    @Test
+    void deletes_a_message_on_request() throws Exception {
+        long id = message("Alice", ContactStatus.PROCESSED, NOW).id();
+
+        mockMvc.perform(delete("/api/admin/contact-messages/" + id).contextPath("/api").with(user("admin")))
+            .andExpect(status().isForbidden());
+        mockMvc.perform(delete("/api/admin/contact-messages/" + id).contextPath("/api").with(user("admin"))
+                .with(xsrf()))
+            .andExpect(status().isNoContent());
+
+        assertThat(contactMessageRepository.findById(id)).isEmpty();
+        mockMvc.perform(get("/api/admin/contact-messages/" + id).contextPath("/api").with(user("admin")))
+            .andExpect(status().isNotFound());
+        mockMvc.perform(delete("/api/admin/contact-messages/" + id).contextPath("/api").with(user("admin"))
+                .with(xsrf()))
+            .andExpect(status().isNotFound());
     }
 
     private ContactMessage message(String name, ContactStatus status, Instant receivedAt) {

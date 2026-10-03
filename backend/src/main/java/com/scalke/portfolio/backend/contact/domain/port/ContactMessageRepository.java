@@ -27,6 +27,11 @@ public interface ContactMessageRepository {
      */
     ContactMessage updateStatus(ContactMessage message);
 
+    /**
+     * Efface le message, immédiatement (F30, D-EX).
+     */
+    void delete(ContactMessage message);
+
     boolean existsAny();
 
     /**

@@ -61,6 +61,13 @@ public class ContactMessageRepositoryAdapter implements ContactMessageRepository
     }
 
     @Override
+    @Transactional
+    public void delete(ContactMessage message) {
+        repository.deleteById(message.id());
+        repository.flush();
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public boolean existsAny() {
         return repository.count() > 0;

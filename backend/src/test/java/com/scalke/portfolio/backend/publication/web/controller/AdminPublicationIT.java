@@ -40,6 +40,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static com.scalke.portfolio.backend.publication.PublicationFixtures.publication;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 
 /**
  * Administration des publications de bout en bout (D-CU) : session, CSRF, validation, références vérifiées, slug
@@ -270,6 +272,42 @@ class AdminPublicationIT extends AbstractIntegrationTest {
             .andExpect(jsonPath("$.content[1].status").value("PUBLISHED"))
             .andExpect(jsonPath("$.content[2].id").value(old.id()))
             .andExpect(jsonPath("$.content[2].contentMarkdown").doesNotExist());
+    }
+
+    /**
+     * F28 : filtres par type et par statut observable (planification échue : publiée ; à venir : programmée) ;
+     * valeur inexistante, 400.
+     */
+    @Test
+    void filters_the_list_by_type_and_observable_status() throws Exception {
+        Publication due = publicationRepository.create(article("echue", PublicationStatus.SCHEDULED,
+            NOW.minus(Duration.ofHours(1))));
+        Publication coming = publicationRepository.create(article("a-venir", PublicationStatus.SCHEDULED,
+            NOW.plus(Duration.ofDays(1))));
+        Publication published = publicationRepository.create(article("publiee", PublicationStatus.PUBLISHED,
+            NOW.minus(Duration.ofDays(1))));
+        Publication news = publicationRepository.create(publication("actualite", PublicationType.NEWS,
+            PublicationStatus.DRAFT, null));
+
+        list("?status=PUBLISHED")
+            .andExpect(jsonPath("$.totalElements").value(2))
+            .andExpect(jsonPath("$.content[*].id", containsInAnyOrder(due.id().intValue(),
+                published.id().intValue())));
+        list("?status=SCHEDULED")
+            .andExpect(jsonPath("$.totalElements").value(1))
+            .andExpect(jsonPath("$.content[0].id").value(coming.id()));
+        list("?type=NEWS")
+            .andExpect(jsonPath("$.totalElements").value(1))
+            .andExpect(jsonPath("$.content[0].id").value(news.id()));
+        list("?type=ARTICLE&status=DRAFT").andExpect(jsonPath("$.totalElements").value(0));
+        list("?type=&status=").andExpect(jsonPath("$.totalElements").value(4));
+        mockMvc.perform(get("/api/admin/publications?status=VISIBLE").contextPath("/api").with(user("admin")))
+            .andExpect(status().isBadRequest());
+    }
+
+    private ResultActions list(String query) throws Exception {
+        return mockMvc.perform(get("/api/admin/publications" + query).contextPath("/api").with(user("admin")))
+            .andExpect(status().isOk());
     }
 
     @Test

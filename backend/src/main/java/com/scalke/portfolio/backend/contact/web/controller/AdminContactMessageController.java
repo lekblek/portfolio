@@ -1,6 +1,7 @@
 package com.scalke.portfolio.backend.contact.web.controller;
 
 import com.scalke.portfolio.backend.contact.application.usecase.ChangeContactMessageStatusUseCase;
+import com.scalke.portfolio.backend.contact.application.usecase.DeleteContactMessageUseCase;
 import com.scalke.portfolio.backend.contact.application.usecase.GetContactMessageUseCase;
 import com.scalke.portfolio.backend.contact.application.usecase.ListContactMessagesUseCase;
 import com.scalke.portfolio.backend.contact.domain.model.ContactStatus;
@@ -14,6 +15,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,6 +38,7 @@ public class AdminContactMessageController {
     private final ListContactMessagesUseCase listContactMessagesUseCase;
     private final GetContactMessageUseCase getContactMessageUseCase;
     private final ChangeContactMessageStatusUseCase changeContactMessageStatusUseCase;
+    private final DeleteContactMessageUseCase deleteContactMessageUseCase;
 
     /**
      * {@code ?status=NEW} : les messages de ce statut seulement ; valeur inconnue → 400 {@code MALFORMED_REQUEST}.
@@ -60,5 +64,14 @@ public class AdminContactMessageController {
     AdminContactMessageResponse changeStatus(@PathVariable Long id,
                                              @Valid @RequestBody ChangeContactMessageStatusRequest body) {
         return AdminContactMessageResponse.from(changeContactMessageStatusUseCase.execute(id, body.status()));
+    }
+
+    /**
+     * Suppression définitive, à la demande de la personne (F30, D-EX) : 204 ; 404 si le message n'existe pas ou plus.
+     */
+    @DeleteMapping("/{id}")
+    ResponseEntity<Void> delete(@PathVariable Long id) {
+        deleteContactMessageUseCase.execute(id);
+        return ResponseEntity.noContent().build();
     }
 }
