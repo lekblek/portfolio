@@ -1,0 +1,77 @@
+/* Profil (F26) : une colonne sur la mesure de lecture, sections séparées par un trait fort, comme
+   les zones de la page À propos ; sommaire des sections en tête. */
+
+.profile-toc ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--spacing) * 1) calc(var(--spacing) * 5);
+  margin-block-start: var(--spacing-block);
+  font-size: var(--text-sm);
+}
+
+.profile-toc a {
+  display: inline-flex;
+  align-items: center;
+  min-height: calc(var(--spacing) * 6);
+}
+
+.profile-form {
+  display: grid;
+  container-type: inline-size;
+  gap: var(--spacing-section);
+  max-width: var(--container-prose);
+  margin-block-start: var(--spacing-block);
+}
+
+.profile-form > .profile-section,
+.profile-form > app-profile-collection {
+  display: block;
+  padding-block-start: var(--spacing-block);
+  border-top: var(--border-strong) solid var(--color-ink);
+  scroll-margin-top: calc(var(--spacing) * 4);
+}
+
+.profile-fields {
+  display: grid;
+  gap: calc(var(--spacing) * 6);
+  margin-block-start: calc(var(--spacing) * 4);
+}
+
+.profile-media {
+  display: grid;
+  gap: calc(var(--spacing) * 4);
+  margin-block-start: calc(var(--spacing) * 4);
+}
+
+/* Deux champs côte à côte quand la place le permet (dates, nom et catégorie…) */
+.profile-pair {
+  display: grid;
+  gap: calc(var(--spacing) * 5);
+}
+
+@container (min-width: 32rem) {
+  .profile-pair {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.profile-preview {
+  padding: calc(var(--spacing) * 4) calc(var(--spacing) * 5);
+  border: var(--border-rule) solid var(--color-rule);
+  border-radius: var(--radius-control);
+  background: var(--color-paper-sunken);
+}
+
+.profile-preview-label {
+  margin-block-end: calc(var(--spacing) * 3);
+  color: var(--color-ink-muted);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.profile-submit {
+  display: grid;
+  gap: calc(var(--spacing) * 4);
+  padding-block-start: var(--spacing-block);
+  border-top: var(--border-strong) solid var(--color-ink);
+}

@@ -41,6 +41,10 @@ export const adminRoutes: Routes = [
         loadComponent: () => import('./dashboard/dashboard-page').then((m) => m.DashboardPage),
       },
       {
+        path: 'profile',
+        loadChildren: () => import('./profile/profile.routes').then((m) => m.profileRoutes),
+      },
+      {
         path: 'taxonomy',
         loadChildren: () => import('./taxonomy/taxonomy.routes').then((m) => m.taxonomyRoutes),
       },

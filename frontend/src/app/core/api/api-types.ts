@@ -46,3 +46,6 @@ export type SaveTechnologyRequest = Schemas['SaveTechnologyRequest'];
 
 export type AdminMedia = Schemas['AdminMediaResponse'];
 export type MediaFormat = AdminMedia['format'];
+
+export type AdminProfile = Schemas['AdminProfileResponse'];
+export type SaveProfileRequest = Schemas['SaveProfileRequest'];

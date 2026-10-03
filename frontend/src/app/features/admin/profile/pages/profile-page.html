@@ -1,0 +1,491 @@
+<h1 class="text-2xl tracking-heading">Profil</h1>
+<p class="mt-2 max-w-prose text-ink-muted">
+  Ce que montrent l’accueil et la page <a routerLink="/about">À propos</a>. Un seul enregistrement
+  remplace tout le profil, dans l’ordre des listes.
+</p>
+
+@if (failedToLoad()) {
+  <app-error-state
+    class="mt-block block"
+    [title]="'Le profil n’a pas pu être chargé.'"
+    (retry)="profile.reload()"
+  />
+} @else if (!ready()) {
+  @defer (on timer(300ms)) {
+    <p role="status" class="mt-block text-ink-muted">Chargement…</p>
+  }
+} @else {
+  @if (firstTime()) {
+    <p class="mt-block max-w-prose">
+      Aucun profil n’est encore enregistré&#8239;: remplissez-le, puis enregistrez-le.
+    </p>
+  }
+
+  <nav class="profile-toc" aria-label="Sections du profil">
+    <ul>
+      @for (section of sections; track section.id) {
+        <li>
+          <a [href]="sectionLink(section.id)">{{ section.label }}</a>
+        </li>
+      }
+    </ul>
+  </nav>
+
+  <form class="profile-form" [formRoot]="profileForm">
+    <section id="profil-identite" class="profile-section" aria-labelledby="profil-identite-titre">
+      <h2 id="profil-identite-titre" class="text-xl tracking-heading">Identité</h2>
+      <div class="profile-fields">
+        <app-field
+          label="Nom affiché"
+          controlId="profil-nom"
+          [error]="errorOf(profileForm.displayName)"
+        >
+          <input
+            appFieldControl
+            type="text"
+            autocomplete="off"
+            [formField]="profileForm.displayName"
+          />
+        </app-field>
+        <app-field
+          label="Titre professionnel"
+          controlId="profil-titre"
+          [error]="errorOf(profileForm.professionalTitle)"
+        >
+          <input
+            appFieldControl
+            type="text"
+            autocomplete="off"
+            [formField]="profileForm.professionalTitle"
+          />
+        </app-field>
+        <app-field
+          label="Présentation courte"
+          controlId="profil-presentation-courte"
+          hint="Une ou deux phrases, sous le nom. 500 caractères au plus."
+          [error]="errorOf(profileForm.shortBio)"
+        >
+          <textarea
+            appFieldControl
+            rows="3"
+            autocomplete="off"
+            [formField]="profileForm.shortBio"
+          ></textarea>
+        </app-field>
+        <app-field
+          label="Lieu"
+          controlId="profil-lieu"
+          optional
+          hint="Ville ou région, par exemple Paris."
+          [error]="errorOf(profileForm.publicLocation)"
+        >
+          <input
+            appFieldControl
+            type="text"
+            autocomplete="off"
+            [formField]="profileForm.publicLocation"
+          />
+        </app-field>
+        <app-field
+          label="Adresse électronique publique"
+          controlId="profil-adresse"
+          optional
+          hint="Gardée dans le profil, jamais affichée sur le site : le formulaire de contact en tient lieu."
+          [error]="errorOf(profileForm.publicEmail)"
+        >
+          <input
+            appFieldControl
+            type="email"
+            inputmode="email"
+            autocomplete="off"
+            spellcheck="false"
+            [formField]="profileForm.publicEmail"
+          />
+        </app-field>
+      </div>
+    </section>
+
+    <section
+      id="profil-presentation"
+      class="profile-section"
+      aria-labelledby="profil-presentation-titre"
+    >
+      <h2 id="profil-presentation-titre" class="text-xl tracking-heading">Présentation</h2>
+      <div class="profile-fields">
+        <app-field
+          label="Présentation"
+          controlId="profil-a-propos"
+          optional
+          hint="En Markdown, sur la page À propos. 10 000 caractères au plus."
+          [error]="errorOf(profileForm.aboutMarkdown)"
+        >
+          <textarea
+            appFieldControl
+            rows="10"
+            autocomplete="off"
+            class="font-code"
+            [formField]="profileForm.aboutMarkdown"
+          ></textarea>
+        </app-field>
+        <div>
+          <button
+            appButton
+            type="button"
+            variant="secondary"
+            size="sm"
+            aria-controls="profil-apercu"
+            [attr.aria-expanded]="preview()"
+            (click)="preview.set(!preview())"
+          >
+            {{ preview() ? 'Masquer l’aperçu' : 'Afficher l’aperçu' }}
+          </button>
+        </div>
+        <div id="profil-apercu" class="profile-preview" [hidden]="!preview()">
+          @if (preview()) {
+            <p class="profile-preview-label">Aperçu</p>
+            @if (profileForm.aboutMarkdown().value().trim(); as source) {
+              <app-markdown-view [source]="source" [headingLevel]="3" />
+            } @else {
+              <p class="text-ink-muted">La présentation est vide.</p>
+            }
+          }
+        </div>
+      </div>
+    </section>
+
+    <section id="profil-medias" class="profile-section" aria-labelledby="profil-medias-titre">
+      <h2 id="profil-medias-titre" class="text-xl tracking-heading">Avatar et CV</h2>
+      <div class="profile-media">
+        <app-media-slot
+          label="Avatar"
+          hint="Une image de la médiathèque, recadrée en carré sur le site."
+          kind="image"
+          subject="l’avatar"
+          [mediaId]="profileForm.avatarMediaId().value()"
+          [media]="avatar.value()"
+          [error]="errorOf(profileForm.avatarMediaId)"
+          (choose)="openPicker('image')"
+          (clear)="clear('avatarMediaId')"
+        />
+        <app-media-slot
+          label="CV"
+          hint="Un PDF de la médiathèque, proposé au téléchargement."
+          kind="pdf"
+          subject="le CV"
+          [mediaId]="profileForm.cvMediaId().value()"
+          [media]="cv.value()"
+          [error]="errorOf(profileForm.cvMediaId)"
+          (choose)="openPicker('pdf')"
+          (clear)="clear('cvMediaId')"
+        />
+      </div>
+    </section>
+
+    <app-profile-collection
+      id="profil-liens"
+      title="Liens professionnels"
+      description="GitHub, LinkedIn… Dans l’ordre voulu sur le site."
+      addLabel="Ajouter un lien"
+      emptyText="Aucun lien."
+      [items]="profileForm.links"
+      [itemName]="linkName"
+      [create]="newLink"
+    >
+      <ng-template [appCollectionItem]="profileForm.links" let-link let-i="index">
+        <app-field
+          label="Libellé"
+          [controlId]="'profil-lien-' + i + '-libelle'"
+          [error]="errorOf(link.label)"
+        >
+          <input appFieldControl type="text" autocomplete="off" [formField]="link.label" />
+        </app-field>
+        <app-field
+          label="Adresse"
+          [controlId]="'profil-lien-' + i + '-adresse'"
+          [error]="errorOf(link.url)"
+        >
+          <input
+            appFieldControl
+            type="url"
+            inputmode="url"
+            autocomplete="off"
+            spellcheck="false"
+            [formField]="link.url"
+          />
+        </app-field>
+      </ng-template>
+    </app-profile-collection>
+
+    <app-profile-collection
+      id="profil-competences"
+      title="Compétences"
+      description="Regroupées par catégorie sur le site, par exemple Frontend, Backend."
+      addLabel="Ajouter une compétence"
+      emptyText="Aucune compétence."
+      [items]="profileForm.skills"
+      [itemName]="skillName"
+      [create]="newSkill"
+    >
+      <ng-template [appCollectionItem]="profileForm.skills" let-skill let-i="index">
+        <div class="profile-pair">
+          <app-field
+            label="Compétence"
+            [controlId]="'profil-competence-' + i + '-nom'"
+            [error]="errorOf(skill.name)"
+          >
+            <input appFieldControl type="text" autocomplete="off" [formField]="skill.name" />
+          </app-field>
+          <app-field
+            label="Catégorie"
+            [controlId]="'profil-competence-' + i + '-categorie'"
+            [error]="errorOf(skill.category)"
+          >
+            <input appFieldControl type="text" autocomplete="off" [formField]="skill.category" />
+          </app-field>
+        </div>
+      </ng-template>
+    </app-profile-collection>
+
+    <app-profile-collection
+      id="profil-experiences"
+      title="Expériences"
+      description="Les plus récentes d’abord, de préférence."
+      addLabel="Ajouter une expérience"
+      emptyText="Aucune expérience."
+      [items]="profileForm.experiences"
+      [itemName]="experienceName"
+      [create]="newExperience"
+    >
+      <ng-template [appCollectionItem]="profileForm.experiences" let-entry let-i="index">
+        <app-field
+          label="Intitulé du poste"
+          [controlId]="'profil-experience-' + i + '-poste'"
+          [error]="errorOf(entry.title)"
+        >
+          <input appFieldControl type="text" autocomplete="off" [formField]="entry.title" />
+        </app-field>
+        <div class="profile-pair">
+          <app-field
+            label="Organisation"
+            [controlId]="'profil-experience-' + i + '-organisation'"
+            [error]="errorOf(entry.organization)"
+          >
+            <input
+              appFieldControl
+              type="text"
+              autocomplete="off"
+              [formField]="entry.organization"
+            />
+          </app-field>
+          <app-field
+            label="Lieu"
+            [controlId]="'profil-experience-' + i + '-lieu'"
+            [error]="errorOf(entry.location)"
+          >
+            <input appFieldControl type="text" autocomplete="off" [formField]="entry.location" />
+          </app-field>
+        </div>
+        <div class="profile-pair">
+          <app-field
+            label="Début"
+            [controlId]="'profil-experience-' + i + '-debut'"
+            [error]="errorOf(entry.startDate)"
+          >
+            <input appFieldControl type="date" [formField]="entry.startDate" />
+          </app-field>
+          <app-field
+            label="Fin"
+            [controlId]="'profil-experience-' + i + '-fin'"
+            optional
+            hint="Vide : en cours."
+            [error]="errorOf(entry.endDate)"
+          >
+            <input appFieldControl type="date" [formField]="entry.endDate" />
+          </app-field>
+        </div>
+        <app-field
+          label="Description"
+          [controlId]="'profil-experience-' + i + '-description'"
+          optional
+          [error]="errorOf(entry.description)"
+        >
+          <textarea
+            appFieldControl
+            rows="4"
+            autocomplete="off"
+            [formField]="entry.description"
+          ></textarea>
+        </app-field>
+      </ng-template>
+    </app-profile-collection>
+
+    <app-profile-collection
+      id="profil-formations"
+      title="Formations"
+      addLabel="Ajouter une formation"
+      emptyText="Aucune formation."
+      [items]="profileForm.educations"
+      [itemName]="educationName"
+      [create]="newEducation"
+    >
+      <ng-template [appCollectionItem]="profileForm.educations" let-entry let-i="index">
+        <div class="profile-pair">
+          <app-field
+            label="Diplôme"
+            [controlId]="'profil-formation-' + i + '-diplome'"
+            [error]="errorOf(entry.degree)"
+          >
+            <input appFieldControl type="text" autocomplete="off" [formField]="entry.degree" />
+          </app-field>
+          <app-field
+            label="Domaine"
+            [controlId]="'profil-formation-' + i + '-domaine'"
+            [error]="errorOf(entry.field)"
+          >
+            <input appFieldControl type="text" autocomplete="off" [formField]="entry.field" />
+          </app-field>
+        </div>
+        <div class="profile-pair">
+          <app-field
+            label="Établissement"
+            [controlId]="'profil-formation-' + i + '-etablissement'"
+            [error]="errorOf(entry.institution)"
+          >
+            <input appFieldControl type="text" autocomplete="off" [formField]="entry.institution" />
+          </app-field>
+          <app-field
+            label="Lieu"
+            [controlId]="'profil-formation-' + i + '-lieu'"
+            [error]="errorOf(entry.location)"
+          >
+            <input appFieldControl type="text" autocomplete="off" [formField]="entry.location" />
+          </app-field>
+        </div>
+        <div class="profile-pair">
+          <app-field
+            label="Début"
+            [controlId]="'profil-formation-' + i + '-debut'"
+            [error]="errorOf(entry.startDate)"
+          >
+            <input appFieldControl type="date" [formField]="entry.startDate" />
+          </app-field>
+          <app-field
+            label="Fin"
+            [controlId]="'profil-formation-' + i + '-fin'"
+            optional
+            hint="Vide : en cours."
+            [error]="errorOf(entry.endDate)"
+          >
+            <input appFieldControl type="date" [formField]="entry.endDate" />
+          </app-field>
+        </div>
+        <app-field
+          label="Description"
+          [controlId]="'profil-formation-' + i + '-description'"
+          optional
+          [error]="errorOf(entry.description)"
+        >
+          <textarea
+            appFieldControl
+            rows="4"
+            autocomplete="off"
+            [formField]="entry.description"
+          ></textarea>
+        </app-field>
+      </ng-template>
+    </app-profile-collection>
+
+    <app-profile-collection
+      id="profil-certifications"
+      title="Certifications"
+      addLabel="Ajouter une certification"
+      emptyText="Aucune certification."
+      [items]="profileForm.certifications"
+      [itemName]="certificationName"
+      [create]="newCertification"
+    >
+      <ng-template [appCollectionItem]="profileForm.certifications" let-entry let-i="index">
+        <div class="profile-pair">
+          <app-field
+            label="Nom"
+            [controlId]="'profil-certification-' + i + '-nom'"
+            [error]="errorOf(entry.name)"
+          >
+            <input appFieldControl type="text" autocomplete="off" [formField]="entry.name" />
+          </app-field>
+          <app-field
+            label="Organisme"
+            [controlId]="'profil-certification-' + i + '-organisme'"
+            [error]="errorOf(entry.issuer)"
+          >
+            <input appFieldControl type="text" autocomplete="off" [formField]="entry.issuer" />
+          </app-field>
+        </div>
+        <div class="profile-pair">
+          <app-field
+            label="Délivrée le"
+            [controlId]="'profil-certification-' + i + '-delivrance'"
+            [error]="errorOf(entry.issuedAt)"
+          >
+            <input appFieldControl type="date" [formField]="entry.issuedAt" />
+          </app-field>
+          <app-field
+            label="Expire le"
+            [controlId]="'profil-certification-' + i + '-expiration'"
+            optional
+            hint="Vide : sans expiration."
+            [error]="errorOf(entry.expiresAt)"
+          >
+            <input appFieldControl type="date" [formField]="entry.expiresAt" />
+          </app-field>
+        </div>
+        <app-field
+          label="Adresse de vérification"
+          [controlId]="'profil-certification-' + i + '-adresse'"
+          optional
+          [error]="errorOf(entry.credentialUrl)"
+        >
+          <input
+            appFieldControl
+            type="url"
+            inputmode="url"
+            autocomplete="off"
+            spellcheck="false"
+            [formField]="entry.credentialUrl"
+          />
+        </app-field>
+      </ng-template>
+    </app-profile-collection>
+
+    <div class="profile-submit">
+      @if (failure(); as text) {
+        <app-alert tone="danger" title="L’enregistrement a échoué">
+          <p>{{ text }}</p>
+        </app-alert>
+      }
+      <div>
+        <button appButton type="submit" [loading]="profileForm().submitting()">
+          Enregistrer le profil
+        </button>
+      </div>
+    </div>
+  </form>
+}
+
+<app-media-picker
+  #picker
+  [title]="pickerKind() === 'image' ? 'Choisir l’avatar' : 'Choisir le CV'"
+  [kind]="pickerKind()"
+  [media]="pickerMedia.value()?.content ?? []"
+  [page]="pickerPage() ?? 1"
+  [totalPages]="pickerMedia.value()?.totalPages ?? 1"
+  [state]="pickerState()"
+  [selectedId]="
+    pickerKind() === 'image' ? profileForm.avatarMediaId().value() : profileForm.cvMediaId().value()
+  "
+  libraryPath="/admin/media"
+  (chosen)="choose($event)"
+  (pageChange)="pickerPage.set($event)"
+  (retry)="pickerMedia.reload()"
+/>
+<app-confirm-dialog #confirm />
