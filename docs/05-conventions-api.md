@@ -1764,7 +1764,7 @@ Mêmes règles que les tags (D-CS, D-CW) ; `displayOrder` absent → 0 ; contrat
 
 ```text
 GET    /api/admin/projects        200 PageResponse<AdminProjectSummaryResponse>
-                                  { id, title, slug, visibility, stage, featured, displayOrder }, 20 par page,
+       ?visibility=&technology=   { id, title, slug, visibility, stage, featured, displayOrder }, 20 par page,
                                   toutes visibilités, ordre d'affichage public
 GET    /api/admin/projects/{id}   200 AdminProjectResponse
 POST   /api/admin/projects        SaveProjectRequest → 201 + Location, AdminProjectResponse
@@ -1791,6 +1791,7 @@ Règles propres à ces contrats (D-CX) :
 * `IN_PROGRESS` exige l’absence de `endDate`, `COMPLETED` sa présence (invariant 21) ;
 * `slug` facultatif : généré depuis le titre à la création, conservé à la modification ; suffixé s’il est pris ; figé dès que le projet a été publié, même archivé ensuite (`slugLocked`) ;
 * bornes : `title` 160, `shortDescription` 500, `descriptionMarkdown` 100 000 caractères, adresses 2 048, `caption` 300 ;
+* filtres de la liste (F27, D-EW) : `visibility` (`DRAFT`, `PUBLISHED`, `ARCHIVED` ; autre valeur → 400) et `technology` (slug ; inconnu → page vide), combinables ; absents ou vides, aucun ;
 * pas de suppression : l’archivage retire un projet du site ;
 * contrats vérifiés par `AdminProjectIT`.
 

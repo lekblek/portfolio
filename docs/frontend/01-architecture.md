@@ -67,7 +67,7 @@ Le contrat de l'API est versionné dans [`docs/api/openapi.json`](../api/openapi
 | Hydratation incrémentale, rejeu d'événements | **USE** | activés par `provideClientHydration()` en v22 ; `@defer (hydrate on …)` pour les blocs lourds |
 | `@defer` | **USE** | KaTeX, Mermaid, éditeur, blocs sous la ligne de flottaison ; jamais sur le contenu principal d'une page publique |
 | Prérendu (`RenderMode.Prerender`) | **USE LATER** | décidé route par route en F33 (D22, étape 52.1) |
-| Angular Aria (`@angular/aria`) | **USE LATER** | directives sans style pour les motifs WAI-ARIA complexes (onglets de l'éditeur, menu, combobox des tags) ; installé à la première étape qui en a besoin |
+| Angular Aria (`@angular/aria`) | **USE** (F27) | combobox et liste à choix multiples (`shared/ui/multi-select.ts`) ; onglets à F31 ; chargé avec les pages d'administration seulement ; rien d'autre sans besoin |
 | Angular CDK (`@angular/cdk`) | **USE** (F26) | glisser-déposer des listes ordonnées (`shared/ui/sortable-list.ts` : collections du profil, puis chapitres), en complément de commandes au clavier, et annonces (`LiveAnnouncer`) ; chargé avec les pages d'administration seulement ; rien d'autre sans besoin |
 | Angular Material | **DO NOT USE** | apparence Material Design contraire à l'identité recherchée ; thème lourd à neutraliser ; les besoins réels sont couverts par la plateforme, Aria et CDK |
 | `@angular/animations` | **DO NOT USE** | API historique ; les transitions CSS et `animate.enter` / `animate.leave` d'Angular suffisent |

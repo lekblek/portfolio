@@ -2,27 +2,28 @@
 
 Ce fichier est la **seule** source de vérité sur l'avancement. Il ne répète pas le contenu des autres documents : il pointe vers eux.
 
-Dernière mise à jour : 2026-10-02 (F00 à F23 poussées, CI verte ; F24 et F25 commitées, à pousser ; F26 vérifiée)
+Dernière mise à jour : 2026-10-03 (F00 à F23 poussées, CI verte ; F24 à F26 commitées, à pousser ; F27 vérifiée)
 
 ---
 
 ## 1. État courant
 
 ```text
-Dernière étape terminée   : F26 — Profil (à committer) ; F24 et F25 commitées (284e518 à 9c2642d), à pousser ; F00 à F23 poussées, CI verte (run 36952913904)
+Dernière étape terminée   : F27 — Projets (administration) et jeu de démonstration visuel (à committer) ; F24 à F26 commitées (284e518 à 9d3f2f8), à pousser ; F00 à F23 poussées, CI verte (run 36952913904)
 Étape en cours            : aucune
-Prochaine étape prévue    : F27 — Projets (administration)
-État                      : F26 : commits proposés
+Prochaine étape prévue    : F28 — Publications (administration)
+État                      : F27 : commits proposés
 Branche                   : develop
-Vérification              : backend : contrat OpenAPI régénéré et vérifié (OpenApiContractIT, AdminProfileIT, AdminProjectIT ; KI-36) ; frontend : lint, lint:styles, format, 293 tests unitaires, types de l'API régénérés, build de production (CDK dans le lot de la page Profil seulement ; lot initial 400,61 kB bruts / 110,85 kB transférés, +1,5 kB par le planificateur de RxJS que le CDK importe, D-ET), 158 tests de bout en bout (6 ignorés) en développement, nouveaux scénarios stables sur 5 exécutions, et en production derrière mandataire local sur 3 exécutions ; page Profil sans violation axe ni débordement à 390 et 1440 px (plein, vide, erreurs, sélecteur) ; glisser-déposer et mouvement réduit vérifiés ; découpage des commits rejoué dans un clone jetable
+Vérification              : backend : 405 tests (unitaires et d'intégration, mvnw verify), contrat OpenAPI régénéré (filtres de la liste d'administration) ; frontend : lint, lint:styles, format, 315 tests unitaires, types de l'API régénérés, build de production (Aria dans un lot paresseux ; lot initial 402,68 kB bruts / 111,17 kB transférés) ; 171 tests de bout en bout (7 ignorés) en développement, nouveaux scénarios stables sur 5 exécutions, 155 en production derrière mandataire sur 3 exécutions ; pagination réelle (projets, articles, actualités, administration) ; administration des projets et 12 pages publiques sans violation axe ni débordement à 390 et 1440 px ; découpage des commits rejoué dans un clone jetable
 ```
 
 ## 2. Prochaine action
 
-1. Committer F26 (commandes de la fin de tranche), pousser avec F24 et F25, vérifier la CI, remplacer les 🟡 par ✅.
-2. Renseigner `ADMIN_USERNAME` et `ADMIN_PASSWORD` dans `deploy/.env` (compte administrateur de développement, mot de passe de 15 caractères au moins) : nécessaires pour utiliser l'administration et pour `e2e/admin-auth.spec.ts`.
-3. Vérification avec un lecteur d'écran (NVDA) du site public (audit F21, constat A7). Plus tard : page de mentions légales avant la mise en production (D-DW).
-4. Étape 36, close (rappel du découpage) :
+1. Committer F27 (commandes de la fin de tranche), pousser avec F24 à F26, vérifier la CI, remplacer les 🟡 par ✅.
+2. Avant la mise en production : traiter KI-38 (variantes d'images), mesuré en F27 (D-EV) : 1,1 Mo d'images sur l'accueil, y compris en 390 px.
+3. Renseigner `ADMIN_USERNAME` et `ADMIN_PASSWORD` dans `deploy/.env` (compte administrateur de développement, mot de passe de 15 caractères au moins) : nécessaires pour utiliser l'administration et pour `e2e/admin-auth.spec.ts`.
+4. Vérification avec un lecteur d'écran (NVDA) du site public (audit F21, constat A7). Plus tard : page de mentions légales avant la mise en production (D-DW).
+5. Étape 36, close (rappel du découpage) :
 
    ```text
    36.1  Taxonomie : catégories et tags                                    ✔ poussée
@@ -33,7 +34,7 @@ Vérification              : backend : contrat OpenAPI régénéré et vérifié
    36.6  Profil : profil et collections, avatar et CV   ✔ poussée
    36.7  Messages de contact : liste, détail, changement de statut   ✔ poussée
    ```
-5. Confirmer ou infirmer D-T (cohérence `stage` ⇔ `endDate`) : `docs/decisions/registre-implementation.md`.
+6. Confirmer ou infirmer D-T (cohérence `stage` ⇔ `endDate`) : `docs/decisions/registre-implementation.md`.
 
 ---
 
@@ -144,8 +145,9 @@ Légende : ✅ terminée et poussée · 🟡 terminée et vérifiée, commits à
 | F23 | Shell d'administration (en-tête, barre latérale repliée en menu sous 64 rem, lien d'évitement) et tableau de bord (relevé : messages non lus, publications, projets, séries, médias, lus dans les listes existantes) ; session expirée pendant le travail → connexion avec `returnUrl` ; `/admin/settings` retiré de la V1 (D25) ; brouillons reportés à F28 (D-EP) | ✅ | `7f162fa`, `c75762e`, docs `d66883b` (CI : run 36952913904) |
 | F24 | Taxonomie (une entrée, trois sous-sections : catégories, tags, technologies) et primitives d'administration : tableau, dialogue de confirmation, notifications, variante `danger`, erreurs du serveur sur les champs, garde des modifications non enregistrées (D-EQ) | 🟡 | `284e518`, `11b9b05`, `0bb21d3`, docs `9c2642d` (à pousser) |
 | F25 | Médiathèque : envoi (bouton ou dépôt, plusieurs fichiers, progression, vérification locale puis du serveur), tableau paginé, texte alternatif exigé pour une image, suppression contrôlée ; sélecteur de médias reporté à F26 (D-ER) | 🟡 | `cb4fb5a`, `0bb21d3`, docs `9c2642d` (à pousser) |
-| F26 | Profil : un formulaire et un enregistrement (identité, présentation Markdown avec aperçu, avatar et CV par le sélecteur de médias, cinq collections ordonnables au clavier ou au glisser-déposer), erreurs du serveur jusque dans les collections ; `@angular/cdk` ajouté ; KI-36 résolu (D-ES, D-ET) | 🟡 | à committer |
-| F27 → F37 | Frontend : voir `docs/frontend/00-roadmap-frontend.md` (remplace les étapes 37 à 51 et les parties frontend de 52) | ⏳ | — |
+| F26 | Profil : un formulaire et un enregistrement (identité, présentation Markdown avec aperçu, avatar et CV par le sélecteur de médias, cinq collections ordonnables au clavier ou au glisser-déposer), erreurs du serveur jusque dans les collections ; `@angular/cdk` ajouté ; KI-36 résolu (D-ES, D-ET) | 🟡 | `ff2940e`, `87f2d51`, `4bde69f`, `a6f2112`, `002e281`, `1be65f3`, `b4d8054`, docs `9d3f2f8` (à pousser) |
+| F27 | Projets (administration) : liste filtrée (visibilité, technologie) et paginée, création, modification complète (slug figé, période, technologies par choix multiple Angular Aria, couverture, captures ordonnables) ; jeu de démonstration visuel du profil `dev` (médias réels, 24 projets, 26 publications, profil complet) ; pages publiques revues avec ces données (figures légendées, image prioritaire) ; KI-38 mesuré (D-EU, D-EV, D-EW) | 🟡 | à committer |
+| F28 → F37 | Frontend : voir `docs/frontend/00-roadmap-frontend.md` (remplace les étapes 37 à 51 et les parties frontend de 52) | ⏳ | — |
 | 52 | Déploiement : voir `docs/steps/liste_complete_etapes.md` (52.7 à 52.21) | ⏳ | — |
 
 Après le push, remplacer les 🟡 par ✅ et noter les hashes.
@@ -164,6 +166,7 @@ Index : [`decisions/README.md`](decisions/README.md).
 | FA01 … FA12 | Architecture frontend : fonctionnalités, frontières ESLint, `httpResource`, types générés, origine de l'API en SSR, rendu par route, Signal Forms, pas de Material ni de Storybook, Playwright et axe, état dans l'URL, Markdown partagé | Acceptées (2026-09-30) ; FA02, FA04, FA05, FA06, FA10 mises en œuvre (F01 à F04) |
 | D-DM … D-DY | Frontend : montée 22.2 et hôtes SSR en local ; frontières par règle ESLint qui résout les chemins ; intercepteur commun et jeton serveur ; types générés et `overrides` de TypeScript ; banc Playwright ; direction visuelle ; tokens et `lint:styles` ; utilitaires ; primitives d'action ; shell public et identité ; mentions légales reportées ; SEO ; rendu Markdown | Actives (F00 à F11) ; D-DO modifiée en F12 (D-EB) |
 | D-EQ, D-ER | Taxonomie et primitives d'administration (décisions du propriétaire : tableaux, formulaires séparés, suppression confirmée, notifications, entrée « Taxonomie ») ; médiathèque | Actives (F24, F25) |
+| D-EU, D-EV, D-EW | Jeu de démonstration visuel du profil `dev` (règle : pas de validation visuelle sans médias quand le modèle en prévoit) ; corrections des pages publiques révélées par ce jeu ; administration des projets (filtres d'API, pastille de statut, choix multiple Angular Aria) | Actives (F27) |
 | D-ES, D-ET | Réponses d'administration séparées des requêtes dans le contrat (KI-36) ; profil, liste ordonnable (CDK), sélecteur de médias | Actives (F26) |
 | D25, D-EP | `/admin/settings` retiré de la V1 (décision du propriétaire) ; shell d'administration, relevé du tableau de bord, intercepteur des sessions expirées | Actives (F23) |
 | D-EL … D-EO | Mouvement du site public (trois mouvements, refus consignés) ; audit public ; authentification d'administration (session, garde, `returnUrl`, intercepteur en F23) ; jeton CSRF au chemin `/` et renouvelé à la connexion | Actives (F20 à F22) |
@@ -218,7 +221,7 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | KI-18 | AMÉLIORATION | `LICENSE` : titulaire et année non renseignés (`[year] [fullname]`) | à décider par le propriétaire du dépôt |
 | KI-22 | AMÉLIORATION | SSR : `security.allowedHosts` vide ; depuis Angular 22.2, le build SSR refuse alors **tout** hôte (400), `localhost` compris : obligatoire avant la mise en production ; en local, `NG_ALLOWED_HOSTS=localhost` (D-DM) | F35 |
 | KI-16 | OPTIONNEL | `V001` : virgule manquante avant `CONSTRAINT profile_single_row` (comportement identique) ; migration appliquée, non modifiable | aucun |
-| KI-38 | AMÉLIORATION | Médias publics servis en une seule taille (`GET /api/public/media/…`) : aucune variante pour `srcset` ; une couverture de 1 600 px est téléchargée entière sur un écran de 320 px (`NG02960` en développement) | F34 (performance) : variantes produites à l'envoi (backend) ou service de redimensionnement, puis `ngSrcset` / chargeur d'images |
+| KI-38 | **PRIORITAIRE** (avant la mise en production) | Médias servis en une seule taille (`GET /api/public/media/…`) : aucune variante pour `srcset`. Mesuré en F27 avec le jeu de démonstration (originaux de 1 500 px) : accueil 6 images, 1 120 ko, liste des projets 756 ko, articles 903 ko, mêmes poids à 390 px ; vignettes de 64 px de la médiathèque chargées en taille d'origine (`NG0913`, `NG02960` en développement) | F34 (performance) : variantes produites à l'envoi (backend) ou service de redimensionnement, puis `ngSrcset` / chargeur d'images (D-EV) |
 | KI-35 | OPTIONNEL | `npm ci` avertit que quatre paquets de la chaîne de build (`esbuild`, `lmdb`, `msgpackr-extract`, `@parcel/watcher`) ont des scripts d'installation non listés dans `allowScripts` (npm 11) ; sans effet sur l'installation | décider d'une liste `allowScripts` explicite, ou ignorer |
 | KI-30 | OPTIONNEL | Les `*IT` transactionnels (écriture de statut, lectures publiques) ne prouvent pas le comportement après commit | à reprendre si un défaut de transaction apparaît |
 
@@ -336,7 +339,7 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | Politique de cache HTTP des réponses publiques de l'API (`Cache-Control` au lieu du `no-store` de Spring Security) | F34 / étape 52 | D-EB : le cache de transfert est ouvert explicitement aux GET de `/api/public/` |
 | Nombre de brouillons sur le tableau de bord (filtre de statut de la liste d'administration des publications) | F28 | D-EP : la liste n'a pas de filtre de statut ; il viendra avec son écran |
 | Sélecteur de médias (dialogue réutilisé par le profil, les projets, les publications et les séries) | fait (F26) | D-ER, D-ET : `app-media-picker` |
-| Primitives `select` et case à cocher | premier formulaire qui les demande (F27, F28) | D-EQ : aucun champ de la taxonomie ni de la médiathèque |
+| Primitives `select` et case à cocher | fait (F27) | D-EW : contrôles natifs de `styles/controls.css` |
 | Page de mentions légales (éditeur, hébergeur) | avant la mise en production publique, une fois l'hébergement connu | D-DW : décision du propriétaire (2026-09-30) ; aucun lien provisoire d'ici là |
 | HSTS derrière le mandataire inverse (requête vue en HTTP par Tomcat) | fait (P-B03) | D-DC : `X-Forwarded-Proto` accepté depuis un réseau de confiance |
 | Adresse réelle du client derrière le mandataire inverse (en-têtes de transfert) pour la limite des essais | fait (P-B03) | D-DC : `X-Forwarded-For` accepté depuis un réseau de confiance ; à vérifier avec le réseau Docker réel à l'étape 52 |
