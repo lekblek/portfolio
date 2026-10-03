@@ -77,3 +77,50 @@ const TIME = new Intl.DateTimeFormat('fr-FR', {
 export function formatDayTime(instant: string): string {
   return `${formatDay(instant)} à ${TIME.format(new Date(instant))}`;
 }
+
+const WALL_CLOCK = new Intl.DateTimeFormat('en-CA', {
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  hourCycle: 'h23',
+  timeZone: SITE_TIME_ZONE,
+});
+
+/** Heure murale du fuseau de référence en millisecondes « comme si c'était UTC ». */
+function wallClock(instant: number): number {
+  const parts = Object.fromEntries(
+    WALL_CLOCK.formatToParts(new Date(instant)).map((part) => [part.type, part.value]),
+  );
+  return Date.UTC(
+    +parts['year'],
+    +parts['month'] - 1,
+    +parts['day'],
+    +parts['hour'],
+    +parts['minute'],
+  );
+}
+
+/**
+ * Valeur d'un `<input type="datetime-local">` (« 2026-10-15T09:30 ») lue à l'heure du fuseau de
+ * référence, quel que soit le fuseau du navigateur → instant ISO. Les affichages (formatDayTime)
+ * utilisant le même fuseau, l'heure saisie est l'heure relue.
+ */
+export function instantFromSiteTime(value: string): string {
+  const [day, time] = value.split('T');
+  const [year, month, date] = day.split('-').map(Number);
+  const [hour, minute] = time.split(':').map(Number);
+  const wanted = Date.UTC(year, month - 1, date, hour, minute);
+  let instant = wanted;
+  // Deux passes : l'écart au fuseau dépend de l'instant (heure d'été)
+  for (let pass = 0; pass < 2; pass++) {
+    instant = wanted - (wallClock(instant) - instant);
+  }
+  return new Date(instant).toISOString();
+}
+
+/** Instant → valeur d'un `<input type="datetime-local">` à l'heure du fuseau de référence. */
+export function siteTimeInput(instant: string): string {
+  return new Date(wallClock(new Date(instant).getTime())).toISOString().slice(0, 16);
+}

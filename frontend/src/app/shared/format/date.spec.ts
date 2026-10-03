@@ -1,4 +1,12 @@
-import { formatDay, formatDayTime, formatMonth, formatPeriod, isoDay } from './date';
+import {
+  formatDay,
+  formatDayTime,
+  formatMonth,
+  formatPeriod,
+  instantFromSiteTime,
+  isoDay,
+  siteTimeInput,
+} from './date';
 
 describe('formatMonth', () => {
   it('writes the month and the year in french', () => {
@@ -39,5 +47,17 @@ describe('formatDayTime', () => {
   it('writes the day and the time of the instant in the reference time zone', () => {
     expect(formatDayTime('2026-10-02T08:42:00Z')).toBe('2 octobre 2026 à 10:42');
     expect(formatDayTime('2026-09-30T22:05:00Z')).toBe('1er octobre 2026 à 00:05');
+  });
+});
+
+describe('site time inputs', () => {
+  it('reads a wall-clock time in Paris, summer and winter', () => {
+    expect(instantFromSiteTime('2026-10-15T09:30')).toBe('2026-10-15T07:30:00.000Z');
+    expect(instantFromSiteTime('2026-12-15T09:30')).toBe('2026-12-15T08:30:00.000Z');
+  });
+
+  it('writes an instant back as a Paris wall-clock time', () => {
+    expect(siteTimeInput('2026-10-15T07:30:00Z')).toBe('2026-10-15T09:30');
+    expect(siteTimeInput('2026-12-15T08:30:00Z')).toBe('2026-12-15T09:30');
   });
 });

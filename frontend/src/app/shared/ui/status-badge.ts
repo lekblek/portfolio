@@ -1,7 +1,11 @@
 import { Component, computed, input } from '@angular/core';
 
-/** États d'un contenu : visibilité d'un projet, statut d'une publication (D-AV). */
-export type ContentStatus = 'DRAFT' | 'IN_REVIEW' | 'SCHEDULED' | 'PUBLISHED' | 'ARCHIVED';
+/**
+ * États affichés : visibilité d'un projet, statut d'une publication (D-AV), statut d'un message de
+ * contact (D-CZ : nouveau, lu, traité, archivé).
+ */
+export type ContentStatus =
+  'DRAFT' | 'IN_REVIEW' | 'SCHEDULED' | 'PUBLISHED' | 'ARCHIVED' | 'NEW' | 'READ' | 'PROCESSED';
 
 const LABELS: Record<ContentStatus, [masculine: string, feminine: string]> = {
   DRAFT: ['Brouillon', 'Brouillon'],
@@ -9,12 +13,15 @@ const LABELS: Record<ContentStatus, [masculine: string, feminine: string]> = {
   SCHEDULED: ['Programmé', 'Programmée'],
   PUBLISHED: ['Publié', 'Publiée'],
   ARCHIVED: ['Archivé', 'Archivée'],
+  NEW: ['Nouveau', 'Nouvelle'],
+  READ: ['Lu', 'Lue'],
+  PROCESSED: ['Traité', 'Traitée'],
 };
 
 /**
  * Pastille de statut (02-design-system §18) : le mot d'abord, la couleur ensuite (jamais seule) ;
  * repère de forme pour distinguer les états sans couleur : cercle plein (publié), cercle vide
- * (brouillon), demi-cercle (relecture, programmation), carré (archivé). Accord selon le contenu :
+ * (brouillon, lu), demi-cercle (relecture, programmation, nouveau), carré (archivé). Accord selon le contenu :
  * « Publié » pour un projet, « Publiée » pour une publication.
  */
 @Component({
@@ -43,15 +50,18 @@ const LABELS: Record<ContentStatus, [masculine: string, feminine: string]> = {
       border-radius: var(--radius-full);
     }
 
-    :host([data-status='PUBLISHED']) {
+    :host([data-status='PUBLISHED']),
+    :host([data-status='PROCESSED']) {
       color: var(--color-success);
     }
 
-    :host([data-status='PUBLISHED']) .status-badge-mark {
+    :host([data-status='PUBLISHED']) .status-badge-mark,
+    :host([data-status='PROCESSED']) .status-badge-mark {
       background: currentColor;
     }
 
-    :host([data-status='IN_REVIEW']) {
+    :host([data-status='IN_REVIEW']),
+    :host([data-status='NEW']) {
       color: var(--color-accent);
     }
 
@@ -60,6 +70,7 @@ const LABELS: Record<ContentStatus, [masculine: string, feminine: string]> = {
     }
 
     :host([data-status='IN_REVIEW']) .status-badge-mark,
+    :host([data-status='NEW']) .status-badge-mark,
     :host([data-status='SCHEDULED']) .status-badge-mark {
       background: linear-gradient(90deg, currentColor 50%, transparent 50%);
     }

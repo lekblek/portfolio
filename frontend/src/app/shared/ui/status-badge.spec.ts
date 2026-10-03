@@ -31,4 +31,16 @@ describe('StatusBadge', () => {
     await fixture.whenStable();
     expect(badge.textContent?.trim()).toBe('Brouillon');
   });
+
+  it('names the statuses of a contact message', async () => {
+    const fixture = TestBed.createComponent(Host);
+    fixture.componentInstance.status.set('NEW');
+    await fixture.whenStable();
+    const badge = (fixture.nativeElement as HTMLElement).querySelector('app-status-badge')!;
+    expect(badge.textContent?.trim()).toBe('Nouveau');
+
+    fixture.componentInstance.status.set('PROCESSED');
+    await fixture.whenStable();
+    expect(badge.textContent?.trim()).toBe('Traité');
+  });
 });
