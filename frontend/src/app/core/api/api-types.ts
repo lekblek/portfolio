@@ -54,3 +54,18 @@ export type AdminProjectSummary = Schemas['AdminProjectSummaryResponse'];
 export type AdminProject = Schemas['AdminProjectResponse'];
 export type SaveProjectRequest = Schemas['SaveProjectRequest'];
 export type ProjectVisibility = AdminProject['visibility'];
+
+export type AdminPublicationSummary = Schemas['AdminPublicationSummaryResponse'];
+export type AdminPublication = Schemas['AdminPublicationResponse'];
+export type CreatePublicationRequest = Schemas['CreatePublicationRequest'];
+export type UpdatePublicationRequest = Schemas['UpdatePublicationRequest'];
+export type PublicationStatus = AdminPublication['status'];
+
+export type AdminSeriesSummary = Schemas['AdminSeriesSummaryResponse'];
+export type AdminSeries = Schemas['AdminSeriesResponse'];
+export type AdminSeriesChapter = AdminSeries['chapters'][number];
+export type SaveSeriesRequest = Schemas['SaveSeriesRequest'];
+
+export type AdminContactMessageSummary = Schemas['AdminContactMessageSummaryResponse'];
+export type AdminContactMessage = Schemas['AdminContactMessageResponse'];
+export type ContactStatus = AdminContactMessage['status'];

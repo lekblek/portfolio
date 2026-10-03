@@ -1,0 +1,258 @@
+<p class="text-sm font-semibold text-ink-muted">
+  <a class="font-medium" routerLink="/admin/publications">Publications</a> · {{ typeLabel() }}
+</p>
+<div class="mt-1 flex flex-wrap items-center gap-x-4 gap-y-2">
+  <h1 class="text-2xl tracking-heading">{{ title() }}</h1>
+  @if (sitePath(); as path) {
+    <a [routerLink]="path">Voir sur le site</a>
+  }
+</div>
+
+@if (editing() && publication.error()) {
+  @if (publication.statusCode() === 404) {
+    <app-empty-state
+      class="mt-block block"
+      message="Cette publication n’existe pas ou n’existe plus."
+    >
+      <a routerLink="/admin/publications">Retour à la liste</a>
+    </app-empty-state>
+  } @else {
+    <app-error-state
+      class="mt-block block"
+      [title]="'La publication n’a pas pu être chargée.'"
+      (retry)="publication.reload()"
+    />
+  }
+} @else if (!ready()) {
+  @defer (on timer(300ms)) {
+    <p role="status" class="mt-block text-ink-muted">Chargement…</p>
+  }
+} @else {
+  <div class="publication-layout">
+    @if (saved(); as current) {
+      <app-publication-status-panel
+        class="publication-status"
+        [publication]="current"
+        [blocked]="publicationForm().dirty()"
+        (changed)="statusChanged($event)"
+      />
+    } @else {
+      <p class="publication-status text-sm text-ink-muted">
+        Une publication naît brouillon&#8239;: après l’avoir créée, vous pourrez la publier ou la
+        programmer.
+      </p>
+    }
+
+    <form class="publication-form" [formRoot]="publicationForm">
+      <section class="publication-section" aria-labelledby="publication-identite">
+        <h2 id="publication-identite" class="text-xl tracking-heading">Identité</h2>
+        <app-field
+          label="Titre"
+          controlId="publication-titre"
+          [error]="errorOf(publicationForm.title)"
+        >
+          <input
+            appFieldControl
+            type="text"
+            autocomplete="off"
+            [formField]="publicationForm.title"
+          />
+        </app-field>
+        <app-field
+          label="Slug"
+          controlId="publication-slug"
+          optional
+          [hint]="
+            slugLocked()
+              ? 'Figé : cette publication a déjà été publiée, et ses adresses partagées doivent rester valides.'
+              : 'Identifiant dans l’adresse, en minuscules et tirets. Vide : tiré du titre ; figé dès la première publication.'
+          "
+          [error]="errorOf(publicationForm.slug)"
+        >
+          <input
+            appFieldControl
+            type="text"
+            autocomplete="off"
+            autocapitalize="none"
+            spellcheck="false"
+            translate="no"
+            [formField]="publicationForm.slug"
+          />
+        </app-field>
+        <app-field
+          label="Résumé"
+          controlId="publication-resume"
+          hint="Sous le titre et dans les listes. 500 caractères au plus."
+          [error]="errorOf(publicationForm.summary)"
+        >
+          <textarea
+            appFieldControl
+            rows="3"
+            autocomplete="off"
+            [formField]="publicationForm.summary"
+          ></textarea>
+        </app-field>
+      </section>
+
+      <section class="publication-section" aria-labelledby="publication-contenu">
+        <h2 id="publication-contenu" class="text-xl tracking-heading">Contenu</h2>
+        <app-field
+          label="Contenu"
+          controlId="publication-texte"
+          optional
+          [hint]="
+            'En Markdown : titres, code, tableaux, formules, diagrammes, figures légendées. ' +
+            contentCount()
+          "
+          [error]="errorOf(publicationForm.contentMarkdown)"
+        >
+          <textarea
+            appFieldControl
+            rows="20"
+            autocomplete="off"
+            class="font-code"
+            [formField]="publicationForm.contentMarkdown"
+          ></textarea>
+        </app-field>
+        <div>
+          <button
+            appButton
+            type="button"
+            variant="secondary"
+            size="sm"
+            aria-controls="publication-apercu"
+            [attr.aria-expanded]="preview()"
+            (click)="preview.set(!preview())"
+          >
+            {{ preview() ? 'Masquer l’aperçu' : 'Afficher l’aperçu' }}
+          </button>
+        </div>
+        <div id="publication-apercu" class="publication-preview" [hidden]="!preview()">
+          @if (preview()) {
+            <p class="publication-preview-label">Aperçu, tel que le site le rendra</p>
+            @if (publicationForm.contentMarkdown().value().trim(); as source) {
+              <app-markdown-view [source]="source" [headingLevel]="3" />
+            } @else {
+              <p class="text-ink-muted">Le contenu est vide.</p>
+            }
+          }
+        </div>
+      </section>
+
+      <section class="publication-section" aria-labelledby="publication-classement">
+        <h2 id="publication-classement" class="text-xl tracking-heading">Classement</h2>
+        <app-field
+          label="Catégorie"
+          controlId="publication-categorie"
+          optional
+          [error]="errorOf(publicationForm.categoryId)"
+        >
+          <select appFieldControl [formField]="publicationForm.categoryId">
+            <option value="">Aucune</option>
+            @for (category of categories.value() ?? []; track category.id) {
+              <option [value]="'' + category.id">{{ category.name }}</option>
+            }
+          </select>
+        </app-field>
+        <app-field
+          label="Tags"
+          controlId="publication-tags"
+          optional
+          hint="Tapez pour filtrer, puis Entrée pour cocher ou décocher."
+          [error]="errorOf(publicationForm.tagIds)"
+        >
+          <app-multi-select
+            listLabel="Tags"
+            placeholder="Rechercher un tag…"
+            [options]="tagOptions()"
+            [formField]="publicationForm.tagIds"
+          />
+        </app-field>
+        <label class="choice">
+          <input type="checkbox" [formField]="publicationForm.featured" />
+          <span>Mettre en avant</span>
+          <span class="choice-hint"
+            >Mise en avant éditoriale, enregistrée avec la publication (le site ne s’en sert pas
+            encore).</span
+          >
+        </label>
+        <app-media-slot
+          label="Couverture"
+          hint="Une image de la médiathèque, en tête de la publication et dans les listes."
+          kind="image"
+          subject="la couverture"
+          [mediaId]="publicationForm.coverMediaId().value()"
+          [media]="cover.value()"
+          [error]="errorOf(publicationForm.coverMediaId)"
+          (choose)="openPicker()"
+          (clear)="clearCover()"
+        />
+      </section>
+
+      <section class="publication-section" aria-labelledby="publication-referencement">
+        <h2 id="publication-referencement" class="text-xl tracking-heading">Référencement</h2>
+        <p class="text-sm text-ink-muted">
+          Facultatif : à défaut, les moteurs de recherche reçoivent le titre et le résumé.
+        </p>
+        <app-field
+          label="Titre pour les moteurs de recherche"
+          controlId="publication-seo-titre"
+          optional
+          [hint]="seoTitleCount()"
+          [error]="errorOf(publicationForm.seoTitle)"
+        >
+          <input
+            appFieldControl
+            type="text"
+            autocomplete="off"
+            [formField]="publicationForm.seoTitle"
+          />
+        </app-field>
+        <app-field
+          label="Description pour les moteurs de recherche"
+          controlId="publication-seo-description"
+          optional
+          [hint]="seoDescriptionCount()"
+          [error]="errorOf(publicationForm.seoDescription)"
+        >
+          <textarea
+            appFieldControl
+            rows="3"
+            autocomplete="off"
+            [formField]="publicationForm.seoDescription"
+          ></textarea>
+        </app-field>
+      </section>
+
+      <div class="publication-submit">
+        @if (failure(); as text) {
+          <app-alert tone="danger" title="L’enregistrement a échoué">
+            <p>{{ text }}</p>
+          </app-alert>
+        }
+        <div class="flex flex-wrap gap-3">
+          <button appButton type="submit" [loading]="publicationForm().submitting()">
+            {{ saved() ? 'Enregistrer les modifications' : 'Créer le brouillon' }}
+          </button>
+          <a appButton variant="secondary" routerLink="/admin/publications">Retour à la liste</a>
+        </div>
+      </div>
+    </form>
+  </div>
+}
+
+<app-media-picker
+  #picker
+  title="Choisir la couverture"
+  kind="image"
+  [media]="pickerMedia.value()?.content ?? []"
+  [page]="pickerPage() ?? 1"
+  [totalPages]="pickerMedia.value()?.totalPages ?? 1"
+  [state]="pickerState()"
+  [selectedId]="publicationForm.coverMediaId().value()"
+  libraryPath="/admin/media"
+  (chosen)="choose($event)"
+  (pageChange)="pickerPage.set($event)"
+  (retry)="pickerMedia.reload()"
+/>
+<app-confirm-dialog #confirm />

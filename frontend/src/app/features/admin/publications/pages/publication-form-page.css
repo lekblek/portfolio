@@ -1,0 +1,50 @@
+/* Publication (F28) : formulaire sur la mesure de lecture ; le panneau de statut en tête, puis en
+   marge droite sur grand écran, à côté du texte qu'il concerne. */
+
+.publication-layout {
+  display: grid;
+  gap: var(--spacing-block);
+  margin-block-start: var(--spacing-block);
+}
+
+@media (width >= 80rem) {
+  .publication-layout {
+    grid-template-columns: minmax(0, var(--container-prose)) calc(var(--spacing) * 80);
+    align-items: start;
+  }
+
+  .publication-status {
+    position: sticky;
+    top: calc(var(--spacing) * 6);
+    grid-column: 2;
+    grid-row: 1;
+  }
+}
+
+.publication-form {
+  display: grid;
+  gap: var(--spacing-section);
+  max-width: var(--container-prose);
+}
+
+.publication-section,
+.publication-submit {
+  display: grid;
+  gap: calc(var(--spacing) * 6);
+  padding-block-start: var(--spacing-block);
+  border-top: var(--border-strong) solid var(--color-ink);
+}
+
+.publication-preview {
+  padding: calc(var(--spacing) * 4) calc(var(--spacing) * 5);
+  border: var(--border-rule) solid var(--color-rule);
+  border-radius: var(--radius-control);
+  background: var(--color-paper-sunken);
+}
+
+.publication-preview-label {
+  margin-block-end: calc(var(--spacing) * 3);
+  color: var(--color-ink-muted);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+}
