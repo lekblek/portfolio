@@ -29,6 +29,9 @@ portfolio:
     notification:
       from: ${MAIL_FROM:portfolio@localhost}
       to: ${MAIL_TO:admin@localhost}
+  admin:
+    username: admin
+    password: local-password1234
 
 springdoc:
   api-docs:
