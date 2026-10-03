@@ -152,6 +152,29 @@ describe('renderMarkdown', () => {
       expect(html).toContain('<a href="https://example.org" class="external">');
     });
 
+    it('turns a lone image with a title into a numbered figure', () => {
+      const { html } = render(
+        'Texte.\n\n![Scène annotée](/api/public/media/a.webp "Détections <b>urbaines</b>")\n\n' +
+          '![Courbes](/api/public/media/b.webp "Suivi de l’entraînement")',
+      );
+
+      expect(html).toContain(
+        '<figure class="figure"><img src="/api/public/media/a.webp" alt="Scène annotée" loading="lazy" decoding="async">' +
+          '<figcaption><span class="figure-number">Figure 1</span>\u00a0— Détections &lt;b&gt;urbaines&lt;/b&gt;</figcaption></figure>',
+      );
+      expect(html).toContain(
+        '<span class="figure-number">Figure 2</span>\u00a0— Suivi de l’entraînement',
+      );
+      expect(html).not.toContain('title=');
+    });
+
+    it('keeps an image without a title, or inside a sentence, as a plain image', () => {
+      expect(render('![Schéma](/api/public/media/cle)').html).not.toContain('<figure');
+      expect(render('Voir ![Schéma](/api/public/media/cle "Titre") ici.').html).not.toContain(
+        '<figure',
+      );
+    });
+
     it('loads images lazily', () => {
       expect(render('![Schéma](/api/public/media/cle)').html).toContain(
         '<img src="/api/public/media/cle" alt="Schéma" loading="lazy" decoding="async">',

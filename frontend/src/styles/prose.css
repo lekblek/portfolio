@@ -99,6 +99,30 @@
     border-radius: var(--radius-media);
   }
 
+  /* Figure légendée (D-EV) : image centrée sur un filet, légende « Figure n » en dessous */
+  & .figure {
+    margin-block: calc(var(--spacing) * 8);
+  }
+
+  & .figure img {
+    display: block;
+    margin-inline: auto;
+    border: var(--border-rule) solid var(--color-rule);
+  }
+
+  & .figure figcaption {
+    margin-block-start: calc(var(--spacing) * 3);
+    color: var(--color-ink-muted);
+    font-family: var(--font-display);
+    font-size: var(--text-sm);
+    line-height: var(--leading-ui);
+  }
+
+  & .figure-number {
+    color: var(--color-ink);
+    font-weight: var(--font-weight-semibold);
+  }
+
   /* Code dans le texte */
   & :not(pre) > code {
     padding: 0.05em 0.15em;

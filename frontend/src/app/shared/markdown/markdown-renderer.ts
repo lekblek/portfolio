@@ -392,6 +392,44 @@ markdown.renderer.rules['link_close'] = (tokens, index, options, env, self) => {
   return hint + self.renderToken(tokens, index, options);
 };
 
+// Figures (02-design-system §5, D-EV) : une image seule dans son paragraphe et pourvue d'un titre
+// (`![texte alternatif](adresse "Légende")`) devient une figure légendée « Figure n — légende » (comme la galerie d'un projet), numérotée
+// dans l'ordre du contenu. Le titre quitte l'image : il n'est lu qu'une fois, dans la légende.
+markdown.core.ruler.push('project_figures', (state) => {
+  let count = 0;
+  state.tokens.forEach((token, index) => {
+    const inline = state.tokens[index + 1];
+    if (token.type !== 'paragraph_open' || inline?.type !== 'inline') {
+      return;
+    }
+    const children = (inline.children ?? []).filter(
+      (child) => !(child.type === 'text' && child.content.trim() === ''),
+    );
+    const image = children.length === 1 && children[0].type === 'image' ? children[0] : null;
+    const caption = String(image?.attrGet('title') ?? '').trim();
+    if (!image || !caption) {
+      return;
+    }
+    count++;
+    image.attrs = (image.attrs ?? []).filter(([name]) => name !== 'title');
+    token.meta = { figure: count };
+    state.tokens[index + 2].meta = { figure: count, caption };
+  });
+});
+
+markdown.renderer.rules['paragraph_open'] = (tokens, index, options, _env, self) =>
+  (tokens[index].meta as { figure?: number } | null)?.figure
+    ? '<figure class="figure">'
+    : self.renderToken(tokens, index, options);
+markdown.renderer.rules['paragraph_close'] = (tokens, index, options, _env, self) => {
+  const meta = tokens[index].meta as { figure?: number; caption?: string } | null;
+  if (!meta?.figure) {
+    return self.renderToken(tokens, index, options);
+  }
+  const caption = markdown.utils.escapeHtml(meta.caption ?? '');
+  return `<figcaption><span class="figure-number">Figure ${meta.figure}</span>\u00a0— ${caption}</figcaption></figure>\n`;
+};
+
 // Images : chargement différé ; dimensions inconnues en Markdown, contenues par la mise en page
 const defaultImage = markdown.renderer.rules['image'];
 markdown.renderer.rules['image'] = (tokens, index, options, env, self) => {
