@@ -118,7 +118,11 @@ test.describe('admin profile', () => {
 
   test('dismisses the media picker, then asks before leaving with unsaved changes', async ({
     page,
+    guard,
   }) => {
+    // Le sélecteur affiche les vignettes de la médiathèque : la spec des médias, en parallèle, peut
+    // supprimer son fichier envoyé entre la liste et la vignette (404 sur ce seul fichier)
+    guard.allowHttpError(/\/api\/public\/media\/[0-9a-f]{32}\.png$/);
     await openProfile(page);
     const choose = page.getByRole('button', { name: /^(Choisir|Changer) l’avatar$/ });
 
