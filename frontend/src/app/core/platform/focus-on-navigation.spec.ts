@@ -6,6 +6,7 @@ import { RouterTestingHarness } from '@angular/router/testing';
 import { focusPageHeadingOnNavigation } from './focus-on-navigation';
 
 @Component({
+  selector: 'app-test-nav-shell',
   imports: [RouterOutlet],
   template: `<main><router-outlet /></main>`,
 })
@@ -16,12 +17,13 @@ class Shell {
 }
 
 @Component({
+  selector: 'app-test-with-heading',
   template: `<h1>Projets</h1>
     <a href="/x">lien</a>`,
 })
 class WithHeading {}
 
-@Component({ template: `<p>Sans titre</p>` })
+@Component({ selector: 'app-test-without-heading', template: `<p>Sans titre</p>` })
 class WithoutHeading {}
 
 describe('focusPageHeadingOnNavigation', () => {
