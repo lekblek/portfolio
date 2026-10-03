@@ -12,9 +12,6 @@ import { ErrorState } from '../../../shared/ui/error-state';
 import { Pagination } from '../../../shared/ui/pagination';
 import { projectListResource } from '../data/projects.resources';
 
-/** Lignes de la liste au-dessus de la ligne de flottaison aux largeurs courantes. */
-const PRIORITY_ROWS = 3;
-
 const PATH = '/projects';
 const DESCRIPTION =
   'Projets de Blek Ngossanga\u202f: présentation, période, état, technologies utilisées et captures.';
@@ -147,13 +144,14 @@ export class ProjectList {
   });
 
   /**
-   * Seule couverture chargée en priorité : la première de la page, si elle figure dans les trois
-   * premières lignes (au-dessus de la ligne de flottaison) ; -1 sinon.
+   * Seule couverture chargée en priorité : la première de la page, quelle que soit sa ligne. Les
+   * lignes sans image sont courtes : avec le jeu de démonstration, la première couverture est l'image
+   * LCP même en quatrième ligne (D-EV) ; une image préchargée sous la ligne de flottaison sur mobile
+   * coûte moins qu'une image LCP chargée tard. -1 : aucune couverture.
    */
-  protected readonly priorityCover = computed(() => {
-    const index = this.shown()?.content.findIndex((entry) => entry.cover !== null) ?? -1;
-    return index < PRIORITY_ROWS ? index : -1;
-  });
+  protected readonly priorityCover = computed(
+    () => this.shown()?.content.findIndex((entry) => entry.cover !== null) ?? -1,
+  );
 
   protected readonly error = computed(() =>
     this.projects.error() ? toApiError(this.projects.error()) : null,

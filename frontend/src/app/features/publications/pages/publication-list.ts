@@ -13,9 +13,6 @@ import { Pagination } from '../../../shared/ui/pagination';
 import { publicationListResource } from '../data/publications.resources';
 import { PUBLICATION_LABELS } from './publication-labels';
 
-/** Lignes de la liste au-dessus de la ligne de flottaison aux largeurs courantes. */
-const PRIORITY_ROWS = 3;
-
 /**
  * Liste des articles ou des actualités (type donné par la route) : registre paginé, filtré par
  * catégorie et par tag. L'état vit dans l'URL (`?page=` en base 1, `?category=`, `?tag=` : slugs),
@@ -167,13 +164,14 @@ export class PublicationList {
   });
 
   /**
-   * Seule couverture chargée en priorité : la première de la page, si elle figure dans les trois
-   * premières lignes (au-dessus de la ligne de flottaison) ; -1 sinon.
+   * Seule couverture chargée en priorité : la première de la page, quelle que soit sa ligne. Les
+   * lignes sans image sont courtes : avec le jeu de démonstration, la première couverture est l'image
+   * LCP même en quatrième ligne (D-EV) ; une image préchargée sous la ligne de flottaison sur mobile
+   * coûte moins qu'une image LCP chargée tard. -1 : aucune couverture.
    */
-  protected readonly priorityCover = computed(() => {
-    const index = this.shown()?.content.findIndex((entry) => entry.cover !== null) ?? -1;
-    return index < PRIORITY_ROWS ? index : -1;
-  });
+  protected readonly priorityCover = computed(
+    () => this.shown()?.content.findIndex((entry) => entry.cover !== null) ?? -1,
+  );
 
   protected readonly error = computed(() =>
     this.publications.error() ? toApiError(this.publications.error()) : null,

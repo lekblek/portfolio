@@ -15,9 +15,6 @@ import { seriesListResource } from '../data/series.resources';
 const DESCRIPTION =
   'Séries d’articles de Blek Ngossanga\u202f: sujets suivis en plusieurs chapitres, dans l’ordre de lecture.';
 
-/** Lignes de la liste au-dessus de la ligne de flottaison aux largeurs courantes. */
-const PRIORITY_ROWS = 3;
-
 /**
  * Liste des séries publiques : registre paginé (`?page=` en base 1 dans l'URL, page invalide →
  * première), page précédente gardée pendant le chargement de la suivante.
@@ -112,11 +109,15 @@ export class SeriesList {
     computation: (next, previous) => next ?? previous?.value,
   });
 
-  /** Seule couverture prioritaire : la première de la page, parmi les trois premières lignes. */
-  protected readonly priorityCover = computed(() => {
-    const index = this.shown()?.content.findIndex((entry) => entry.cover !== null) ?? -1;
-    return index < PRIORITY_ROWS ? index : -1;
-  });
+  /**
+   * Seule couverture chargée en priorité : la première de la page, quelle que soit sa ligne. Les
+   * lignes sans image sont courtes : avec le jeu de démonstration, la première couverture est l'image
+   * LCP même en quatrième ligne (D-EV) ; une image préchargée sous la ligne de flottaison sur mobile
+   * coûte moins qu'une image LCP chargée tard. -1 : aucune couverture.
+   */
+  protected readonly priorityCover = computed(
+    () => this.shown()?.content.findIndex((entry) => entry.cover !== null) ?? -1,
+  );
 
   protected readonly error = computed(() =>
     this.series.error() ? toApiError(this.series.error()) : null,

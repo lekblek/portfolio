@@ -36,7 +36,12 @@ export function chapterCountLabel(count: number): string {
       }
       @if (series().cover; as cover) {
         <div class="register-cover">
-          <img [ngSrc]="cover.url" fill [alt]="cover.altText ?? ''" [priority]="coverPriority()" />
+          <!-- priority n'est lu qu'à la création de l'image : deux branches, recréées quand il change -->
+          @if (coverPriority()) {
+            <img [ngSrc]="cover.url" fill [alt]="cover.altText ?? ''" priority />
+          } @else {
+            <img [ngSrc]="cover.url" fill [alt]="cover.altText ?? ''" />
+          }
         </div>
       }
     </article>
