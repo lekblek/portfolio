@@ -9,7 +9,6 @@ import {
   viewChild,
 } from '@angular/core';
 import {
-  FieldTree,
   form,
   FormField,
   FormRoot,
@@ -21,6 +20,7 @@ import {
   validate,
 } from '@angular/forms/signals';
 
+import { visibleError } from '../../../shared/forms/visible-error';
 import { retryAfterMinutes, toApiError } from '../../../core/api/api-error';
 import { Seo } from '../../../core/seo/seo';
 import { serverFieldErrors } from '../../../shared/forms/server-errors';
@@ -244,11 +244,7 @@ export class ContactPage {
     effect(() => this.success()?.focus());
   }
 
-  /** Première erreur d'un champ, une fois le champ quitté ou le formulaire soumis. */
-  protected errorOf(field: FieldTree<string>): string | null {
-    const state = field();
-    return state.touched() ? (state.errors()[0]?.message ?? null) : null;
-  }
+  protected readonly errorOf = visibleError;
 
   protected writeAgain(): void {
     this.contactForm().reset({ ...EMPTY });

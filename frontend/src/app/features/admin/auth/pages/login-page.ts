@@ -8,7 +8,6 @@ import {
   viewChild,
 } from '@angular/core';
 import {
-  FieldTree,
   form,
   FormField,
   FormRoot,
@@ -18,6 +17,7 @@ import {
 } from '@angular/forms/signals';
 import { Router, RouterLink } from '@angular/router';
 
+import { visibleError } from '../../../../shared/forms/visible-error';
 import { retryAfterMinutes, toApiError } from '../../../../core/api/api-error';
 import { Alert } from '../../../../shared/ui/alert';
 import { Button } from '../../../../shared/ui/button';
@@ -164,11 +164,7 @@ export class LoginPage {
     });
   }
 
-  /** Première erreur d'un champ, une fois le champ quitté ou le formulaire soumis. */
-  protected errorOf(field: FieldTree<string>): string | null {
-    const state = field();
-    return state.touched() ? (state.errors()[0]?.message ?? null) : null;
-  }
+  protected readonly errorOf = visibleError;
 
   private async leaveIfAlreadyOpen(): Promise<void> {
     try {

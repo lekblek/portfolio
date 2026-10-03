@@ -11,7 +11,6 @@ import {
   viewChild,
 } from '@angular/core';
 import {
-  FieldTree,
   form,
   FormField,
   FormRoot,
@@ -21,6 +20,7 @@ import {
 } from '@angular/forms/signals';
 import { Router, RouterLink } from '@angular/router';
 
+import { visibleError } from '../../../../shared/forms/visible-error';
 import { toApiError } from '../../../../core/api/api-error';
 import { AdminMedia } from '../../../../core/api/api-types';
 import { serverFieldErrors } from '../../../../shared/forms/server-errors';
@@ -254,10 +254,7 @@ export class MediaEditPage implements UnsavedChanges {
     return FORMAT_LABEL[media.format];
   }
 
-  protected errorOf(field: FieldTree<string>): string | null {
-    const state = field();
-    return state.touched() ? (state.errors()[0]?.message ?? null) : null;
-  }
+  protected readonly errorOf = visibleError;
 
   canLeave(): boolean | Promise<boolean> {
     if (this.saved || !this.altForm().dirty()) {

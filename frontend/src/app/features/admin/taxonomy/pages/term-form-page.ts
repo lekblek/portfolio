@@ -22,6 +22,7 @@ import {
 } from '@angular/forms/signals';
 import { Router, RouterLink } from '@angular/router';
 
+import { visibleError } from '../../../../shared/forms/visible-error';
 import { toApiError } from '../../../../core/api/api-error';
 import { serverFieldErrors } from '../../../../shared/forms/server-errors';
 import { UnsavedChanges } from '../../../../shared/forms/unsaved-changes.guard';
@@ -286,11 +287,7 @@ export class TermFormPage implements UnsavedChanges {
     });
   }
 
-  /** Première erreur d'un champ, une fois le champ quitté ou le formulaire soumis. */
-  protected errorOf(field: FieldTree<string>): string | null {
-    const state = field();
-    return state.touched() ? (state.errors()[0]?.message ?? null) : null;
-  }
+  protected readonly errorOf = visibleError;
 
   canLeave(): boolean | Promise<boolean> {
     if (this.saved || !this.termForm().dirty()) {
