@@ -49,3 +49,8 @@ export type MediaFormat = AdminMedia['format'];
 
 export type AdminProfile = Schemas['AdminProfileResponse'];
 export type SaveProfileRequest = Schemas['SaveProfileRequest'];
+
+export type AdminProjectSummary = Schemas['AdminProjectSummaryResponse'];
+export type AdminProject = Schemas['AdminProjectResponse'];
+export type SaveProjectRequest = Schemas['SaveProjectRequest'];
+export type ProjectVisibility = AdminProject['visibility'];

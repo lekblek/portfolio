@@ -45,6 +45,10 @@ export const adminRoutes: Routes = [
         loadChildren: () => import('./profile/profile.routes').then((m) => m.profileRoutes),
       },
       {
+        path: 'projects',
+        loadChildren: () => import('./projects/projects.routes').then((m) => m.projectRoutes),
+      },
+      {
         path: 'taxonomy',
         loadChildren: () => import('./taxonomy/taxonomy.routes').then((m) => m.taxonomyRoutes),
       },

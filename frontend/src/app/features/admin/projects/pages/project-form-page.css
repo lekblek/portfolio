@@ -1,0 +1,70 @@
+/* Projet (F27) : une colonne sur la mesure de lecture, sections séparées par un trait fort, comme
+   le profil ; deux champs côte à côte quand la place le permet. */
+
+.project-form {
+  display: grid;
+  gap: var(--spacing-section);
+  max-width: var(--container-prose);
+  margin-block-start: var(--spacing-block);
+  container-type: inline-size;
+}
+
+.project-section,
+.project-submit {
+  display: grid;
+  gap: calc(var(--spacing) * 4);
+  padding-block-start: var(--spacing-block);
+  border-top: var(--border-strong) solid var(--color-ink);
+}
+
+.project-fields {
+  display: grid;
+  gap: calc(var(--spacing) * 6);
+}
+
+.project-pair {
+  display: grid;
+  gap: calc(var(--spacing) * 5);
+}
+
+@container (min-width: 32rem) {
+  .project-pair {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.project-short {
+  max-width: calc(var(--spacing) * 32);
+}
+
+.project-preview {
+  padding: calc(var(--spacing) * 4) calc(var(--spacing) * 5);
+  border: var(--border-rule) solid var(--color-rule);
+  border-radius: var(--radius-control);
+  background: var(--color-paper-sunken);
+}
+
+.project-preview-label {
+  margin-block-end: calc(var(--spacing) * 3);
+  color: var(--color-ink-muted);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.project-screenshot {
+  display: grid;
+  gap: calc(var(--spacing) * 4);
+}
+
+@container (min-width: 32rem) {
+  .project-screenshot {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+.project-error {
+  margin-block-start: calc(var(--spacing) * 2);
+  color: var(--color-danger);
+  font-weight: var(--font-weight-medium);
+}

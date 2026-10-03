@@ -1,0 +1,357 @@
+<p class="text-sm font-semibold text-ink-muted">
+  <a class="font-medium" routerLink="/admin/projects">Projets</a>
+</p>
+<div class="mt-1 flex flex-wrap items-center gap-x-4 gap-y-2">
+  <h1 class="text-2xl tracking-heading">{{ title() }}</h1>
+  @if (saved(); as current) {
+    <app-status-badge [status]="current.visibility" />
+    @if (current.visibility === 'PUBLISHED') {
+      <a [routerLink]="['/projects', current.slug]">Voir sur le site</a>
+    }
+  }
+</div>
+
+@if (editing() && project.error(); as error) {
+  @if (project.statusCode() === 404) {
+    <app-empty-state class="mt-block block" message="Ce projet n’existe pas ou n’existe plus.">
+      <a routerLink="/admin/projects">Retour à la liste</a>
+    </app-empty-state>
+  } @else {
+    <app-error-state
+      class="mt-block block"
+      [title]="'Le projet n’a pas pu être chargé.'"
+      (retry)="project.reload()"
+    />
+  }
+} @else if (!ready()) {
+  @defer (on timer(300ms)) {
+    <p role="status" class="mt-block text-ink-muted">Chargement…</p>
+  }
+} @else {
+  <form class="project-form" [formRoot]="projectForm">
+    <section class="project-section" aria-labelledby="projet-identite">
+      <h2 id="projet-identite" class="text-xl tracking-heading">Identité</h2>
+      <div class="project-fields">
+        <app-field label="Titre" controlId="projet-titre" [error]="errorOf(projectForm.title)">
+          <input appFieldControl type="text" autocomplete="off" [formField]="projectForm.title" />
+        </app-field>
+        <app-field
+          label="Slug"
+          controlId="projet-slug"
+          optional
+          [hint]="
+            slugLocked()
+              ? 'Figé : ce projet a déjà été publié, et ses adresses partagées doivent rester valides.'
+              : editing()
+                ? 'Identifiant dans l’adresse du projet. Il se fige à la première publication.'
+                : 'Identifiant dans l’adresse du projet, en minuscules et tirets. Vide : tiré du titre ; figé dès la première publication.'
+          "
+          [error]="errorOf(projectForm.slug)"
+        >
+          <input
+            appFieldControl
+            type="text"
+            autocomplete="off"
+            autocapitalize="none"
+            spellcheck="false"
+            translate="no"
+            [formField]="projectForm.slug"
+          />
+        </app-field>
+        <app-field
+          label="Résumé"
+          controlId="projet-resume"
+          hint="Une ou deux phrases, dans la liste des projets et les aperçus. 500 caractères au plus."
+          [error]="errorOf(projectForm.shortDescription)"
+        >
+          <textarea
+            appFieldControl
+            rows="3"
+            autocomplete="off"
+            [formField]="projectForm.shortDescription"
+          ></textarea>
+        </app-field>
+      </div>
+    </section>
+
+    <section class="project-section" aria-labelledby="projet-presentation">
+      <h2 id="projet-presentation" class="text-xl tracking-heading">Description</h2>
+      <div class="project-fields">
+        <app-field
+          label="Description"
+          controlId="projet-description"
+          optional
+          hint="En Markdown, sur la page du projet : titres, listes, code, tableaux."
+          [error]="errorOf(projectForm.descriptionMarkdown)"
+        >
+          <textarea
+            appFieldControl
+            rows="12"
+            autocomplete="off"
+            class="font-code"
+            [formField]="projectForm.descriptionMarkdown"
+          ></textarea>
+        </app-field>
+        <div>
+          <button
+            appButton
+            type="button"
+            variant="secondary"
+            size="sm"
+            aria-controls="projet-apercu"
+            [attr.aria-expanded]="preview()"
+            (click)="preview.set(!preview())"
+          >
+            {{ preview() ? 'Masquer l’aperçu' : 'Afficher l’aperçu' }}
+          </button>
+        </div>
+        <div id="projet-apercu" class="project-preview" [hidden]="!preview()">
+          @if (preview()) {
+            <p class="project-preview-label">Aperçu</p>
+            @if (projectForm.descriptionMarkdown().value().trim(); as source) {
+              <app-markdown-view [source]="source" [headingLevel]="3" />
+            } @else {
+              <p class="text-ink-muted">La description est vide.</p>
+            }
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class="project-section" aria-labelledby="projet-publication">
+      <h2 id="projet-publication" class="text-xl tracking-heading">Publication</h2>
+      <div class="project-fields">
+        <fieldset class="choice-group">
+          <legend>Visibilité</legend>
+          <label class="choice">
+            <input type="radio" value="DRAFT" [formField]="projectForm.visibility" />
+            <span>Brouillon</span>
+            <span class="choice-hint">Absent du site ; se prépare à loisir.</span>
+          </label>
+          <label class="choice">
+            <input type="radio" value="PUBLISHED" [formField]="projectForm.visibility" />
+            <span>Publié</span>
+            <span class="choice-hint">Visible dans la liste des projets et sur sa page.</span>
+          </label>
+          <label class="choice">
+            <input type="radio" value="ARCHIVED" [formField]="projectForm.visibility" />
+            <span>Archivé</span>
+            <span class="choice-hint">Retiré du site, conservé ici.</span>
+          </label>
+        </fieldset>
+        <label class="choice">
+          <input type="checkbox" [formField]="projectForm.featured" />
+          <span>Mettre en avant</span>
+          <span class="choice-hint">Le projet figure parmi les projets choisis de l’accueil.</span>
+        </label>
+        <app-field
+          label="Ordre d’affichage"
+          controlId="projet-ordre"
+          optional
+          hint="Les projets sont rangés par ordre croissant, puis du plus récent au plus ancien. Vide : 0."
+          [error]="errorOf(projectForm.displayOrder)"
+        >
+          <input
+            appFieldControl
+            type="text"
+            inputmode="numeric"
+            autocomplete="off"
+            class="project-short"
+            [formField]="projectForm.displayOrder"
+          />
+        </app-field>
+      </div>
+    </section>
+
+    <section class="project-section" aria-labelledby="projet-periode">
+      <h2 id="projet-periode" class="text-xl tracking-heading">Période</h2>
+      <div class="project-fields">
+        <fieldset class="choice-group">
+          <legend>Avancement</legend>
+          <label class="choice">
+            <input
+              type="radio"
+              value="IN_PROGRESS"
+              [formField]="projectForm.stage"
+              (change)="stageChanged()"
+            />
+            <span>En cours</span>
+            <span class="choice-hint">Pas de date de fin.</span>
+          </label>
+          <label class="choice">
+            <input
+              type="radio"
+              value="COMPLETED"
+              [formField]="projectForm.stage"
+              (change)="stageChanged()"
+            />
+            <span>Terminé</span>
+            <span class="choice-hint">Date de fin demandée.</span>
+          </label>
+        </fieldset>
+        <div class="project-pair">
+          <app-field
+            label="Début"
+            controlId="projet-debut"
+            [error]="errorOf(projectForm.startDate)"
+          >
+            <input appFieldControl type="date" [formField]="projectForm.startDate" />
+          </app-field>
+          @if (projectForm.stage().value() === 'COMPLETED') {
+            <app-field label="Fin" controlId="projet-fin" [error]="errorOf(projectForm.endDate)">
+              <input appFieldControl type="date" [formField]="projectForm.endDate" />
+            </app-field>
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class="project-section" aria-labelledby="projet-liens">
+      <h2 id="projet-liens" class="text-xl tracking-heading">Technologies et adresses</h2>
+      <div class="project-fields">
+        <app-field
+          label="Technologies"
+          controlId="projet-technologies"
+          optional
+          hint="Tapez pour filtrer, puis Entrée pour cocher ou décocher. Elles servent de filtre sur le site."
+          [error]="errorOf(projectForm.technologyIds)"
+        >
+          <app-multi-select
+            listLabel="Technologies"
+            placeholder="Rechercher une technologie…"
+            [options]="technologyOptions()"
+            [formField]="projectForm.technologyIds"
+          />
+        </app-field>
+        <app-field
+          label="Dépôt de code"
+          controlId="projet-depot"
+          optional
+          [error]="errorOf(projectForm.repositoryUrl)"
+        >
+          <input
+            appFieldControl
+            type="url"
+            inputmode="url"
+            autocomplete="off"
+            spellcheck="false"
+            [formField]="projectForm.repositoryUrl"
+          />
+        </app-field>
+        <app-field
+          label="Démonstration"
+          controlId="projet-demo"
+          optional
+          [error]="errorOf(projectForm.demoUrl)"
+        >
+          <input
+            appFieldControl
+            type="url"
+            inputmode="url"
+            autocomplete="off"
+            spellcheck="false"
+            [formField]="projectForm.demoUrl"
+          />
+        </app-field>
+      </div>
+    </section>
+
+    <section class="project-section" aria-labelledby="projet-images">
+      <h2 id="projet-images" class="text-xl tracking-heading">Images</h2>
+      <div class="project-fields">
+        <app-media-slot
+          label="Couverture"
+          hint="Une image de la médiathèque, en tête de la page du projet et dans la liste."
+          kind="image"
+          subject="la couverture"
+          [mediaId]="projectForm.coverMediaId().value()"
+          [media]="cover.value()"
+          [error]="errorOf(projectForm.coverMediaId)"
+          (choose)="openPicker('cover')"
+          (clear)="clearCover()"
+        />
+        <div>
+          <h3 class="font-semibold">Captures</h3>
+          <p class="mt-1 text-sm text-ink-muted">
+            Galerie de la page du projet, dans cet ordre, chacune avec sa légende.
+          </p>
+          @if (errorOf(projectForm.screenshots); as message) {
+            <p class="project-error" tabindex="-1" data-invalid="true">{{ message }}</p>
+          }
+          @if (projectForm.screenshots().value().length === 0) {
+            <p class="mt-3 text-ink-muted">Aucune capture.</p>
+          } @else {
+            <app-sortable-list class="mt-3" label="Captures" (moved)="moveScreenshot($event)">
+              @for (screenshot of projectForm.screenshots; track screenshot; let i = $index) {
+                <app-sortable-item
+                  [index]="i"
+                  [count]="projectForm.screenshots().value().length"
+                  [name]="screenshotName(i)"
+                  (moveTo)="moveScreenshot($event)"
+                  (remove)="removeScreenshot(i)"
+                >
+                  <div class="project-screenshot">
+                    <app-screenshot-preview [mediaId]="screenshot.mediaId().value()" />
+                    <app-field
+                      label="Légende"
+                      [controlId]="'projet-capture-' + i + '-legende'"
+                      optional
+                      [error]="errorOf(screenshot.caption)"
+                    >
+                      <input
+                        appFieldControl
+                        type="text"
+                        autocomplete="off"
+                        [formField]="screenshot.caption"
+                      />
+                    </app-field>
+                  </div>
+                </app-sortable-item>
+              }
+            </app-sortable-list>
+          }
+          <button
+            appButton
+            type="button"
+            variant="secondary"
+            class="mt-4"
+            data-add-screenshot
+            (click)="openPicker('screenshot')"
+          >
+            Ajouter une capture
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <div class="project-submit">
+      @if (failure(); as text) {
+        <app-alert tone="danger" title="L’enregistrement a échoué">
+          <p>{{ text }}</p>
+        </app-alert>
+      }
+      <div class="flex flex-wrap gap-3">
+        <button appButton type="submit" [loading]="projectForm().submitting()">
+          {{ editing() ? 'Enregistrer les modifications' : 'Créer le projet' }}
+        </button>
+        <a appButton variant="secondary" routerLink="/admin/projects">Annuler</a>
+      </div>
+    </div>
+  </form>
+}
+
+<app-media-picker
+  #picker
+  [title]="pickerTarget() === 'cover' ? 'Choisir la couverture' : 'Ajouter une capture'"
+  kind="image"
+  [media]="pickerMedia.value()?.content ?? []"
+  [page]="pickerPage() ?? 1"
+  [totalPages]="pickerMedia.value()?.totalPages ?? 1"
+  [state]="pickerState()"
+  [selectedId]="pickerTarget() === 'cover' ? projectForm.coverMediaId().value() : null"
+  libraryPath="/admin/media"
+  (chosen)="choose($event)"
+  (pageChange)="pickerPage.set($event)"
+  (retry)="pickerMedia.reload()"
+/>
+<app-confirm-dialog #confirm />
