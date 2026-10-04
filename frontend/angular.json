@@ -42,6 +42,7 @@
               "cytoscape-cose-bilkent",
               "cytoscape-fcose",
               "dayjs",
+              "extend",
               "fastdom"
             ],
             "server": "src/main.server.ts",
