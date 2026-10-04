@@ -96,47 +96,15 @@
 
       <section class="publication-section" aria-labelledby="publication-contenu">
         <h2 id="publication-contenu" class="text-xl tracking-heading">Contenu</h2>
-        <app-field
-          label="Contenu"
+        <app-content-editor
           controlId="publication-texte"
-          optional
+          [formField]="publicationForm.contentMarkdown"
           [hint]="
             'En Markdown : titres, code, tableaux, formules, diagrammes, figures légendées. ' +
             contentCount()
           "
           [error]="errorOf(publicationForm.contentMarkdown)"
-        >
-          <textarea
-            appFieldControl
-            rows="20"
-            autocomplete="off"
-            class="font-code"
-            [formField]="publicationForm.contentMarkdown"
-          ></textarea>
-        </app-field>
-        <div>
-          <button
-            appButton
-            type="button"
-            variant="secondary"
-            size="sm"
-            aria-controls="publication-apercu"
-            [attr.aria-expanded]="preview()"
-            (click)="preview.set(!preview())"
-          >
-            {{ preview() ? 'Masquer l’aperçu' : 'Afficher l’aperçu' }}
-          </button>
-        </div>
-        <div id="publication-apercu" class="publication-preview" [hidden]="!preview()">
-          @if (preview()) {
-            <p class="publication-preview-label">Aperçu, tel que le site le rendra</p>
-            @if (publicationForm.contentMarkdown().value().trim(); as source) {
-              <app-markdown-view [source]="source" [headingLevel]="3" />
-            } @else {
-              <p class="text-ink-muted">Le contenu est vide.</p>
-            }
-          }
-        </div>
+        />
       </section>
 
       <section class="publication-section" aria-labelledby="publication-classement">

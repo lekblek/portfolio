@@ -5,6 +5,9 @@ const path = require('node:path');
 
 const APP_ROOT = path.join(__dirname, '..', 'src', 'app');
 
+/** Sous-dossiers de features/admin que les autres écrans d'administration peuvent importer. */
+const ADMIN_SHARED = ['auth', 'editor'];
+
 /** @type {Record<string, string>} */
 const AREA_LABELS = {
   feature: 'une fonctionnalité',
@@ -62,7 +65,12 @@ function violation(from, to) {
       if (['core', 'shared', 'layout'].includes(to.area)) return null;
       if (to.area === 'feature') return 'le site public';
       if (to.area !== 'admin') return to.area;
-      if (from.feature === undefined || to.feature === from.feature || to.feature === 'auth') {
+      // auth (session) et editor (éditeur de contenu, F31) servent toute l'administration
+      if (
+        from.feature === undefined ||
+        to.feature === from.feature ||
+        ADMIN_SHARED.includes(to.feature ?? '')
+      ) {
         return null;
       }
       return 'une autre fonctionnalité d’administration';

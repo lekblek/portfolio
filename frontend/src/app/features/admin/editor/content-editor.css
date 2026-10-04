@@ -1,0 +1,66 @@
+.editor-head {
+  display: grid;
+  gap: calc(var(--spacing) * 2);
+}
+
+.editor-label {
+  font-weight: var(--font-weight-semibold);
+}
+
+.field-error {
+  color: var(--color-danger);
+  font-weight: var(--font-weight-medium);
+}
+
+.editor-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--spacing) * 1);
+  margin-block-start: calc(var(--spacing) * 3);
+  padding: calc(var(--spacing) * 1);
+  border: var(--border-rule) solid var(--color-rule);
+  border-radius: var(--radius-control);
+  background: var(--color-paper-sunken);
+}
+
+/* Cadre commun aux panneaux Visuel et Aperçu : la page de rédaction, sous la barre */
+.editor-frame {
+  display: block;
+  margin-block-start: calc(var(--spacing) * 2);
+}
+
+.editor-loading,
+.editor-preview {
+  min-height: calc(var(--spacing) * 96);
+  padding: calc(var(--spacing) * 6);
+  border: var(--border-strong) solid var(--color-ink);
+  border-radius: var(--radius-control);
+}
+
+.editor-dialog {
+  width: min(calc(100% - 2 * var(--spacing-gutter)), calc(var(--spacing) * 128));
+  margin: auto;
+  padding: calc(var(--spacing) * 6);
+  border: var(--border-strong) solid var(--color-ink);
+  border-radius: var(--radius-control);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  box-shadow: var(--shadow-overlay);
+}
+
+.editor-dialog::backdrop {
+  background: var(--color-backdrop);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .editor-dialog[open] {
+    transition:
+      opacity var(--duration-base) var(--ease-out),
+      transform var(--duration-base) var(--ease-out);
+
+    @starting-style {
+      opacity: 0;
+      transform: scale(0.97);
+    }
+  }
+}

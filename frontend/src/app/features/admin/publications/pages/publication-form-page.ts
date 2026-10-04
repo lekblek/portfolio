@@ -24,10 +24,10 @@ import { Router, RouterLink } from '@angular/router';
 import { adminMediaResource, mediaPickerPageResource } from '../../../../core/api/admin-media';
 import { toApiError } from '../../../../core/api/api-error';
 import { AdminMedia, AdminPublication, PublicationType } from '../../../../core/api/api-types';
+import { ContentEditor } from '../../editor/content-editor';
 import { serverFieldErrors } from '../../../../shared/forms/server-errors';
 import { UnsavedChanges } from '../../../../shared/forms/unsaved-changes.guard';
 import { visibleError } from '../../../../shared/forms/visible-error';
-import { MarkdownView } from '../../../../shared/markdown/markdown-view';
 import { Alert } from '../../../../shared/ui/alert';
 import { Button } from '../../../../shared/ui/button';
 import { ConfirmDialog } from '../../../../shared/ui/confirm-dialog';
@@ -79,13 +79,13 @@ const COUNT = new Intl.NumberFormat('fr-FR');
     Alert,
     Button,
     ConfirmDialog,
+    ContentEditor,
     EmptyState,
     ErrorState,
     Field,
     FieldControl,
     FormField,
     FormRoot,
-    MarkdownView,
     MediaPicker,
     MediaSlot,
     MultiSelect,
@@ -134,7 +134,6 @@ export class PublicationFormPage implements UnsavedChanges {
   );
 
   protected readonly ready = signal(false);
-  protected readonly preview = signal(false);
   protected readonly failure = signal<string | null>(null);
 
   protected readonly title = computed(() => {

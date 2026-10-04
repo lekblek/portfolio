@@ -89,8 +89,9 @@ test.describe('admin publications', () => {
       await page.getByRole('link', { name: 'Nouvel article' }).click();
       await page.getByLabel('Titre', { exact: true }).fill(RECIPE);
       await page.getByLabel('Résumé').fill('Article de recette des tests de bout en bout.');
+      await page.getByRole('tab', { name: 'Markdown' }).click();
       await page
-        .getByRole('textbox', { name: /^Contenu/ })
+        .getByRole('textbox', { name: 'Contenu (Markdown)' })
         .fill('## Recette\n\nUn paragraphe et `du code`.');
       await page.getByRole('button', { name: 'Créer le brouillon' }).click();
       await expect(page.locator('app-toast-region')).toContainText('Brouillon');

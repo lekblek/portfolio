@@ -1,0 +1,212 @@
+<div ngTabs class="content-editor">
+  <div class="editor-head">
+    <span [id]="controlId() + '-onglets'" class="editor-label">{{ label() }}</span>
+    <div
+      ngTabList
+      class="tab-list"
+      selectionMode="explicit"
+      [attr.aria-labelledby]="controlId() + '-onglets'"
+      [(selectedTab)]="tab"
+    >
+      <button ngTab type="button" class="tab" value="visuel">Visuel</button>
+      <button ngTab type="button" class="tab" value="markdown">Markdown</button>
+      <button ngTab type="button" class="tab" value="apercu">Aperçu</button>
+    </div>
+  </div>
+
+  @if (hint(); as text) {
+    <p [id]="hintId()" class="mt-2 text-sm text-ink-muted">{{ text }}</p>
+  }
+  @if (error() && tab() !== 'markdown') {
+    <p [id]="errorId()" class="field-error mt-2">
+      {{ error() }}
+      <button
+        appButton
+        type="button"
+        variant="quiet"
+        size="sm"
+        data-invalid="true"
+        (click)="showSource()"
+      >
+        Corriger dans l’onglet Markdown
+      </button>
+    </p>
+  }
+
+  <div ngTabPanel class="tab-panel" value="visuel" [preserveContent]="true">
+    <ng-template ngTabContent>
+      <div role="toolbar" class="editor-toolbar" aria-label="Mise en forme">
+        @for (action of formatActions; track action.label; let index = $index) {
+          <button
+            appButton
+            type="button"
+            variant="quiet"
+            size="sm"
+            [attr.tabindex]="index === activeAction() ? 0 : -1"
+            (mousedown)="$event.preventDefault()"
+            (keydown)="toolbarKeys($event, formatActions.length)"
+            (focus)="activeAction.set(index)"
+            (click)="action.run()"
+          >
+            {{ action.label }}
+          </button>
+        }
+      </div>
+      @defer (on idle) {
+        <app-visual-editor
+          #visual
+          class="editor-frame"
+          [markdown]="value()"
+          [label]="label() + ', édition visuelle'"
+          [describedBy]="hint() ? hintId() : undefined"
+          (changed)="fromVisual($event)"
+        />
+      } @placeholder (minimum 300ms) {
+        <p class="editor-frame editor-loading text-ink-muted">Chargement de l’éditeur visuel…</p>
+      } @error {
+        <p role="alert" class="editor-frame text-danger">
+          L’éditeur visuel n’a pas pu être chargé&#8239;: écrivez dans l’onglet Markdown.
+        </p>
+      }
+    </ng-template>
+  </div>
+
+  <div ngTabPanel class="tab-panel" value="markdown" [preserveContent]="true">
+    <ng-template ngTabContent>
+      <div role="toolbar" class="editor-toolbar" aria-label="Insertion">
+        @for (action of sourceActions; track action.label) {
+          <button appButton type="button" variant="quiet" size="sm" (click)="action.run()">
+            {{ action.label }}
+          </button>
+        }
+      </div>
+      <app-field
+        class="mt-2 block"
+        [label]="label() + ' (Markdown)'"
+        [controlId]="controlId()"
+        [error]="error()"
+      >
+        <textarea
+          #source
+          appFieldControl
+          rows="20"
+          autocomplete="off"
+          spellcheck="true"
+          class="font-code"
+          [value]="value()"
+          (input)="fromSource($event)"
+          (blur)="markTouched()"
+        ></textarea>
+      </app-field>
+    </ng-template>
+  </div>
+
+  <div ngTabPanel class="tab-panel" value="apercu" [preserveContent]="true">
+    <ng-template ngTabContent>
+      <div class="editor-frame editor-preview">
+        @if (value().trim(); as source) {
+          <app-markdown-view [source]="source" [headingLevel]="3" />
+        } @else {
+          <p class="text-ink-muted">Le contenu est vide.</p>
+        }
+      </div>
+    </ng-template>
+  </div>
+</div>
+
+<dialog
+  #dialog
+  class="editor-dialog"
+  [attr.aria-labelledby]="controlId() + '-dialogue'"
+  (close)="onDialogClose()"
+>
+  @if (insertion(); as current) {
+    <form class="grid gap-6" (submit)="confirmInsertion($event)" novalidate>
+      @switch (current.kind) {
+        @case ('link') {
+          <h2 [id]="controlId() + '-dialogue'" class="text-xl tracking-heading">Ajouter un lien</h2>
+          <app-field
+            label="Adresse"
+            [controlId]="controlId() + '-lien'"
+            hint="Une adresse complète (https://…) ou un chemin du site (/articles/…). Le lien porte sur le texte sélectionné."
+            [error]="insertionError()"
+          >
+            <input
+              appFieldControl
+              type="url"
+              autocomplete="off"
+              [value]="href()"
+              (input)="href.set($any($event.target).value)"
+            />
+          </app-field>
+        }
+        @case ('code') {
+          <h2 [id]="controlId() + '-dialogue'" class="text-xl tracking-heading">
+            Insérer un bloc de code
+          </h2>
+          <app-field label="Langage" [controlId]="controlId() + '-langage'">
+            <select appFieldControl (change)="language.set($any($event.target).value)">
+              @for (option of languages; track option) {
+                <option [value]="option" [selected]="option === language()">{{ option }}</option>
+              }
+            </select>
+          </app-field>
+        }
+        @case ('image') {
+          <h2 [id]="controlId() + '-dialogue'" class="text-xl tracking-heading">Décrire l’image</h2>
+          <p class="text-sm text-ink-muted" translate="no">{{ current.media.originalName }}</p>
+          <app-field
+            label="Texte alternatif"
+            [controlId]="controlId() + '-alt'"
+            hint="Ce que montre l’image, pour qui ne la voit pas. Repris de la médiathèque s’il existe."
+            [error]="insertionError()"
+          >
+            <input
+              appFieldControl
+              type="text"
+              autocomplete="off"
+              [value]="altText()"
+              (input)="altText.set($any($event.target).value)"
+            />
+          </app-field>
+          <app-field
+            label="Légende"
+            optional
+            [controlId]="controlId() + '-legende'"
+            hint="Avec une légende, l’image devient une figure numérotée sur le site."
+          >
+            <input
+              appFieldControl
+              type="text"
+              autocomplete="off"
+              [value]="caption()"
+              (input)="caption.set($any($event.target).value)"
+            />
+          </app-field>
+        }
+      }
+      <div class="flex flex-wrap gap-3">
+        <button appButton type="submit">
+          {{ current.kind === 'link' ? 'Ajouter le lien' : 'Insérer' }}
+        </button>
+        <button appButton type="button" variant="secondary" (click)="closeInsertion()">
+          Annuler
+        </button>
+      </div>
+    </form>
+  }
+</dialog>
+
+<app-media-picker
+  #picker
+  title="Insérer une image"
+  kind="image"
+  [media]="pickerMedia.value()?.content ?? []"
+  [page]="pickerPage() ?? 1"
+  [totalPages]="pickerMedia.value()?.totalPages ?? 1"
+  [state]="pickerState()"
+  libraryPath="/admin/media"
+  (chosen)="mediaChosen($event)"
+  (pageChange)="pickerPage.set($event)"
+  (retry)="pickerMedia.reload()"
+/>

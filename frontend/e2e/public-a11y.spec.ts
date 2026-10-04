@@ -15,8 +15,10 @@ interface Route {
 
 async function firstSlug(request: APIRequestContext, path: string): Promise<string> {
   const page = await (await request.get(`/api/public/${path}`)).json();
-  expect(page.content.length, `contenu d'amorçage pour ${path}`).toBeGreaterThan(0);
-  return page.content[0].slug;
+  // Hors contenus de recette, publiés puis archivés par d'autres tests en parallèle
+  const stable = page.content.filter((item: { slug: string }) => !item.slug.endsWith('-e2e'));
+  expect(stable.length, `contenu d'amorçage pour ${path}`).toBeGreaterThan(0);
+  return stable[0].slug;
 }
 
 async function routes(request: APIRequestContext): Promise<Route[]> {
