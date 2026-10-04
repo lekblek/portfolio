@@ -10,6 +10,12 @@ import { ContactPage } from './contact-page';
 
 const URL = '/api/public/contact-messages';
 
+/** Profil public réduit à ce que la page lit : liens professionnels et CV. */
+const PROFILE = {
+  links: [{ label: 'GitHub', url: 'https://github.com/blek' }],
+  cv: { url: '/api/public/media/cv.pdf', sizeBytes: 36_400 },
+};
+
 async function setUp() {
   TestBed.configureTestingModule({
     providers: [
@@ -22,6 +28,9 @@ async function setUp() {
   const harness = await RouterTestingHarness.create();
   await harness.navigateByUrl('/contact');
   const http = TestBed.inject(HttpTestingController);
+  http.expectOne('/api/public/profile').flush(PROFILE);
+  await harness.fixture.whenStable();
+  harness.detectChanges();
   const element = () => harness.routeNativeElement as HTMLElement;
   const control = (id: string) =>
     element().querySelector<HTMLInputElement | HTMLTextAreaElement>(`#${id}`)!;
@@ -81,6 +90,18 @@ describe('ContactPage', () => {
     const trap = control('contact-site');
     expect(trap.closest('[aria-hidden="true"]')).not.toBeNull();
     expect(trap.getAttribute('tabindex')).toBe('-1');
+  });
+
+  it('gives the context beside the form: welcome topics, professional links and the CV', async () => {
+    const { element } = await setUp();
+
+    const context = element().querySelector('aside')!;
+    expect(context.getAttribute('aria-label')).toBe('Avant d’écrire');
+    expect(context.textContent).toContain('Sujets bienvenus');
+    expect(context.querySelector('a[href="https://github.com/blek"]')?.textContent).toContain(
+      'GitHub',
+    );
+    expect(context.querySelector('a[href="/api/public/media/cv.pdf"]')).not.toBeNull();
   });
 
   it('says how the data of the form are used, in the words validated by the owner', async () => {

@@ -1,20 +1,15 @@
 /*
- * Ligne de registre (02-design-system §4.3, §18) : entrées de projet, de publication et de série.
- * Petit écran : méta, titre (vignette 3:2 à côté s'il y a une couverture), résumé, termes.
- * Dès que la liste (conteneur de requête, classe `@container`) dispose de 60 rem : grille de
- * 12 colonnes alignée sur celle des pages, méta sur 3 colonnes, texte sur 6, couverture sur 3.
+ * Ligne de registre (02-design-system §4.3, §18) : résultats de la recherche. Petit écran : méta,
+ * titre, résumé. Dès que la liste (conteneur de requête, classe `@container`) dispose de 60 rem :
+ * grille de 12 colonnes alignée sur celle des pages, méta sur 3 colonnes, texte sur 6. Les listes
+ * de contenus illustrées utilisent les cartes de `plates.css` (DS09).
  */
 .register-entry {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  grid-template-areas: 'meta' 'title' 'summary' 'terms';
+  grid-template-areas: 'meta' 'title' 'summary';
   column-gap: calc(var(--spacing) * 4);
   row-gap: calc(var(--spacing) * 2);
-}
-
-.register-with-cover {
-  grid-template-columns: minmax(0, 1fr) calc(var(--spacing) * 24);
-  grid-template-areas: 'meta cover' 'title cover' 'summary summary' 'terms terms';
 }
 
 .register-title {
@@ -47,31 +42,9 @@
   grid-area: summary;
 }
 
-.register-terms {
-  grid-area: terms;
-  margin-block-start: calc(var(--spacing) * 1);
-}
-
-.register-cover {
-  grid-area: cover;
-  align-self: start;
-  position: relative;
-  aspect-ratio: 3 / 2;
-  overflow: hidden;
-  border: var(--border-rule) solid var(--color-rule);
-  border-radius: var(--radius-media);
-  background: var(--color-paper-sunken);
-}
-
-.register-cover img {
-  object-fit: cover;
-}
-
 @container (min-width: 60rem) {
   .register-entry {
     grid-template-columns: repeat(12, minmax(0, 1fr));
-    /* La hauteur de la couverture s'ajoute à la dernière ligne, pas entre titre et résumé */
-    grid-template-rows: auto auto 1fr;
     grid-template-areas: none;
     column-gap: calc(var(--spacing) * 8);
     align-items: start;
@@ -79,14 +52,13 @@
 
   .register-meta {
     grid-column: 1 / span 3;
-    grid-row: 1 / span 3;
+    grid-row: 1 / span 2;
     flex-direction: column;
     padding-block-start: calc(var(--spacing) * 1);
   }
 
   .register-title,
-  .register-summary,
-  .register-terms {
+  .register-summary {
     grid-column: 4 / span 6;
   }
 
@@ -97,13 +69,69 @@
   .register-summary {
     grid-row: 2;
   }
+}
 
-  .register-terms {
-    grid-row: 3;
-  }
+/*
+ * Frise (parcours de la page À propos, DS09) : filet vertical à gauche, repère carré à hauteur de
+ * chaque titre ; l'ordre est chronologique (une vraie séquence), du plus récent au plus ancien.
+ */
+.timeline > li {
+  position: relative;
+  padding-inline-start: calc(var(--spacing) * 8);
+  padding-block-end: var(--spacing-block);
+}
 
-  .register-cover {
-    grid-column: 10 / span 3;
-    grid-row: 1 / span 3;
-  }
+.timeline > li:last-child {
+  padding-block-end: 0;
+}
+
+.timeline > li::before {
+  content: '';
+  position: absolute;
+  inset-block: calc(var(--spacing) * 2) 0;
+  /* Au milieu du repère de 12 px */
+  inset-inline-start: calc(var(--spacing) * 1.5);
+  border-inline-start: var(--border-rule) solid var(--color-rule);
+}
+
+.timeline > li:last-child::before {
+  display: none;
+}
+
+.timeline > li::after {
+  content: '';
+  position: absolute;
+  inset-block-start: calc(var(--spacing) * 2);
+  inset-inline-start: 0;
+  width: calc(var(--spacing) * 3);
+  height: calc(var(--spacing) * 3);
+  border: var(--border-strong) solid var(--color-ink);
+  background: var(--color-paper);
+}
+
+.timeline > li:first-child::after {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+/*
+ * Repère de type de contenu (recherche, DS09) : une forme par type, toujours suivie du mot ;
+ * projet carré plein, article rond plein, actualité losange.
+ */
+.type-mark {
+  display: inline-block;
+  flex: none;
+  width: calc(var(--spacing) * 2.5);
+  height: calc(var(--spacing) * 2.5);
+  background: var(--color-ink);
+}
+
+.type-mark[data-type='ARTICLE'] {
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+}
+
+.type-mark[data-type='NEWS'] {
+  transform: rotate(45deg);
+  background: var(--color-ink-muted);
 }

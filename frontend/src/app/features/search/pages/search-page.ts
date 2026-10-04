@@ -73,6 +73,23 @@ const DESCRIPTION =
       </div>
     </div>
 
+    @if (!text() && !tooLong()) {
+      <section class="search-browse" aria-labelledby="parcourir">
+        <h2 id="parcourir" class="text-lg tracking-heading">Parcourir</h2>
+        <ul class="search-browse-list">
+          @for (entry of browse; track entry.path) {
+            <li>
+              <a class="search-browse-link" [routerLink]="entry.path"
+                ><span class="type-mark" [attr.data-type]="entry.type" aria-hidden="true"></span
+                >{{ entry.label }}</a
+              >
+              <p class="mt-2 text-sm text-ink-muted">{{ entry.text }}</p>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
     @if (error(); as failure) {
       <div class="lg:grid lg:grid-cols-12 lg:gap-8">
         <div class="lg:col-span-9 lg:col-start-4">
@@ -129,6 +146,54 @@ const DESCRIPTION =
       width: auto;
       min-width: 0;
     }
+
+    .search-browse {
+      display: grid;
+      gap: calc(var(--spacing) * 4);
+      padding-block: var(--spacing-block) var(--spacing-section);
+      border-top: var(--border-rule) solid var(--color-rule);
+    }
+
+    .search-browse-list {
+      display: grid;
+      gap: var(--spacing-flow) calc(var(--spacing) * 8);
+    }
+
+    .search-browse-list > li {
+      padding-block-start: calc(var(--spacing) * 3);
+      border-top: var(--border-strong) solid var(--color-ink);
+    }
+
+    .search-browse-link {
+      display: inline-flex;
+      align-items: center;
+      gap: calc(var(--spacing) * 2);
+      min-height: calc(var(--spacing) * 11);
+      font-size: var(--text-xl);
+      font-weight: var(--font-weight-semibold);
+      letter-spacing: var(--tracking-heading);
+    }
+
+    @media (min-width: 48rem) {
+      .search-browse-list {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (min-width: 64rem) {
+      .search-browse {
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+        column-gap: calc(var(--spacing) * 8);
+      }
+
+      .search-browse > h2 {
+        grid-column: 1 / span 3;
+      }
+
+      .search-browse-list {
+        grid-column: 4 / span 9;
+      }
+    }
   `,
 })
 export class SearchPage {
@@ -139,9 +204,31 @@ export class SearchPage {
 
   protected readonly maxLength = MAX_QUERY_LENGTH;
 
+  /** État initial : les listes cherchées, avec leur repère de type. */
+  protected readonly browse = [
+    {
+      type: 'PROJECT',
+      path: '/projects',
+      label: 'Projets',
+      text: 'Réalisations, de l’objectif aux résultats, avec leurs captures.',
+    },
+    {
+      type: 'ARTICLE',
+      path: '/articles',
+      label: 'Articles',
+      text: 'Textes techniques longs : architecture, vision par ordinateur, exploitation.',
+    },
+    {
+      type: 'NEWS',
+      path: '/news',
+      label: 'Actualités',
+      text: 'Nouvelles courtes : lancements, versions, interventions.',
+    },
+  ] as const;
+
   protected readonly query = computed(() => this.q() ?? '');
   protected readonly tooLong = computed(() => this.query().length > MAX_QUERY_LENGTH);
-  private readonly text = computed(() => (this.tooLong() ? '' : this.query().trim()));
+  protected readonly text = computed(() => (this.tooLong() ? '' : this.query().trim()));
 
   protected readonly currentPage = computed(() => {
     const page = Number(this.page());

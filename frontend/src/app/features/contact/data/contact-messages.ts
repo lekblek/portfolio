@@ -1,7 +1,7 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, httpResource } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 
-import { ContactMessageRequest } from '../../../core/api/api-types';
+import { ContactMessageRequest, Profile } from '../../../core/api/api-types';
 
 /**
  * Envoie un message du formulaire de contact (`POST /api/public/contact-messages`) : 202 sans
@@ -13,4 +13,13 @@ export async function sendContactMessage(
   message: ContactMessageRequest,
 ): Promise<void> {
   await firstValueFrom(http.post<void>('/api/public/contact-messages', message));
+}
+
+/**
+ * Profil public, pour le contexte de la page (liens professionnels, CV) : une requête lue au rendu
+ * serveur puis reprise du cache de transfert. 404 (profil non publié) : la page n'affiche que le
+ * formulaire. À appeler dans un contexte d'injection.
+ */
+export function contactProfileResource() {
+  return httpResource<Profile>(() => '/api/public/profile');
 }

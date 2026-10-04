@@ -2,8 +2,8 @@ export interface NavItem {
   /** Chemin absolu de la page (`/about`). */
   path: string;
   label: string;
-  /** Reprise dans le pied de page (liens principaux seulement). */
-  footer: boolean;
+  /** Colonne du plan du site, dans le pied de page : contenus publiés, ou pages du site. */
+  section: 'content' | 'site';
 }
 
 /**
@@ -11,11 +11,11 @@ export interface NavItem {
  * son lien avec sa route : aucun lien vers une page qui n'existe pas encore.
  */
 export const PUBLIC_NAVIGATION: readonly NavItem[] = [
-  { path: '/projects', label: 'Projets', footer: true },
-  { path: '/articles', label: 'Articles', footer: true },
-  { path: '/series', label: 'Séries', footer: false },
-  { path: '/news', label: 'Actualités', footer: false },
-  { path: '/about', label: 'À propos', footer: true },
-  { path: '/contact', label: 'Contact', footer: true },
-  { path: '/search', label: 'Recherche', footer: false },
+  { path: '/projects', label: 'Projets', section: 'content' },
+  { path: '/articles', label: 'Articles', section: 'content' },
+  { path: '/series', label: 'Séries', section: 'content' },
+  { path: '/news', label: 'Actualités', section: 'content' },
+  { path: '/about', label: 'À propos', section: 'site' },
+  { path: '/contact', label: 'Contact', section: 'site' },
+  { path: '/search', label: 'Recherche', section: 'site' },
 ];

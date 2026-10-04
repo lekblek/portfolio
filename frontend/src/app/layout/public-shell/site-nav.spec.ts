@@ -7,8 +7,8 @@ import { NavItem } from './navigation';
 import { SiteNav } from './site-nav';
 
 const ITEMS: NavItem[] = [
-  { path: '/about', label: 'À propos', footer: true },
-  { path: '/projects', label: 'Projets', footer: true },
+  { path: '/about', label: 'À propos', section: 'site' },
+  { path: '/projects', label: 'Projets', section: 'content' },
 ];
 
 @Component({

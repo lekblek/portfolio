@@ -27,7 +27,7 @@ import { serverFieldErrors } from '../../../shared/forms/server-errors';
 import { Alert } from '../../../shared/ui/alert';
 import { Button } from '../../../shared/ui/button';
 import { Field, FieldControl } from '../../../shared/ui/field';
-import { sendContactMessage } from '../data/contact-messages';
+import { contactProfileResource, sendContactMessage } from '../data/contact-messages';
 
 /** Bornes et forme d'adresse du contrat (D-CG, D-EJ). */
 const NAME_MAX = 100;
@@ -78,9 +78,9 @@ function notBlank(path: SchemaPath<string>, message: string): void {
   imports: [Alert, Button, Field, FieldControl, FormField, FormRoot],
   host: { class: 'block page-container wrap-break-word' },
   template: `
-    <div class="grid gap-3 pt-section pb-section lg:grid-cols-12 lg:gap-8">
+    <div class="contact-grid grid gap-3 pt-section pb-section lg:grid-cols-12 lg:gap-8">
       <p class="text-sm font-semibold text-ink-muted lg:col-span-3 lg:pt-3">Contact</p>
-      <div class="min-w-0 lg:col-span-9 lg:col-start-4">
+      <div class="min-w-0 lg:col-span-9 lg:col-start-4 lg:row-span-2">
         <h1 class="text-3xl leading-tight tracking-title">Écrire un message</h1>
         <p class="mt-flow max-w-prose font-text text-lg leading-prose">
           Une question sur un projet, un article ou une collaboration&#8239;: la réponse arrive à
@@ -182,9 +182,66 @@ function notBlank(path: SchemaPath<string>, message: string): void {
           </form>
         }
       </div>
+      <aside
+        class="contact-context min-w-0 lg:col-span-3 lg:col-start-1 lg:row-start-2"
+        aria-label="Avant d’écrire"
+      >
+        <h2 class="font-semibold">Sujets bienvenus</h2>
+        <ul class="contact-topics">
+          <li>Un projet ou un article publié ici</li>
+          <li>Une collaboration ou une opportunité</li>
+        </ul>
+        @if (profile.hasValue()) {
+          @let current = profile.value();
+          @if (current.links.length > 0 || current.cv) {
+            <h2 class="mt-block font-semibold">Ailleurs</h2>
+            <ul class="mt-2" aria-label="Liens professionnels">
+              @for (link of current.links; track $index) {
+                <li>
+                  <a class="external inline-flex min-h-11 items-center" [href]="link.url"
+                    >{{ link.label }}<span class="sr-only"> (site externe)</span></a
+                  >
+                </li>
+              }
+              @if (current.cv; as cv) {
+                <li>
+                  <a class="inline-flex min-h-11 items-center" [href]="cv.url" download
+                    >Télécharger le CV <span class="ms-1 text-ink-muted">(PDF)</span></a
+                  >
+                </li>
+              }
+            </ul>
+          }
+        }
+      </aside>
     </div>
   `,
   styles: `
+    .contact-context {
+      margin-block-start: var(--spacing-block);
+      padding-block-start: calc(var(--spacing) * 3);
+      border-top: var(--border-strong) solid var(--color-ink);
+      font-size: var(--text-sm);
+    }
+
+    @media (min-width: 64rem) {
+      /* Le repère et le contexte en haut de la marge, le formulaire sur toute la hauteur */
+      .contact-grid {
+        grid-template-rows: auto 1fr;
+      }
+
+      .contact-context {
+        align-self: start;
+      }
+    }
+
+    .contact-topics {
+      display: grid;
+      gap: calc(var(--spacing) * 2);
+      margin-block-start: calc(var(--spacing) * 2);
+      color: var(--color-ink-muted);
+    }
+
     .contact-trap {
       position: absolute;
       inset-inline-start: -10000px;
@@ -195,6 +252,8 @@ function notBlank(path: SchemaPath<string>, message: string): void {
   `,
 })
 export class ContactPage {
+  protected readonly profile = contactProfileResource();
+
   private readonly model = signal<ContactModel>({ ...EMPTY });
 
   protected readonly contactForm = form(

@@ -9,9 +9,9 @@ import { CareerEntry } from './career-entry';
   selector: 'app-education-list',
   imports: [CareerEntry],
   template: `
-    <ol class="@container divide-y divide-rule">
+    <ol class="@container timeline">
       @for (education of educations(); track $index) {
-        <li class="py-flow first:pt-0 last:pb-0">
+        <li>
           <app-career-entry
             [heading]="education.degree"
             [details]="[education.field, education.institution, education.location]"

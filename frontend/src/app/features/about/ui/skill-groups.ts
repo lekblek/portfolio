@@ -3,13 +3,15 @@ import { Component, input } from '@angular/core';
 import { SkillGroup } from '../../../core/api/api-types';
 
 /**
- * Compétences par catégorie : liste de définitions, catégorie en colonne dès que la liste
- * dispose de 36 rem. Noms techniques protégés de la traduction automatique.
+ * Compétences par catégorie (DS09) : une colonne par catégorie, 2 dès 30 rem de conteneur, 4 dès
+ * 56 rem ; liste de définitions, compétences une par ligne. Noms techniques protégés de la
+ * traduction automatique.
  */
 @Component({
   selector: 'app-skill-groups',
+  host: { class: '@container block' },
   template: `
-    <dl class="@container">
+    <dl class="skill-groups">
       @for (group of groups(); track $index) {
         <div class="skill-group">
           <dt class="font-semibold">{{ group.category }}</dt>
@@ -25,41 +27,34 @@ import { SkillGroup } from '../../../core/api/api-types';
     </dl>
   `,
   styles: `
+    .skill-groups {
+      display: grid;
+      gap: var(--spacing-flow) calc(var(--spacing) * 8);
+    }
+
     .skill-group {
       display: grid;
-      grid-template-columns: minmax(0, 1fr);
-      column-gap: calc(var(--spacing) * 8);
-      row-gap: calc(var(--spacing) * 1);
-      padding-block: calc(var(--spacing) * 3);
-      border-top: var(--border-rule) solid var(--color-rule);
-    }
-
-    .skill-group:first-child {
-      padding-block-start: 0;
-      border-top: 0;
-    }
-
-    .skill-group:last-child {
-      padding-block-end: 0;
+      align-content: start;
+      gap: calc(var(--spacing) * 2);
+      padding-block-start: calc(var(--spacing) * 3);
+      border-top: var(--border-strong) solid var(--color-ink);
     }
 
     .skill-list {
-      display: flex;
-      flex-wrap: wrap;
-      column-gap: calc(var(--spacing) * 2);
-    }
-
-    /* Séparateur visible, sans texte de remplacement : la liste énonce déjà chaque élément */
-    .skill-list > li:not(:last-child)::after {
-      content: '·' / '';
-      margin-inline-start: calc(var(--spacing) * 2);
+      display: grid;
+      gap: calc(var(--spacing) * 1);
       color: var(--color-ink-muted);
     }
 
-    @container (min-width: 36rem) {
-      .skill-group {
-        grid-template-columns: 12rem minmax(0, 1fr);
-        align-items: baseline;
+    @container (min-width: 30rem) {
+      .skill-groups {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @container (min-width: 56rem) {
+      .skill-groups {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
       }
     }
   `,
