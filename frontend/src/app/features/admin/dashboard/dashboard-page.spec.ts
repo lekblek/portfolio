@@ -60,7 +60,9 @@ describe('DashboardPage', () => {
     const { http, settle, rows } = setUp();
 
     for (const request of http.match(() => true)) {
-      expect(request.request.params.get('size')).toBe('1');
+      // Messages non lus et brouillons : les cinq derniers, montrés dans le travail en cours
+      const listed = request.request.params.get('status') !== null;
+      expect(request.request.params.get('size')).toBe(listed ? '5' : '1');
       request.flush(page(COUNTS[keyOf(request.request)]));
     }
     await settle();
@@ -96,6 +98,54 @@ describe('DashboardPage', () => {
     );
     expect(element.querySelector('a[href="/admin/publications?status=DRAFT"]')).not.toBeNull();
     expect(element.querySelector('a[href="/admin/media"]')?.textContent).toBe('Médias');
+  });
+
+  it('shows the latest unread messages and drafts, linked to their page', async () => {
+    const { http, element, settle } = setUp();
+    for (const request of http.match(() => true)) {
+      const status = request.request.params.get('status');
+      if (status === 'NEW') {
+        request.flush({
+          ...page(1),
+          content: [
+            {
+              id: 7,
+              name: 'Camille Martin',
+              email: 'camille@example.com',
+              subject: 'Une mission',
+              status: 'NEW',
+              createdAt: '2026-10-02T09:00:00Z',
+            },
+          ],
+        });
+      } else if (status === 'DRAFT') {
+        request.flush({
+          ...page(1),
+          content: [
+            {
+              id: 9,
+              type: 'ARTICLE',
+              title: 'Suivi multi-objets',
+              slug: 'suivi',
+              status: 'DRAFT',
+              publishedAt: null,
+              featured: false,
+              updatedAt: '2026-10-03T08:00:00Z',
+            },
+          ],
+        });
+      } else {
+        request.flush(page(COUNTS[keyOf(request.request)]));
+      }
+    }
+    await settle();
+
+    expect(element.querySelector('a[href="/admin/messages/7"]')?.textContent).toBe('Une mission');
+    expect(element.textContent).toContain('Camille Martin');
+    expect(element.querySelector('a[href="/admin/publications/9"]')?.textContent).toBe(
+      'Suivi multi-objets',
+    );
+    expect(element.querySelector('a[href="/admin/publications/new/article"]')).not.toBeNull();
   });
 
   it('offers to retry when a count cannot be read, then shows the tally', async () => {

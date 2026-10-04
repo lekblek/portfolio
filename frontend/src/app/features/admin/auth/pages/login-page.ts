@@ -19,6 +19,7 @@ import { Router, RouterLink } from '@angular/router';
 
 import { visibleError } from '../../../../shared/forms/visible-error';
 import { retryAfterMinutes, toApiError } from '../../../../core/api/api-error';
+import { SITE_NAME } from '../../../../core/seo/site-config';
 import { Alert } from '../../../../shared/ui/alert';
 import { Button } from '../../../../shared/ui/button';
 import { Field, FieldControl } from '../../../../shared/ui/field';
@@ -51,10 +52,13 @@ interface Failure {
   selector: 'app-login-page',
   imports: [Alert, Button, Field, FieldControl, FormField, FormRoot, RouterLink],
   template: `
-    <main id="contenu" class="page-container" tabindex="-1">
-      <div class="grid max-w-prose gap-block py-section">
+    <main id="contenu" class="login-page" tabindex="-1">
+      <div class="login-panel grid gap-block">
         <div>
-          <p class="text-sm font-semibold text-ink-muted">Administration</p>
+          <p class="text-sm text-ink-muted">
+            <span class="font-semibold text-ink">{{ siteName }}</span>
+            <span aria-hidden="true"> · </span>Administration
+          </p>
           <h1 class="mt-2 text-3xl leading-tight tracking-title">Connexion</h1>
         </div>
 
@@ -111,14 +115,41 @@ interface Failure {
           </div>
         </form>
 
-        <p class="text-sm">
+        <p class="border-t border-rule pt-flow text-sm">
           <a routerLink="/">Retour au site</a>
         </p>
       </div>
     </main>
   `,
+  styles: `
+    /* Panneau centré à trait fort (DS09) : un écran fini, pas un formulaire posé dans le vide */
+    .login-page {
+      display: grid;
+      place-items: center;
+      min-height: 100dvh;
+      padding: var(--spacing-section) var(--spacing-gutter);
+      background: var(--color-paper-sunken);
+    }
+
+    .login-panel {
+      width: 100%;
+      max-width: calc(var(--spacing) * 112);
+      padding: var(--spacing-block) calc(var(--spacing) * 6);
+      border: var(--border-strong) solid var(--color-ink);
+      border-radius: var(--radius-control);
+      background: var(--color-paper);
+    }
+
+    @media (min-width: 48rem) {
+      .login-panel {
+        padding: var(--spacing-block) calc(var(--spacing) * 10);
+      }
+    }
+  `,
 })
 export class LoginPage {
+  protected readonly siteName = SITE_NAME;
+
   /** Page demandée avant la connexion (paramètre de requête), filtrée par `adminReturnUrl`. */
   readonly returnUrl = input<string | undefined>();
 

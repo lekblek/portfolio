@@ -88,7 +88,7 @@ test.describe('admin shell', () => {
     await page.keyboard.press('Tab');
     await expect(page.getByRole('button', { name: 'Se déconnecter' })).toBeFocused();
     await page.keyboard.press('Tab');
-    await expect(page.getByRole('link', { name: 'Tableau de bord' })).toBeFocused();
+    await expect(page.getByRole('link', { name: 'Tableau de bord', exact: true })).toBeFocused();
 
     await skip.focus();
     await page.keyboard.press('Enter');
