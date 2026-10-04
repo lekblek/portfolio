@@ -124,3 +124,23 @@ export function instantFromSiteTime(value: string): string {
 export function siteTimeInput(instant: string): string {
   return new Date(wallClock(new Date(instant).getTime())).toISOString().slice(0, 16);
 }
+
+const PUBLICATION_MONTH = new Intl.DateTimeFormat('fr-FR', {
+  month: 'long',
+  year: 'numeric',
+  timeZone: SITE_TIME_ZONE,
+});
+
+/** Mois d'une publication dans le fuseau de référence : « septembre 2026 » (groupes de dépêches). */
+export function formatPublicationMonth(instant: string): string {
+  return PUBLICATION_MONTH.format(new Date(instant));
+}
+
+const SHORT_MONTH = new Intl.DateTimeFormat('fr-FR', { month: 'short', timeZone: SITE_TIME_ZONE });
+
+/** Jour et mois abrégé, pour une date en colonne : `{ day: '1er', month: 'oct.' }`. */
+export function dayAndShortMonth(instant: string): { day: string; month: string } {
+  const date = new Date(instant);
+  const day = DAY.formatToParts(date).find((part) => part.type === 'day')?.value ?? '';
+  return { day: day === '1' ? '1er' : day, month: SHORT_MONTH.format(date) };
+}

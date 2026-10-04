@@ -86,6 +86,11 @@
   --breakpoint-lg: 64rem;
   --breakpoint-xl: 80rem;
 
+  /* Rapports d'image (§15, DS09) : planches et cartes, têtes et couvertures de détail, portrait */
+  --aspect-cover: 3 / 2;
+  --aspect-wide: 16 / 9;
+  --aspect-portrait: 4 / 5;
+
   /* Rayons et ombre (§9) */
   --radius-control: 3px;
   --radius-media: 2px;

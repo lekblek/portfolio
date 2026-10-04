@@ -1,0 +1,236 @@
+/*
+ * Planches et cartes de contenu (02-design-system §18, DS09 ; plan 04-visual-refresh-plan §5).
+ *
+ * Planche : média encadré d'un filet, rapport fixe, recadré sans déformation ; planche vide pour un
+ * contenu sans couverture (papier quadrillé et repère typographique, décorative).
+ * Carte : planche puis texte ; le titre est le seul lien, sa cible couvre la carte (pseudo-élément),
+ * les liens de termes restent au-dessus. Ordre du document : titre, méta, résumé, termes, planche ;
+ * la grille place la planche en tête à l'écran. L'hôte de la carte est un conteneur de requête.
+ */
+
+.plate {
+  position: relative;
+  aspect-ratio: var(--aspect-cover);
+  overflow: hidden;
+  border: var(--border-rule) solid var(--color-rule);
+  border-radius: var(--radius-media);
+  background: var(--color-paper-sunken);
+}
+
+.plate-wide {
+  aspect-ratio: var(--aspect-wide);
+}
+
+.plate img {
+  object-fit: cover;
+}
+
+/* Papier quadrillé de la planche technique : filets tous les 24 px, repère au centre */
+.plate-empty {
+  display: grid;
+  place-items: center;
+  background-color: var(--color-paper-sunken);
+  background-image:
+    linear-gradient(var(--color-rule) var(--border-rule), transparent var(--border-rule)),
+    linear-gradient(90deg, var(--color-rule) var(--border-rule), transparent var(--border-rule));
+  background-size: calc(var(--spacing) * 6) calc(var(--spacing) * 6);
+  background-position: center;
+}
+
+.plate-mark {
+  padding: calc(var(--spacing) * 1) calc(var(--spacing) * 3);
+  background: var(--color-paper-sunken);
+  color: var(--color-ink-muted);
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-title);
+  line-height: var(--leading-tight);
+}
+
+.plate-caption {
+  margin-block-start: calc(var(--spacing) * 2);
+  color: var(--color-ink-muted);
+  font-size: var(--text-sm);
+}
+
+/* Grille de cartes : 1 colonne, 2 dès md, 3 dès xl */
+.card-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  column-gap: calc(var(--spacing) * 8);
+  row-gap: calc(var(--spacing) * 12);
+}
+
+@media (min-width: 48rem) {
+  .card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 80rem) {
+  .card-grid-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.card {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: 'plate' 'meta' 'title' 'summary' 'terms';
+  align-content: start;
+  row-gap: calc(var(--spacing) * 2);
+}
+
+.card-plate {
+  grid-area: plate;
+  margin-block-end: calc(var(--spacing) * 2);
+}
+
+.card-meta {
+  grid-area: meta;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: calc(var(--spacing) * 2);
+  color: var(--color-ink-muted);
+  font-size: var(--text-sm);
+}
+
+.card-meta strong {
+  color: var(--color-ink);
+  font-weight: var(--font-weight-medium);
+}
+
+.card-title {
+  grid-area: title;
+  font-size: var(--text-xl);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-heading);
+  text-wrap: balance;
+}
+
+.card-link {
+  color: var(--color-ink);
+  text-decoration-line: none;
+}
+
+/* La cible du titre couvre la carte ; le focus reste dessiné autour du titre */
+.card-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.card-link:hover,
+.card-link:focus-visible {
+  color: var(--color-accent-strong);
+  text-decoration-line: underline;
+}
+
+.card-summary {
+  grid-area: summary;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  font-family: var(--font-text);
+  line-height: var(--leading-prose);
+}
+
+.card-terms {
+  grid-area: terms;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: calc(var(--spacing) * 3);
+  font-size: var(--text-sm);
+}
+
+/* Liens secondaires au-dessus de la cible étendue du titre */
+.card-meta a {
+  position: relative;
+  z-index: 1;
+}
+
+/* Carte de tête : planche à gauche (7 colonnes), texte à droite, dès 56 rem de conteneur */
+.card-lead .card-title {
+  font-size: var(--text-2xl);
+}
+
+@container (min-width: 56rem) {
+  .card-lead {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-template-rows: auto auto auto 1fr;
+    grid-template-areas: none;
+    column-gap: calc(var(--spacing) * 8);
+    align-items: start;
+  }
+
+  .card-lead .card-plate {
+    grid-column: 1 / span 7;
+    grid-row: 1 / span 4;
+    margin-block-end: 0;
+  }
+
+  .card-lead .card-meta,
+  .card-lead .card-title,
+  .card-lead .card-summary,
+  .card-lead .card-terms {
+    grid-column: 8 / span 5;
+  }
+
+  .card-lead .card-meta {
+    grid-row: 1;
+  }
+
+  .card-lead .card-title {
+    grid-row: 2;
+    font-size: var(--text-3xl);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-title);
+  }
+
+  .card-lead .card-summary {
+    grid-row: 3;
+    -webkit-line-clamp: 6;
+    line-clamp: 6;
+    font-size: var(--text-lg);
+  }
+
+  .card-lead .card-terms {
+    grid-row: 4;
+  }
+}
+
+/* Survol (pointeur fin) : filet de la planche en accent ; l'image s'avance à peine */
+@media (hover: hover) and (pointer: fine) {
+  .card:has(.card-link:hover) .plate {
+    border-color: var(--color-accent);
+  }
+
+  .card .plate img {
+    transition: transform var(--duration-slow) var(--ease-out);
+  }
+
+  .card:has(.card-link:hover) .plate img {
+    transform: scale(1.02);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card .plate img {
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+/* Repère en mots (catégorie) : plus petit que des initiales */
+.plate-label {
+  font-size: var(--text-xl);
+  letter-spacing: var(--tracking-heading);
+}
