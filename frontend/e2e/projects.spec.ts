@@ -60,7 +60,9 @@ test.describe('projects', () => {
 
     expect(calls).toEqual([]);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Projets');
-    await expect(page.getByRole('heading', { level: 2 })).toHaveCount(api.content.length);
+    await expect(page.getByRole('main').getByRole('heading', { level: 2 })).toHaveCount(
+      api.content.length,
+    );
     await openMenu(page);
     await expect(
       page.getByRole('navigation', { name: 'Navigation principale' }).getByRole('link', {
@@ -86,13 +88,17 @@ test.describe('projects', () => {
 
     await expect(page).toHaveURL(`/projects?technology=${technology.slug}`);
     await expect(page.getByText(`Technologie : ${technology.name}`)).toBeVisible();
-    await expect(page.getByRole('heading', { level: 2 })).toHaveCount(filtered.content.length);
+    await expect(page.getByRole('main').getByRole('heading', { level: 2 })).toHaveCount(
+      filtered.content.length,
+    );
     await expectAccessible(page);
 
     await page.getByRole('link', { name: 'Retirer le filtre' }).click();
 
     await expect(page).toHaveURL('/projects');
-    await expect(page.getByRole('heading', { level: 2 })).toHaveCount(api.content.length);
+    await expect(page.getByRole('main').getByRole('heading', { level: 2 })).toHaveCount(
+      api.content.length,
+    );
   });
 
   test('keeps the filter across pages, from the keyboard', async ({ page }) => {

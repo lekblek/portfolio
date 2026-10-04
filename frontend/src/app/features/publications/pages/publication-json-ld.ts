@@ -1,6 +1,6 @@
 import { Publication } from '../../../core/api/api-types';
 import { SITE_NAME } from '../../../core/seo/site-config';
-import { publicationPath } from '../../../shared/content/publication-entry';
+import { publicationPath } from '../../../shared/content/content-labels';
 
 /**
  * Données structurées d'une publication : `Article` (article technique) ou `NewsArticle`

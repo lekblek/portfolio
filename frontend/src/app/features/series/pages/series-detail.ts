@@ -5,10 +5,10 @@ import { RouterLink } from '@angular/router';
 import { toApiError } from '../../../core/api/api-error';
 import { injectResponseStatus } from '../../../core/platform/response-status';
 import { Seo } from '../../../core/seo/seo';
-import { readingTimeLabel } from '../../../shared/content/publication-entry';
-import { chapterCountLabel } from '../../../shared/content/series-entry';
+import { chapterCountLabel, readingTimeLabel } from '../../../shared/content/content-labels';
 import { markdownExcerpt } from '../../../shared/format/excerpt';
 import { MarkdownView } from '../../../shared/markdown/markdown-view';
+import { Button } from '../../../shared/ui/button';
 import { ErrorState } from '../../../shared/ui/error-state';
 import { seriesResource } from '../data/series.resources';
 import { ChapterList } from '../ui/chapter-list';
@@ -16,13 +16,14 @@ import { seriesJsonLd } from './series-json-ld';
 
 /**
  * Page d'une série : retour à la liste et fiche (chapitres, lecture totale) dans la marge,
- * titre, description, couverture, puis la table des chapitres dans l'ordre de lecture. Seuls les
+ * titre, description et « Commencer par le chapitre 1 », couverture en planche à côté dès `xl`
+ * (DS09), puis le parcours des chapitres dans l'ordre de lecture. Seuls les
  * chapitres visibles sont listés, numérotés par leur rang public. Slug inconnu ou série sans
  * chapitre visible : page introuvable, 404 au rendu serveur.
  */
 @Component({
   selector: 'app-series-detail',
-  imports: [ChapterList, ErrorState, MarkdownView, NgOptimizedImage, RouterLink],
+  imports: [Button, ChapterList, ErrorState, MarkdownView, NgOptimizedImage, RouterLink],
   host: { class: 'block page-container wrap-break-word' },
   template: `
     @if (series.hasValue()) {
@@ -31,9 +32,34 @@ import { seriesJsonLd } from './series-json-ld';
         <p class="mb-flow text-sm lg:col-span-3 lg:col-start-1 lg:row-start-1 lg:mb-0 lg:pt-3">
           <a routerLink="/series">Toutes les séries</a>
         </p>
-        <header class="min-w-0 lg:col-span-9 lg:col-start-4 lg:row-span-2 lg:row-start-1">
-          <h1 class="text-3xl leading-tight tracking-title">{{ current.title }}</h1>
-          <app-markdown-view class="mt-flow block" [source]="current.descriptionMarkdown" />
+        <header
+          class="series-head min-w-0 lg:col-span-9 lg:col-start-4 lg:row-span-2 lg:row-start-1"
+          [class.series-head-with-cover]="current.cover"
+        >
+          <div class="series-intro min-w-0">
+            <h1 class="text-3xl leading-tight tracking-title">{{ current.title }}</h1>
+            <app-markdown-view class="mt-flow block" [source]="current.descriptionMarkdown" />
+            @if (current.chapters[0]; as first) {
+              <p class="mt-block">
+                <a appButton [routerLink]="['/articles', first.slug]"
+                  >Commencer par le chapitre 1<span class="sr-only">
+                    &nbsp;: {{ first.title }}</span
+                  ></a
+                >
+              </p>
+            }
+          </div>
+          @if (current.cover; as cover) {
+            <div class="series-cover plate">
+              <img
+                [ngSrc]="cover.url"
+                fill
+                sizes="(min-width: 80rem) 24rem, (min-width: 64rem) 30vw, 100vw"
+                [alt]="cover.altText ?? ''"
+                priority
+              />
+            </div>
+          }
         </header>
         <aside
           class="mt-block min-w-0 lg:col-span-3 lg:col-start-1 lg:row-start-2 lg:mt-flow"
@@ -50,20 +76,8 @@ import { seriesJsonLd } from './series-json-ld';
             </div>
           </dl>
         </aside>
-        @if (current.cover; as cover) {
-          <figure class="mt-block min-w-0 lg:col-span-9 lg:col-start-4 lg:row-start-3">
-            <img
-              class="series-cover"
-              [ngSrc]="cover.url"
-              [width]="cover.width"
-              [height]="cover.height"
-              [alt]="cover.altText ?? ''"
-              priority
-            />
-          </figure>
-        }
         <section
-          class="mt-section min-w-0 border-t border-rule pt-block lg:col-span-12 lg:row-start-4"
+          class="mt-section min-w-0 border-t border-rule pt-block lg:col-span-12 lg:row-start-3"
           aria-labelledby="chapitres"
         >
           <h2 id="chapitres" class="text-2xl tracking-heading lg:sr-only">Chapitres</h2>
@@ -121,12 +135,17 @@ import { seriesJsonLd } from './series-json-ld';
       font-weight: var(--font-weight-medium);
     }
 
-    .series-cover {
-      width: 100%;
-      height: auto;
-      border: var(--border-rule) solid var(--color-rule);
-      border-radius: var(--radius-media);
-      background: var(--color-paper-sunken);
+    .series-head {
+      display: grid;
+      gap: var(--spacing-block);
+    }
+
+    @media (min-width: 80rem) {
+      .series-head-with-cover {
+        grid-template-columns: minmax(0, 5fr) minmax(0, 4fr);
+        column-gap: calc(var(--spacing) * 8);
+        align-items: start;
+      }
     }
   `,
 })

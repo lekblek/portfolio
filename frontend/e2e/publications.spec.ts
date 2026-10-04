@@ -63,7 +63,8 @@ test.describe('publications', () => {
     page,
     request,
   }) => {
-    const list = await articles(request);
+    // Hors articles de recette, publiés puis archivés par d'autres tests en parallèle
+    const list = (await articles(request)).filter((article) => !article.slug.endsWith('-e2e'));
     const html = await (await request.get('/articles')).text();
     for (const article of list) {
       expect(html).toContain(`href="/articles/${article.slug}"`);
@@ -75,7 +76,11 @@ test.describe('publications', () => {
 
     expect(calls).toEqual([]);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Articles');
-    await expect(page.getByRole('heading', { level: 2 })).toHaveCount(list.length);
+    for (const article of list) {
+      await expect(
+        page.getByRole('main').getByRole('heading', { level: 2, name: article.title }),
+      ).toBeVisible();
+    }
     await expectAccessible(page);
   });
 
@@ -97,6 +102,8 @@ test.describe('publications', () => {
     await filtered;
     await expect(page).toHaveURL(`/articles?category=${category.slug}`);
     await expect(page.getByRole('list', { name: 'Filtres actifs' })).toContainText(category.name);
+    // Les tags se lisent sur la page de l'article (les cartes de la liste n'en montrent pas)
+    await page.goto(`/articles/${article?.slug}`, { waitUntil: 'networkidle' });
     await page
       .getByRole('list', { name: `Tags de ${article?.title}` })
       .getByRole('link', { name: tags[0].name })
@@ -114,7 +121,10 @@ test.describe('publications', () => {
     await page.goto('/news');
 
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Actualités');
-    await expect(page.getByRole('heading', { level: 2 })).toHaveCount(news.length);
+    // Dépêches groupées par mois : un titre de niveau 3 par actualité, sous le titre de son mois
+    await expect(page.getByRole('main').getByRole('heading', { level: 3 })).toHaveCount(
+      news.length,
+    );
     if (news.length > 0) {
       await expect(page.getByRole('link', { name: news[0].title })).toHaveAttribute(
         'href',

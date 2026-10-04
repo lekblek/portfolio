@@ -87,7 +87,7 @@ describe('SeriesList', () => {
     expect(element().querySelector('h1')?.textContent).toBe('Séries');
     expect(element().querySelector('h2 a')?.getAttribute('href')).toBe('/series/spring-boot');
     expect(element().textContent).toContain('2 chapitres');
-    expect(element().querySelector('.register-summary')?.textContent?.trim()).toBe(
+    expect(element().querySelector('.card-summary')?.textContent?.trim()).toBe(
       'Une série en plusieurs étapes.',
     );
   });
@@ -110,11 +110,17 @@ describe('SeriesDetail', () => {
       link.textContent,
       link.getAttribute('href'),
     ]);
+    // Le rang du chapitre est lu avant son titre ; le repère numéroté est décoratif
     expect(chapters).toEqual([
-      ['Construire une API', '/articles/api'],
-      ['Mettre en production', '/articles/production'],
+      ['Chapitre 1\u00a0: Construire une API', '/articles/api'],
+      ['Chapitre 2\u00a0: Mettre en production', '/articles/production'],
     ]);
-    expect(element().textContent).toContain('Chapitre 2');
+    expect(element().querySelector('.chapter-step')?.getAttribute('aria-hidden')).toBe('true');
+    const start = element().querySelector<HTMLAnchorElement>('a[appButton]')!;
+    expect(start.getAttribute('href')).toBe('/articles/api');
+    expect(start.textContent?.replace(/\s+/g, ' ').trim()).toBe(
+      'Commencer par le chapitre 1 : Construire une API',
+    );
     expect(element().querySelector('dl')?.textContent).toContain('15\u00a0min de lecture');
     const jsonLd = TestBed.inject(DOCUMENT).getElementById('json-ld-page')?.textContent ?? '';
     expect(JSON.parse(jsonLd)).toMatchObject({

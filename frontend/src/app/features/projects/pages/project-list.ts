@@ -6,7 +6,7 @@ import { ProjectSummary } from '../../../core/api/api-types';
 import { Page } from '../../../core/api/page';
 import { injectResponseStatus } from '../../../core/platform/response-status';
 import { Seo } from '../../../core/seo/seo';
-import { ProjectEntry } from '../../../shared/content/project-entry';
+import { ProjectCard } from '../../../shared/content/project-card';
 import { EmptyState } from '../../../shared/ui/empty-state';
 import { ErrorState } from '../../../shared/ui/error-state';
 import { Pagination } from '../../../shared/ui/pagination';
@@ -17,14 +17,14 @@ const DESCRIPTION =
   'Projets de Blek Ngossanga\u202f: présentation, période, état, technologies utilisées et captures.';
 
 /**
- * Liste des projets publiés : registre paginé, filtré par technologie. L'état vit dans l'URL
+ * Liste des projets publiés : grille de planches (DS09), paginée, filtrée par technologie. L'état vit dans l'URL
  * (`?page=` en base 1, `?technology=` : slug), lu en entrées par la liaison des paramètres du
  * routeur ; une page invalide vaut la première (comme l'API). Pendant un changement de page ou
  * de filtre, la page précédente reste affichée jusqu'à la réponse.
  */
 @Component({
   selector: 'app-project-list',
-  imports: [EmptyState, ErrorState, Pagination, ProjectEntry, RouterLink],
+  imports: [EmptyState, ErrorState, Pagination, ProjectCard, RouterLink],
   host: { class: 'block page-container wrap-break-word' },
   template: `
     <div class="grid gap-3 pt-section pb-block lg:grid-cols-12 lg:gap-8">
@@ -66,10 +66,10 @@ const DESCRIPTION =
       </div>
     } @else if (shown(); as current) {
       @if (current.content.length > 0) {
-        <ul class="@container divide-y divide-rule border-t border-rule">
+        <ul class="card-grid card-grid-3 border-t border-rule pt-block pb-section">
           @for (project of current.content; track project.slug; let index = $index) {
-            <li class="py-block">
-              <app-project-entry
+            <li>
+              <app-project-card
                 [project]="project"
                 [currentTechnology]="filter()"
                 [coverPriority]="index === priorityCover()"
@@ -144,14 +144,14 @@ export class ProjectList {
   });
 
   /**
-   * Seule couverture chargée en priorité : la première de la page, quelle que soit sa ligne. Les
-   * lignes sans image sont courtes : avec le jeu de démonstration, la première couverture est l'image
-   * LCP même en quatrième ligne (D-EV) ; une image préchargée sous la ligne de flottaison sur mobile
-   * coûte moins qu'une image LCP chargée tard. -1 : aucune couverture.
+   * Seule couverture chargée en priorité : la première de la page si elle est dans les deux premières
+   * rangées de la grille (haut de page dès 1280 px, où les planches vides de la première rangée
+   * laissent l'image LCP en deuxième rangée) ; plus bas, aucune (DS09). -1 : aucune.
    */
-  protected readonly priorityCover = computed(
-    () => this.shown()?.content.findIndex((entry) => entry.cover !== null) ?? -1,
-  );
+  protected readonly priorityCover = computed(() => {
+    const index = this.shown()?.content.findIndex((entry) => entry.cover !== null) ?? -1;
+    return index < 6 ? index : -1;
+  });
 
   protected readonly error = computed(() =>
     this.projects.error() ? toApiError(this.projects.error()) : null,

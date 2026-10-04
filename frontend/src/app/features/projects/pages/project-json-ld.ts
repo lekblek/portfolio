@@ -1,5 +1,5 @@
 import { Project } from '../../../core/api/api-types';
-import { projectStageLabel } from '../../../shared/content/project-entry';
+import { projectStageLabel } from '../../../shared/content/content-labels';
 
 /**
  * Données structurées d'un projet : `CreativeWork`, le type de schema.org qui décrit une œuvre

@@ -6,7 +6,7 @@ import { SeriesSummary } from '../../../core/api/api-types';
 import { Page } from '../../../core/api/page';
 import { injectResponseStatus } from '../../../core/platform/response-status';
 import { Seo } from '../../../core/seo/seo';
-import { SeriesEntry } from '../../../shared/content/series-entry';
+import { SeriesCard } from '../../../shared/content/series-card';
 import { EmptyState } from '../../../shared/ui/empty-state';
 import { ErrorState } from '../../../shared/ui/error-state';
 import { Pagination } from '../../../shared/ui/pagination';
@@ -21,7 +21,7 @@ const DESCRIPTION =
  */
 @Component({
   selector: 'app-series-list',
-  imports: [EmptyState, ErrorState, Pagination, RouterLink, SeriesEntry],
+  imports: [EmptyState, ErrorState, Pagination, RouterLink, SeriesCard],
   host: { class: 'block page-container wrap-break-word' },
   template: `
     <div class="grid gap-3 pt-section pb-block lg:grid-cols-12 lg:gap-8">
@@ -52,10 +52,10 @@ const DESCRIPTION =
       </div>
     } @else if (shown(); as current) {
       @if (current.content.length > 0) {
-        <ul class="@container divide-y divide-rule border-t border-rule">
+        <ul class="divide-y divide-rule border-t border-rule">
           @for (entry of current.content; track entry.slug; let index = $index) {
             <li class="py-block">
-              <app-series-entry [series]="entry" [coverPriority]="index === priorityCover()" />
+              <app-series-card [series]="entry" [coverPriority]="index === priorityCover()" />
             </li>
           }
         </ul>

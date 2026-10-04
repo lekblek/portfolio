@@ -5,7 +5,7 @@ import { RouterLink } from '@angular/router';
 import { toApiError } from '../../../core/api/api-error';
 import { injectResponseStatus } from '../../../core/platform/response-status';
 import { Seo } from '../../../core/seo/seo';
-import { projectStageLabel } from '../../../shared/content/project-entry';
+import { projectStageLabel } from '../../../shared/content/content-labels';
 import { formatPeriod } from '../../../shared/format/date';
 import { MarkdownView } from '../../../shared/markdown/markdown-view';
 import { Button } from '../../../shared/ui/button';
@@ -15,8 +15,9 @@ import { projectResource } from '../data/projects.resources';
 import { projectJsonLd } from './project-json-ld';
 
 /**
- * Détail d'un projet publié, mis en page comme une planche : dans la marge gauche, le retour à la
- * liste (en tête sur petit écran) et le cartouche des métadonnées (état, période, technologies) ;
+ * Détail d'un projet publié, en étude de cas (DS09) : dans la marge gauche, le retour à la liste
+ * (en tête sur petit écran) et le cartouche des métadonnées (état, période, technologies), qui
+ * accompagne la lecture sur grand écran ;
  * dans la colonne principale, titre, résumé, liens vers le code et la démonstration s'ils
  * existent, couverture, description, puis les captures en figures numérotées, chacune entière
  * dans un cadre 3:2 commun (des rapports différents ne laissent aucun trou dans la galerie). Slug inconnu ou projet non public : page
@@ -55,7 +56,7 @@ import { projectJsonLd } from './project-json-ld';
         </header>
 
         <aside
-          class="mt-block min-w-0 lg:col-span-3 lg:col-start-1 lg:row-span-3 lg:row-start-2 lg:mt-flow"
+          class="project-aside mt-block min-w-0 lg:col-span-3 lg:col-start-1 lg:row-span-3 lg:row-start-2 lg:mt-flow"
           aria-label="Fiche du projet"
         >
           <dl class="project-sheet">
@@ -86,14 +87,15 @@ import { projectJsonLd } from './project-json-ld';
         @if (current.cover; as cover) {
           <figure class="mt-block min-w-0 lg:col-span-9 lg:col-start-4 lg:row-start-3">
             <!-- Sous le titre et le résumé : au-dessus de la ligne de flottaison, prioritaire -->
-            <img
-              class="project-image"
-              [ngSrc]="cover.url"
-              [width]="cover.width"
-              [height]="cover.height"
-              [alt]="cover.altText ?? ''"
-              priority
-            />
+            <div class="plate plate-wide">
+              <img
+                [ngSrc]="cover.url"
+                fill
+                sizes="(min-width: 80rem) 62rem, (min-width: 64rem) 75vw, 100vw"
+                [alt]="cover.altText ?? ''"
+                priority
+              />
+            </div>
           </figure>
         }
 
@@ -105,7 +107,7 @@ import { projectJsonLd } from './project-json-ld';
               <h2 id="captures" class="text-2xl tracking-heading">Captures</h2>
               <ol class="gallery mt-flow">
                 @for (screenshot of current.screenshots; track $index) {
-                  <li>
+                  <li [class.gallery-lead]="$first && current.screenshots.length !== 2">
                     <figure>
                       <!-- Cadre 3:2 commun : la capture y est entière (jamais recadrée) -->
                       <div class="gallery-frame">
@@ -181,17 +183,18 @@ import { projectJsonLd } from './project-json-ld';
       font-weight: var(--font-weight-medium);
     }
 
-    .project-image {
-      width: 100%;
-      height: auto;
-      border: var(--border-rule) solid var(--color-rule);
-      border-radius: var(--radius-media);
-      background: var(--color-paper-sunken);
+    /* La fiche accompagne la lecture de l'étude de cas sur grand écran */
+    @media (min-width: 64rem) {
+      .project-aside {
+        position: sticky;
+        top: var(--spacing-block);
+        align-self: start;
+      }
     }
 
     .gallery-frame {
       position: relative;
-      aspect-ratio: 3 / 2;
+      aspect-ratio: var(--aspect-cover);
       overflow: hidden;
       border: var(--border-rule) solid var(--color-rule);
       border-radius: var(--radius-media);
@@ -210,6 +213,11 @@ import { projectJsonLd } from './project-json-ld';
     @media (min-width: 48rem) {
       .gallery {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      /* Première capture en grand quand la galerie en compte une, trois ou plus */
+      .gallery-lead {
+        grid-column: 1 / -1;
       }
     }
   `,

@@ -2,7 +2,7 @@ import { Component, computed, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { SearchResult, SearchResultType } from '../../../core/api/api-types';
-import { publicationPath } from '../../../shared/content/publication-entry';
+import { publicationPath } from '../../../shared/content/content-labels';
 import { formatDay, isoDay } from '../../../shared/format/date';
 
 const TYPE_LABELS: Record<SearchResultType, string> = {
@@ -19,8 +19,8 @@ export function searchResultPath(result: Pick<SearchResult, 'type' | 'slug'>): s
 }
 
 /**
- * Ligne de résultat, sur la grille du registre : nature (article, actualité, projet) et date
- * d'une publication, titre lié à sa page, résumé.
+ * Ligne de résultat, sur la grille du registre : nature (article, actualité, projet : mot et
+ * repère de forme, DS09) et date d'une publication, titre lié à sa page, résumé.
  */
 @Component({
   selector: 'app-search-result-entry',
@@ -31,7 +31,10 @@ export function searchResultPath(result: Pick<SearchResult, 'type' | 'slug'>): s
         <a [routerLink]="link()">{{ result().title }}</a>
       </h2>
       <p class="register-meta">
-        <span class="font-medium">{{ typeLabel() }}</span>
+        <span class="type-label font-medium"
+          ><span class="type-mark" [attr.data-type]="result().type" aria-hidden="true"></span
+          >{{ typeLabel() }}</span
+        >
         @if (result().publishedAt; as instant) {
           <span class="sr-only">, </span>
           <time class="text-ink-muted tabular-nums" [attr.datetime]="day(instant)">{{
@@ -41,6 +44,13 @@ export function searchResultPath(result: Pick<SearchResult, 'type' | 'slug'>): s
       </p>
       <p class="register-summary max-w-prose font-text leading-prose">{{ result().summary }}</p>
     </article>
+  `,
+  styles: `
+    .type-label {
+      display: inline-flex;
+      align-items: center;
+      gap: calc(var(--spacing) * 2);
+    }
   `,
 })
 export class SearchResultEntry {

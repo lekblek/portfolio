@@ -11,7 +11,7 @@ import {
   publicationListPath,
   publicationPath,
   readingTimeLabel,
-} from '../../../shared/content/publication-entry';
+} from '../../../shared/content/content-labels';
 import { formatDay, isoDay } from '../../../shared/format/date';
 import { CodeCopy } from '../../../shared/markdown/code-copy';
 import { MarkdownMath } from '../../../shared/markdown/markdown-math';

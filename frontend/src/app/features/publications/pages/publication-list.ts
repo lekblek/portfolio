@@ -6,7 +6,10 @@ import { PublicationSummary, PublicationType } from '../../../core/api/api-types
 import { Page } from '../../../core/api/page';
 import { injectResponseStatus } from '../../../core/platform/response-status';
 import { Seo } from '../../../core/seo/seo';
-import { publicationListPath, PublicationEntry } from '../../../shared/content/publication-entry';
+import { NewsItem } from '../../../shared/content/news-item';
+import { PublicationCard } from '../../../shared/content/publication-card';
+import { publicationListPath } from '../../../shared/content/content-labels';
+import { formatPublicationMonth } from '../../../shared/format/date';
 import { EmptyState } from '../../../shared/ui/empty-state';
 import { ErrorState } from '../../../shared/ui/error-state';
 import { Pagination } from '../../../shared/ui/pagination';
@@ -14,15 +17,57 @@ import { publicationListResource } from '../data/publications.resources';
 import { PUBLICATION_LABELS } from './publication-labels';
 
 /**
- * Liste des articles ou des actualités (type donné par la route) : registre paginé, filtré par
- * catégorie et par tag. L'état vit dans l'URL (`?page=` en base 1, `?category=`, `?tag=` : slugs),
+ * Liste des articles ou des actualités (type donné par la route), paginée, filtrée par catégorie
+ * et par tag (DS09) : articles en grille de cartes, le premier en tête quand il ouvre la liste
+ * (page 1, sans filtre) et qu'il a une couverture ; actualités en dépêches groupées par mois. L'état vit dans l'URL (`?page=` en base 1, `?category=`, `?tag=` : slugs),
  * lu en entrées ; une page invalide vaut la première. Chaque filtre actif est affiché et
  * retirable seul. Pendant un changement, la page précédente reste affichée.
  */
 @Component({
   selector: 'app-publication-list',
-  imports: [EmptyState, ErrorState, Pagination, PublicationEntry, RouterLink],
+  imports: [EmptyState, ErrorState, NewsItem, Pagination, PublicationCard, RouterLink],
   host: { class: 'block page-container wrap-break-word' },
+  styles: `
+    .news-month {
+      display: grid;
+      gap: calc(var(--spacing) * 4);
+      padding-block: var(--spacing-block);
+    }
+
+    .news-month + .news-month {
+      border-top: var(--border-rule) solid var(--color-rule);
+    }
+
+    .news-month-title {
+      font-size: var(--text-lg);
+      letter-spacing: var(--tracking-heading);
+    }
+
+    .news-month-title::first-letter {
+      text-transform: uppercase;
+    }
+
+    @media (min-width: 64rem) {
+      .news-month {
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+        column-gap: calc(var(--spacing) * 8);
+      }
+
+      .news-month-title {
+        grid-column: 1 / span 3;
+      }
+
+      .news-month > ul {
+        grid-column: 4 / span 9;
+      }
+    }
+
+    .card-grid-lead {
+      grid-column: 1 / -1;
+      padding-block-end: var(--spacing-block);
+      border-bottom: var(--border-rule) solid var(--color-rule);
+    }
+  `,
   template: `
     <div class="grid gap-3 pt-section pb-block lg:grid-cols-12 lg:gap-8">
       @if (shown(); as current) {
@@ -82,18 +127,36 @@ import { PUBLICATION_LABELS } from './publication-labels';
       </div>
     } @else if (shown(); as current) {
       @if (current.content.length > 0) {
-        <ul class="@container divide-y divide-rule border-t border-rule">
-          @for (publication of current.content; track publication.slug; let index = $index) {
-            <li class="py-block">
-              <app-publication-entry
-                [publication]="publication"
-                [currentCategory]="categoryFilter()"
-                [currentTag]="tagFilter()"
-                [coverPriority]="index === priorityCover()"
-              />
-            </li>
-          }
-        </ul>
+        @if (type() === 'NEWS') {
+          <div class="border-t border-rule pb-section">
+            @for (group of months(); track group.month) {
+              <section class="news-month" [attr.aria-labelledby]="'mois-' + $index">
+                <h2 [id]="'mois-' + $index" class="news-month-title">{{ group.month }}</h2>
+                <ul class="divide-y divide-rule">
+                  @for (item of group.items; track item.slug) {
+                    <li class="py-block first:pt-0">
+                      <app-news-item [item]="item" />
+                    </li>
+                  }
+                </ul>
+              </section>
+            }
+          </div>
+        } @else {
+          <ul class="card-grid card-grid-3 border-t border-rule pt-block pb-section">
+            @for (publication of current.content; track publication.slug; let index = $index) {
+              <li [class.card-grid-lead]="index === 0 && hasLead()">
+                <app-publication-card
+                  [publication]="publication"
+                  [lead]="index === 0 && hasLead()"
+                  [currentCategory]="categoryFilter()"
+                  [currentTag]="tagFilter()"
+                  [coverPriority]="index === priorityCover()"
+                />
+              </li>
+            }
+          </ul>
+        }
         <div class="border-t border-rule pt-block lg:grid lg:grid-cols-12 lg:gap-8">
           <app-pagination
             class="block lg:col-span-9 lg:col-start-4"
@@ -163,15 +226,43 @@ export class PublicationList {
     computation: (next, previous) => next ?? previous?.value,
   });
 
-  /**
-   * Seule couverture chargée en priorité : la première de la page, quelle que soit sa ligne. Les
-   * lignes sans image sont courtes : avec le jeu de démonstration, la première couverture est l'image
-   * LCP même en quatrième ligne (D-EV) ; une image préchargée sous la ligne de flottaison sur mobile
-   * coûte moins qu'une image LCP chargée tard. -1 : aucune couverture.
-   */
-  protected readonly priorityCover = computed(
-    () => this.shown()?.content.findIndex((entry) => entry.cover !== null) ?? -1,
+  /** Article de tête : le premier de la liste non filtrée, page 1, s'il a une couverture. */
+  protected readonly hasLead = computed(
+    () =>
+      this.type() === 'ARTICLE' &&
+      this.currentPage() === 1 &&
+      !this.categoryFilter() &&
+      !this.tagFilter() &&
+      !!this.shown()?.content[0]?.cover,
   );
+
+  /**
+   * Seule couverture chargée en priorité (articles) : la première de la page si elle est dans les
+   * deux premières rangées de la grille (haut de page dès 1280 px, où les planches vides de la
+   * première rangée laissent l'image LCP en deuxième rangée) ; plus bas, aucune. -1 : aucune.
+   */
+  protected readonly priorityCover = computed(() => {
+    if (this.type() === 'NEWS') {
+      return -1;
+    }
+    const index = this.shown()?.content.findIndex((entry) => entry.cover !== null) ?? -1;
+    return index < 6 ? index : -1;
+  });
+
+  /** Actualités groupées par mois de publication, dans l'ordre de la liste. */
+  protected readonly months = computed(() => {
+    const groups: { month: string; items: PublicationSummary[] }[] = [];
+    for (const item of this.shown()?.content ?? []) {
+      const month = formatPublicationMonth(item.publishedAt);
+      const last = groups.at(-1);
+      if (last?.month === month) {
+        last.items.push(item);
+      } else {
+        groups.push({ month, items: [item] });
+      }
+    }
+    return groups;
+  });
 
   protected readonly error = computed(() =>
     this.publications.error() ? toApiError(this.publications.error()) : null,
