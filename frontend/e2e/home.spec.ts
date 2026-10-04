@@ -26,11 +26,14 @@ test.describe('home', () => {
     expect(calls).toEqual([]);
     await expect(page).toHaveTitle('Blek Ngossanga — Software Engineering, AI Vision & Research');
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(profile.displayName);
-    await expect(page.getByRole('table', { name: 'En bref' })).toBeVisible();
+    // Cartouche de faits réels (titre réservé aux lecteurs d'écran), domaines, compositions
+    await expect(page.locator('.title-block')).toContainText('Projets publiés');
+    await expect(page.getByRole('heading', { level: 2, name: 'Domaines' })).toBeVisible();
     await expect(
       page.getByRole('heading', { level: 2, name: 'Projets mis en avant' }),
     ).toBeVisible();
-    await expect(page.getByRole('heading', { level: 2, name: 'Derniers articles' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 2, name: 'Articles' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 3, name: 'Derniers articles' })).toBeVisible();
     await expectAccessible(page);
   });
 

@@ -140,6 +140,13 @@ async function render(responses: Responses) {
   return harness.routeNativeElement as HTMLElement;
 }
 
+function facts(element: HTMLElement): (string | undefined)[][] {
+  return Array.from(element.querySelectorAll('.title-block .fact')).map((fact) => [
+    fact.querySelector('dt')?.textContent?.trim(),
+    fact.querySelector('dd')?.textContent?.trim(),
+  ]);
+}
+
 function headings(element: HTMLElement, level: string): string[] {
   return Array.from(element.querySelectorAll(level)).map((h) => h.textContent?.trim() ?? '');
 }
@@ -162,32 +169,41 @@ describe('HomePage', () => {
 
     expect(headings(element, 'h1')).toEqual(['Blek Gedeon Ngossanga']);
     expect(headings(element, 'h2')).toEqual([
+      'En bref',
       'Projets mis en avant',
-      'Derniers articles',
+      'Articles',
       'Séries',
-      'Dernières actualités',
+      'Actualités',
       'Contact',
     ]);
+    // Sans couverture, l'article n'est pas mis en tête : il rejoint la liste des derniers articles
     expect(headings(element, 'h3')).toEqual([
       'Projet vitrine',
-      'Publication premier',
+      'Derniers articles',
       'Une série',
       'Publication lancement',
     ]);
-    const facts = Array.from(element.querySelectorAll('table tr')).map((row) =>
-      Array.from(row.children).map((cell) => cell.textContent?.trim()),
+    expect(element.querySelector('.home-latest a')?.textContent?.trim()).toBe(
+      'Publication premier',
     );
-    expect(facts).toEqual([
-      ['Rôle', 'Ingénieur logiciel'],
-      ['Lieu', 'Tanger, Maroc'],
-      ['Pile', 'Java, Angular'],
+    expect(facts(element)).toEqual([
       ['Projets publiés', '4'],
       ['Publications', '2'],
+      ['Pile des projets présentés', 'Java, Angular'],
       ['Dernière publication', '25 septembre 2026'],
     ]);
-    expect(element.querySelector('a[href="/projects"]')?.textContent).toBe('Tous les projets (4)');
+    const actions = Array.from(element.querySelectorAll('.home-statement a[appButton]')).map(
+      (link) => [link.textContent?.replace(/\s+/g, ' ').trim(), link.getAttribute('href')],
+    );
+    expect(actions).toEqual([
+      ['Voir les projets', '/projects'],
+      ['Télécharger le CV (PDF, 1,2 Mo)', '/api/public/media/cv'],
+      ['Écrire un message', '/contact'],
+    ]);
+    expect(element.querySelector('.home-zone-head a[href="/projects"]')?.textContent).toBe(
+      'Tous les projets (4)',
+    );
     expect(element.querySelector('a[href="/news"]')?.textContent).toBe('Toutes les actualités (1)');
-    expect(element.querySelector('a[href="/contact"]')?.textContent).toBe('écrire un message');
     expect(element.querySelector('ul[aria-label="Liens professionnels"] a')?.textContent).toContain(
       'GitHub',
     );
@@ -203,10 +219,42 @@ describe('HomePage', () => {
       projects: { content: [project('premier', false, ['Python'])], total: 1 },
     });
 
-    expect(headings(element, 'h2')).toEqual(['Projets', 'Contact']);
+    expect(headings(element, 'h2')).toEqual(['En bref', 'Projets', 'Contact']);
     expect(headings(element, 'h3')).toEqual(['Projet premier']);
-    expect(element.querySelector('table')?.textContent).toContain('Python');
-    expect(element.querySelector('table')?.textContent).not.toContain('Dernière publication');
+    expect(element.querySelector('.title-block')?.textContent).toContain('Python');
+    expect(element.querySelector('.title-block')?.textContent).not.toContain(
+      'Dernière publication',
+    );
+  });
+
+  it('shows the portrait and the domains of the profile', async () => {
+    const element = await render({
+      profile: {
+        ...PROFILE,
+        avatar: {
+          url: '/api/public/media/avatar.webp',
+          width: 800,
+          height: 800,
+          altText: 'Portrait',
+        },
+        skillGroups: [
+          { category: 'Backend', skills: [{ name: 'Java' }, { name: 'Spring Boot' }] },
+          { category: 'IA et données', skills: [{ name: 'PyTorch' }] },
+        ],
+      },
+      projects: { content: [project('premier', false, ['Python'])], total: 1 },
+    });
+
+    const portrait = element.querySelector<HTMLImageElement>('.home-portrait img')!;
+    expect(portrait.getAttribute('alt')).toBe('Portrait');
+    expect(element.querySelector('.home-portrait figcaption')?.textContent).toContain(
+      'Tanger, Maroc',
+    );
+    expect(headings(element, 'h2')).toContain('Domaines');
+    const domains = Array.from(element.querySelectorAll('.home-domain-list li')).map((item) =>
+      item.textContent?.replace(/\s+/g, ' ').trim(),
+    );
+    expect(domains).toEqual(['Backend Java · Spring Boot', 'IA et données PyTorch']);
   });
 
   it('says so when no project is published', async () => {
