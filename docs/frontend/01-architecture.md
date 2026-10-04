@@ -120,6 +120,7 @@ frontend/
         │   ├── home/  about/  projects/  publications/  series/  search/  contact/  not-found/
         │   └── admin/
         │       ├── auth/        connexion, session, garde, déconnexion
+        │       ├── editor/      éditeur de contenu Visuel / Markdown / Aperçu (F31, ADR 0004)
         │       ├── dashboard/  profile/  projects/  publications/  series/
         │       ├── taxonomy/    catégories, tags, technologies
         │       ├── media/  messages/
@@ -136,7 +137,7 @@ Un dossier n'est créé qu'avec son premier fichier réel : la structure ci-dess
 | Depuis | Peut importer | Ne peut pas importer |
 |---|---|---|
 | `features/<x>` | `core`, `shared`, `layout` (routes seulement) | une autre fonctionnalité (`features/<y>`) |
-| `features/admin/<x>` | `core`, `shared`, `features/admin/auth` | le site public (`features/<public>`) |
+| `features/admin/<x>` | `core`, `shared`, `features/admin/auth`, `features/admin/editor` (éditeur de contenu, F31) | le site public (`features/<public>`) |
 | `layout` | `core`, `shared` | `features` |
 | `shared` | `core` (types de l'API compris) | `features`, `layout` |
 | `core` | rien d'applicatif | `shared`, `features`, `layout` |

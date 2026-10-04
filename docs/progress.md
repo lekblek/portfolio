@@ -2,25 +2,25 @@
 
 Ce fichier est la **seule** source de vérité sur l'avancement. Il ne répète pas le contenu des autres documents : il pointe vers eux.
 
-Dernière mise à jour : 2026-10-03 (F00 à F23 poussées, CI verte ; F24 à F27 commitées, à pousser ; F28 à F30 vérifiées)
+Dernière mise à jour : 2026-10-04 (F00 à F30 poussées, CI verte ; passe visuelle et F31 vérifiées)
 
 ---
 
 ## 1. État courant
 
 ```text
-Dernière étape terminée   : F28 à F30 — Publications, séries et messages de contact (administration), traitées en un lot (à committer) ; F24 à F27 commitées (284e518 à 716687d), à pousser ; F00 à F23 poussées, CI verte (run 36952913904)
+Dernière étape terminée   : passe visuelle (DS09, D-FA) puis F31 — Éditeur éditorial hybride (ADR 0004, D-FB), traitées en un lot (à committer) ; F00 à F30 poussées, CI verte (run 37149194923)
 Étape en cours            : aucune
-Prochaine étape prévue    : F31 — Éditeur éditorial hybride (ADR 0004 et paquets Milkdown à valider avant le code)
-État                      : F28 à F30 : commits proposés
+Prochaine étape prévue    : F32 — Mouvement et audit de l'administration
+État                      : passe visuelle et F31 : commits proposés
 Branche                   : develop
-Vérification              : backend : 360 tests unitaires et 407 d'intégration (mvnw verify), contrat OpenAPI régénéré (filtres de la liste d'administration des publications, suppression d'un message) ; frontend : lint, lint:styles, format, types (application, tests, E2E), 339 tests unitaires, types de l'API régénérés, build de production (lot initial 402,51 kB bruts / 110,39 kB transférés ; écrans du lot dans des lots paresseux de l'administration) ; 181 tests de bout en bout (9 ignorés) en développement, nouveaux scénarios et shell d'administration stables sur 5 exécutions, 167 en production derrière mandataire sur 3 exécutions ; tableau de bord, publications (liste, programmée, brouillon, programmation refusée, publiée, création refusée), séries (liste, chapitres) et messages (liste, message) sans violation axe ni débordement à 390 et 1440 px ; décisions D-EX, D-EY, D-EZ
+Vérification              : backend inchangé ; frontend : lint, lint:styles, format, types (application, tests, E2E), 360 tests unitaires (dont 11 d'aller-retour Markdown sur un corpus de 6 documents et 6 de l'éditeur), build de production (lot initial 410,11 kB bruts / 111,89 kB transférés ; éditeur dans le lot paresseux `visual-editor`, 472 kB / 124 kB) ; 182 tests de bout en bout (10 ignorés) en développement sur 2 exécutions, scénario de l'éditeur stable sur 5, specs publiques touchées sur 3, 168 en production derrière mandataire sur 3 exécutions ; 84 captures (21 pages publiques et d'administration à 390, 768, 1440 et 1920 px) et l'éditeur à 390, 768, 1440, 1920 sans violation axe ni débordement ; décisions DS09, D-FA, D-FB, ADR 0004
 ```
 
 ## 2. Prochaine action
 
-1. Committer F28 à F30 (commandes de la fin du lot), pousser avec F24 à F27, vérifier la CI, remplacer les 🟡 par ✅.
-2. F31 : rédiger l'ADR 0004 (Milkdown Crepe ou Kit, aller-retour Markdown, formules, `mermaid`, poids) et la faire valider avant d'ajouter la dépendance.
+1. Committer la passe visuelle et F31 (commandes de la fin du lot), pousser, vérifier la CI, remplacer les 🟡 par ✅.
+2. F32 (mouvement et audit de l'administration) ; l'éditeur de F31 pourra servir aux descriptions des projets et des séries si le besoin est confirmé.
 3. Avant la mise en production : traiter KI-38 (variantes d'images), mesuré en F27 (D-EV) : 1,1 Mo d'images sur l'accueil, y compris en 390 px.
 4. Renseigner `ADMIN_USERNAME` et `ADMIN_PASSWORD` dans `deploy/.env` (compte administrateur de développement, mot de passe de 15 caractères au moins) : nécessaires pour utiliser l'administration et pour `e2e/admin-auth.spec.ts`.
 5. Vérification avec un lecteur d'écran (NVDA) du site public (audit F21, constat A7). Plus tard : page de mentions légales avant la mise en production (D-DW).
@@ -144,14 +144,16 @@ Légende : ✅ terminée et poussée · 🟡 terminée et vérifiée, commits à
 | F21 | Audit public : axe sur 21 états et 4 pages en erreur, clavier, 320 à 1920 px, captures comparées, revue d'interface ; corrections typographiques et `autocomplete` ; rapport `audits/2026-10-02-audit-frontend-public.md` (D-EM) | ✅ | `d1b1362`, `2da7edc`, docs `252be22` (CI : run 36948186371) |
 | F22 | Authentification d'administration : `/admin/login`, session (`AdminSession`), garde, `returnUrl` limité à l'administration, déconnexion, accueil minimal ; jeton CSRF lisible et renouvelé (backend) ; intercepteur des 401 reporté à F23 (D-EN, D-EO) | ✅ | `98dc531`, `f1c682a`, `282db16`, docs `252be22` (CI : run 36948186371) |
 | F23 | Shell d'administration (en-tête, barre latérale repliée en menu sous 64 rem, lien d'évitement) et tableau de bord (relevé : messages non lus, publications, projets, séries, médias, lus dans les listes existantes) ; session expirée pendant le travail → connexion avec `returnUrl` ; `/admin/settings` retiré de la V1 (D25) ; brouillons reportés à F28 (D-EP) | ✅ | `7f162fa`, `c75762e`, docs `d66883b` (CI : run 36952913904) |
-| F24 | Taxonomie (une entrée, trois sous-sections : catégories, tags, technologies) et primitives d'administration : tableau, dialogue de confirmation, notifications, variante `danger`, erreurs du serveur sur les champs, garde des modifications non enregistrées (D-EQ) | 🟡 | `284e518`, `11b9b05`, `0bb21d3`, docs `9c2642d` (à pousser) |
-| F25 | Médiathèque : envoi (bouton ou dépôt, plusieurs fichiers, progression, vérification locale puis du serveur), tableau paginé, texte alternatif exigé pour une image, suppression contrôlée ; sélecteur de médias reporté à F26 (D-ER) | 🟡 | `cb4fb5a`, `0bb21d3`, docs `9c2642d` (à pousser) |
-| F26 | Profil : un formulaire et un enregistrement (identité, présentation Markdown avec aperçu, avatar et CV par le sélecteur de médias, cinq collections ordonnables au clavier ou au glisser-déposer), erreurs du serveur jusque dans les collections ; `@angular/cdk` ajouté ; KI-36 résolu (D-ES, D-ET) | 🟡 | `ff2940e`, `87f2d51`, `4bde69f`, `a6f2112`, `002e281`, `1be65f3`, `b4d8054`, docs `9d3f2f8` (à pousser) |
-| F27 | Projets (administration) : liste filtrée (visibilité, technologie) et paginée, création, modification complète (slug figé, période, technologies par choix multiple Angular Aria, couverture, captures ordonnables) ; jeu de démonstration visuel du profil `dev` (médias réels, 24 projets, 26 publications, profil complet) ; pages publiques revues avec ces données (figures légendées, image prioritaire) ; KI-38 mesuré (D-EU, D-EV, D-EW) | 🟡 | `8aa6534`, `98dfe27`, `50011d6`, `387dee5`, `22cb3fd`, `3d7eb51`, `a24d00c`, `f543cac`, `3022681`, docs `716687d` (à pousser) |
-| F28 | Publications (administration) : liste filtrée par type et statut observable (filtres ajoutés à l'API), création par type, modification qui reste sur la page, panneau de statut aux seules transitions permises (programmation en heure de Paris, archivage confirmé), slug figé ; tableau de bord : brouillons et compteurs reliés à leurs listes (D-EY) | 🟡 | à committer |
-| F29 | Séries (administration) : liste, création puis chapitres sur la page de la série, chapitres ordonnables enregistrés à part, ajout par liste déroulante (D-EZ) | 🟡 | à committer |
-| F30 | Messages de contact : boîte de réception filtrée par statut, message en texte brut, « Répondre » par la messagerie, cycle en avant seulement, suppression définitive confirmée (route ajoutée à l'API, D-EX) | 🟡 | à committer |
-| F31 → F37 | Frontend : voir `docs/frontend/00-roadmap-frontend.md` (remplace les étapes 37 à 51 et les parties frontend de 52) | ⏳ | — |
+| F24 | Taxonomie (une entrée, trois sous-sections : catégories, tags, technologies) et primitives d'administration : tableau, dialogue de confirmation, notifications, variante `danger`, erreurs du serveur sur les champs, garde des modifications non enregistrées (D-EQ) | ✅ | `284e518`, `11b9b05`, `0bb21d3`, docs `9c2642d` (CI : run 37149194923) |
+| F25 | Médiathèque : envoi (bouton ou dépôt, plusieurs fichiers, progression, vérification locale puis du serveur), tableau paginé, texte alternatif exigé pour une image, suppression contrôlée ; sélecteur de médias reporté à F26 (D-ER) | ✅ | `cb4fb5a`, `0bb21d3`, docs `9c2642d` (CI : run 37149194923) |
+| F26 | Profil : un formulaire et un enregistrement (identité, présentation Markdown avec aperçu, avatar et CV par le sélecteur de médias, cinq collections ordonnables au clavier ou au glisser-déposer), erreurs du serveur jusque dans les collections ; `@angular/cdk` ajouté ; KI-36 résolu (D-ES, D-ET) | ✅ | `ff2940e`, `87f2d51`, `4bde69f`, `a6f2112`, `002e281`, `1be65f3`, `b4d8054`, docs `9d3f2f8` (CI : run 37149194923) |
+| F27 | Projets (administration) : liste filtrée (visibilité, technologie) et paginée, création, modification complète (slug figé, période, technologies par choix multiple Angular Aria, couverture, captures ordonnables) ; jeu de démonstration visuel du profil `dev` (médias réels, 24 projets, 26 publications, profil complet) ; pages publiques revues avec ces données (figures légendées, image prioritaire) ; KI-38 mesuré (D-EU, D-EV, D-EW) | ✅ | `8aa6534`, `98dfe27`, `50011d6`, `387dee5`, `22cb3fd`, `3d7eb51`, `a24d00c`, `f543cac`, `3022681`, docs `716687d` (CI : run 37149194923) |
+| F28 | Publications (administration) : liste filtrée par type et statut observable (filtres ajoutés à l'API), création par type, modification qui reste sur la page, panneau de statut aux seules transitions permises (programmation en heure de Paris, archivage confirmé), slug figé ; tableau de bord : brouillons et compteurs reliés à leurs listes (D-EY) | ✅ | `c74c56f`, `36e0936`, `b966a5b`, `8fba3e7`, `b1af515`, `3eba717`, docs `657970c` (CI : run 37149194923) |
+| F29 | Séries (administration) : liste, création puis chapitres sur la page de la série, chapitres ordonnables enregistrés à part, ajout par liste déroulante (D-EZ) | ✅ | `114a9ac`, `b1af515`, docs `657970c` (CI : run 37149194923) |
+| F30 | Messages de contact : boîte de réception filtrée par statut, message en texte brut, « Répondre » par la messagerie, cycle en avant seulement, suppression définitive confirmée (route ajoutée à l'API, D-EX) | ✅ | `c74c56f`, `36e0936`, `6038807`, `b1af515`, docs `657970c` (CI : run 37149194923) |
+| Passe visuelle | Planches (DS09) : benchmark, audit page par page, plan `docs/frontend/04-visual-refresh-plan.md` ; accueil (portrait, faits, domaines, compositions), cartes de projets et d'articles, dépêches, séries, étude de cas, frise, contact en deux colonnes, recherche, pied de page, connexion et tableau de bord d'administration (D-FA) | 🟡 | à committer |
+| F31 | Éditeur éditorial hybride : ADR 0004 (Milkdown Kit), onglets Visuel / Markdown / Aperçu, barre d'outils, images de la médiathèque, formules et Mermaid, aller-retour Markdown testé sur un corpus (D-FB) | 🟡 | à committer |
+| F32 → F37 | Frontend : voir `docs/frontend/00-roadmap-frontend.md` (remplace les étapes 37 à 51 et les parties frontend de 52) | ⏳ | — |
 | 52 | Déploiement : voir `docs/steps/liste_complete_etapes.md` (52.7 à 52.21) | ⏳ | — |
 
 Après le push, remplacer les 🟡 par ✅ et noter les hashes.
@@ -172,6 +174,8 @@ Index : [`decisions/README.md`](decisions/README.md).
 | D-EQ, D-ER | Taxonomie et primitives d'administration (décisions du propriétaire : tableaux, formulaires séparés, suppression confirmée, notifications, entrée « Taxonomie ») ; médiathèque | Actives (F24, F25) |
 | D-EU, D-EV, D-EW | Jeu de démonstration visuel du profil `dev` (règle : pas de validation visuelle sans médias quand le modèle en prévoit) ; corrections des pages publiques révélées par ce jeu ; administration des projets (filtres d'API, pastille de statut, choix multiple Angular Aria) | Actives (F27) |
 | D-EX, D-EY, D-EZ | Messages de contact et suppression définitive (route d'API) ; administration des publications (filtres d'API, panneau de statut, programmation en heure de Paris) et tableau de bord relié ; administration des séries (chapitres enregistrés à part) | Actives (F28 à F30) |
+| ADR 0004 | Éditeur hybride des publications : Milkdown Kit, Markdown canonique | Acceptée (2026-10-03, F31) |
+| D-FA, D-FB, DS09 | Passe visuelle (planches, une forme par type de contenu, survol des cartes) ; éditeur hybride (normalisation jamais écrite, dollars littéraux, insertion de blocs et d'images) | Actives |
 | D-ES, D-ET | Réponses d'administration séparées des requêtes dans le contrat (KI-36) ; profil, liste ordonnable (CDK), sélecteur de médias | Actives (F26) |
 | D25, D-EP | `/admin/settings` retiré de la V1 (décision du propriétaire) ; shell d'administration, relevé du tableau de bord, intercepteur des sessions expirées | Actives (F23) |
 | D-EL … D-EO | Mouvement du site public (trois mouvements, refus consignés) ; audit public ; authentification d'administration (session, garde, `returnUrl`, intercepteur en F23) ; jeton CSRF au chemin `/` et renouvelé à la connexion | Actives (F20 à F22) |
@@ -346,6 +350,11 @@ Audit d'origine : [`audits/2026-09-24-audit-avant-16.3.md`](audits/2026-09-24-au
 | Sélecteur de médias (dialogue réutilisé par le profil, les projets, les publications et les séries) | fait (F26) | D-ER, D-ET : `app-media-picker` |
 | Primitives `select` et case à cocher | fait (F27) | D-EW : contrôles natifs de `styles/controls.css` |
 | Choix filtrant des articles d'une série (au lieu d'une liste déroulante limitée à 100 articles) | quand le catalogue dépasse 100 articles | D-EZ : taille maximale d'une page de l'API |
+| Couvertures et décompte par type dans les résultats de recherche | si la recherche devient un parcours principal | D-FA : le contrat ne les donne pas ; une couverture demanderait au module `search` d'appeler `media` (ADR 0002) |
+| Sommaire des sections sur le détail d'un projet | si les études de cas s'allongent | D-FA : rendu Markdown à reprendre dans la page, comme l'article |
+| Mise en avant des publications (`featured`) sur le site | décision du propriétaire | D-FA : l'accueil prend l'article illustré le plus récent ; le drapeau reste enregistré seulement |
+| Rendu des formules et des diagrammes dans l'éditeur visuel | si la rédaction le demande | D-FB, ADR 0004 : source éditable, rendu dans l'Aperçu |
+| Éditeur hybride pour les descriptions des projets et des séries | F32 ou à la demande | D-FB : composant partagé par l'administration, branché sur les publications seulement |
 | Page de mentions légales (éditeur, hébergeur) | avant la mise en production publique, une fois l'hébergement connu | D-DW : décision du propriétaire (2026-09-30) ; aucun lien provisoire d'ici là |
 | HSTS derrière le mandataire inverse (requête vue en HTTP par Tomcat) | fait (P-B03) | D-DC : `X-Forwarded-Proto` accepté depuis un réseau de confiance |
 | Adresse réelle du client derrière le mandataire inverse (en-têtes de transfert) pour la limite des essais | fait (P-B03) | D-DC : `X-Forwarded-For` accepté depuis un réseau de confiance ; à vérifier avec le réseau Docker réel à l'étape 52 |

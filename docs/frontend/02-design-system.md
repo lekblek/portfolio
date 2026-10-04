@@ -1,6 +1,6 @@
 # Système de design — Portfolio V1
 
-Statut : **Accepté** (2026-09-30). La direction visuelle (§4) a été choisie par le propriétaire en F05, sur des prototypes réels (accueil, liste de projets, article avec code, formule et figure) capturés de 320 à 1920 px ; les valeurs de §4, §6, §8, §9 et §10 sont définitives.
+Statut : **Accepté** (2026-09-30), révisé par DS09 (2026-10-04, §4.7). La direction visuelle (§4) a été choisie par le propriétaire en F05, sur des prototypes réels (accueil, liste de projets, article avec code, formule et figure) capturés de 320 à 1920 px ; les valeurs de §4, §6, §8, §9 et §10 sont définitives.
 
 Source de vérité : [`frontend/src/styles/tokens.css`](../../frontend/src/styles/tokens.css) (F06). Ce document explique les tokens ; en cas d'écart, le fichier de tokens fait foi et ce document est corrigé. Les noms suivent les espaces de noms de Tailwind 4 (`--color-*`, `--text-*`, `--spacing-*`, `--container-*`, `--radius-*`…), qui produisent les utilitaires (`text-ink`, `mt-flow`, `max-w-prose`, `rounded-control`). Le catalogue de développement `/_ui` affiche chaque token appliqué et calcule les contrastes dans le navigateur.
 
@@ -46,7 +46,7 @@ L'univers d'une planche d'ingénierie ou d'une figure scientifique : un fond bla
 
 - **Élément mémorable (un seul)** : la page d'article, mise en page comme une planche — sommaire en marge gauche, métadonnées puis notes en marge droite sur grand écran, figures et équations numérotées et légendées, code sur fond en retrait.
 - **Rappel discret** : sur l'accueil, un cartouche (le bloc-titre d'un plan) qui réunit des faits réels : rôle, pile principale, nombre de projets et de publications, date de mise à jour.
-- **Tout le reste reste calme** : accueil typographique sans image d'illustration, listes en registres sobres, navigation discrète.
+- **Tout le reste reste calme** : navigation discrète, aucun effet. *Révisé par DS09 (2026-10-04)* : l'accueil montre le portrait et les couvertures, les listes de projets, d'articles et de séries deviennent des compositions de **planches** (§4.7) ; le registre sobre reste pour la recherche, les chapitres et l'administration.
 
 ### 4.1 Palette
 
@@ -109,6 +109,10 @@ Inter, Roboto, Arial, la police système seule et les familles d'une marque conn
 |---|---|---|
 | « Instrument » | fond gris froid, graphite, accent vert-bleu, superfamille Source ; listes en tableaux | lecture rapide excellente, mais rendu d'outil d'administration et accent seulement AA (5,69:1) |
 | « Monographie » | romaine dominante (Newsreader), accent rouge sombre, page de titre et sommaire | lecture longue élégante, mais caractère littéraire trop marqué pour le sujet et polices les plus lourdes (≈ 350 kB) ; seules ses notes marginales sont reprises (§4.5) |
+
+### 4.7 Planches (DS09, 2026-10-04)
+
+Les médias réels du contenu deviennent des **planches** : cadre à filet `rule`, rayon `--radius-media`, fond `paper-sunken`, rapport fixe (`--aspect-cover` 3:2, `--aspect-wide` 16:9, `--aspect-portrait` 4:5), recadrage `object-fit: cover`. Un contenu sans couverture garde sa place par une **planche vide** : papier quadrillé (filets `rule` tous les 24 px) et repère typographique (initiales du titre, ou catégorie d'un article), décorative (`aria-hidden`). Une forme par type de contenu : projet = carte à planche 3:2 ; article = carte, tête en 16:9 ; actualité = dépêche datée, vignette facultative ; série = planche 16:9 à côté du texte, parcours numéroté ; recherche = repère de forme par type. Plan et raisons : [`04-visual-refresh-plan.md`](04-visual-refresh-plan.md).
 
 ---
 
@@ -178,6 +182,7 @@ Règles :
 | `--radius-control` | 3 px | boutons, champs |
 | `--radius-media` | 2 px | images, blocs de code |
 | `--radius-full` | 9999 px | avatar seulement |
+| `--aspect-cover` · `--aspect-wide` · `--aspect-portrait` | 3/2 · 16/9 · 4/5 | planches de carte · têtes et couvertures de détail · portrait de l'accueil (DS09) |
 | filet | 1 px `--color-rule` | séparation de zones, de lignes de registre, de blocs |
 | trait fort | 1,5 px `--color-ink` | cartouche, bornes de la navigation de série, bordure d'un contrôle |
 | `--shadow-overlay` | une seule ombre | éléments flottants (menu, dialogue) — aucune ombre sur le contenu posé dans la page |
@@ -225,8 +230,10 @@ Mouvements du site public, décidés en F20 (D-EL) ; tout autre mouvement passe 
 | notification | fondu et montée de 8 px, `--duration-base`, `--ease-out`, `@starting-style` ; retrait immédiat | apparition immédiate |
 | ouverture de la navigation mobile (site public et administration) | liste révélée (opacité) en descendant de 4 px, `--duration-base`, `--ease-out`, `@starting-style` ; fermeture immédiate | apparition immédiate |
 | message d'issue (`app-alert`) | fondu et montée de 4 px, `--duration-base`, `--ease-out`, `@starting-style` ; jamais dans le rendu serveur | apparition immédiate |
+| survol d'une carte de contenu (pointeur fin, DS09) | filet de la planche en `accent` ; image à `scale(1.02)`, `--duration-slow`, `--ease-out` | filet seulement |
+| dialogue d'insertion de l'éditeur (F31) | comme le dialogue de confirmation | apparition immédiate |
 
-Refusés en F20 : transitions entre pages, apparitions en cascade, transitions de survol, hauteur des `<details>`, défilement doux vers les ancres, fondu du libellé « Copié », apparition des diagrammes, rotation de l'icône du menu (raisons : D-EL).
+Refusés en F20 : transitions entre pages, apparitions en cascade, transitions de survol (sauf celle des cartes, DS09 : elle confirme la cible étendue à toute la carte), hauteur des `<details>`, défilement doux vers les ancres, fondu du libellé « Copié », apparition des diagrammes, rotation de l'icône du menu (raisons : D-EL).
 
 ## 12. Plans (z-index)
 
@@ -260,6 +267,7 @@ Un `<dialog>` ouvert par `showModal()` ou un élément `popover` vit dans la cou
 - Toujours `width` et `height` (fournis par l'API), `alt` venant de `altText` ; image décorative → `alt=""`.
 - Rapports d'image fixés par emplacement (couverture de projet, avatar) ; recadrage par `object-fit`, jamais de déformation.
 - Pas d'image d'illustration générique. Les captures de projets sont réelles (`01-perimetre-v1.md` §20).
+- Planches (§4.7) : `sizes` donné par emplacement (carte, tête, portrait) ; une seule image prioritaire par page, celle du haut (dans les listes, la première couverture des deux premières rangées) ; les autres en `lazy`. `priority` et `sizes` ne sont lus qu'à la création de l'image : un changement passe par une nouvelle image (NG02953).
 
 ## 16. Règles responsive
 
@@ -308,14 +316,18 @@ Une primitive n'est créée qu'au premier écran qui en a besoin, et seulement s
 | registre de parcours | composants de `features/about/ui` (`app-career-entry`, listes) | **fait** (F12) | propre à la page À propos : une entrée par `<li>`, titre `<h3>` puis précisions, date ou période en colonne fixe de 12 rem dès que la liste (conteneur de requête) dispose de 36 rem, filet entre deux entrées ; compétences en liste de définitions, séparateurs « · » sans texte de remplacement ; déplacé dans `shared/` seulement si une autre fonctionnalité en a besoin |
 | pagination | composant `app-pagination` (`shared/ui/pagination.ts`) | **fait** (F13) | liens, pas boutons ; `?page=` en base 1, première page sans paramètre, autres paramètres (filtres) conservés ; première, dernière, courante et voisines, ellipses ; `aria-current="page"` et filet `accent` sur la page courante ; « Précédente » / « Suivante » ; cibles de 44 px ; rien pour une seule page |
 | terme (catégorie, tag, technologie) | composant `app-term-links` (`shared/ui/term-link.ts`) | **fait** (F13) | liens typographiques vers la liste filtrée, séparés par « · » sans texte de remplacement, jamais des pastilles ; cible de 24 px au moins ; terme du filtre en cours marqué (`aria-current`, graisse) |
-| entrée de projet | composant `app-project-entry` (`shared/content`) | **fait** (F13) | ligne de registre : état et période, titre lié, résumé, technologies, couverture dans un emplacement 3:2 (vignette sur petit écran) ; grille de 12 colonnes dès 60 rem de conteneur ; `<h2>` ou `<h3>` |
+| planche et planche vide | composant `app-content-plate` (`shared/content`), feuille `styles/plates.css` | **fait** (passe visuelle, DS09) | §4.7 ; couverture ou papier quadrillé et repère ; `wide` (16:9) ; `priority` ; `sizes` |
+| carte de projet | composant `app-project-card` (`shared/content`) | **fait** (DS09, remplace l'entrée de projet de F13) | planche, état et période, titre lié (seul lien, cible étendue à la carte), description sur trois lignes, quatre technologies au plus (« + n », la technologie filtrée gardée) ; `lead` : planche à gauche (7/12) dès 56 rem de conteneur ; ordre du document : titre d'abord |
+| carte d'article | composant `app-publication-card` (`shared/content`) | **fait** (DS09, remplace l'entrée de publication de F14) | planche (vide : repère de la catégorie), catégorie liée, date, temps de lecture, titre, résumé ; `lead` : planche 16:9 et tags |
+| dépêche | composant `app-news-item` (`shared/content`) | **fait** (DS09) | actualités : jour en grand et mois abrégé dans une colonne (date complète pour les lecteurs d'écran), titre lié, résumé, vignette facultative ; groupes par mois dans la liste |
+| carte de série | composant `app-series-card` (`shared/content`) | **fait** (DS09, remplace l'entrée de série de F16) | planche 16:9 à gauche dès 40 rem de conteneur, nombre de chapitres, titre, début de la description |
+| frise | classe `timeline` (`styles/register.css`) | **fait** (DS09) | parcours de la page À propos : filet vertical, repère carré (le plus récent en `accent`) |
+| repère de type | classe `type-mark` (`styles/register.css`) | **fait** (DS09) | recherche : carré (projet), rond (article), losange (actualité), toujours suivi du mot |
 | table des matières | composant `app-table-of-contents` (`shared/markdown`) | **fait** (F14) | `nav` nommé, titres de niveaux 2 et 3 imbriqués (filet à gauche du second niveau) ; sur l'article : collant dans la marge gauche dès 80 rem, repliable (`<details>`) en dessous |
 | bouton Copier des blocs de code | barre du bloc (`codeToolbar`) + `app-code-copy` | **fait** (F14) | langage reconnu à gauche, « Copier » à droite (texte `accent`, 32 px) ; « Copié » deux secondes, annonce `aria-live` ; retour de pression des boutons (§11, F20) |
-| ligne de registre | feuille `styles/register.css` (`register-entry`, `register-meta`, `register-title`, `register-summary`, `register-terms`, `register-cover`) | **fait** (F16) | grille commune des entrées de projet, de publication et de série (troisième usage, §17) |
-| cartouche | `features/home/ui/title-block.ts` | **fait** (F17) | tableau « En bref » de faits réels, trait fort `ink`, cellules en `--text-xs` ; une ligne sans donnée est absente |
-| entrée de série | composant `app-series-entry` (`shared/content`) | **fait** (F16) | nombre de chapitres, titre lié, premier paragraphe de la description, couverture 3:2 |
+| ligne de registre | feuille `styles/register.css` (`register-entry`, `register-meta`, `register-title`, `register-summary`) | **fait** (F16, réduite en DS09) | résultats de la recherche ; les listes de contenus passent aux cartes |
+| cartouche | `features/home/ui/title-block.ts` | **fait** (F17, revu en DS09) | faits réels sous le portrait : nombres de projets et de publications en grand, pile et dernière publication sur toute la largeur ; trait fort `ink` ; titre « En bref » pour les lecteurs d'écran ; une cellule sans donnée est absente |
 | navigation de série | `features/publications/ui/series-navigation.ts` | **fait** (F16) | ligne de contexte sous le résumé ; bloc de fin d'article entre deux traits forts `ink`, précédent et suivant (`rel`) |
-| entrée de publication | composant `app-publication-entry` (`shared/content`) | **fait** (F14) | registre des projets : date et temps de lecture, titre lié, résumé, catégorie puis tags, couverture 3:2 |
 | note marginale | notes du Markdown (`markdown-it-footnote`), rendues après le bloc qui les appelle (`role="note"`) ; styles `prose`, marge avec `prose-margin-notes` | **fait** (F14) | §4.5 : en marge droite dès `xl` (sous la fiche de l'article), dans le flux en dessous ; numéro `accent`, filet gauche `rule`, lien de retour |
 | champ (libellé, aide, erreur) | composant `app-field` + directive `appFieldControl`, feuille `styles/controls.css` | **fait** (F19) | libellé visible, aide puis erreur liées par `aria-describedby` (l'erreur d'abord), `aria-invalid` ; contrôles natifs à texte de 16 px, cible de 44 px, bordure `ink`, `danger` si invalide ; choix et cases à cocher : ligne « choix » (F27) |
 | message en ligne / région d'annonce | composant `app-alert` | **fait** (F19) | succès (`success`, icône, reçoit le focus) ou échec (`danger`, `role="alert"`) ; filet gauche de la couleur du ton, fond `paper-sunken` ; entrée en 200 ms (§11, F20), d'où la règle : jamais dans le rendu serveur d'une page |
@@ -331,7 +343,8 @@ Une primitive n'est créée qu'au premier écran qui en a besoin, et seulement s
 | liste ordonnable | `app-sortable-list` + `app-sortable-item` (`shared/ui/sortable-list.ts`, CDK glisser-déposer) | **fait** (F26) | éléments encadrés d'un filet `rule` ; barre sur `paper-sunken` : poignée (souris et toucher, masquée aux lecteurs d'écran), position « 2 / 3 », « Monter », « Descendre », « Retirer » en variante `quiet` nommés avec l'élément ; alternative clavier par ces boutons, déplacement annoncé, focus gardé sur le bouton utilisé (ou l'autre à une extrémité) ; pendant un glisser : place marquée en pointillé, élément saisi avec l'ombre `overlay` |
 | sélecteur de médias | composant `app-media-picker` (`shared/ui/media-picker.ts`) | **fait** (F26) | `<dialog>` modal comme le dialogue de confirmation ; grille de boutons « Choisir … » (vignette, nom, dimensions et poids ; le média courant cerclé `accent`, `aria-current`), réduite à la sorte attendue ; « Plus récents » / « Plus anciens » ; lien vers la médiathèque ; états chargement, vide, erreur avec « Réessayer » |
 | combobox à choix multiples | composant `app-multi-select` (`shared/ui/multi-select.ts`, Angular Aria) | **fait** (F27) | motif combobox de l'APG : champ qui filtre (sans tenir compte des accents), liste à choix multiples sous le champ (filet fort `ink`, ombre `overlay`, coche carrée `accent`, option active cerclée `focus`), `Entrée` coche ou décoche, `Échap` ferme ; choix retenus en éléments retirables sous le champ ; annonce du nombre de choix ; contrôle de Signal Forms |
-| onglets | Angular Aria | F31 | Visuel / Markdown / Aperçu |
+| onglets | `shared/ui/tabs.ts` (Angular Aria), styles `.tab-list`, `.tab`, `.tab-panel` (`controls.css`) | **fait** (F31) | motif *tabs* de l'APG, sélection explicite (flèches, puis Entrée ou Espace) ; onglet courant souligné `accent` ; panneau `ngTabContent` gardé (`preserveContent`) après la première ouverture |
+| éditeur de contenu | `features/admin/editor` (`app-content-editor`, ADR 0004) | **fait** (F31) | onglets Visuel (Milkdown Kit, à la demande), Markdown (zone de texte, alternative complète), Aperçu (moteur public) ; barre d'outils (motif *toolbar* : un arrêt de tabulation, flèches) ; dialogues d'insertion (lien, bloc de code, image de la médiathèque avec texte alternatif et légende) |
 | menu | Angular Aria | à la demande | pas de besoin identifié |
 | squelette de chargement | CSS | à la demande | seulement si un chargement client dépasse ≈ 300 ms en pratique ; le rendu serveur évite le premier chargement |
 | carte générique | — | **exclue** | chaque fonctionnalité compose son entrée (`project-entry`, `publication-entry`) ; une carte générique naît seulement si trois usages identiques apparaissent |
@@ -377,3 +390,4 @@ Chaque page qui affiche des données prévoit, dès sa première version :
 | DS06 | Tokens de mouvement et principe « aucun mouvement sans raison » (§11) | Acceptée |
 | DS07 | Thème clair seulement en V1 (D13), tokens sémantiques prêts pour un thème sombre ultérieur | Acceptée |
 | DS08 | Typographie française (§6) | Acceptée |
+| DS09 | Planches (§4.7) : médias structurants, une forme par type de contenu, survol des cartes ; révise l'accueil « sans image » et les registres de DS01 sans changer palette, polices ni grille | **Acceptée** (2026-10-04, passe visuelle demandée par le propriétaire ; [`04-visual-refresh-plan.md`](04-visual-refresh-plan.md)) |
