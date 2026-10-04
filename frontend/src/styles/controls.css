@@ -75,3 +75,40 @@ select.field-control {
   background: var(--color-paper-sunken);
   color: var(--color-ink-muted);
 }
+
+/*
+ * Onglets (F31, `shared/ui/tabs.ts`) : liste sur un filet, onglet courant souligné d'un trait
+ * accent (comme le lien courant de la navigation), cibles de 44 px ; panneau masqué = `inert`.
+ */
+.tab-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--spacing) * 1);
+  border-bottom: var(--border-rule) solid var(--color-rule);
+}
+
+.tab {
+  min-height: calc(var(--spacing) * 11);
+  padding-inline: calc(var(--spacing) * 4);
+  border: 0;
+  border-bottom: calc(var(--border-strong) * 2) solid transparent;
+  background: none;
+  color: var(--color-ink-muted);
+  font: inherit;
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+}
+
+.tab:hover {
+  color: var(--color-ink);
+}
+
+.tab[aria-selected='true'] {
+  border-bottom-color: var(--color-accent);
+  color: var(--color-ink);
+  font-weight: var(--font-weight-semibold);
+}
+
+.tab-panel[inert] {
+  display: none;
+}
